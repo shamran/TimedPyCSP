@@ -1,0 +1,3 @@
+Kan vi nøjes med MTT- altåCSP kun med timed traces og uden failures, da vi skal beskæftige os med pycsp implementation og ikke med corectness. eller ?
+
+Hvordan passer timed CSP med DES og 
