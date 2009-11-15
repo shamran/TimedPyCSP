@@ -1,3 +1,34 @@
-Kan vi nøjes med MTT- altåCSP kun med timed traces og uden failures, da vi skal beskæftige os med pycsp implementation og ikke med corectness. eller ?
+Vi mangler at læse kritiske artikler om timed csp.
 
-Hvordan passer timed CSP med DES og 
+
+
+Kan vi nøjes med MTT- altså CSP kun med timed traces og uden failures, da vi skal beskæftige os med pycsp implementation og ikke med corectness. eller ?
+
+
+Hvordan passer timed CSP med DES og real time samt interactive?
+
+
+Skal ting ske i real time, og resultatet skal komme inden for deadline; eller skal det hvis det kører retuneres inden for dealine og ellers skal resultatet så ses bort fra.
+ 
+
+Hvordan defineres inteactive time. Som skal dette  køres efter denne tid, m.m. at en (af disse) event er sket.
+
+
+Hvordan skal vi holde styr på prioriteter i events?
+
+
+hvordan kan CSP og event hænge sammen da en lav proritets event kan medføre at man ikke er klar til at modtage en høj proritet event, da alla events i CSP skal komme gennem kanaler.
+
+
+kan man tolke csp som at den kun kan modtage events når den står i en alternation, og den dér er klar til at modtage events af de typer som findes i ALT'en, Når processen  ikke står i alt'en kan den ikke modtage events? 
+ - hvis det er tilfældet kan man så bruge at hver proces er to tråde en der lytter ved alt, og en slave der sættes i gang med reelt arb.
+
+
+
+
+Kan vi arbejde med at producer / consumer, hvor vi har en producer og flere consumers. Producers  står som schedual og alle events der skal køres sendes til produces som så  udvælger hvilken workload der næste gang skal gives til consumer baseret på proritet og tid.
+
+
+I PDES kan man have at en enhed kan lave to event i samme tidskridt. er det største problem når arbejdere snakker sammmen direkte. fx. hvis hver consumer bearbjder et antal rækker i en matric og skl kommunikere med hinanden om ændring af værdier for  randelementer.
+
+
