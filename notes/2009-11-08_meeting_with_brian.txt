@@ -1,0 +1,25 @@
+real time
+interactive
+PDES parallel discrete even simulation
+
+
+timed CSP (lidt relevant)
+
+
+laves i PyCSP
+ - greenlet (co rutiner)
+
+
+
+mandag 15
+onsdag 10-12
+
+discrete events på wiki
+
+email til brian
+ - gæster på csp kursus
+ - læsemateriale
+ 
+Handel-C 
+
+
