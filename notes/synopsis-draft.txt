@@ -1,0 +1,42 @@
+3 små eksempelproblemer:
+
+Et  real time eksempel. 
+
+
+Et interaktivt tids eksempel. 
+et lille spil, f.eks packman hvor spøgelserne styres af events.
+
+Et PDES eksempel. f.eks. et problem hvor en matricer der skal opdateres i hvert tidsskridt. 
+ eks. fish and sharks i en maricetorres.
+ 
+
+Hvorfor / hvad kan time bruges til. Hvordan bruges barrierer som en implementation af tid for tid; hvad er fordele /ulemper.
+
+Baggrund for simulationer; hvad bruger man discrite event simulation. Hvorfor er det svært i en parallel version. 
+fortæl hvorfor Python er fantastisk. 
+
+Hvad skal resultatet af dette speciale være; noget med en udvidelse af pycsp til en "timed pycsp" med en syntaks der kan håndterer (de tre modeller) /(eksempelvis de tre modeller)
+ 
+ 
+ 
+ 
+ ---------------
+ Udforske om man kan lave et framework der kan håndtere forskellige typer tid.
+ 
+ Gennemgang af pycsp.
+ 
+ Definition af tid.
+ 
+ Sammenligning af de forskellige typer af tid.
+ 
+ Udforske hvilken betydning det har for et sprog når begrebet tid introduceres. (lugter af sprog)
+
+ Gennemgang af CSP. Her skal fokuseres på de dele der 
+ 
+ ------------------
+
+Læringsmål:
+
+* Opnå forståelse / kunne vise  / kunne beskrive og ... /  vi skal forstå problematikken for diskrete begivenheder. 
+* 
+    

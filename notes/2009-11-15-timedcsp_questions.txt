@@ -32,3 +32,10 @@ Kan vi arbejde med at producer / consumer, hvor vi har en producer og flere cons
 I PDES kan man have at en enhed kan lave to event i samme tidskridt. er det største problem når arbejdere snakker sammmen direkte. fx. hvis hver consumer bearbjder et antal rækker i en matric og skl kommunikere med hinanden om ændring af værdier for  randelementer.
 
 
+
+Findes der andre tidsmodeller, og kunne det være relevant at pycsp kunne bruge andre tidsmodeller?
+Hvad skal vi egentligt lave. skal vi implementere: de tre modeller. eller et framework der kan modtage en tidsmodel som eksempelvis de tre nævnte.
+
+Hvordan får vi et speciale der IKKE fokusere på sproget men på løsningen / og implementeringen og  implemneteringsproblemerne
+
+
