@@ -1,7 +1,8 @@
 3 små eksempelproblemer:
 
-Et  real time eksempel. 
-
+Et real time eksempel: 
+eksterni en perionde -> komprimer -> gemmes på disk
+simuleret atomkraftværk.
 
 Et interaktivt tids eksempel. 
 et lille spil, f.eks packman hvor spøgelserne styres af events.
@@ -15,7 +16,7 @@ Hvorfor / hvad kan time bruges til. Hvordan bruges barrierer som en implementati
 Baggrund for simulationer; hvad bruger man discrite event simulation. Hvorfor er det svært i en parallel version. 
 fortæl hvorfor Python er fantastisk. 
 
-Hvad skal resultatet af dette speciale være; noget med en udvidelse af pycsp til en "timed pycsp" med en syntaks der kan håndterer (de tre modeller) /(eksempelvis de tre modeller)
+
  
  
  
@@ -38,5 +39,14 @@ Hvad skal resultatet af dette speciale være; noget med en udvidelse af pycsp ti
 Læringsmål:
 
 * Opnå forståelse / kunne vise  / kunne beskrive og ... /  vi skal forstå problematikken for diskrete begivenheder. 
-* 
+
+    Vi skal kunne: 
+    * identificere problemstillingerne introduceret af tidsmodeller i CSP.
+ 
+    * argumentere hvilke ændringer  der skal foretages i Pycsp for at introducerer tidsmodeller.
+    * foretage en helt eller delvis implemention i PyCSP af de ændringer vi har beskrevet.
+    * foretage en evaluering de implementerede tidsmodeller sammenholdt med ligende løsninger.
+    * beskrive de foretagede ændringer så de er trivielle at benytte for folk med kendskab til PyCSP ->
+    * gennem eksempler demonstrere anvendelsen.
+    
     
