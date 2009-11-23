@@ -45,7 +45,7 @@ Læringsmål:
  
     * argumentere hvilke ændringer  der skal foretages i Pycsp for at introducerer tidsmodeller.
     * foretage en helt eller delvis implemention i PyCSP af de ændringer vi har beskrevet.
-    * foretage en evaluering de implementerede tidsmodeller sammenholdt med ligende løsninger.
+    * foretage en evaluering de implementerede tidsmodeller sammenholdt med lignende løsninger.
     * beskrive de foretagede ændringer så de er trivielle at benytte for folk med kendskab til PyCSP ->
     * gennem eksempler demonstrere anvendelsen.
     
