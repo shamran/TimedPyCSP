@@ -48,5 +48,12 @@ Læringsmål:
     * foretage en evaluering de implementerede tidsmodeller sammenholdt med lignende løsninger.
     * beskrive de foretagede ændringer så de er trivielle at benytte for folk med kendskab til PyCSP ->
     * gennem eksempler demonstrere anvendelsen.
-    
+
+ \fxnote[inline]{TID: svævende begreb. definitioner af tid, er det diskret, kontinuerlig, \\
+Undersøgelse via eksempler\\
+udvide pycsp\\
+pæn syntaks - skal kunne \\
+Vi ønsker at se på sammenhængen mellem tidsmodellerne og proritering i Pycsp, samt undersøge om Pythons scheduler kan ændres fra en FIFO kø til en prioeriteret kø så den kan understøtte tidsmodellerne.
+}
+\   
     
