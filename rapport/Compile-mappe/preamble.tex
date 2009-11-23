@@ -1,0 +1,129 @@
+\documentclass[a4paper, % papirstørrelse, skal altid med
+final,% Når man skal skifte kompileringsmetode mellem draft og final skal man flytte kommenteringen %  i Draft kommanoerne, nedenfor.
+11pt, % standardstørrelse på fonten
+openany, % anvnedes hvis kapitler bare skal starte på den næste side
+oneside,
+article
+]{memoir}
+% marginer, memoir to to metoder
+% den traditionelle, se memoir manualen
+% venstre: 2.5cm, højre: 3.5cm, top: 3cm, bund: 4cm
+%her kan margenen sættes manuelt, hvis man har lyst\setlrmarginsandblock{3.5cm}{3.5cm}{*}
+%\setlrmarginsandblock{1.5cm}{6.5cm}{*}
+%her kan margenen sættes manuelt, hvis man har lyst\setulmarginsandblock{3cm}{4cm}{*}
+% % mere utraditionelt, men hurtigt smartere
+% % vi sætter tekstblokken og placerer den
+% % værdierne som er angivet svarer ca. til dem anvende i LaTeXbogen
+% % 400pt bred og en højde svarende til at forholdet er det gyldne snit
+% \settypeblocksize{*}{400pt}{1.618}
+% % placer tekstblokken på papriet, kun en værdi skal angives, her sider
+% % vi bare hvad forholder mellem marginerne skal være
+% \setlrmargins{*}{*}{1.6}
+% \setulmargins{*}{*}{1.3}
+\checkandfixthelayout % laver forskellige beregninger og sætter de
+% almindelige længder op
+\usepackage[utf8]{inputenc} % eller utf8 eller ansinew eller ...
+\usepackage[danish]{babel} %direktiv til at bruge det danske sprog
+
+\usepackage[]{fixme} % til at skrive \fixme kommentarer til sig
+
+%\newenvironment{Draft}{\fixme{HUSK at ændre kommenteringen i preamble når man skifter mellem draft og final} }{  }
+\let\Draft=\comment \let\endDraft=\endcomment
+
+
+%har vi ord der bliver delt forkert kan de indsættes i hyphernation med bindestreg alle steder hvor ordet kan deles
+\hyphenation{tit-len mo-del-len pro-du-ce-rer an-svars-hav-ende om-for-deles for-bind-elses-mulig-heder ska-ber æn-dring-er net-værks-en-hed-er peer backup backup-system fast-track backup-systemer nabo-peers frame-work efter-som Grund-lag-et plads-effek-tivi-teten audits}
+
+
+\usepackage{nameref}
+\usepackage[danish]{varioref} % smarte krydsreferencer via \vref
+%\usepackage[colorlinks, linkcolor=blue, citecolor=blue, urlcolor=blue, final=true]{hyperref}
+
+%giver mulighed for at hoppe i pdf'filen via referencerne.
+%hyperref er ustabil med varieof,
+%og skal udkommenteres hvis der opstår problemer.
+%specielt skal udkommenteres når man kompilere i final
+
+\renewcommand\danishhyphenmins{22} % bedre orddeling
+\addto\captionsdanish{%brug bedrer danske ord for de faste tekster
+\renewcommand\contentsname{Indholdsfortegnelse}
+\renewcommand\appendixname{Appendiks}
+}
+
+\usepackage[style=numeric-comp,sorting=nyt]{biblatex}
+\DefineBibliographyStrings{danish}{%
+references      = {Litteraturliste},
+bibliography    = {Litteraturliste},
+urlseen         = {Lokaliseret d\adddot},
+andothers 		= {m\adddot fl\adddot},
+typeeditor      = {{udgiver}{udg\adddot}},
+typeeditors 	= {{udgivere}{udg\adddot}},
+}
+
+%\bibliography{litteratur} %indsaet en reference til bib filen
+%\usepackage{biblatex}
+%\usepackage[babel]{csquotes} %bedrer mulighed for at citerer
+
+
+
+\usepackage[T1]{fontenc} % bedre orddeling og ofte påkrævet at
+% forskellige fonte
+%\usepackage{fourier} % eller mathpazo eller lignende, eller fjern den
+% for at få standard fonten
+% sætter nogle default værdier vedr. floats
+
+\let\newfloat\relax % memoir har allerede defineret denne men det gør
+% float pakken også
+\usepackage{float}
+\restylefloat{table}
+\floatevery{table}{\centering\small} % alle tabel floats centreres og
+% skrives i \small
+\restylefloat{figure}
+\floatevery{figure}{\centering} % automatisk centrering af alle
+% figurer
+% float environments får ’htbp’ som standard placerings værdier når
+% man ikke har angivet noget
+
+\makeatletter
+\renewcommand\fps@figure{htbp}
+\renewcommand\fps@table{htbp}
+\makeatother
+\usepackage{amsmath,amssymb} % bedre matematik og ekstra fonte
+\usepackage{textcomp} % adgagn til tekstsymboler
+\usepackage[notcite,notref]{showkeys} % viser labels i margin,
+% udkommenteres for at fjerne, eller
+% anvend option final
+
+
+\setsecnumdepth{subsubsection} % eller hvor dybt man nu ønsker at har
+% overskrifterne nummereret
+\maxsecnumdepth{subsubsection}
+\settocdepth{subsubsection} % hvor dybt ned vi ønsker ting med i
+
+% OPSÆTNING AF SÆTNINGER etc.
+\usepackage[amsmath,thmmarks]{ntheorem} % bedre fleksimibitet
+\usepackage[final]{graphicx} % pakke til inklusion af grafik
+\usepackage{epsfig}
+
+\makeindex % hvis man ønsker at lave et index
+%\usepackage{pstricks}
+\usepackage{tikz}
+
+
+%Linjeafstand: (1,5 = siderne bliver ca. til ns)
+\linespread{1}
+\selectfont
+
+
+%\usepackage{pdfpages}
+
+%\includeonly{../litteratur}
+
+
+
+\title{Peer-to-peer Backup}
+\author{Simon Christiano Bognolo og Rasmus Ebdrup Sørensen}
+\begin{document}
+%\begin{titlingpage}
+%\maketitle
+%\end{titlingpage}
