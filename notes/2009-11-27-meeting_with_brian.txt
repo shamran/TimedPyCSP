@@ -1,0 +1,38 @@
+* Underskrifter på vores specialekontrakt.
+  (deadline d. 31-05-10)
+
+* Skal vi KUN kigge på greenlets udgaven eller skal vi blot starte med at fokusere på greenelets da der allerede her findes en scheduler som vi kan extended.
+
+* Jeg kan ikke finde noget om Thrombus og csp på kents hjemmeside. kan du give nogle mere præcise links.
+
+* Hvad er det smarte ved DES , er det at man kan introducere stokastiske variabler, og man så kan generalisere  om systemet på baggrund at flowet.
+  - vi kan simulere modeller som man ikke kan opsætte matematiske modeller for. eg. logistik , eller kontinuerlige probelemer, der ses som diskrete events.
+
+* Hvordan skal vi gribe det an, vi er lidt i vildrede.
+
+* Vi skal have tre nemme eksempler (kan vi nå at lave dem inden kl 14.00 ?)
+
+* HRT : kan vi se det som hrt er tid for processer mens DES er tid for event (kommunikation).
+   
+ 8 dec. speciale DIKU Morten Siburh
+
+  -- Brian spurgte: Hvordan skal vi repræsentere tid i  api'et  -- Det skal vi tænke over 
+
+
+Near time
+ * Vi skal have beskrevet de tre eksempler med tekst og figurer.
+ * Vi skal have skrevet noget teori om DES, HRT samt SRT.
+ * Vi skal lave en grov tidsplan.
+ * gennemlæse sympy og simpy
+ 
+// Kan man i HRT og SRT have en række event til hver process og hver af disse event har en deadline, og man vælger den proces, hvis event er tidligst, eller har hver proces kun en deadline men justere sin deadline som processen skrider frem. Vi formoder detter er et designvalg MAV.
+
+//   - Hvis vi skal lave des til alle typer, og også til greenlets; Hvordan hindre vi at vores des bliver til Pdes?
+//   - eks: vi har en liste af processer (P, tid) : (P1, t0) og (P2,t3) og (P3,t5); vi kan ikke køre dem parallelt da P1 kan schedulere processer i tiden t2, hvor t0<t2<t3 og som derfor skal køres før P2, skal det tilgengæld køres sekventielt her kan vi ikke køre flere processor samtidigt.
+
+ // * I det endelige program skal standard være ikke at bruge time, hvordan angiver man fra start om man vil bruge time, og i så fald hvilken type time.
+
+
+ // * Jeg forestiller mig at vi extender alle lister i schedularen af typen plist til en heapq hvor hvert element har en deadline. tid. nå man popper min, ved man hvad tiden er og kan i hard realtime se om deadlinen er overholdt.
+
+ // * Hvorfor er der så mange forskellige lister, kan Rune give en gennemgang af brug af de forskellig køer i scheduleren (lister)
