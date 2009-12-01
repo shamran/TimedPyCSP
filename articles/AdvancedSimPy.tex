@@ -1,0 +1,1619 @@
+\documentclass[11pt]{article}
+
+\setlength{\oddsidemargin}{0.0in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\topmargin}{0.0in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\textwidth}{6.5in}
+\setlength{\textheight}{9.0in}
+\setlength{\parindent}{0in}
+\setlength{\parskip}{0.1in}
+
+\usepackage{times}
+\usepackage{fancyvrb}
+\usepackage{relsize}
+\usepackage{hyperref}
+
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{Advanced Features of the SimPy Language}
+
+\author{Norm Matloff}
+
+\date{February 29, 2008 \\
+\copyright{}2006-2008, N.S. Matloff} 
+
+\maketitle
+
+\tableofcontents{}
+
+\newpage
+
+\section{Overview}
+
+In this document we present several advanced features of the SimPy
+language.  These will make your SimPy programming more convenient and
+enjoyable.  In small programs, use of some of these features will
+produce a modest but worthwhile reduction on programming effort and
+increase in program clarity.  In large programs, the savings add up, and
+can make a very significant improvement.
+
+\section{ Use of SimPy's {\bf cancel() Function}}
+
+In many simulation programs, a thread is waiting for one of two events;
+whichever occurs first will trigger a resumption of execution of the thread.
+The thread will typically want to ignore the other, later-occurring event. We
+can use SimPy's {\bf cancel()} function to cancel the later event.
+
+\subsection{Example:  Network Timeout}
+\label{nettimeout}
+
+An example of this is in the program {\bf TimeOut.py}. The model
+consists of a network node which transmits but also sets a {\bf timeout}
+period, as follows:  After sending the message out onto the network, the
+node waits for an acknowledgement from the recipient.  If an
+acknowledgement does not arrive within a certain specified period of
+time, it is assumed that the message was lost, and it will be sent
+again.  We wish to determine the percentage of attempted transmissions
+which result in timeouts. 
+
+The timeout period is assumed to be 0.5, and acknowledgement time is
+assumed to be exponentially distributed with mean 1.0.  Here is the
+code:
+
+\begin{Verbatim}[fontsize=\relsize{-2},numbers=left]
+#!/usr/bin/env python
+
+# Introductory SimPy example to illustrate the modeling of "competing
+# events" such as timeouts, especially using SimPy's cancel() method.  A
+# network node sends a message but also sets a timeout period; if the
+# node times out, it assumes the message it had sent was lost, and it
+# will send again.  The time to get an acknowledgement for a message is
+# exponentially distributed with mean 1.0, and the timeout period is
+# 0.5.  Immediately after receiving an acknowledgement, the node sends
+# out a new message.
+
+# We find the proportion of messages which timeout.  The output should
+# be about 0.61.
+
+# the main classes are:
+
+#   Node, simulating the network node, with our instance being Nd
+#   TimeOut, simulating a timeout timer, with our instance being TO
+#   Acknowledge, simulating an acknowledgement, with our instance being ACK
+
+# overview of program design:
+
+#   Nd acts as the main "driver," with a loop that continually creates 
+#   TimeOuts and Acknowledge objects, passivating itself until one of
+#   those objects' events occurs; if for example the timeout occurs
+#   before the acknowledge, the TO object will reactivate Nd and cancel
+#   the ACK object's event, and vice versa
+
+from SimPy.Simulation import *
+from random import Random,expovariate
+
+class Node(Process):
+   def __init__(self):
+      Process.__init__(self)  
+      self.NMsgs = 0  # number of messages sent
+      self.NTimeOuts = 0  # number of timeouts which have occurred
+      # ReactivatedCode will be 1 if timeout occurred, 2 ACK if received  
+      self.ReactivatedCode = None  
+   def Run(self):
+      while 1:
+         self.NMsgs += 1
+         # set up the timeout
+         G.TO = TimeOut()
+         activate(G.TO,G.TO.Run())
+         # set up message send/ACK
+         G.ACK = Acknowledge()
+         activate(G.ACK,G.ACK.Run())
+         yield passivate,self 
+         if self.ReactivatedCode == 1:
+            self.NTimeOuts += 1
+         self.ReactivatedCode = None
+
+class TimeOut(Process):
+   TOPeriod = 0.5
+   def __init__(self):
+      Process.__init__(self)  
+   def Run(self):
+      yield hold,self,TimeOut.TOPeriod
+      G.Nd.ReactivatedCode = 1  
+      reactivate(G.Nd)
+      self.cancel(G.ACK)
+
+class Acknowledge(Process):
+   ACKRate = 1/1.0
+   def __init__(self):
+      Process.__init__(self)  
+   def Run(self):
+      yield hold,self,G.Rnd.expovariate(Acknowledge.ACKRate)
+      G.Nd.ReactivatedCode = 2  
+      reactivate(G.Nd)
+      self.cancel(G.TO)
+
+class G:  # globals
+   Rnd = Random(12345)
+   Nd = Node()
+
+def main():
+   initialize()  
+   activate(G.Nd,G.Nd.Run())
+   simulate(until=10000.0)
+   print 'the percentage of timeouts was', float(G.Nd.NTimeOuts)/G.Nd.NMsgs
+
+if __name__ == '__main__':  main()
+\end{Verbatim}
+
+The main driver here is a class {\bf Node}, whose PEM code includes the lines
+
+\begin{Verbatim}[fontsize=\relsize{-2},numbers=left]
+while 1:
+   self.NMsgs += 1
+   G.TO = TimeOut()
+   activate(G.TO,G.TO.Run())
+   G.ACK = Acknowledge()
+   activate(G.ACK,G.ACK.Run())
+   yield passivate,self 
+   if self.ReactivatedCode == 1:
+      self.NTimeOuts += 1
+   self.ReactivatedCode = None
+\end{Verbatim}
+
+The node creates an object {\bf G.TO} of our {\bf TimeOut} class, which
+will simulate a timeout period, and creates an object {\bf G.ACK} of our
+{\bf Acknowledge} class to simulate a transmission and acknowledgement.
+Then the node passivates itself, allowing {\bf G.TO} and {\bf G.ACK} to
+do their work.  One of them will finish first, and then will call SimPy's
+{\bf reactivate()} function to ``wake up'' the suspended node.  The node
+senses whether it was a timeout or acknowledgement which woke it up, via
+the variable {\bf ReactivatedCode}, and then updates its timeout count
+accordingly.
+
+Here's what {\bf TimeOut.Run()} does:
+
+\begin{Verbatim}[fontsize=\relsize{-2},numbers=left]
+yield hold,self,TimeOut.TOPeriod
+G.Nd.ReactivatedCode = 1  
+reactivate(G.Nd)
+self.cancel(G.ACK)
+\end{Verbatim}
+
+It holds a random timeout time, then sets a flag in {\bf Nd} to let the
+latter know that it was the timeout which occurred first, rather than
+the acknowledgement.  Then it reactivates {\bf Nd} and cancels {\bf
+ACK}. {\bf ACK} of course has similar code for handling the case in
+which the acknowledgement occurs before the timeout.
+
+Note that in our case here, we want the thread to go out of existence
+when canceled. The {\bf cancel()} function does not make that occur. It
+simply removes the pending events associated with the given thread. The
+thread is still there. 
+
+However, here the {\bf TO} and {\bf ACK} threads will go out of
+existence anyway, for a somewhat subtle reason:\footnote{Thanks to
+Travis Grathwell for pointing this out.}  Think of what happens when we
+finish one iteration of the {\bf while} loop in {\bf main()}.  A new
+object of type {\bf TimeOut} will be created, and then assigned to {\bf
+G.TO}.  That means that the {\bf G.TO} no longer points to the old {\bf
+TimeOut} object, and since nothing else points to it either, the Python
+interpreter will now {\bf garbage collect} that old object.
+
+\subsection{Example:  Machine with Breakdown}
+\label{break}
+
+Here is another example of {\bf cancel()}:
+
+\begin{Verbatim}[fontsize=\relsize{-2},numbers=left]
+#!/usr/bin/env python
+
+# JobBreak.py
+
+# One machine, which sometimes breaks down.  Up time and repair time are
+# exponentially distributed.  There is a continuing supply of jobs
+# waiting to use the machine, i.e. when one job finishes, another
+# immediately begins.  When a job is interrupted by a breakdown, it
+# resumes "where it left off" upon repair, with whatever time remaining
+# that it had before.
+
+from SimPy.Simulation import *
+from random import Random,expovariate
+
+import sys
+
+class G:  # globals
+   CurrentJob = None
+   Rnd = Random(12345)
+   M = None  # our one machine
+
+class Machine(Process):
+   def __init__(self):
+      Process.__init__(self)  
+   def Run(self):
+      while 1:
+         UpTime = G.Rnd.expovariate(Machine.UpRate)
+         yield hold,self,UpTime
+         CJ = G.CurrentJob
+         self.cancel(CJ)
+         NewNInts = CJ.NInts + 1
+         NewTimeLeft = CJ.TimeLeft - (now()-CJ.LatestStart)
+         RepairTime = G.Rnd.expovariate(Machine.RepairRate)
+         yield hold,self,RepairTime
+         G.CurrentJob = Job(CJ.ID,NewTimeLeft,NewNInts,CJ.OrigStart,now()) 
+         activate(G.CurrentJob,G.CurrentJob.Run())
+
+class Job(Process):
+   ServiceRate = None
+   NDone = 0  # jobs done so far
+   TotWait = 0.0  # total wait for those jobs
+   NNoInts = 0  # jobs done so far that had no interruptions
+   def __init__(self,ID,TimeLeft,NInts,OrigStart,LatestStart):
+      Process.__init__(self)  
+      self.ID = ID
+      self.TimeLeft = TimeLeft  # amount of work left for this job
+      self.NInts = NInts  # number of interruptions so far
+      # time this job originally started
+      self.OrigStart = OrigStart
+      # time the latest work period began for this job
+      self.LatestStart = LatestStart
+   def Run(self):
+      yield hold,self,self.TimeLeft
+      # job done 
+      Job.NDone += 1
+      Job.TotWait += now() - self.OrigStart
+      if self.NInts == 0:  Job.NNoInts += 1
+      # start the next job
+      SrvTm = G.Rnd.expovariate(Job.ServiceRate)
+      G.CurrentJob = Job(G.CurrentJob.ID+1,SrvTm,0,now(),now())
+      activate(G.CurrentJob,G.CurrentJob.Run())
+
+def main():
+   Job.ServiceRate = float(sys.argv[1])
+   Machine.UpRate = float(sys.argv[2])
+   Machine.RepairRate = float(sys.argv[3])
+   initialize()
+   SrvTm = G.Rnd.expovariate(Job.ServiceRate)
+   G.CurrentJob = Job(0,SrvTm,0,0.0,0.0)
+   activate(G.CurrentJob,G.CurrentJob.Run())
+   G.M = Machine()
+   activate(G.M,G.M.Run())
+   MaxSimtime = float(sys.argv[4])
+   simulate(until=MaxSimtime)
+   print 'mean wait:', Job.TotWait/Job.NDone
+   print '% of jobs with no interruptions:', \
+      float(Job.NNoInts)/Job.NDone
+
+if __name__ == '__main__': main()
+\end{Verbatim}
+
+Here we have one machine, with occasional breakdown, but we also keep
+track of the number of jobs done.  See the comments in the code for
+details.
+
+Here we have set up a class {\bf Job}.  When a new job starts service,
+an instance of this class is set up to model that job.  If its service
+then runs to completion without interruption, fine.  But if the machine
+breaks down in the midst of service, this instance of the {\bf Job}
+class will be discarded, and a new instance will later be created when
+this job resumes service after the repair.  In other words, each object
+of the class {\bf Job} models one job to be done, but it can be either a
+brand new job or the resumption of an interrupted job.  
+
+Let's take a look at {\bf Job.Run()}:
+
+\begin{Verbatim}[fontsize=\relsize{-2},numbers=left]
+yield hold,self,self.TimeLeft
+Job.NDone += 1
+Job.TotWait += now() - self.OrigStart
+if self.NInts == 0:  Job.NNoInts += 1
+SrvTm = G.Rnd.expovariate(Job.ServiceRate)
+G.CurrentJob = Job(G.CurrentJob.ID+1,SrvTm,0,now(),now())
+activate(G.CurrentJob,G.CurrentJob.Run())
+\end{Verbatim}
+
+This looks innocuous enough.  We hold for the time it takes to finish
+the job, then update our totals, and launch the next job.  What is not
+apparent, though, is that we may actually never reach that second line,
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+Job.NDone += 1
+\end{Verbatim}
+
+The reason for this is that the machine may break down before the job
+finishes.  In that case, what we have set up is that {\bf Machine.Run()}
+will cancel the pending job completion event, 
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+self.cancel(CJ)
+\end{Verbatim}
+
+simulate the repair of the machine,
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+RepairTime = G.Rnd.expovariate(Machine.RepairRate)
+yield hold,self,RepairTime
+\end{Verbatim}
+
+and then create a new instance of {\bf Job} which will simulate
+the processing of the remainder of the interrupted job (which may get
+interrupted too):
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+NewNInts = CJ.NInts + 1
+NewTimeLeft = CJ.TimeLeft - (now()-CJ.LatestStart)
+...
+G.CurrentJob = Job(CJ.ID,NewTimeLeft,NewNInts,CJ.OrigStart,now())
+activate(G.CurrentJob,G.CurrentJob.Run())
+\end{Verbatim}
+
+There are other ways of doing this, in particular by using SimPy's {\bf
+interrupt()} and {\bf interrupted()} functions, but we defer this to
+Section \ref{interrupt}.
+
+\subsection{Example: Cell Phone Network}
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+# simulates one cell in a cellular phone network; here all calls are
+# local, no handoffs; calls last a random time; if a channel is not
+# available when a new call arrives, the oldest one is pre-empted
+
+# usage:  
+
+# python Cell2.py ArrRate DurRate NChnls MaxSimTime
+
+# where:
+
+#    ArrRate = rate of arrivals of calls (reciprocal of mean time
+#              between arrivals)
+#    DurRate = reciprocal of mean duration of local calls
+#    NChnls = number of channels
+#    MaxSimtime = amount of time to simulate
+
+import sys,random
+
+from SimPy.Simulation import *
+from PeriodicSampler import *
+
+class Globals:
+   Rnd = random.Random(12345)
+   Debug = False
+
+class Cell:  
+   NChnls = None  
+   NFreeChannels = None  
+
+class CellMonClass:  # to set up PeriodicSampler
+   def __init__(self):
+      self.ChnlMon = Monitor()
+   def RecordNBusyChnls(self):
+      return Cell.NChnls - Cell.NFreeChannels
+
+class Call(Process):
+   DurRate = None  # reciprocal of mean call duration
+   NArrv = 0  # number of calls arrived so far
+   NPre_empted = 0  # number of calls pre-empted so far
+   NextID = 0  # for debugging
+   CurrentCalls = []  # pointers to the currently-active calls
+   ChnlMon = Monitor()  # to monitor number of busy channels
+   FracMon = Monitor()  # to monitor pre-emption fractions
+   def __init__(self):
+      Process.__init__(self)
+      self.ID = Call.NextID
+      Call.NextID += 1
+      self.MyStartTime = now()
+      self.MyFinishTime = None
+   def Run(self):  # simulates one call
+      Call.NArrv += 1
+      CallTime = Globals.Rnd.expovariate(Call.DurRate)
+      self.MyFinishTime = now() + CallTime
+      if Globals.Debug: self.ShowStatus()
+      Call.CurrentCalls.append(self)
+      if Cell.NFreeChannels == 0:  # no channels available
+         Oldest = Call.CurrentCalls.pop(0)
+         self.cancel(Oldest)
+         Cell.NFreeChannels += 1  # one channel freed
+         Call.NPre_empted += 1
+         FullCallLength = Oldest.MyFinishTime - Oldest.MyStartTime
+         AmountPre_empted = Oldest.MyFinishTime - now()
+         Call.FracMon.observe(AmountPre_empted/FullCallLength)
+         del Oldest
+      Cell.NFreeChannels -= 1  # grab the channel
+      Call.ChnlMon.observe(Cell.NChnls-Cell.NFreeChannels)
+      yield hold,self,CallTime
+      Cell.NFreeChannels += 1  # release the channel
+      Call.ChnlMon.observe(Cell.NChnls-Cell.NFreeChannels)
+      if Call.CurrentCalls != []:
+         Call.CurrentCalls.remove(self)
+      return  # not needed, but enables a breakpoint here
+   def ShowStatus(self):  # for debugging and program verification
+      print
+      print 'time', now()
+      print Cell.NFreeChannels, 'free channels'
+      print 'ID',self.ID,'finish time is',self.MyFinishTime
+      print 'current calls:'
+      for CurrCall in Call.CurrentCalls:
+         print CurrCall.ID,CurrCall.MyFinishTime
+      print 'next arrival at',Arrivals.NextArrival
+
+class Arrivals(Process):
+   ArrRate = None
+   NextArrival = None  # for debugging and program verification
+   def __init__(self):
+      Process.__init__(self)
+   def Run(self):
+      while 1:
+         TimeToNextArrival = Globals.Rnd.expovariate(Arrivals.ArrRate)
+         Arrivals.NextArrival = now() + TimeToNextArrival
+         yield hold,self,TimeToNextArrival
+         C = Call()
+         activate(C,C.Run())
+
+def main():
+   if 'debug' in sys.argv: Globals.Debug = True
+   Arrivals.ArrRate = float(sys.argv[1])
+   Call.DurRate = float(sys.argv[2])
+   Cell.NChnls = int(sys.argv[3])
+   Cell.NFreeChannels = Cell.NChnls
+   initialize()  
+   Arr = Arrivals()
+   activate(Arr,Arr.Run())
+   CMC = CellMonClass()
+   CMC.PrSm = PerSmp(0.1,CMC.ChnlMon,CMC.RecordNBusyChnls)
+   activate(CMC.PrSm,CMC.PrSm.Run())
+   MaxSimtime = float(sys.argv[4])
+   simulate(until=MaxSimtime)
+   print 'fraction of pre-empted calls:', Call.NPre_empted/float(Call.NArrv)
+   print 'average fraction cut among pre-empted:',Call.FracMon.mean()
+   print 'mean number of active channels, Method I:',Call.ChnlMon.timeAverage()
+   print 'mean number of active channels, Method II:',CMC.ChnlMon.mean()
+
+if __name__ == '__main__': main()
+\end{Verbatim}
+
+\section{Job Interruption}
+\label{interrupt}
+
+SimPy allows one thread to interrupt another, which can be very useful.
+
+\subsection{Example:  Machine Breakdown Again}
+
+In Section \ref{break} we had a program {\bf JobBreak.py}, which modeled
+a machine with breakdown on which we collected job time data.  We
+presented that program as an example of {\bf cancel()}.  However, it is
+much more easily handeled via the function {\bf interrupt()}.  Here is a
+new version of the program using that function:
+
+\begin{Verbatim}[fontsize=\relsize{-2},numbers=left]
+#!/usr/bin/env python
+
+# JobBreakInt.py:  illustration of interrupt() and interrupted()
+
+# One machine, which sometimes breaks down.  Up time and repair time are
+# exponentially distributed.  There is a continuing supply of jobs
+# waiting to use the machine, i.e. when one job finishes, the next
+# begins.  When a job is interrupted by a breakdown, it resumes "where
+# it left off" upon repair, with whatever time remaining that it had
+# before.
+
+from SimPy.Simulation import *
+from random import Random,expovariate
+
+import sys
+
+class G:  # globals
+   CurrentJob = None
+   Rnd = Random(12345)
+   M = None  # our one machine
+
+class Machine(Process):
+   def __init__(self):
+      Process.__init__(self)  
+   def Run(self):
+      from SimPy.Simulation import _e
+      while 1:
+         UpTime = G.Rnd.expovariate(Machine.UpRate)
+         yield hold,self,UpTime
+         self.interrupt(G.CurrentJob)
+         RepairTime = G.Rnd.expovariate(Machine.RepairRate)
+         yield hold,self,RepairTime
+         reactivate(G.CurrentJob)
+
+class Job(Process):
+   ServiceRate = None
+   NDone = 0  # jobs done so far
+   TotWait = 0.0  # total wait for those jobs
+   NNoInts = 0  # jobs done so far that had no interruptions
+   NextID = 0
+   def __init__(self):
+      Process.__init__(self)  
+      self.ID = Job.NextID
+      Job.NextID += 1
+      # amount of work left for this job
+      self.TimeLeft = G.Rnd.expovariate(Job.ServiceRate)  
+      self.NInts = 0  # number of interruptions so far
+      # time this job originally started
+      self.OrigStart = now()
+      # time the latest work period began for this job
+      self.LatestStart = now()
+   def Run(self):
+      from SimPy.Simulation import _e
+      while True:
+         yield hold,self,self.TimeLeft
+         # did the job run to completion?
+         if not self.interrupted(): break
+         self.NInts += 1
+         self.TimeLeft -= now() - self.LatestStart
+         yield passivate,self  # wait for repair
+         self.LatestStart = now()
+      Job.NDone += 1
+      Job.TotWait += now() - self.OrigStart
+      if self.NInts == 0:  Job.NNoInts += 1
+      # start the next job
+      G.CurrentJob = Job()
+      activate(G.CurrentJob,G.CurrentJob.Run())
+
+def main():
+   Job.ServiceRate = float(sys.argv[1])
+   Machine.UpRate = float(sys.argv[2])
+   Machine.RepairRate = float(sys.argv[3])
+   initialize()
+   G.CurrentJob = Job()
+   activate(G.CurrentJob,G.CurrentJob.Run())
+   G.M = Machine()
+   activate(G.M,G.M.Run())
+   MaxSimtime = float(sys.argv[4])
+   simulate(until=MaxSimtime)
+   print 'mean wait:', Job.TotWait/Job.NDone
+   print '% of jobs with no interruptions:', \
+      float(Job.NNoInts)/Job.NDone
+
+if __name__ == '__main__': main()
+\end{Verbatim}
+
+The first key part of {\bf Machine.Run()} is
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+yield hold,self,UpTime
+self.interrupt(G.CurrentJob)
+\end{Verbatim}
+
+A call to {\bf interrupt()} cancels the pending {\bf yield hold}
+operation of its ``victim,'' i.e. the thread designated in the argument.
+\footnote{The function {\bf interrupt()} should not be called unless the
+thread to be interrupted is in the midst of {\bf yield hold}.} A new
+artificial event will be created for the victim, with event time being
+the current simulated time, {\bf now()}.  The caller does not lose
+control of the CPU, and continues to execute, but when it hits its next
+{\bf yield} statement (or {\bf passivate()} etc.) and thus loses control
+of the CPU, the victim will probably be next to run, as its (new,
+artificial) event time will be the current time.
+
+In our case here, at the time 
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+self.interrupt(G.CurrentJob)
+\end{Verbatim}
+
+is executed by the {\bf Machine} thread, the current job is in the midst
+of being serviced.  The call interrupts that service, to reflect the
+fact that the machine has broken down.  At this point, the current job's
+event is canceled, with the artificial event being created as above.
+The current job's thread won't run yet, and the {\bf Machine} thread
+will continue.  But when the latter reaches the line
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+yield hold,self,RepairTime
+\end{Verbatim}
+
+the {\bf Machine} thread loses control of the CPU and the current job's
+thread runs.  The latter executes
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+if not self.interrupted(): break
+self.NInts += 1
+self.TimeLeft -= now() - self.LatestStart
+yield passivate,self  # wait for repair
+\end{Verbatim}
+
+The interruption will be sensed by {\bf self.interrupted()} returning
+True.  The job thread will then do the proper bookkeeping, and then
+passivate itself, waiting for the machine to come back up.  When the
+latter event occurs, the machine's thread executes
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+reactivate(G.CurrentJob)
+\end{Verbatim}
+
+to get the interrupted job started again.
+
+Note that a job may go through multiple cycles of run, interruption,
+run, interruption, etc., depending on how many breakdowns the machine
+has during the lifetime of this job.  This is the reason for the {\bf
+while} loop in {\bf Job.Run()}:
+
+\begin{Verbatim}[fontsize=\relsize{-2},numbers=left]
+while True:
+   yield hold,self,self.TimeLeft
+   # did the job run to completion?
+   if not self.interrupted(): break
+   self.NInts += 1
+   self.TimeLeft -= now() - self.LatestStart
+   yield passivate,self  # wait for repair
+   self.LatestStart = now()
+Job.NDone += 1
+Job.TotWait += now() - self.OrigStart
+...
+\end{Verbatim}
+
+In the job's final cycle (which could be its first), the {\bf yield
+hold} will not be interrupted.  In this case the call to {\bf
+interrupted()} will inform the thread that it had {\it not} been
+interrupted.  The loop will be exited, the final bookkeeping for this
+job will be done, and the next job will be started.
+
+By the way, we did not have to have our instance variable {\bf TimeLeft}
+in {\bf Job}.  SimPy's {\bf Process} class has its own built-in instance
+variable {\bf interruptLeft} which records how much time in the {\bf
+yield hold} had been remaining at the time of the interruption.
+
+\subsection{Example:  Network Timeout Again}
+
+Use of interrupts makes our old network node acknowledgement/timeout
+program {\bf TimeOut.py} in Section \ref{nettimeout} considerably
+simpler:
+
+\begin{Verbatim}[fontsize=\relsize{-2},numbers=left]
+#!/usr/bin/env python
+
+# TimeOutInt.py
+
+# Same as TimeOut.py but using interrupts.  A network node sends a message
+# but also sets a timeout period; if the node times out, it assumes the
+# message it had sent was lost, and it will send again.  The time to get
+# an acknowledgement for a message is exponentially distributed with
+# mean 1.0, and the timeout period is 0.5.  Immediately after receiving
+# an acknowledgement, the node sends out a new message.
+
+# We find the proportion of messages which timeout.  The output should
+# be about 0.61.
+
+from SimPy.Simulation import *
+from random import Random,expovariate
+
+class Node(Process):
+   def __init__(self):
+      Process.__init__(self)  
+      self.NMsgs = 0  # number of messages sent
+      self.NTimeOuts = 0  # number of timeouts which have occurred
+   def Run(self):
+      from SimPy.Simulation import _e
+      while 1:
+         self.NMsgs += 1
+         # set up the timeout
+         G.TO = TimeOut()
+         activate(G.TO,G.TO.Run())
+         # wait for ACK, but could be timeout
+         yield hold,self,G.Rnd.expovariate(1.0)
+         if self.interrupted():
+            self.NTimeOuts += 1
+         else:  self.cancel(G.TO)
+
+class TimeOut(Process):
+   TOPeriod = 0.5
+   def __init__(self):
+      Process.__init__(self)  
+   def Run(self):
+      from SimPy.Simulation import _e
+      yield hold,self,TimeOut.TOPeriod
+      self.interrupt(G.Nd)
+
+class G:  # globals
+   Rnd = Random(12345)
+   Nd = Node()
+
+def main():
+   initialize()  
+   activate(G.Nd,G.Nd.Run())
+   simulate(until=10000.0)
+   print 'the percentage of timeouts was', float(G.Nd.NTimeOuts)/G.Nd.NMsgs
+
+if __name__ == '__main__':  main()
+\end{Verbatim}
+
+Use of interrupts allowed us to entirely eliminate our old {\bf ACK}
+class.  Moreover, the code looks more natural now, as a timeout could be
+thought of as ``interrupting'' the node.
+
+\section{Interthread Synchronization}
+
+In our introductory SimPy document, in cases in which one thread needed
+to wait for some other thread to take some action,\footnote{I've used
+the word {\it action} here rather than {\it event}, as the latter term
+refers to items in SimPy's internal event list, generated by {\bf yield
+hold} operations.  But this won't completely remove the confusion, as
+the SimPy keyword {\bf waitevent} will be introduced below.  But again,
+that term will refer to what I'm describing as {\it actions} here.  The
+official SimPy term is a {\it SimEvent}.} we made use of {\bf
+passivate()} and {\bf reactivate()}.  Those can be used in general, but
+more advanced constructs would make our lives easier.
+
+For example, suppose many threads are waiting for the same action to
+occur.  The thread which triggered that action would then have to call
+{\bf reactivate()} on all of them.  Among other things, this would mean
+we would have to have code which kept track of which threads were
+waiting.  We could do that, but it would be nicer if we didn't have to.
+
+In fact, actions like {\bf yield waitevent} alleviate us of that burden.
+This makes our code easier to write and maintain, and easier to read.
+
+\subsection{Example:  Yet Another Machine Breakdown Model}
+
+Below is an example, again modeling a machine repair situation.  It is
+similar to {\bf MachRep3.py} from our introductory document, but with R
+machines instead of two, and a policy that the repairperson is called if
+the number of operating machines falls below K.
+
+\begin{Verbatim}[fontsize=\relsize{-2},numbers=left]
+#!/usr/bin/env python
+
+# MachRep4.py
+
+# SimPy example:  R machines, which sometimes break down.  Up time is
+# exponentially distributed with rate UpRate, and repair time is
+# exponentially distributed with rate RepairRate.  The repairperson is
+# summoned when fewer than K of the machines are up, and reaches the
+# site after a negligible amount of time.  He keeps repairing machines
+# until there are none that need it, then leaves.
+
+# usage:  python MachRep4.py R UpRate RepairRate K MaxSimTime
+
+from SimPy.Simulation import *
+from random import Random,expovariate
+
+class G:  # globals
+   Rnd = Random(12345)
+   RepairPerson = Resource(1)
+   RepairPersonOnSite = False
+   RPArrive = SimEvent()  
+
+class MachineClass(Process):
+   MachineList = []  # list of all objects of this class
+   UpRate = None  # reciprocal of mean up time
+   RepairRate = None  # reciprocal of mean repair time
+   R = None  # number of machines
+   K = None  # threshold for summoning the repairperson
+   TotalUpTime = 0.0  # total up time for all machines
+   NextID = 0  # next available ID number for MachineClass objects
+   NUp = 0  # number of machines currently up
+   # create an event to signal arrival of repairperson
+   def __init__(self):
+      Process.__init__(self)  
+      self.StartUpTime = None  # time the current up period started
+      self.ID = MachineClass.NextID   # ID for this MachineClass object
+      MachineClass.NextID += 1
+      MachineClass.MachineList.append(self)
+      MachineClass.NUp += 1  # start in up mode
+   def Run(self):
+      from SimPy.Simulation import _e
+      while 1:
+         self.StartUpTime = now()  
+         yield hold,self,G.Rnd.expovariate(MachineClass.UpRate)
+         MachineClass.TotalUpTime += now() - self.StartUpTime
+         MachineClass.NUp -= 1
+         # if the repairperson is already onsite, just request him;
+         # otherwise, check whether fewer than K machines are up 
+         if not G.RepairPersonOnSite:
+            if MachineClass.NUp < MachineClass.K: 
+                  G.RPArrive.signal()
+                  G.RepairPersonOnSite = True
+            else: yield waitevent,self,G.RPArrive
+         yield request,self,G.RepairPerson
+         yield hold,self,G.Rnd.expovariate(MachineClass.RepairRate)
+         MachineClass.NUp += 1
+         # if no more machines waiting for repair, dismiss repairperson
+         if G.RepairPerson.waitQ == []: 
+            G.RepairPersonOnSite = False
+         yield release,self,G.RepairPerson
+
+def main():
+   initialize()  
+   MachineClass.R = int(sys.argv[1])
+   MachineClass.UpRate = float(sys.argv[2])
+   MachineClass.RepairRate = float(sys.argv[3])
+   MachineClass.K = int(sys.argv[4])
+   for I in range(MachineClass.R):
+      M = MachineClass()
+      activate(M,M.Run())
+   MaxSimtime = float(sys.argv[5])
+   simulate(until=MaxSimtime)
+   print 'proportion of up time was',  \
+      MachineClass.TotalUpTime/(MachineClass.R*MaxSimtime)
+
+if __name__ == '__main__':  main()
+\end{Verbatim}
+
+Here we make use of a new SimPy class, {\bf SimEvent}:
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+RepairPersonOnSite = False
+RPArrive = SimEvent()
+\end{Verbatim}
+
+We also set up a variable {\bf RepairPersonOnSite} to keep track of
+whether the repairperson is currently available; more on this point
+below.
+
+Here is the core code, executed when a machine goes down:
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+MachineClass.NUp -= 1
+if not G.RepairPersonOnSite:
+   if MachineClass.NUp < MachineClass.K:
+         G.RPArrive.signal()
+         G.RepairPersonOnSite = True
+   else: yield waitevent,self,G.RPArrive
+yield request,self,G.RepairPerson
+\end{Verbatim}
+
+If the repairperson is on site already, then we go straight to the {\bf
+yield request} to queue up for repair.  If the repairperson is not on
+site, and the number of working machines has not yet dropped below K,
+our machine executes {\bf yield waitevent} on our action {\bf
+G.RPArrive}, which basically passivates this thread.  If on the other
+hand our machine's failure does make the number of working machines drop
+below K, we execute the {\bf signal()} function, which reactivates all
+the machines which had been waiting.  
+
+Again, all of that could have been done via explicit {\bf passivate()} 
+and {\bf reactivate()} calls, but it's much more convenient to let
+SimPy do that work for us, behind the scenes.
+
+One of the member variables of {\bf SimEvent} is {\bf occurred}, which
+of course is a boolean variable stating whether the action has occurred
+yet.  Note that as soon as a wait for an event finishes, this variable
+reverts to False.  This is why we needed a separate variable above,
+{\bf G.RepairPersonOnSite}.
+
+\subsection{Which Comes First?}
+
+In general thread terminology, we say that we {\bf post} a signal when
+we call {\bf signal()}.  One of the issues to resolve when you learn any
+thread system concerns what happens when a signal is posted before any
+waits for it are executed.  In many thread systems, that posting will be
+completely ignored, and subsequent waits will thus last forever, or at
+least until another signal is posted.  This obviously can cause bugs and
+makes programming more difficult.
+
+In SimPy it's the opposite:  If a signal is posted first, before any
+waits are started, the next wait will return immediately.  That was
+not an issue in this program, but it's important to keep in mind in
+general.
+
+\subsection{Waiting for Whichever Action Comes First}
+
+You can also use {\bf yield waiteventj} to wait for several actions,
+producing a ``whichever comes first'' operation.  To do this, instead of
+using the form
+
+{\tt yield waitevent,self,} {\it action\_name}
+
+use
+
+{\tt yield waitevent,self,} {\it tuple\_or\_list\_of\_action\_names}
+
+Then whenever a signal is invoked on any one of the specified actions,
+all waits queued will be reactivated.
+
+\subsection{The yield queueevent Operation}
+
+This works just like {\bf yield waitevent}, but when the signal is
+invoked, only the action at the head of the queue will be reactivated.
+
+\subsection{Example:  Carwash}
+
+\begin{Verbatim}[fontsize=\relsize{-2},numbers=left]
+# simulates a carwash; cars queue up at the entrance; each car chooses
+# one of two grades of wash, MostlyClean (1.0 unit of time) and Gleaming
+# (2.0 units of time); there is only one bay in the carwash, so only one
+# is served at a time; at the exit there is a buffer space where cars
+# wait to go out onto the street; cross traffic does not stop, so a car
+# must wait for a large enough gap in the traffic in order to move out
+# onto the street 
+
+# usage:  
+
+# python CarWash.py ArrRate PropMostlyClean BufSize CrossRate ExitTime MaxSimTime
+
+# where:
+
+#    ArrRate = rate of arrivals of calls to carwash (reciprocal of mean 
+#              time between arrivals)
+#    PropMostlyClean = proportion of cars that opt for the MostlyClean wash
+#    BufSize = number of cars that can fit in the exit buffer
+#    CrossRate = rate of arrivals of cars on the street passing the carwash
+#    ExitTime = time needed for one car to get out onto the street
+#    MaxSimtime = amount of time to simulate
+
+# basic strategy of the simulation:  model the carwash itself as a
+# Resource, and do the same for the buffer and the front spot in the
+# buffer; when a car acquires the latter, it watches for a gap big
+# enough to enter the street
+
+import sys,random
+
+from SimPy.Simulation import *
+from PeriodicSampler import *
+
+class Globals:
+   Rnd = random.Random(12345)
+   Debug = False
+
+class Street(Process):
+   CrossRate = None  
+   ExitTime = None
+   NextArrival = None  # time of next street arrival 
+   CrossArrive = SimEvent()
+   def Run(self):
+      while 1:
+         TimeToNextArrival = Globals.Rnd.expovariate(Street.CrossRate)
+         Street.NextArrival = now() + TimeToNextArrival
+         Street.CrossArrive.signal()  # tells car at front of buffer to 
+                                      # check new TimeToNextArrival
+         yield hold,self,TimeToNextArrival
+         if Globals.Debug: 
+            print 
+            print 'time',now()
+            print 'street arrival'
+
+class Car(Process):
+   NextID = 0  # for debugging
+   PropMostlyClean = None
+   CurrentCars = []  # for debugging and code verification
+   TotalWait = 0.0  # total wait times of all cars, from arrival to
+                    # carwash to exit onto the street
+   TotalBufTime = 0.0  # total time in buffer for all cars
+   NStuckInBay = 0  # number of cars stuck in bay when wash done, due to
+                    # full buffer
+   AllDone = 0  # number of cars that have gotten onto the street
+   def __init__(self):
+      Process.__init__(self)
+      self.ID = Car.NextID
+      Car.NextID += 1
+      self.ArrTime = None  # time this car arrived at carwash
+      self.WashDoneTime = None  # time this car will finish its wash
+      self.LeaveTime = None  # time this car will exit
+      self.StartBufTime = None  # start of period in buffer
+   def Run(self):  # simulates one call
+      self.State = 'waiting for bay'
+      Car.CurrentCars.append(self)
+      self.ArrTime = now()
+      if Globals.Debug: ShowStatus('carwash arrival')
+      yield request,self,CarWash.Bay
+      self.State = 'in bay'
+      if Globals.Rnd.uniform(0,1) < Car.PropMostlyClean: WashTime = 1.0
+      else: WashTime = 2.0
+      self.WashDoneTime = now() + WashTime
+      if Globals.Debug: ShowStatus('start wash')
+      yield hold,self,WashTime
+      self.State = 'waiting for buffer'
+      self.WashDoneTime = None
+      if Globals.Debug: ShowStatus('wash done')
+      if CarWash.Buf.n == 0: Car.NStuckInBay += 1
+      yield request,self,CarWash.Buf
+      self.StartBufTime = now()
+      yield release,self,CarWash.Bay
+      self.State = 'in buffer'
+      if Globals.Debug: ShowStatus('got into buffer')
+      yield request,self,CarWash.BufFront 
+      # OK, now wait to get out onto the street; every time a new car
+      # arrives in cross traffic, it will signal us to check the new
+      # next arrival time
+      while True:
+         PossibleLeaveTime = now() + Street.ExitTime
+         if Street.NextArrival >= PossibleLeaveTime:
+            self.State = 'on the way out'
+            self.LeaveTime = PossibleLeaveTime
+            if Globals.Debug: ShowStatus('leaving')
+            yield hold,self,Street.ExitTime
+            Car.CurrentCars.remove(self)
+            self.LeaveTime = None
+            Car.TotalWait += now() - self.ArrTime
+            Car.TotalBufTime += now() - self.StartBufTime
+            if Globals.Debug: ShowStatus('gone')
+            Car.AllDone += 1
+            yield release,self,CarWash.BufFront
+            yield release,self,CarWash.Buf
+            return
+         yield waitevent,self,Street.CrossArrive
+
+class CarWash(Process):
+   ArrRate = None
+   BufSize = None
+   Buf = None  # will be Resource(BufSize) instance representing buffer
+   BufFront = Resource(1)  # front buffer slot, by the street
+   NextArrival = None # time of next carwash arrival (for debugging/code
+                      # verification)
+   Bay = Resource(1)  # the carwash
+   def __init__(self):
+      Process.__init__(self)
+   def Run(self): # arrivals
+      while 1:
+         TimeToNextArrival = Globals.Rnd.expovariate(CarWash.ArrRate)
+         CarWash.NextArrival = now() + TimeToNextArrival
+         yield hold,self,TimeToNextArrival
+         C = Car()
+         activate(C,C.Run())
+
+class BufMonClass(Process):  # to enable use of PeriodicSampler
+   def __init__(self):
+      Process.__init__(self)
+      self.BufMon = Monitor()
+   def RecordNInBuf(self):
+      return CarWash.BufSize - CarWash.Buf.n
+
+def ShowStatus(msg):  # for debugging and code verification
+   print
+   print 'time', now()
+   print msg
+   print 'current cars:'
+   for C in Car.CurrentCars:
+      print '  ',C.ID,C.State,
+      if C.WashDoneTime != None: 
+         print 'wash will be done at',C.WashDoneTime
+      elif C.LeaveTime != None:
+         print 'gone at',C.LeaveTime
+      else: print
+   print 'next carwash arrival at',CarWash.NextArrival
+   print 'next street arrival at',Street.NextArrival
+
+def main():
+   if 'debug' in sys.argv: Globals.Debug = True
+   CarWash.ArrRate = float(sys.argv[1])
+   Car.PropMostlyClean = float(sys.argv[2])
+   CarWash.BufSize = int(sys.argv[3])
+   CarWash.Buf = Resource(CarWash.BufSize)
+   Street.CrossRate = float(sys.argv[4])
+   Street.ExitTime = float(sys.argv[5])
+   initialize()  
+   CWArr = CarWash()
+   activate(CWArr,CWArr.Run())
+   StArr = Street()
+   activate(StArr,StArr.Run())
+   MaxSimtime = float(sys.argv[6])
+   BMC = BufMonClass()
+   BMC.PrSmp = PerSmp(0.1,BMC.BufMon,BMC.RecordNInBuf)
+   activate(BMC.PrSmp,BMC.PrSmp.Run())
+   simulate(until=MaxSimtime)
+   print 'number of cars getting onto the street',Car.AllDone
+   print 'mean total wait:',Car.TotalWait/Car.AllDone
+   MeanWaitInBuffer = Car.TotalBufTime/Car.AllDone
+   print 'mean wait in buffer:',MeanWaitInBuffer
+   print 'proportion of cars blocked from exiting bay:', \
+      float(Car.NStuckInBay)/Car.AllDone
+   print "mean number of cars in buffer, using Little's Rule:", \
+      MeanWaitInBuffer * CarWash.ArrRate  
+   print 'mean number of cars in buffer, using alternate method:', \
+      BMC.BufMon.mean()
+
+if __name__ == '__main__': main()
+\end{Verbatim}
+
+\section{Advanced Use of the Resource Class}
+
+The default queuing {\bf discipline}, i.e. priority policy, for the {\bf
+Resource} class is First Come, First Served (FCFS).  The alternative is
+to assign different priorities to threads waiting for the resource,
+which you do by the named argument {\bf qType}.  For example, 
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+R = Resource(8,qType=PriorityQ)
+\end{Verbatim}
+
+creates a resource {\bf R} with eight service units, the queue for which
+has priorities assigned.  The priorities are specified in the {\bf yield
+request} statement.  For instance,
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+yield request,self,R,88
+\end{Verbatim}
+
+requests to use the resource {\bf R}, with priority 88.  The priorities
+are user-defined.
+
+\subsection{Example:  Network Channel with Two Levels of Service}
+
+Below is an example of a model in which we use the non-FCFS version of
+{\bf Resource}.  Here we have a shared network channel on which both
+video and data are being transmitted.  The two types of traffic act in
+complementary manners:
+
+\begin{itemize}
+
+\item We can tolerate a certain percentage of lost video packets, as
+small loss just causes a bit of jitter on the screen.  But we can't have
+any noticeable delay.
+
+\item We can tolerate a certain increase in delay for data packets. 
+We won't care about or even notice a small increase in delay.  But we
+can't lose packets.
+
+\end{itemize}
+
+Accordingly, 
+
+\begin{itemize}
+
+\item We discard video packets that are too ``old,'' with threshold
+being controlled by the design parameter L explained in the comments in
+the program below.
+
+\item We don't discard data packets.
+
+\end{itemize}
+
+For a fixed level of data traffic, we can for example use simulation to
+study the tradeoff arising from our choice of the value of L.  Smaller L
+means more lost video packets but smaller delay for data, and vice
+versa.
+
+Here is the program:
+
+\begin{Verbatim}[fontsize=\relsize{-2},numbers=left]
+#!/usr/bin/env python
+
+# QoS.py:  illustration of non-FCFS priorities in Resource class
+
+# Communications channel, shared by video and data.  Video packets
+# arrive every 2.0 amount of time, and have transmission time 1.0.  Data
+# packet interarrivals are exponentially distributed with rate DArrRate,
+# and their transmission time is uniformaly distributed on {1,2,3,4,5}.
+# Video packets have priority over data packets but the latter are not
+# pre-emptable.  A video packet is discarded upon arrival if it would be
+# sent L or more amount of time late.
+
+# usage:  python QoS.py DArrRate L MaxSimTime
+
+from SimPy.Simulation import *
+from random import Random,expovariate
+
+class G:  # globals
+   Rnd = Random(12345)
+   Chnl = None  # our one channel
+   VA = None  # our one video arrivals process
+   DA = None  # our one video arrivals process
+
+class ChannelClass(Resource):
+   def __init__(self):  
+      # note arguments to parent constructor:
+      Resource.__init__(self,capacity=1,qType=PriorityQ)
+      # if a packet is currently being sent, here is when transmit will end
+      self.TimeEndXMit = None
+      self.NWaitingVid = 0  # number of video packets in queue
+
+class VidJob(Process):
+   def __init__(self):
+      Process.__init__(self)  
+   def Run(self):
+      Lost = False
+      # if G.Chnl.TimeEndXMit is None, then no jobs in the system
+      # now, so this job will start right away (handled below); 
+      # otherwise:
+      if G.Chnl.TimeEndXMit != None:  
+         # first check for loss
+         TimeThisPktStartXMit = G.Chnl.TimeEndXMit + G.Chnl.NWaitingVid
+         if TimeThisPktStartXMit - now() > VidArrivals.L:
+            Lost = True
+            VidArrivals.NLost += 1
+            return
+      G.Chnl.NWaitingVid += 1
+      yield request,self,G.Chnl,1  # higher priority
+      G.Chnl.NWaitingVid -= 1
+      G.Chnl.TimeEndXMit = now() + 0.999999999999
+      yield hold,self,0.999999999999  # to avoid coding "ties"
+      G.Chnl.TimeEndXMit = None
+      yield release,self,G.Chnl
+
+class VidArrivals(Process):
+   L = None  # threshold for discarding packet
+   NArrived = 0  # number of video packets arrived
+   NLost = 0  # number of video packets lost
+   def __init__(self):
+      Process.__init__(self)  
+   def Run(self):
+      while 1:
+         yield hold,self,2.0
+         VidArrivals.NArrived += 1
+         V = VidJob()
+         activate(V,V.Run())
+
+class DataJob(Process):
+   def __init__(self):
+      Process.__init__(self)  
+      self.ArrivalTime = now()
+   def Run(self):
+      yield request,self,G.Chnl,0  # lower priority
+      XMitTime = G.Rnd.randint(1,6) - 0.000000000001
+      G.Chnl.TimeEndXMit = now() + XMitTime
+      yield hold,self,XMitTime
+      G.Chnl.TimeEndXMit = None
+      DataArrivals.NSent += 1
+      DataArrivals.TotWait += now() - self.ArrivalTime
+      yield release,self,G.Chnl
+
+class DataArrivals(Process):
+   DArrRate = None  #  data arrival rate
+   NSent = 0  # number of video packets arrived
+   TotWait = 0.0  # number of video packets lost
+   def __init__(self):
+      Process.__init__(self)  
+   def Run(self):
+      while 1:
+         yield hold,self,G.Rnd.expovariate(DataArrivals.DArrRate)
+         D = DataJob()
+         activate(D,D.Run()) 
+
+# def ShowStatus():
+#    print 'time', now()
+#    print 'current xmit ends at', G.Chnl.TimeEndXMit
+#    print 'there are now',len(G.Chnl.waitQ), 'in the wait queue'
+#    print G.Chnl.NWaitingVid, 'of those are video packets'
+
+def main():
+   initialize()  
+   DataArrivals.DArrRate = float(sys.argv[1])
+   VidArrivals.L = int(sys.argv[2])
+   G.Chnl = ChannelClass()
+   G.VA = VidArrivals()
+   activate(G.VA,G.VA.Run())
+   G.DA = DataArrivals()
+   activate(G.DA,G.DA.Run())
+   MaxSimtime = float(sys.argv[3])
+   simulate(until=MaxSimtime)
+   print 'proportion of video packets lost:', \
+      float(VidArrivals.NLost)/VidArrivals.NArrived
+   MeanDataDelay = DataArrivals.TotWait/DataArrivals.NSent
+   print 'mean delay for data packets:',MeanDataDelay
+   # use Little's Rule
+   print 'mean number of data packets in system:', \
+      DataArrivals.DArrRate * MeanDataDelay
+
+if __name__ == '__main__':  main()
+\end{Verbatim}
+
+We have chosen to make a subclass of {\bf Resource} for channels.  In
+doing so, we do have to be careful when our subclass' constructor calls
+{\bf Resource}'s constructor:
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+Resource.__init__(self,capacity=1,qType=PriorityQ)
+\end{Verbatim}
+
+The named argument {\bf capacity} is the number of resource units, which
+is 1 in our case.  I normally don't name it in my {\bf Resource} calls,
+as it is the first argument and thus doesn't need to be named, but in
+this case I've used the name for clarity.  And of course I've put in the
+{\bf qType} argument.
+
+Here is where I set the priorities:
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+yield request,self,G.Chnl,1  # video
+...
+yield request,self,G.Chnl,0  # data
+\end{Verbatim}
+
+I chose the values 1 and 0 arbitrarily.  Any values would have worked,
+as long as the one for video was higher, to give it a higher priority.
+
+Note that I have taken transmission times to be 0.000000000001 lower
+than an integer, so as to avoid ``ties,'' in which a transmission would
+end exactly when messages might arrive.  This is a common issue when
+{\bf yield hold} times are integers.
+
+\subsection{Example:  Call Center}
+
+This program simulates the operation of a call-in advice nurse system,
+such as the one in Kaiser Permanente.  The key issue here is that the
+number of servers (nurses) varies through time, as the policy here is to
+take nurses off the shift when the number of callers is light, and to
+add more nurses during periods of heavy usage.
+
+\begin{Verbatim}[fontsize=\relsize{-2},numbers=left]
+#!/usr/bin/env python
+
+# CallCtr.py:  simulation of call-in advice nurse system
+
+#  patients call in, with exponential interarrivals with rate Lambda1;
+#  they queue up for a number of advice nurses which varies through time
+#  (initially MOL); service time is exponential with rate Lambda2; if the
+#  system has been empty (i.e. no patients in the system, either being
+#  served or in the queue) for TO amount of time, the number of nurses
+#  is reduced by 1 (but it can never go below 1); a new TO period is then
+#  begun; when a new patient call comes in, if the new queue length is
+#  at least R the number of nurses is increased by 1, but it cannot go
+#  above MOL; here the newly-arrived patient is counted in the queue
+#  length
+
+# usage:  
+
+#   python CallCtr.py MOL, R, TO, Lambda1, Lambda2, MaxSimtime, Debug
+
+from SimPy.Simulation import *
+from random import Random,expovariate
+import sys
+import PeriodicSampler
+
+# globals
+class G:
+   Rnd = Random(12345)
+   NrsPl = None  # nurse pool
+
+class NursePool(Process):
+   def __init__(self,MOL,R,TO):
+      Process.__init__(self)
+      self.Rsrc = Resource(capacity=MOL,qType=PriorityQ)  # the nurses
+      self.MOL = MOL  # maximum number of nurses online
+      self.R = R
+      self.TO = TO
+      self.NrsCurrOnline = 0  # current number of nurses online
+      self.TB = None  # current timebomb thread, if any
+      self.Mon = Monitor()  # monitors numbers of nurses online
+      self.PrSm = PeriodicSampler.PerSmp(1.0,self.Mon,self.MonFun)
+      activate(self.PrSm,self.PrSm.Run())
+   def MonFun(self):
+      return self.NrsCurrOnline
+   def Wakeup(NrsPl,Evt):  # wake nurse pool manager
+      reactivate(NrsPl)
+      # state the cause
+      NrsPl.WakingEvent = Evt
+      if G.Debug:  ShowStatus(Evt)
+   def StartTimeBomb(self):
+      self.TB = TimeBomb(self.TO,self)
+      activate(self.TB,self.TB.Run())
+   def Run(self):
+      self.NrsCurrOnline = self.MOL
+      # system starts empty, so start timebomb
+      self.StartTimeBomb()
+      # this thread is a server, usually sleeping but occasionally being
+      # wakened to handle an event:
+      while True:  
+         yield passivate,self  # sleep until an event occurs:
+         if self.WakingEvent == 'arrival':
+            # if system had been empty, cancel timebomb 
+            if PtClass.NPtsInSystem == 1:  
+               self.cancel(self.TB)
+               self.TB = None
+            else:  # check for need to expand pool
+               # how many in queue, including this new patient?
+               NewQL = len(self.Rsrc.waitQ) + 1
+               if NewQL >= self.R and self.NrsCurrOnline < self.MOL:
+                  # bring a new nurse online
+                  yield release,self,self.Rsrc
+                  self.NrsCurrOnline += 1
+            continue  # go back to sleep
+         if self.WakingEvent == 'departure':
+            if PtClass.NPtsInSystem == 0:
+               self.StartTimeBomb()
+            continue  # go back to sleep
+         if self.WakingEvent == 'timebomb exploded':
+            if self.NrsCurrOnline > 1:  
+               # must take 1 nurse offline
+               yield request,self,self.Rsrc,100
+               self.NrsCurrOnline -= 1
+            self.StartTimeBomb()
+            continue  # go back to sleep
+
+class TimeBomb(Process):
+   def __init__(self,TO,NrsPl):
+      Process.__init__(self)
+      self.TO = TO  # timeout period
+      self.NrsPl = NrsPl  # nurse pool
+      self.TimeStarted = now()  # for debugging
+   def Run(self):
+      yield hold,self,self.TO
+      NursePool.Wakeup(G.NrsPl,'timebomb exploded')
+
+class PtClass(Process):  # simulates one patient
+   SrvRate = None  # service rate
+   NPtsInSystem = 0  
+   Mon = Monitor()
+   def __init__(self):
+      Process.__init__(self)
+      self.ArrivalTime = now()
+   def Run(self):
+      # changes which trigger expansion or contraction of the nurse pool
+      # occur at arrival points and departure points
+      PtClass.NPtsInSystem += 1
+      NursePool.Wakeup(G.NrsPl,'arrival')  
+      # dummy to give nurse pool thread a chance to wake up, possibly
+      # change the number of nurses, and reset the timebomb:
+      yield hold,self,0.00000000000001
+      yield request,self,G.NrsPl.Rsrc,1
+      if G.Debug:  ShowStatus('service starts')
+      yield hold,self,G.Rnd.expovariate(PtClass.SrvRate)
+      yield release,self,G.NrsPl.Rsrc
+      PtClass.NPtsInSystem -= 1
+      Wait = now() - self.ArrivalTime
+      PtClass.Mon.observe(Wait)
+      NursePool.Wakeup(G.NrsPl,'departure')
+
+class ArrivalClass(Process):  # simulates patients arrivals
+   ArvRate = None 
+   def __init__(self):
+      Process.__init__(self)  
+   def Run(self):
+      while 1:
+         yield hold,self,G.Rnd.expovariate(ArrivalClass.ArvRate)
+         Pt = PtClass()
+         activate(Pt,Pt.Run())
+
+def ShowStatus(Evt):  # for debugging and code verification
+   print 
+   print Evt, 'at time', now()
+   print G.NrsPl.NrsCurrOnline, 'nurse(s) online'
+   print PtClass.NPtsInSystem, 'patient(s) in system'
+   if G.NrsPl.TB:
+      print 'timebomb started at time', G.NrsPl.TB.TimeStarted
+   else:  print 'no timebomb ticking'
+
+def main():
+   MOL = int(sys.argv[1])
+   R = int(sys.argv[2])
+   TO = float(sys.argv[3])
+   initialize()
+   G.NrsPl = NursePool(MOL,R,TO)
+   activate(G.NrsPl,G.NrsPl.Run())
+   ArrivalClass.ArvRate = float(sys.argv[4])
+   PtClass.SrvRate = float(sys.argv[5])
+   A = ArrivalClass()
+   activate(A,A.Run())
+   MaxSimTime = float(sys.argv[6])
+   G.Debug = int(sys.argv[7])
+   simulate(until=MaxSimTime)
+   print 'mean wait =',PtClass.Mon.mean()
+   print 'mean number of nurses online =',G.NrsPl.Mon.mean()
+
+if __name__ == '__main__': main()
+\end{Verbatim}
+
+Since the number of servers varies through time, we cannot use the SimPy
+{\bf Resource} class in a straightforward manner, as that class assumes
+a fixed number of servers.  However, by making use of that class'
+priorities capability, we can achieve the effect of a varying number of
+servers.  Here we make use of an idea from a page on the SimPy Web site,
+\url{http://simpy.sourceforge.net/changingcapacity.htm}.
+
+The way this works is that we remove a server from availability by
+performing a {\bf yield request} with a very high priority level, a
+level higher than is used for any real request.  In our case here, a
+real request is done via the line
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+yield request,self,G.NrsPl.Rsrc,1
+\end{Verbatim}
+
+with priority 1.  By contrast, in order to take one nurse off the shift,
+we perform
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+yield request,self,self.Rsrc,100
+self.NrsCurrOnline -= 1
+\end{Verbatim}
+
+The high priority ensures that this bogus ``request'' will prevail over
+any real one, with the effect that the nurse is taken offline.  Note,
+though, that existing services are not pre-empted, i.e. a nurse is not
+removed from the shift in the midst of serving someone.
+
+Note the necessity of the line
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+self.NrsCurrOnline -= 1
+\end{Verbatim}
+
+The {\bf n} member variable of SimPy's {\bf Resource} class, which
+records the number of available resource units, would not tell us here
+how many nurses are available, because some of the resource units are
+held by the bogus ``requests'' in our scheme here.  Thus we need a
+variable of our own, {\bf NrsCurrOnline}.
+
+As you can see from the call to {\bf passivate()} in  {\bf
+NursePool.Run()}, the thread {\bf NursePool.Run()} is mostly dormant,
+awakening only when it needs to add or delete a nurse from the pool.  It
+is awakened for this purpose by the patient and ``timebomb'' classes,
+{\bf PtClass} and {\bf TimeBomb}, which call this function in {\bf
+NursePool}:
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+def Wakeup(NrsPl,Evt):  
+   reactivate(NrsPl)
+   NrsPl.WakingEvent = Evt
+\end{Verbatim}
+
+It wakes up the {\bf NursePool} thread, which will then decide whether
+it should take action to change the size of the nurse pool, based on the
+argument {\bf Evt}.  
+
+For example, when a new patient call arrives, generated by the {\bf
+ArrivalClass} thread, the latter creates a {\bf PtClass} thread, which
+simulates that one patient's progress through the system.  The first
+thing this thread does is 
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+NursePool.Wakeup(G.NrsPl,'arrival')
+\end{Verbatim}
+
+so as to give the {\bf NursePool} thread a chance to check whether the
+pool should be expanded.
+
+We also have a {\bf TimeBomb} class, which deals with the fact that if
+the system is devoid of patients for a long time, the size of the nurse
+pool will be reduced.  After the given timeout period, this thread
+awakenens the {\bf NursePool} thread with the event 'timebomb exploded'.
+
+By the way, since {\bf activate()} requires that its first argument be a
+class instance rather than a class, we are forced to create an instance
+of {\bf NursePool}, {\bf G.NrsPl}, even though we only have one nurse
+pool.  That leads to the situation we have with the function {\bf
+NursePool.Wakeup()} being neither a class method nor an instance method.
+
+Note the use of monitors, including in our {\bf PeriodicSampler} class.
+
+I have included a function {\bf ShowStatus()} to help with debugging,
+and especially with verification of the program.  Here is some sample
+output:
+
+\begin{Verbatim}[fontsize=\relsize{-2}]
+timebomb exploded at time 0.5
+6 nurse(s) online
+0 patient(s) in system
+timebomb started at time 0
+
+arrival at time 0.875581049552
+5 nurse(s) online
+1 patient(s) in system
+timebomb started at time 0.5
+
+service starts at time 0.875581049552
+5 nurse(s) online
+1 patient(s) in system
+no timebomb ticking
+
+departure at time 1.19578373243
+5 nurse(s) online
+0 patient(s) in system
+no timebomb ticking
+
+timebomb exploded at time 1.69578373243
+5 nurse(s) online
+0 patient(s) in system
+timebomb started at time 1.19578373243
+
+timebomb exploded at time 2.19578373243
+4 nurse(s) online
+0 patient(s) in system
+timebomb started at time 1.69578373243
+
+timebomb exploded at time 2.69578373243
+3 nurse(s) online
+0 patient(s) in system
+timebomb started at time 2.19578373243
+
+timebomb exploded at time 3.19578373243
+2 nurse(s) online
+0 patient(s) in system
+timebomb started at time 2.69578373243
+
+timebomb exploded at time 3.69578373243
+1 nurse(s) online
+0 patient(s) in system
+timebomb started at time 3.19578373243
+\end{Verbatim}
+
+\end{document}
+

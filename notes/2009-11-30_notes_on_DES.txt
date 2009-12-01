@@ -1,0 +1,43 @@
+Måske kunne vi oprette en ny heap, kaldet yield-køen. når man ønsker at kommunikere til en tid, eller modtage noget til en bestemt tid, yield'es der og processen ligges på heapen. Scheduleren proccesere nu alle tråde i nex, curent, blocking, og først når der ikke findes job der fremskrives tiden til næste  event i yield-køen.
+ - Dette er taget fra SimPy, der har en nice overload hvor man blot kan skrive yield tid, og så fortsætter man til den tid.
+ 
+ Sikre livelock, og deadlock.
+ 
+ Hvis man venter på en intern ressource... så skal tiden kunne gå mens jeg venter på den 
+ Specielt skal man ved kommunikation have mulighed for at tiden skal gå.
+ 
+ 
+I stedet for at have traces for hele programmet, har Simpy en monitor funktion. hver gang en variable ændres f.eks. x. kan man kalde monitoren Xmon.observe(x), denne logger så tid og værdi, så man til slut kan se hvornår variablen ændrede sig.
+Man kan også vælge at få en trace af hele systemet.
+
+Man kan også have bruge for time average, som til hver tidsenhed måler eg. antallet i kø, eller ventetiden , dermed kan man få et mere  retvisende gennemsnit for flowet igennem processen. Dette kan alternativt køres som en ekstra funktion der sampler med en given frekvens og derfra udregner time average.
+
+Kan vi have at den samme proces venter på mere end en event, hvis det ikke er i en ALT? - hvis ikke skal vi også opdatere denne.
+
+
+
+definer: reel tid er tid som i the clock on the wall, 
+         logisk tid som i DES bruges af events.
+         
+
+Skal man i DES have mulighed for at bruge sleep, med en reel tid i DES. Og skal man kunne have et system hvor den logiske tid blandes med den reelle tid. 
+
+Man skal have muligehd for at få af vide hvad klokken er i logisk tid.
+
+
+
+
+
+PYCSP:
+I klassen proces findes wait, hvad gør state ACTIVE der. Jeg læser  while state == Active then s.next.switch som at den vil give en uendelig lykke
+Nej, for vi skal netop vente til state bliver read/write og derfor kan vi have while Active løkken.
+
+Hvad sker der i alt linie 223 compiling strings
+
+//csvpy
+
+
+eksempler, tider generelt.
+
+Brian snakker om at have de samme eksempler som fra andre simulationer.
+

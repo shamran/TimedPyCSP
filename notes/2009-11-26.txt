@@ -1,0 +1,7 @@
+Hvordan skal deadlines defineres.
+skal man kunne lave out of order eksekvering processer der burder kører sekventielt.
+
+skal man kunne vælge baseret på ALT's, skal der kigges på deadlinen for de forskelige processer før der vælges.
+
+ 
+
