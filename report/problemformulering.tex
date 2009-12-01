@@ -1,0 +1,64 @@
+\input{Compile-mappe/preamble}
+%\documentclass[a4paper, % papirstørrelse, skal altid med
+%final,% Når man skal skifte kompileringsmetode mellem draft og final skal man flytte kommenteringen %  i Draft kommanoerne, nedenfor.
+%11pt, % standardstørrelse på fonten
+%openany, % anvnedes hvis kapitler bare skal starte på den næste side
+%oneside,
+%article
+%]{memoir}
+
+%\usepackage[draft]{fixme} % til at skrive \fixme kommentarer til sig
+
+
+%\begin{document}
+\chapter{Intro} 
+\section{Problemformulering}
+\fxnote[inline]{Sprog fremtid:\\
+Det ønskes at\\
+ ikke\\
+ Det var ønsket at}
+
+\fxnote[inline]{hvad vi vil lave , hvordan vi vil lave det, hvad det skal resultere i, hvorfor gør vi det. }
+
+Vi ønsker i dette speciale at analysere mulighederne for i praksis at inkludere tre tidsmodeller DES, deadline scheduling og interactive time i pycsp.
+%Vi ønsker med eksempler at vise vores udviddelse med praktiske eksempler ledsaget af tegninger og tekst.
+
+Vi ønsker på baggrund af analysen at foretage en hel eller delvis implementation af tidsmodellerne. Med udgangspunkt i eksempler vil vi påvise fordele og ulemper i implementationen, samt foretage en sammenligning med den hidtidige måde at simulere tid på.
+
+Vi ønsker at vores udvidelse skal kunne bruges i et bredere udviklermiljø, og derfor ønsker vi at vores løsning skal være teknisk velfunderet samt have en notation der nemt kan bruges.
+
+%Vi ønsker at udvidde sproget pycsp så det i praksis bliver muligt for processer at kende til tid.
+\fxnote[inline]{TID: svævende begreb. definitioner af tid, er det diskret, kontinuerlig, \\
+Undersøgelse via eksempler\\
+udvide pycsp\\
+pæn syntaks - skal kunne \\
+}
+Vi ønsker at se på sammenhængen mellem tidsmodellerne og proritering i Pycsp, samt undersøge om Pythons scheduler kan ændres fra en FIFO kø til en prioeriteret kø så den kan understøtte tidsmodellerne.
+
+\subsection{Motivation}
+For at modellere de nævnte tidsmodeller i PyCSP idag, er man nødt til at introducerer barrierer for at definere tidsskridt. Denne løsning kræver en stor omskrivning af et udviklet program, sammenlignet med en version uden en tidsmodel. Dette er ikke ønskværdigt og vi vil gerne udvikle en funktionalitet i PyCSP, så man kan benytte tid intuitivt i et udviklet program.
+
+Året efter CSP blev opfundet blev tid introduceret i CSP alligevel er tid i CSP aldrig kommer ud over rampen og blevet inkluderet nogle sprog der implementere CSP. Dette skyldes at selvom tid i CSP blev korrekt udviklet sematisk og er korrekt, kan det ikke bruges/ er svært at bruge / egner sig ikke til implementation / i et programmeringssprog. Vi ønsker i stedet for at definere tid sematisk og kunne bevise tidsaspektet at starte med et formål om at tid skal være nemt tilgængeligt når man udvikler et program.
+
+
+
+På nuværende tidspunkt kan det kun gøres med bariere, hvilket ikke er en elegant løsning.
+Man vil kunne resonere om processerne ud fra en stokastisk tidselement. 
+
+\fxnote[inline]{Brian skal komme med mere motivation}
+
+\subsection{Resultat}
+Projektet skal resultere i en udviddelse af PyCSP der understøtter de nævnte modeller, samt en evaluering af udviddelsen. En vigtig del af resultatet vil være en række forklarende eksempler, der viser ''best practice'' for andvendelsen af i  
+
+\section{Konkrete mål med projektet}
+\textbf{Læringsmålene for dette projekt er som følger:}
+
+\begin{itemize}
+ \item Identificere problemstillingerne introduceret af tidsmodeller i CSP.
+ \item Argumentere hvilke ændringer  der skal foretages i Pycsp for at introducerer tidsmodeller.
+ \item Foretage en helt eller delvis implemention i PyCSP af de ændringer vi har beskrevet.
+ \item Foretage en evaluering de implementerede tidsmodeller sammenholdt med lignende løsninger.
+ \item Beskrive de foretagede ændringer så de er trivielle at benytte for folk med kendskab til PyCSP.
+ \item Gennem eksempler demonstrere anvendelsen.
+\end{itemize}
+\end{document}
