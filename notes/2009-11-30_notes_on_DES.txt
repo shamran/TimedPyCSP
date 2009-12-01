@@ -24,15 +24,18 @@ Skal man i DES have mulighed for at bruge sleep, med en reel tid i DES. Og skal 
 
 Man skal have muligehd for at få af vide hvad klokken er i logisk tid.
 
-
-
-
-
+ - Det kan være smart at inkludere et plotting modul så man kan se hvordan en kæ ændre sig over simulationen. 
+ - For at forbedre en simulation, kan det være en fordel at kunne køre den samme simulation flere gange.
+ - Det kunne være en ide at beskrive følgende "frequently occurring situations" ("the production line model", "the service counter model", "the network model", etc.)
+ - Med klassisk yield  har man mulighed for at at returnere  værdier i en yield. Med dette kan man notificere schedulere hvornår man ønsker at starte igen.
+ 
 PYCSP:
 I klassen proces findes wait, hvad gør state ACTIVE der. Jeg læser  while state == Active then s.next.switch som at den vil give en uendelig lykke
 Nej, for vi skal netop vente til state bliver read/write og derfor kan vi have while Active løkken.
 
 Hvad sker der i alt linie 223 compiling strings
+
+Hvorfor er greenelts valgt, og specielt ifh. til generators og coroutines.
 
 //csvpy
 
