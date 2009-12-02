@@ -32,6 +32,7 @@ Man skal have muligehd for at få af vide hvad klokken er i logisk tid.
 PYCSP:
 I klassen proces findes wait, hvad gør state ACTIVE der. Jeg læser  while state == Active then s.next.switch som at den vil give en uendelig lykke
 Nej, for vi skal netop vente til state bliver read/write og derfor kan vi have while Active løkken.
+hvad er map som findes i channels
 
 Hvad sker der i alt linie 223 compiling strings
 
