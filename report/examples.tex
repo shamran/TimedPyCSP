@@ -1,7 +1,7 @@
 \chapter{Eksempler}
 
-\section{Hajer og fisk på Wator} Som eksempel på en DES simulation
-har vi valgt at tage udgangspunkt i det scenarie som A. K. Dewdney
+\section{Hajer og fisk på Wator} Som eksempel på en \des har vi valgt at tage 
+udgangspunkt i det scenarie som A. K. Dewdney
 beskrev i artiklen \fixme[inline]{reference}. Artiklen beskriver den
 fiktive planet Wator, der har form som en torus og er fuldstændig
 dækket af vand. Verdenen er inddelt i felter som beskrevet på side
@@ -34,4 +34,23 @@ Såfremt de initielle parametre understøtter en bæredygtig bestand
 forventer vi at se bestanden af henholdsvis fisk og hajer oscillere
 afhængigt af hinanden.
 
-\section{Kunder i en bank} Et klassisk eksempel inden for \des
+\section{Kunder i en bank} Et klassisk eksempel inden for \des er at simulere  
+en række kunder der alle ankommer til en butik, hvor de skal serviceres. Dette 
+simple problem kan bruges til at modellere mange forskellige 
+problemstillinger, som hvordan flowet ændrer sig hvis man varrier en parameter 
+i systemet. Programmeringssproget SimPy har som et af deres eksempel, en 
+simulering af kunder i en bank. SimPy bruger dette som en gennemgående 
+eksempler hvor de løbende udvidder deres model for at vise forskellige 
+egenskaber ved deres model. For at nemt at kunne sammenligne SimPy  med vores 
+model vil vi bruge dette eksempel.
+
+I det simple tilfælde af eksemplet ankommer der en kunde til banken på på et 
+tilfældigt tidspunkt. Hun opholder sig i banken i et tidsrum, hvorefter hun 
+igen forlader banken.
+
+I det simple eksempel kan der ikke uddrages meget information, da banken ikke 
+består af en begrænset ressource som kunderne skal tilgå.  Eksemplet er derfor 
+udvidet med en service disk, hvor alle kunderne skal betjenes af en 
+servicemedarbejder. Alle kunder ankommer til banken i tilfædig orden og 
+stiller sig i kø til at blive serviceret. Dette  svare til en M/M/1\fixme{hvad  
+er en m/m/1 kø} kø.
