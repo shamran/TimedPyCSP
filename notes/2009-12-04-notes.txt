@@ -1,0 +1,17 @@
+Hvordan virker en retire i forhold til en forsendelse.
+
+hvis man først sender en værdi og derefter en retire. vil den modtagne process ikke modtage værdien og først bagefter modtage retire exceptionen?
+
+
+Hvordan virker retire i en alternation?
+
+
+      82: Length of queue in bank 1 before incrementing
+      83: bank waits in alt
+      83: Generator retires
+      83: All genreators have retires, we can empty the queue and exit
+      87: Customer09 left bank
+
+      71: Generator retires
+      71: bank waits in alt
+
