@@ -8,11 +8,6 @@ from pygame.locals import *
 EMPTY, FISH, SHARK = range(3)
 TYPE, AGE, MOVED, STARVED = range(4)
 
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
-
-pygame.init()
 
 @process
 def barrier (nr, cIN, cOUT):
@@ -26,35 +21,35 @@ def barrier (nr, cIN, cOUT):
 
 
 @process
-def start(cOUT):
-  worldsize = 32 #world is symmetric, value*value
-  worldparts = 1 #change to dymamic later
+def start(cOUT, nr_partsW):
+  world_height = 10
+  world_width = 32
+  #worldsize = 32 #world is symmetric, value*value
+  worldparts = 2 #change to dymamic later
   
   starting_fish = 40
   starting_sharks = 40
 
-  cOUT((starting_fish, starting_sharks, worldsize))
-
+  nr_partsW(worldparts)
+  for i in range(worldparts):
+    cOUT((starting_fish, starting_sharks, world_height, world_width/worldparts,i)) # i is transmitted as a reference to the worldpart
 
 @process
-def worldpart (cIN):
-  fish, sharks, worldsize = cIN()
+def worldpart (cIN, cOUT):
+  fish, sharks, world_height, part_width, part_id = cIN()
   print "%i fish and %i sharks in the world" %(fish, sharks)
-  windowsurface = pygame.display.set_mode((worldsize, worldsize), 0, 32) 
-  #Array is fefined as x,y,type of fish, age, moved 
-  #Array is defines as x,y,(FISH or SHARK), (MOVED or NOTMOVED) with a age value at the location
-  mypart = zeros((worldsize,worldsize,4))
-  #Distribute fish and sharks randomly in the world
+  #Array is fefined as x,y,type of fish, age, moved, starved 
+  mypart = zeros((part_width,world_height,4))
 
-  assert worldsize**2 > fish+sharks #make sure we have room for fish+sharks
+  assert world_height*part_width > fish+sharks #make sure we have room for fish+sharks
  
   #FIXME for several worldparts!
   def getsurroundings(x,y,type):
     empty = []
-    if mypart[x][(y-1)%worldsize][TYPE] == type: empty.append((x,(y-1)%worldsize)) #Above
-    if mypart[x][(y+1)%worldsize][TYPE] == type: empty.append((x,(y+1)%worldsize)) #Below
-    if mypart[(x-1)%worldsize][y][TYPE] == type: empty.append(((x-1)%worldsize,y)) #Left
-    if mypart[(x+1)%worldsize][y][TYPE] == type: empty.append(((x+1)%worldsize,y)) #Right
+    if mypart[x][(y-1)%world_height][TYPE] == type: empty.append((x,(y-1)%world_height)) #Above
+    if mypart[x][(y+1)%world_height][TYPE] == type: empty.append((x,(y+1)%world_height)) #Below
+    if mypart[(x-1)%part_width][y][TYPE] == type: empty.append(((x-1)%part_width,y)) #Left
+    if mypart[(x+1)%part_width][y][TYPE] == type: empty.append(((x+1)%part_width,y)) #Right
     return empty
 
   
@@ -62,8 +57,8 @@ def worldpart (cIN):
   #Populate fish
   i = 0
   while i < fish:
-    x = randint(0,worldsize-1)
-    y = randint(0,worldsize-1)
+    x = randint(0,part_width-1)
+    y = randint(0,world_height-1)
     if mypart[x][y][TYPE] == EMPTY:
       mypart[x][y][TYPE] = FISH
       mypart[x][y][AGE] = randint(1,3)
@@ -73,8 +68,8 @@ def worldpart (cIN):
   #Populate sharks
   i = 0
   while i < sharks:
-    x = randint(0,worldsize-1)
-    y = randint(0,worldsize-1)
+    x = randint(0,part_width-1)
+    y = randint(0,world_height-1)
     if mypart[x][y][TYPE] == EMPTY:
       mypart[x][y][TYPE] = SHARK
       mypart[x][y][AGE] = randint(0,3)
@@ -83,15 +78,15 @@ def worldpart (cIN):
 
       i+=1
 
-  printworld(mypart)
   while True: 
-    for i in range(worldsize):
-      for j in range(worldsize):
+    #reset MOVED before we begin the iteration
+    for i in range(world_height):
+      for j in range(part_width):
         f = mypart[j][i]
         f[MOVED] = 0
 
-    for i in range(worldsize):
-      for j in range(worldsize):
+    for i in range(world_height):
+      for j in range(part_width):
         f = mypart[j][i]
         emptyspaces = getsurroundings(j,i, EMPTY)
         fish = getsurroundings(j,i,FISH)
@@ -144,21 +139,51 @@ def worldpart (cIN):
           else:
             f[AGE] = 0
         
-    var = raw_input("continue?")
-    printworld(mypart)
+    #var = raw_input("continue?")
+    cOUT((mypart, part_id))
     
-def printworld(part):
-  print "World:"
-  for i in range(len(part)): # y coordinate
-    for j in range(len(part[0])): # x coordinate
-      f = part[j][i]
-      if f[TYPE] == EMPTY: print " ",
-      if f[TYPE] == FISH: print "F",
-      if f[TYPE] == SHARK: print "S",
-    print ""
+
+
+@process
+def aggregate(partR, nr_partsR, cW):
+  nr_parts = nr_partsR()
+  while True:
+    for k in range(nr_parts):
+      part, part_id = partR()
+      if k == 0: 
+        world = zeros((len(part)*nr_parts, len(part[0])))
+      offset = part_id*len(part)
+      for i in range(len(part[0])):
+        for j in range(len(part)):
+          world[j+offset][i] = part[j][i][TYPE]
+    #print "Aggregated world:"
+    #print world
+    cW(world)
+
+@process
+def visualize(cIN):
+  while True:
+    part = cIN()
+    print "World:"
+    for i in range(len(part[0])): # y coordinate
+      for j in range(len(part)): # x coordinate
+        type = part[j][i]
+        if type == EMPTY: print " ",
+        if type == FISH: print "-",
+        if type == SHARK: print "|",
+      print ""
+
+
+
 
 ch = Channel()
+start2aggr = Channel()
+part2aggr = Channel()
+aggr2vis = Channel()
 
 Parallel(
-  start(ch.writer()), worldpart(ch.reader())
+  start(ch.writer(), start2aggr.writer()), 
+  2*worldpart(ch.reader(), part2aggr.writer()),
+  aggregate(part2aggr.reader(), start2aggr.reader(), aggr2vis.writer()),
+  visualize(aggr2vis.reader())
 )
