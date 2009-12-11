@@ -29,7 +29,6 @@ def barrier (nr, cin, cout):
        cout(1)
 
 
-
 @process
 def printer (cin):
    while True:
