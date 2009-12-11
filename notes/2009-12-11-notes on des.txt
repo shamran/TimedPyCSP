@@ -1,0 +1,3 @@
+i scheduler er designet som en singleton så der kun findes en instans, dette giver problemer da, man så ikke blot kan extenden den og kalde base initatoren men skal overkrive hele  instiatoren og derfor have en copy paste code reuse.
+
+i guard findes der timeout som vi skal håndtere i DES.
