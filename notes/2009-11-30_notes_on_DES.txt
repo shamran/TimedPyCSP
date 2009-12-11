@@ -33,12 +33,19 @@ PYCSP:
 I klassen proces findes wait, hvad gør state ACTIVE der. Jeg læser  while state == Active then s.next.switch som at den vil give en uendelig lykke
 Nej, for vi skal netop vente til state bliver read/write og derfor kan vi have while Active løkken.
 hvad er map som findes i channels
-
+i channel er der en readqueue og writequeue?
 Hvad sker der i alt linie 223 compiling strings
 
 Hvorfor er greenelts valgt, og specielt ifh. til generators og coroutines.
 
 //csvpy
+
+profiling : 
+--cProfile -s time 
+prioriteret alternation, med skip til sidst
+
+
+graphics-py
 
 
 eksempler, tider generelt.

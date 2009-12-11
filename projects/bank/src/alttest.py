@@ -15,19 +15,26 @@ def P(cin, din):
 				din:'print "1 : din %d"%__channel_input'
 												}]).execute()
 			print "0 : leaving alt"
-			#sleep(2)
+			sleep(1)
 	except ChannelRetireException:
 		retire(cin,din)
-		print "retire"
+		print "0 : got retire propergating"
 	except ChannelPoisonException:
+		print "0 : got poison propergating"
 		poison(cin,din)
-		print "poison"
 
 @process
 def Q(id,out,tmax):
 	t = 0
 	while t<tmax:
-		out(t)
+		try:
+			out(t)
+		except ChannelRetireException:
+			print "%d : got retire"%id
+			return
+		except ChannelPoisonException:
+			print "%d : got poison"%id
+			return
 		t+=1
 	print "%d : poisons channel"%id
 	poison(out)

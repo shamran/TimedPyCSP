@@ -5,4 +5,5 @@ cd tmp
 cd ..
 pdflatex  -interaction=batchmode -output-directory tmp skelet
 pdflatex  -interaction=batchmode -output-directory tmp skelet
-cp tmp/skelet.pdf ../masterthesis.pdf 
+cp tmp/skelet.pdf ../masterthesis.pdf
+evince ../masterthesis.pdf

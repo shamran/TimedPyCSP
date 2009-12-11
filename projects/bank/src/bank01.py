@@ -14,7 +14,7 @@ def Time(nprocesses,timeOUT):
 		#print "sending time %f"%(_t)
 		for i in range (0,nprocesses):
 			timeOUT(_t)
-
+  
 @process
 def Customer(custid,interval,timeIN,barrierOUT,barrierIN):
 	"""Customer walks in waits and leaves"""
@@ -22,7 +22,7 @@ def Customer(custid,interval,timeIN,barrierOUT,barrierIN):
 	left = False
 	Rnd = Random()
 	waittime = 0 
-	arrive = Rnd.random()*20
+	arrive = round(Rnd.random()*20)
 	while True:
 		barrierOUT(1)
 		barrierIN()
@@ -33,19 +33,19 @@ def Customer(custid,interval,timeIN,barrierOUT,barrierIN):
 		if _t <= arrive and _t+1 > arrive: 
 			left = False
 			arrived = True
-			print "%8.3f : Here I am Customer %s   "%(_t,custid)
-			waittime = Rnd.random()*20
-		#waits for 5 min.
+			print "%8.0f : Here I am Customer %s   "%(_t,custid)
+			waittime = round(Rnd.random()*20)
 		if _t<arrive+waittime:
 			continue
-
 		if not left:
-			print "%8.3f :cust %s waited %8.3f "%(_t,custid,waittime)
+			print "%8.0f : cust %s left, waited %2.0f "%(_t,custid,waittime)
 			left  = True
 			arrived = False
+
 @process
 def Barrier(nprocesses, signalIN, signalOUT):
-	""" Barrier, waits for a signal from nprocesses in signalIN and the inparallel sends a signal to all on signalOUT"""	
+	""" Barrier, waits for a signal from nprocesses in signalIN and the
+	    inparallel sends a signal to all on signalOUT"""	
 	while True:
 		for i in range (0,nprocesses):
 			signalIN()

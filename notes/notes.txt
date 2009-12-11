@@ -1,8 +1,0 @@
-Hvordan kan man i pycsp lave en one2All
-i branch and bound eksemplet kunne man med fordel propagere bound ud til at alle worker trådene i stedet for at skulle vente på at workeren pull information.
-
-
-
-Kan man i Pycsp bruge både processor samt greenlets i samme program.
-
-

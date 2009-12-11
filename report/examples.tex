@@ -37,10 +37,10 @@ afhængigt af hinanden.
 \section{Kunder i en bank} Et klassisk eksempel inden for \des er at simulere  
 en række kunder der alle ankommer til en butik, hvor de skal serviceres. Dette 
 simple problem kan bruges til at modellere mange forskellige 
-problemstillinger, som hvordan flowet ændrer sig hvis man varrier en parameter 
+problemstillinger, som hvordan flowet ændrer sig hvis man varier en parameter 
 i systemet. Programmeringssproget SimPy har som et af deres eksempel, en 
 simulering af kunder i en bank. SimPy bruger dette som en gennemgående 
-eksempler hvor de løbende udvidder deres model for at vise forskellige 
+eksempler hvor de løbende udvider deres model for at vise forskellige 
 egenskaber ved deres model. For at nemt at kunne sammenligne SimPy  med vores 
 model vil vi bruge dette eksempel.
 
@@ -50,7 +50,29 @@ igen forlader banken.
 
 I det simple eksempel kan der ikke uddrages meget information, da banken ikke 
 består af en begrænset ressource som kunderne skal tilgå.  Eksemplet er derfor 
-udvidet med en service disk, hvor alle kunderne skal betjenes af en 
-servicemedarbejder. Alle kunder ankommer til banken i tilfædig orden og 
+også udvidet med en service disk, hvor alle kunderne skal betjenes af en 
+servicemedarbejder. Alle kunder ankommer til banken i tilfældig orden og 
 stiller sig i kø til at blive serviceret. Dette  svare til en M/M/1\fixme{hvad  
 er en m/m/1 kø} kø.
+
+
+\section{Eksisterende PYCSP}
+For at modellere eksemplet med kunder i en bank i PyCSP, skal der foretages en række valg. Først og fremmest skal det besluttes hvad der skal være processer, og hvordan  kanalerne skal forbindes. 
+I DES findes der i modsætningen til PDES \fixme{referencer} en global tid og alle processerne skal derfor have  en fælles tid der tæller op samtidigt. Den en brugt metode er at  bruge en barrier \vref{barrier}.
+
+\begin{lstlisting}[label=barrier,caption=A barrier in PyCSP]
+@process
+def Barrier(nprocesses, signalIN, signalOUT):
+	while True:
+		for i in range (nprocesses):
+			signalIN()
+		for i in range (nprocesses):
+			signalOUT(0)
+\end{lstlisting}
+
+Barrier blev introduceret i MPI, og sikrer at alle tråde har nået dette punkt før de må fortsætte. 
+I PyCSP er det trivielt at have  denne egenskab, da processer til begge kanalender er klar, og med to kanaler kan man sikre at ingen proces modtager et signal før alle processer har sendt et signal til barrieren.
+
+I SimPy er hver customer en process og det vil være nærliggende at 
+
+

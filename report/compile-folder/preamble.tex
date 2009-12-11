@@ -1,5 +1,5 @@
 \documentclass[a4paper, % papirstørrelse, skal altid med
-draft,%final,% Når man skal skifte kompileringsmetode mellem draft og final 
+final,% Når man skal skifte kompileringsmetode mellem draft og final 
 skal man flytte kommenteringen %  i Draft kommanoerne, nedenfor.
 11pt, % standardstørrelse på fonten
 openany, % anvnedes hvis kapitler bare skal starte på den næste side
@@ -26,7 +26,7 @@ article
 \usepackage[utf8]{inputenc} % eller utf8 eller ansinew eller ...
 \usepackage[danish]{babel} %direktiv til at bruge det danske sprog
 
-\usepackage[]{fixme} % til at skrive \fixme kommentarer til sig
+\usepackage[draft]{fixme} % til at skrive \fixme kommentarer til sig
 
 %\newenvironment{Draft}{\fixme{HUSK at ændre kommenteringen i preamble når man skifter mellem draft og final} }{  }
 \let\Draft=\comment \let\endDraft=\endcomment
@@ -112,10 +112,59 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 
 
 %Linjeafstand: (1,5 = siderne bliver ca. til ns)
-\linespread{1}
+\linespread{1,5}
 \selectfont
 
 \newcommand{\des}[0]{Discrete event simulation}
+
+% OPSÆTNING TIL INKLUDERING AF SOURCE CODE
+\usepackage[final]{listings}
+\usepackage{courier}
+ \lstset{
+         basicstyle=\footnotesize\ttfamily, % Standardschrift
+         %numbers=left,               % Ort der Zeilennummern
+         numberstyle=\tiny,          % Stil der Zeilennummern
+         %stepnumber=2,               % Abstand zwischen den Zeilennummern
+         numbersep=5pt,              % Abstand der Nummern zum Text
+         tabsize=2,                  % Groesse von Tabs
+         extendedchars=true,         %
+         breaklines=true,            % Zeilen werden Umgebrochen
+         keywordstyle=\color{red},
+                frame=b,         
+ %        keywordstyle=[1]\textbf,    % Stil der Keywords
+ %        keywordstyle=[2]\textbf,    %
+ %        keywordstyle=[3]\textbf,    %
+ %        keywordstyle=[4]\textbf,   \sqrt{\sqrt{}} %
+         stringstyle=\color{white}\ttfamily, % Farbe der String
+         showspaces=false,           % Leerzeichen anzeigen ?
+         showtabs=false,             % Tabs anzeigen ?
+         xleftmargin=17pt,
+         framexleftmargin=17pt,
+         framexrightmargin=5pt,
+         framexbottommargin=4pt,
+         %backgroundcolor=\color{lightgray},
+         showstringspaces=false      % Leerzeichen in Strings anzeigen ?        
+ }
+ \lstloadlanguages{% Check Dokumentation for further languages ...
+         %[Visual]Basic
+         %Pascal
+         %C
+         %C++
+         %XML
+         %HTML
+         PYTHON
+ }
+    %\DeclareCaptionFont{blue}{\color{blue}} 
+
+  %\captionsetup[lstlisting]{singlelinecheck=false, labelfont={blue}, textfont={blue}}
+  \usepackage{caption}
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
+
+
+
+
 %\usepackage{pdfpages}
 
 %\includeonly{../litteratur}
