@@ -1,0 +1,15 @@
+
+- Hvad har vi nået i de sidste to uger.
+
+    Vi har implementeret to bank eksempler, for at kunne sammenligne SimPy med vores implementation.
+    Vi har implementeret WATOR som et live world eksempel hvor vores implementation kan sersette barrierer.
+
+- Hvad skulle vi have nået i de sidste to uger.
+
+- Hvad skal vi nå i de næste to uger.
+
+SPG til Brian
+
+    - Har du ikke vist en pæn csp metode til at have uendelige kø? (selvudvidende)
+    - Vi har som eksperiment udviddet greenlets med simulation
+
