@@ -13,5 +13,7 @@
 SPG til Brian
 
     - Har du ikke vist en pæn csp metode til at have uendelige kø? (selvudvidende)
+       = Ha en process med en kø. og have en alt der kan vælge mellem at poppe og pusher.
+      
     - Vi har som eksperiment udviddet greenlets med simulation
-
+       = 

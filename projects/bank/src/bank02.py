@@ -14,6 +14,8 @@ class Customer:
     self.name = name
     self.waittime = round(expovariate(1/meanTBA))
 
+  def __repr__(self):
+    return "%s,%s"%(self.waittime,self.name)
 @process
 def Generator(i,number,meanTBA, customerWRITER,barrierWRITER,barrierREADER):
   """Generaters a customer with a given time difference"""
@@ -22,19 +24,19 @@ def Generator(i,number,meanTBA, customerWRITER,barrierWRITER,barrierREADER):
   numberInserted = 0
   while numberInserted<number:
     if t_event<=time:
-      c = Customer(name = "Customer%02d"%(numberInserted,),meanTBA=meanTBA)
-      print "%64.0f: G: %s =%s"%(time,numberInserted,c.name)
+      c = Customer(name = "Customer%d:%02d"%(i,numberInserted),meanTBA=meanTBA)
+      print "%64.0f: G%d: %s =%s"%(time,i,numberInserted,c.name)
       customerWRITER(c)
-      print "%64.0f: G: sent customer %s =%s"%(time,numberInserted,c.name)
+      print "%64.0f: G%d: sent customer %s =%s"%(time,i,numberInserted,c.name)
       t_event = time + round(expovariate(1/meanTBA))
       numberInserted+=1
-    print "%64.0f: G: enters barrier "%(time)
+    print "%64.0f: G%d: enters barrier "%(time,i)
     barrierWRITER(0)
-    print "%64.0f: G: enters barrier2 "%(time)
+    print "%64.0f: G%d: enters barrier2 "%(time,i)
     barrierREADER()
-    print "%64.0f: G: increments time "%(time)
+    print "%64.0f: G%d: increments time "%(time,i)
     time+=1
-  print "%64.0f: G: retires"%time 
+  print "%64.0f: G%d: retires"%(time,i) 
   retire(customerWRITER)
   try:
     while True:
@@ -42,7 +44,7 @@ def Generator(i,number,meanTBA, customerWRITER,barrierWRITER,barrierREADER):
       barrierREADER()
       time +=1
   except ChannelPoisonException:
-    print "%64.0f: G: got poison"%time 
+    print "%64.0f: G%d: got poison"%(time,i) 
 
 
 @process
@@ -73,9 +75,10 @@ def Bank(meanWait,customerREADER,barrierWRITER, barrierR):
           print "%94.0f: B: Length of queue in bank %d"%(time,len(customers))
           break
         elif g == customerREADER:
-          print "%94.0f: B: adding a customer %s"%(time,msg.name)
+          print "%94.0f: B: adding a customer %s"%(time,msg)
           heappush(customers,(time+msg.waittime,msg))
-          print "%94.0f: B:%s"%(time,customers)
+          print "%94.0f: B:"%(time)
+          show_tree(customers,offset=93)
       if len(customers)>0:
         ntime,ncust = heappop(customers)
         if ntime<=time:
@@ -111,7 +114,7 @@ def Barrier(nprocesses, barrierIN, signalOUT):
 
 if __name__ == "__main__":
   print "main starting"
-  nprocesses = 1
+  nprocesses = 2
   customer = Channel()
   barrierDone = Channel()
   barrierContinue = Channel()
