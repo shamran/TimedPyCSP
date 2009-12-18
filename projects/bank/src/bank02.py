@@ -16,6 +16,10 @@ class Customer:
 
   def __repr__(self):
     return "%s,%s"%(self.waittime,self.name)
+
+
+  
+
 @process
 def Generator(i,number,meanTBA, customerWRITER,barrierWRITER,barrierREADER):
   """Generaters a customer with a given time difference"""
@@ -78,7 +82,8 @@ def Bank(meanWait,customerREADER,barrierWRITER, barrierR):
           print "%94.0f: B: adding a customer %s"%(time,msg)
           heappush(customers,(time+msg.waittime,msg))
           print "%94.0f: B:"%(time)
-          show_tree(customers,offset=93)
+          #show_tree(customers,offset=93)
+          print customers
       if len(customers)>0:
         ntime,ncust = heappop(customers)
         if ntime<=time:
@@ -118,8 +123,8 @@ if __name__ == "__main__":
   customer = Channel()
   barrierDone = Channel()
   barrierContinue = Channel()
-  numberCustomers=2
-  meanTBA = 10.0
+  numberCustomers=5
+  meanTBA = 1.0
   meanWT = 20.0
   Parallel(
     Bank(meanWT,+customer,-barrierDone,+barrierContinue),
