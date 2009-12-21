@@ -9,7 +9,6 @@ from pygame.locals import *
 EMPTY, FISH, SHARK = range(3)
 TYPE, AGE, MOVED, STARVED = range(4)
 
-
 @process
 def barrier (nr, cR, cW):
   while True:
@@ -28,8 +27,8 @@ def start(cOUT, nr_partsW):
   #worldsize = 32 #world is symmetric, value*value
   worldparts = 2 #change to dymamic later
   
-  starting_fish = 40
-  starting_sharks = 40
+  starting_fish = 10
+  starting_sharks = 5
 
   nr_partsW(worldparts)
   for i in range(worldparts):
@@ -39,27 +38,79 @@ def start(cOUT, nr_partsW):
 def worldpart (cIN, cOUT, barR, barW, leftR, leftW, rightR, rightW):
   fish, sharks, world_height, part_width, part_id = cIN()
   print "%i fish and %i sharks in the world" %(fish, sharks)
-  #Array is fefined as x,y,type of fish, age, moved, starved 
+  #Array is defined as x,y,type of fish, age, moved, starved 
   mypart = zeros((part_width+2,world_height,4))
 
   assert world_height*part_width > fish+sharks #make sure we have room for fish+sharks
  
-  #FIXME for several worldparts!
   def getsurroundings(x,y,type):
     empty = []
     if mypart[x][(y-1)%world_height][TYPE] == type: empty.append((x,(y-1)%world_height)) #Above
     if mypart[x][(y+1)%world_height][TYPE] == type: empty.append((x,(y+1)%world_height)) #Below
-    if mypart[(x-1)%part_width][y][TYPE] == type: empty.append(((x-1)%part_width,y)) #Left
-    if mypart[(x+1)%part_width][y][TYPE] == type: empty.append(((x+1)%part_width,y)) #Right
+    if mypart[x-1][y][TYPE] == type: empty.append((x-1,y)) #Left
+    if mypart[x+1][y][TYPE] == type: empty.append((x+1,y)) #Right
     return empty
 
   
+  def merge_columns(col, pos):
+    for i in range len(col):
+      if col[i][MOVED] == 1:
+        assert mypart
+  
+  def synchronize(merge=False):
+    my_left_col = mypart[1] 
+    my_right_col = mypart[len(mypart)-2] 
+    
+    shadow_left_col = mypart[0]
+    shadow_right_col = mypart[len(mypart)-1] 
+ 
+
+    @choice
+    def read_left(__channel_input=None):
+      if merge:
+        print ""
+      else:
+        mypart[0] = __channel_input
+        rightW(my_right_col)
+
+    @choice
+    def write_right():
+      if merge:
+        print ""
+      else:
+        mypart[0] = leftR()
+    
+    Alternation([
+      (leftR,read_left()), 
+      (rightW,my_right_col,write_right())]
+      ).execute()
+
+    @choice 
+    def read_right(__channel_input=None):
+      if merge:
+        print "" 
+      else:
+        mypart[len(mypart)-1] = __channel_input
+        leftW(my_left_col)
+
+    @choice
+    def write_left():
+      if merge:
+        print ""
+      else:
+        mypart[len(mypart)-1] = rightR()
+
+    Alternation([
+      (rightR,read_right()), 
+      (leftW,my_left_col,write_left())]
+      ).execute()
+
 
   #Populate fish
   i = 0
   while i < fish:
-    x = random.randint(1,part_width)
-    y = random.randint(0,world_height-1)
+    x = random.randint(1,part_width+1)
+    y = random.randint(0,world_height)
     if mypart[x][y][TYPE] == EMPTY:
       mypart[x][y][TYPE] = FISH
       mypart[x][y][AGE] = random.randint(0,3)
@@ -69,16 +120,18 @@ def worldpart (cIN, cOUT, barR, barW, leftR, leftW, rightR, rightW):
   #Populate sharks
   i = 0
   while i < sharks:
-    x = random.randint(1,part_width)
-    y = random.randint(0,world_height-1)
+    x = random.randint(1,part_width+1)
+    y = random.randint(0,world_height)
     if mypart[x][y][TYPE] == EMPTY:
       mypart[x][y][TYPE] = SHARK
       mypart[x][y][AGE] = random.randint(0,3)
       mypart[x][y][MOVED] = 0
       mypart[x][y][STARVED] = 0
-
       i+=1
+
   # Temp printing  
+  '''
+  print "before exchange %i" %(part_id)
   for i in range(len(mypart[0])):
     for j in range(len(mypart)):
       f = mypart[j][i]
@@ -86,41 +139,7 @@ def worldpart (cIN, cOUT, barR, barW, leftR, leftW, rightR, rightW):
       if f[TYPE] == FISH: print "/",
       if f[TYPE] == SHARK: print "|",
     print""
-
-  #Update shadow rows
-
-  left_col = mypart[1] 
-  right_col = mypart[len(mypart)-2] 
-  cOUT((mypart, part_id))
-
-  @choice
-  def read_left_first(__channel_input):
-    mypart[0] = __channel_input
-    rightW(right_col)
-
-  @choice
-  def write_right_first():
-    mypart[0] = leftR()
-  
-  Alternation([
-    (leftR,"read_left_first(__channel_input)"), 
-    (rightW,right_col,None)]
-    ).execute()
-
-  @choice 
-  def read_right_first(__channel_input):
-    mypart[len(mypart)-1] = __channel_input
-    leftW(left_col)
-
-  @choice
-  def write_left_first():
-    mypart[len(mypart)-1] = rightR()
-
-  Alternation([
-    (rightR,"read_right_first(__channel_input)"), 
-    (leftW,left_col,None)]
-    ).execute()
-
+  '''
   
   while True: 
     #reset MOVED before we begin the iteration
@@ -128,6 +147,11 @@ def worldpart (cIN, cOUT, barR, barW, leftR, leftW, rightR, rightW):
       for j in range(1,part_width+1):
         f = mypart[j][i]
         f[MOVED] = 0
+
+    synchronize() 
+    cOUT((mypart, part_id))
+    barW(1)
+    barR()
 
     for i in range(world_height):
       for j in range(1,part_width+1):
@@ -182,7 +206,11 @@ def worldpart (cIN, cOUT, barR, barW, leftR, leftW, rightR, rightW):
             f[STARVED] = 0
           else:
             f[AGE] = 0
-        
+    
+    #Send fish and sharks that have moved to another world part
+    
+
+
     #var = raw_input("continue?")
     cOUT((mypart, part_id))
     barW(1)
@@ -213,13 +241,11 @@ def visualize(cIN):
     for i in range(len(part[0])): # y coordinate
       for j in range(len(part)): # x coordinate
         type = part[j][i]
-        if type == EMPTY: print " ",
-        if type == FISH: print "-",
-        if type == SHARK: print "|",
+        if type == EMPTY: print ".",
+        if type == FISH: print "|",
+        if type == SHARK: print "*",
       print ""
-
-
-
+    t = raw_input()
 
 ch = Channel()
 start2aggr = Channel()
