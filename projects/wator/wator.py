@@ -47,13 +47,14 @@ def worldpart (part_id,cIN, barR, barW):
     f = world[j][i]
     if f[TYPE] == EMPTY or f[MOVED] == 1:
       return
+    p = Point(j,i)
     fish = None
     if f[TYPE] == SHARK :
       if f[STARVED] >= 3:
         #print "SHARK DYING ->",
         for i in range(4):
           f[i] = 0
-        viz(j,i)
+        viz_die(p)
         return
       # Move to fish and eat it
       fish = getsurroundings(j,i,FISH)
@@ -66,24 +67,22 @@ def worldpart (part_id,cIN, barR, barW):
       if emptyspaces:
         spawn = randomchoice(emptyspaces)
     if spawn:        
-        move(_from=f,_to=world[spawn[0]][spawn[1]])
-        viz(j,i)
-        viz(spawn[0],spawn[1])
+        move(_from=f,f=p,_to=world[spawn.getX()][spawn.getY()],t=spawn)
     else:
         f[AGE] += 1
         f[STARVED] += 1
 
   def getsurroundings(x,y,_type):
     empty = []
-    if world[x][(y-1)%world_height][TYPE] == _type: empty.append((x,(y-1)%world_height)) #Above
-    if world[x][(y+1)%world_height][TYPE] == _type: empty.append((x,(y+1)%world_height)) #Below
-    if world[(x-1)%world_width][y][TYPE] == _type: empty.append(((x-1)%world_width,y)) #Left
-    if world[(x+1)%world_width][y][TYPE] == _type: empty.append(((x+1)%world_width,y)) #Right
+    if world[x][(y-1)%world_height][TYPE] == _type: empty.append(Point(x,(y-1)%world_height)) #Above
+    if world[x][(y+1)%world_height][TYPE] == _type: empty.append(Point(x,(y+1)%world_height)) #Below
+    if world[(x-1)%world_width][y][TYPE] == _type: empty.append(Point((x-1)%world_width,y)) #Left
+    if world[(x+1)%world_width][y][TYPE] == _type: empty.append(Point((x+1)%world_width,y)) #Right
     if empty == []: 
       return None
     return empty
 
-  def move(_from, _to):
+  def move(_from,f, _to,t):
       #print _element(_from)," -> ",
       if _from[TYPE] == SHARK:
         if _to[TYPE] == FISH:
@@ -95,18 +94,22 @@ def worldpart (part_id,cIN, barR, barW):
       _to[AGE] = _from[AGE]+1
       _to[MOVED] = 1
       _to[TYPE] = _from[TYPE]
+      _to[GUI] = _from[GUI]
+      viz_move(f,t)
 
       if (_to[TYPE] == FISH and _to[AGE]<3) or _to[AGE]<10 :
-        for i in range(4):
+        for i in range(5):
           _from[i] = 0
       else:
         #print " MULTIPLYING ->",
         _to[AGE] = 0
         _from[AGE] = 0
         _from[MOVED] = 1
+        _from[GUI] = create_gui(_from[TYPE],f.getX(),f.getY())
+        _from[GUI].draw(win) 
         #print _element(_to),_element(_from)
 
-  def viz(x,y):
+  """def viz(x,y):
       _x = x*multiplier
       _y = y*multiplier
       
@@ -114,7 +117,17 @@ def worldpart (part_id,cIN, barR, barW):
       point2 = Point(_x+multiplier,_y+multiplier)
       rec = Rectangle(point1,point2)
       rec.setFill(color[world[x][y][TYPE]])
-      rec.draw(win)
+      rec.draw(win)"""
+
+  def viz_move(_from, _to):
+      dx =  _to.getX() - _from.getX() 
+      dy =  _to.getY() - _from.getY() 
+      #print "move",_from, _to, dx,dy 
+      world[_to.getX()][_to.getY()][GUI].move(dx*multiplier,dy*multiplier)
+
+  def viz_die(_to):
+      world[_to.getX()][_to.getY()][GUI].undraw()
+
   @io
   def main_iteration():
       for i in range(world_height):
@@ -147,17 +160,24 @@ def worldpart (part_id,cIN, barR, barW):
   
 @process
 def visualize(barR,barW):
-  for i in xrange(10):
+  for i in xrange(iterations):
     print i
     barW(1)
     barR()
     barW(1)
     barR()
-    #win.update()
-    #t = raw_input()
+    win.update()
+    t = raw_input()
     barW(1)
     barR()
   poison(barW,barR)   
+
+def create_gui(type,x,y):
+  point1 = Point(x*multiplier,y*multiplier)
+  point2 = Point(x*multiplier+multiplier,y*multiplier+multiplier)
+  rec = Rectangle(point1,point2)
+  rec.setFill(color[type])
+  return rec
 
 def create(type):
   x = random.randint(0,world_width)
@@ -165,14 +185,6 @@ def create(type):
   while not world[x][y][TYPE] == EMPTY:
     x = random.randint(0,world_width)
     y = random.randint(0,world_height)
-  point1 = Point(x,y)
-  point2 = Point(x+multiplier,y+multiplier)
-  rec = Rectangle(point1,point2)
-  #print x,y,GUI,world[x][y][GUI]
-  world[x][y][GUI] = rec 
-  world[x][y][GUI].setFill(color[type])
-  world[x][y][GUI].draw(win)
-  world[x][y][TYPE] = type
   age = random.randint(0,9)
   if type == FISH:
     age = random.randint(0,3)
@@ -180,21 +192,22 @@ def create(type):
   world[x][y][AGE] = age 
   world[x][y][MOVED] = 0
   world[x][y][STARVED] = 0
+  world[x][y][TYPE] = type
+  world[x][y][GUI] = create_gui(type,x,y)
+  world[x][y][GUI].draw(win)
 
-
-world_height = 10
-world_width = 30 
+world_height = 60
+world_width = 80 
 worldparts = 5 
-starting_fish = 30
-starting_sharks = 3
+starting_fish = 600
+starting_sharks = 257
 multiplier = 10
-
+iterations = 100
 assert world_height*world_width >= starting_fish+starting_sharks #make sure we have room for fish+sharks
 world = zeros((world_width,world_height,5),object)
 
-print world
 #Set GUI
-win = GraphWin("WATOR",world_width*multiplier,world_height*multiplier,True)
+win = GraphWin("WATOR",world_width*multiplier,world_height*multiplier,False)
 win.setBackground("blue1")
 
 

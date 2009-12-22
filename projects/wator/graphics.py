@@ -546,7 +546,7 @@ class Point(GraphicsObject):
                 
     def getX(self): return self.x
     def getY(self): return self.y
-
+    def __repr__(self): return "(%d,%d)"%(self.x,self.y)
 class _BBox(GraphicsObject):
     # Internal base class for objects represented by bounding box
     # (opposite corners) Line segment is a degenerate case.
