@@ -1,0 +1,28 @@
+Vi kan nu simulere en basal des hvor tiden tælles om i diskrete tidsskridt, men vi har ikke en trace funktionalitet. 
+spg er
+* Hvad skal der dannes traces over
+* hvor finmaskes skal tracen være
+* i buffers hvad skal der føres af traces. skal der med hvornår elementet
+* blev lagt på bufferen hvor lang tid det har ligget der mv, mv.
+
+
+Bufferd channel:
+ - Dette svare til en queue i Simpy Disse er basis klassen og udvides med FIFO,PriorityQ.
+    - en queue er basalt set en liste og en monitor.
+    - En FIFO queue har flg. egnskaber:
+        - enter
+        - leave
+        - takeout
+    - Hvis monitoren er sat, tilføjes der til hver event en record i Monitor objektet(Monitor.observer()
+ 
+ -  I Simpy består en resource af en queue (FIFO,FILO, preemptive mv.), et navn, en capacitet, samt en monitor.
+
+ - Det er Monitor der er central i Simpy for at kunne trække data om simulationen ud.
+    Man kan for Simpys monitors udtrække følgende data:
+    - count
+    - mean
+    - total
+    - variance
+
+      En monitor plotter event i to akser, som defineres ved start. for en queue kan det være længden af køen til tiden. Monitor er en sun klasse af en  liste.
+      

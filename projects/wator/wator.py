@@ -5,288 +5,219 @@ from numpy import *
 import pygame, sys
 #from pygame.locals import *
 from graphics import *
-
+#import psyco
+#psyco.full()
 EMPTY, FISH, SHARK = range(3)
-TYPE, AGE, MOVED, STARVED = range(4)
+TYPE, AGE, MOVED, STARVED, GUI = range(5)
+
+type =  {
+      0 : "EMPTY",
+      1 : "FISH",
+      2 : "SHARK"
+      }
+color = {
+    0 : "blue",
+    1 : "green", 
+    2 : "red"
+    }
+
+def _element(element):
+  return "%s:age:%i moved:%i starved:%i"%(type[element[TYPE]],element[AGE],element[MOVED],element[STARVED])
 
 @process
 def barrier (nr, cR, cW):
-  while True:
-    for i in range(nr):
-       cR()
-       #sleep(1)
-       #print "%i workers in barrier" %(i+1)
-    for i in range(nr):
-       cW(1)
-
-
-@process
-def start(cOUT, nr_partsW):
-  world_height = 60
-  world_width = 60
-  #worldsize = 32 #world is symmetric, value*value
-  worldparts = 2 #change to dymamic later
-  
-  starting_fish = 80 
-  starting_sharks = 60
-
-  nr_partsW(worldparts)
-  for i in range(worldparts):
-    cOUT((starting_fish, starting_sharks, world_height, world_width/worldparts,i)) # i is transmitted as a reference to the worldpart
+  try:
+    while True:
+      for i in range(nr):
+         cR()
+      for i in range(nr):
+         cW(1)
+  except ChannelPoisonException:
+    return
 
 @process
-def worldpart (cIN, cOUT, barR, barW, leftR, leftW, rightR, rightW):
-  fish, sharks, world_height, part_width, part_id = cIN()
-  print "%i fish and %i sharks in the world" %(fish, sharks)
-  #Array is defined as x,y,type of fish, age, moved, starved 
-  mypart = zeros((part_width+2,world_height,4))
+def worldpart (part_id,cIN, barR, barW):
 
-  assert world_height*part_width > fish+sharks #make sure we have room for fish+sharks
- 
-  def getsurroundings(x,y,type):
+  #indices for working in a shared matrix:
+  part_width = (world_width/worldparts)-2
+  start_col = part_id*(part_width+2)
+  right_shadow_col = (start_col+part_width)%world_width
+
+  def element_iteration(j,i):
+    f = world[j][i]
+    if f[TYPE] == EMPTY or f[MOVED] == 1:
+      return
+    fish = None
+    if f[TYPE] == SHARK :
+      if f[STARVED] >= 3:
+        #print "SHARK DYING ->",
+        for i in range(4):
+          f[i] = 0
+        viz(j,i)
+        return
+      # Move to fish and eat it
+      fish = getsurroundings(j,i,FISH)
+    spawn = None
+    if fish:
+      spawn = randomchoice(fish)
+    else:
+      #Move to empty space
+      emptyspaces = getsurroundings(j,i, EMPTY)
+      if emptyspaces:
+        spawn = randomchoice(emptyspaces)
+    if spawn:        
+        move(_from=f,_to=world[spawn[0]][spawn[1]])
+        viz(j,i)
+        viz(spawn[0],spawn[1])
+    else:
+        f[AGE] += 1
+        f[STARVED] += 1
+
+  def getsurroundings(x,y,_type):
     empty = []
-    if mypart[x][(y-1)%world_height][TYPE] == type: empty.append((x,(y-1)%world_height)) #Above
-    if mypart[x][(y+1)%world_height][TYPE] == type: empty.append((x,(y+1)%world_height)) #Below
-    if mypart[x-1][y][TYPE] == type: empty.append((x-1,y)) #Left
-    if mypart[x+1][y][TYPE] == type: empty.append((x+1,y)) #Right
+    if world[x][(y-1)%world_height][TYPE] == _type: empty.append((x,(y-1)%world_height)) #Above
+    if world[x][(y+1)%world_height][TYPE] == _type: empty.append((x,(y+1)%world_height)) #Below
+    if world[(x-1)%world_width][y][TYPE] == _type: empty.append(((x-1)%world_width,y)) #Left
+    if world[(x+1)%world_width][y][TYPE] == _type: empty.append(((x+1)%world_width,y)) #Right
+    if empty == []: 
+      return None
     return empty
 
-  
-  #def merge_columns(col, pos):
-  #  for i in range len(col):
-  #    if col[i][MOVED] == 1:
-  #      assert mypart
-  
-  def synchronize(merge=False):
-    my_left_col = mypart[1] 
-    my_right_col = mypart[len(mypart)-2] 
-    
-    shadow_left_col = mypart[0]
-    shadow_right_col = mypart[len(mypart)-1] 
+  def move(_from, _to):
+      #print _element(_from)," -> ",
+      if _from[TYPE] == SHARK:
+        if _to[TYPE] == FISH:
+          _to[STARVED] = 0
+          #print " EATING ->",
+        else:
+          _to[STARVED] = _from[STARVED] + 1
+
+      _to[AGE] = _from[AGE]+1
+      _to[MOVED] = 1
+      _to[TYPE] = _from[TYPE]
+
+      if (_to[TYPE] == FISH and _to[AGE]<3) or _to[AGE]<10 :
+        for i in range(4):
+          _from[i] = 0
+      else:
+        #print " MULTIPLYING ->",
+        _to[AGE] = 0
+        _from[AGE] = 0
+        _from[MOVED] = 1
+        #print _element(_to),_element(_from)
+
+  def viz(x,y):
+      _x = x*multiplier
+      _y = y*multiplier
+      
+      point1 = Point(_x,_y)
+      point2 = Point(_x+multiplier,_y+multiplier)
+      rec = Rectangle(point1,point2)
+      rec.setFill(color[world[x][y][TYPE]])
+      rec.draw(win)
+  @io
+  def main_iteration():
+      for i in range(world_height):
+        for j in range(start_col,start_col+part_width+2):
+          f = world[j][i]
+          f[MOVED] = 0
+
+      for i in range(world_height):
+        for j in range(start_col,start_col+part_width):
+          element_iteration(j,i)
+            
  
 
-    @choice
-    def read_left(__channel_input=None):
-      if merge:
-        print ""
-      else:
-        mypart[0] = __channel_input
-        rightW(my_right_col)
+  try:
+    while True:
+      main_iteration()
+      barW(1)
+      barR()
+      for i in range(world_height):
+        for j in range(2):
+          element_iteration(right_shadow_col+j,i)
+      barW(1)
+      barR()
+      #visualizing have single access
+      barW(1)
+      barR()
 
-    @choice
-    def write_right():
-      if merge:
-        print ""
-      else:
-        mypart[0] = leftR()
-    
-    Alternation([
-      (leftR,read_left()), 
-      (rightW,my_right_col,write_right())]
-      ).execute()
-
-    @choice 
-    def read_right(__channel_input=None):
-      if merge:
-        print "" 
-      else:
-        mypart[len(mypart)-1] = __channel_input
-        leftW(my_left_col)
-
-    @choice
-    def write_left():
-      if merge:
-        print ""
-      else:
-        mypart[len(mypart)-1] = rightR()
-
-    Alternation([
-      (rightR,read_right()), 
-      (leftW,my_left_col,write_left())]
-      ).execute()
-
-
-  #Populate fish
-  i = 0
-  while i < fish:
-    x = random.randint(1,part_width+1)
-    y = random.randint(0,world_height)
-    if mypart[x][y][TYPE] == EMPTY:
-      mypart[x][y][TYPE] = FISH
-      mypart[x][y][AGE] = random.randint(0,3)
-      mypart[x][y][MOVED] = 0
-      i+=1
-
-  #Populate sharks
-  i = 0
-  while i < sharks:
-    x = random.randint(1,part_width+1)
-    y = random.randint(0,world_height)
-    if mypart[x][y][TYPE] == EMPTY:
-      mypart[x][y][TYPE] = SHARK
-      mypart[x][y][AGE] = random.randint(0,3)
-      mypart[x][y][MOVED] = 0
-      mypart[x][y][STARVED] = 0
-      i+=1
-
-  # Temp printing  
-  '''
-  print "before exchange %i" %(part_id)
-  for i in range(len(mypart[0])):
-    for j in range(len(mypart)):
-      f = mypart[j][i]
-      if f[TYPE] == EMPTY: print ".",
-      if f[TYPE] == FISH: print "/",
-      if f[TYPE] == SHARK: print "|",
-    print""
-  '''
+  except ChannelPoisonException:
+      poison(cIN)
   
-  while True: 
-    #reset MOVED before we begin the iteration
-    for i in range(world_height):
-      for j in range(1,part_width+1):
-        f = mypart[j][i]
-        f[MOVED] = 0
-
-    synchronize() 
-    cOUT((mypart, part_id))
+@process
+def visualize(barR,barW):
+  for i in xrange(10):
+    print i
     barW(1)
     barR()
-
-    for i in range(world_height):
-      for j in range(1,part_width+1):
-        f = mypart[j][i]
-        emptyspaces = getsurroundings(j,i, EMPTY)
-        fish = getsurroundings(j,i,FISH)
-        #Fish has not moved or reproduced yet and has room to do so
-        if f[TYPE] == FISH and f[MOVED] == 0 and len(emptyspaces) > 0:
-          spawn = randomchoice(emptyspaces)
-          mypart[spawn[0]][spawn[1]][TYPE] = FISH
-          mypart[spawn[0]][spawn[1]][AGE] = 0
-          mypart[spawn[0]][spawn[1]][MOVED] = 1
-          if f[AGE] < 3: #Delete old fish (so it becomes a move instead of spawn)
-            mypart[spawn[0]][spawn[1]][AGE] = f[AGE]+1 #remember age and increment
-            f[TYPE] = EMPTY
-            f[AGE] = 0
-            f[MOVED] = 0
-          else:
-            f[AGE] = 0 #Age is reset for both new and old fish when a spawn accurs
-        
-        #Sharks want to eat if possible, otherwise move. 
-        if f[TYPE] == SHARK and f[MOVED] == 0: # and (len(emptyspaces) > 0 or (len(fish) > 0)):
-          #Shark is starved and dies
-          if f[STARVED] == 3:
-            f[TYPE] = EMPTY
-            f[AGE] = 0
-            f[MOVED] = 0
-            f[STARVED] = 0
-            continue
-          # Move to fish and eat it
-          try:
-            spawn = randomchoice(fish)
-            mypart[spawn[0]][spawn[1]][STARVED] = 0 #Reset starvation as we eat
-          except IndexError:
-            try:
-              # Move
-              spawn = randomchoice(emptyspaces)
-              mypart[spawn[0]][spawn[1]][STARVED] = f[STARVED]+1
-            except IndexError:
-              #no fish to eat, nowhere to move
-              f[AGE] +=1
-              f[STARVED] +=1
-              continue
-          mypart[spawn[0]][spawn[1]][TYPE] = SHARK
-          mypart[spawn[0]][spawn[1]][AGE] = 0
-          mypart[spawn[0]][spawn[1]][MOVED] = 1
-          if f[AGE] < 10: #Delete old shark (so it becomes a move instead of spawn)
-            mypart[spawn[0]][spawn[1]][AGE] = f[AGE]+1 #remember age and increment
-            f[TYPE] = EMPTY
-            f[AGE] = 0
-            f[MOVED] = 0
-            f[STARVED] = 0
-          else:
-            f[AGE] = 0
-    
-    #Send fish and sharks that have moved to another world part
-    
-
-
-    #var = raw_input("continue?")
-    cOUT((mypart, part_id))
     barW(1)
     barR()
-  
-
-@process
-def aggregate(partR, nr_partsR, cW):
-  nr_parts = nr_partsR()
-  while True:
-    for k in range(nr_parts):
-      part, part_id = partR()
-      if k == 0: 
-        world = zeros((len(part)*nr_parts, len(part[0])))
-      offset = part_id*len(part)
-      for i in range(len(part[0])):
-        for j in range(len(part)):
-          world[j+offset][i] = part[j][i][TYPE]
-    #print "Aggregated world:"
-    #print world
-    cW(world)
-
-#@process
-#def visualize(cIN):
-#  while True:
-#    part = cIN()
-#    print "World:"
-#    for i in range(len(part[0])): # y coordinate
-#      for j in range(len(part)): # x coordinate
-#        type = part[j][i]
-#        if type == EMPTY: print ".",
-#        if type == FISH: print "|",
-#        if type == SHARK: print "*",
-#      print ""
-
-@process
-def visualize(cIN):
-  win = GraphWin("WATOR",500,500,False)
-  win.setBackground("blue1")
-  prev_part = []
-  while True:
-    part = cIN()
-    for i in range(len(part[0])): # y coordinate
-      for j in range(len(part)): # x coordinate
-        type = part[j][i]
-        if len(prev_part) and (type != prev_part[j][i]):
-          #print "prev: %i, part: %i" %(prev_part[j][i],type)
-          if type == EMPTY: win.plot(j,i,"black")
-          if type == FISH: win.plot(j,i,"green")
-          if type == SHARK: win.plot(j,i,"red")
-    win.update()
-    prev_part = part
-
+    #win.update()
     #t = raw_input()
+    barW(1)
+    barR()
+  poison(barW,barR)   
+
+def create(type):
+  x = random.randint(0,world_width)
+  y = random.randint(0,world_height)
+  while not world[x][y][TYPE] == EMPTY:
+    x = random.randint(0,world_width)
+    y = random.randint(0,world_height)
+  point1 = Point(x,y)
+  point2 = Point(x+multiplier,y+multiplier)
+  rec = Rectangle(point1,point2)
+  #print x,y,GUI,world[x][y][GUI]
+  world[x][y][GUI] = rec 
+  world[x][y][GUI].setFill(color[type])
+  world[x][y][GUI].draw(win)
+  world[x][y][TYPE] = type
+  age = random.randint(0,9)
+  if type == FISH:
+    age = random.randint(0,3)
+  
+  world[x][y][AGE] = age 
+  world[x][y][MOVED] = 0
+  world[x][y][STARVED] = 0
+
+
+world_height = 10
+world_width = 30 
+worldparts = 5 
+starting_fish = 30
+starting_sharks = 3
+multiplier = 10
+
+assert world_height*world_width >= starting_fish+starting_sharks #make sure we have room for fish+sharks
+world = zeros((world_width,world_height,5),object)
+
+print world
+#Set GUI
+win = GraphWin("WATOR",world_width*multiplier,world_height*multiplier,True)
+win.setBackground("blue1")
+
+
+#Populate fish
+for i in range(starting_fish):  
+    create(FISH)
+
+#Populate sharks
+for i in range(starting_sharks):
+  create(SHARK)
 
 ch = Channel()
 start2aggr = Channel()
 part2aggr = Channel()
 aggr2vis = Channel()
-part2bar = Channel()
-bar2part = Channel()
-
-#change to dymanic channel assignment:
-zero2oneL = Channel()
-one2zeroL = Channel()
-zero2oneR = Channel()
-one2zeroR = Channel()
+barrier_channel = Channel()
 
 
 
 #def worldpart (cIN, cOUT, barR, barW, leftR, leftW, rightR, rightW):
 Parallel(
-  start(ch.writer(), start2aggr.writer()), 
-  worldpart(ch.reader(), part2aggr.writer(), bar2part.reader(), part2bar.writer(),one2zeroL.reader(),zero2oneL.writer(),one2zeroR.reader(),zero2oneR.writer()),
-  worldpart(ch.reader(), part2aggr.writer(), bar2part.reader(), part2bar.writer(),zero2oneR.reader(),one2zeroR.writer(),zero2oneL.reader(),one2zeroL.writer()),
-  aggregate(part2aggr.reader(), start2aggr.reader(), aggr2vis.writer()),
-  visualize(aggr2vis.reader()),
-  barrier(2, part2bar.reader(), bar2part.writer())
+  # start(ch.writer(), workers), 
+  [worldpart(i, +ch,+barrier_channel,-barrier_channel) for i in range(worldparts)],
+  visualize(+barrier_channel,-barrier_channel),
+  barrier(worldparts+1, +barrier_channel, -barrier_channel)
 )
