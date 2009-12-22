@@ -41,7 +41,7 @@ def worldpart (cIN, cOUT, barR, barW, leftR, leftW, rightR, rightW):
   #Array is defined as x,y,type of fish, age, moved, starved 
   mypart = zeros((part_width+2,world_height,4))
 
-  assert world_height*part_width > fish+sharks #make sure we have room for fish+sharks
+  assert world_height*part_width >= fish+sharks #make sure we have room for fish+sharks
  
   def getsurroundings(x,y,type):
     empty = []
