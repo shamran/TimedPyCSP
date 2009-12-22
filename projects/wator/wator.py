@@ -180,8 +180,8 @@ def visualize(barR,barW):
 world_height = 40
 world_width = 80 
 worldparts = 5 
-starting_fish = 430
-starting_sharks = 20
+starting_fish = 530
+starting_sharks = 30
 
 assert world_height*world_width >= starting_fish+starting_sharks #make sure we have room for fish+sharks
 world = zeros((world_width,world_height,4))
