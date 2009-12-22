@@ -3,8 +3,8 @@ import random
 from random import choice as randomchoice 
 from numpy import *
 import pygame, sys
-from pygame.locals import *
-
+#from pygame.locals import *
+from graphics import *
 
 EMPTY, FISH, SHARK = range(3)
 TYPE, AGE, MOVED, STARVED = range(4)
@@ -22,13 +22,13 @@ def barrier (nr, cR, cW):
 
 @process
 def start(cOUT, nr_partsW):
-  world_height = 10
-  world_width = 32
+  world_height = 60
+  world_width = 60
   #worldsize = 32 #world is symmetric, value*value
   worldparts = 2 #change to dymamic later
   
-  starting_fish = 10
-  starting_sharks = 5
+  starting_fish = 80 
+  starting_sharks = 60
 
   nr_partsW(worldparts)
   for i in range(worldparts):
@@ -41,7 +41,7 @@ def worldpart (cIN, cOUT, barR, barW, leftR, leftW, rightR, rightW):
   #Array is defined as x,y,type of fish, age, moved, starved 
   mypart = zeros((part_width+2,world_height,4))
 
-  assert world_height*part_width >= fish+sharks #make sure we have room for fish+sharks
+  assert world_height*part_width > fish+sharks #make sure we have room for fish+sharks
  
   def getsurroundings(x,y,type):
     empty = []
@@ -52,10 +52,10 @@ def worldpart (cIN, cOUT, barR, barW, leftR, leftW, rightR, rightW):
     return empty
 
   
-  def merge_columns(col, pos):
-    for i in range len(col):
-      if col[i][MOVED] == 1:
-        assert mypart
+  #def merge_columns(col, pos):
+  #  for i in range len(col):
+  #    if col[i][MOVED] == 1:
+  #      assert mypart
   
   def synchronize(merge=False):
     my_left_col = mypart[1] 
@@ -233,19 +233,38 @@ def aggregate(partR, nr_partsR, cW):
     #print world
     cW(world)
 
+#@process
+#def visualize(cIN):
+#  while True:
+#    part = cIN()
+#    print "World:"
+#    for i in range(len(part[0])): # y coordinate
+#      for j in range(len(part)): # x coordinate
+#        type = part[j][i]
+#        if type == EMPTY: print ".",
+#        if type == FISH: print "|",
+#        if type == SHARK: print "*",
+#      print ""
+
 @process
 def visualize(cIN):
+  win = GraphWin("WATOR",500,500,False)
+  win.setBackground("blue1")
+  prev_part = []
   while True:
     part = cIN()
-    print "World:"
     for i in range(len(part[0])): # y coordinate
       for j in range(len(part)): # x coordinate
         type = part[j][i]
-        if type == EMPTY: print ".",
-        if type == FISH: print "|",
-        if type == SHARK: print "*",
-      print ""
-    t = raw_input()
+        if len(prev_part) and (type != prev_part[j][i]):
+          #print "prev: %i, part: %i" %(prev_part[j][i],type)
+          if type == EMPTY: win.plot(j,i,"black")
+          if type == FISH: win.plot(j,i,"green")
+          if type == SHARK: win.plot(j,i,"red")
+    win.update()
+    prev_part = part
+
+    #t = raw_input()
 
 ch = Channel()
 start2aggr = Channel()

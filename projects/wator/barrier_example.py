@@ -1,5 +1,7 @@
 from pycsp.greenlets import *
 from time import *
+from graphics import *
+
 #import pdb; pdb.set_trace()
 @process
 def numbers (cout):
@@ -33,7 +35,8 @@ def barrier (nr, cin, cout):
 def printer (cin):
    while True:
       try:
-        print cin() 
+        x = cin() 
+        print x
       except ChannelRetireException:
          break
 
