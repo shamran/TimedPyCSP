@@ -197,7 +197,8 @@ if __name__ == "__main__":
   iterations = 50
   pct_fish = 0.5
   pct_shark = 0.1
-  img_size = (10,10)
+  multiplier = 10
+  img_size = (multiplier,multiplier)
 
 #Set GUI
   pygame.init()
@@ -210,15 +211,13 @@ if __name__ == "__main__":
   assert fish_img.get_height() == fish_img.get_width()
   assert shark_img.get_bounding_rect() == fish_img.get_bounding_rect()
 
-  multiplier = shark_img.get_height() 
   display = pygame.display.list_modes()[0]
   world_width = (display[0]/(multiplier*world_parts))*world_parts
   world_height = display[1]/multiplier
   screen = pygame.display.set_mode((world_width*multiplier,world_height*multiplier),FULLSCREEN)
   screen.fill(color["blue"])
 
-
-  #Create shared data structure
+#Create shared data structure
   assert 0 == world_width%world_parts
   starting_fish = int(world_width*world_height*pct_fish) 
   starting_sharks = int(world_width*world_height*pct_shark)
@@ -226,12 +225,10 @@ if __name__ == "__main__":
   world = zeros((world_width,world_height,4),object)
 
 #Populate fish
-  for i in xrange(starting_fish):  
-      create(FISH)
+  for i in xrange(starting_fish): create(FISH)
 
 #Populate sharks
-  for i in xrange(starting_sharks):
-    create(SHARK)
+  for i in xrange(starting_sharks): create(SHARK)
 
   barrier_channel = Channel()
 
