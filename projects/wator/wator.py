@@ -47,30 +47,48 @@ def worldpart (part_id,cIN, barR, barW):
     f = world[j][i]
     if f[TYPE] == EMPTY or f[MOVED] == 1:
       return
+    if f[TYPE] == FISH and not getsurroundings(j,i, EMPTY):
+      return
     p = Point(j,i)
     fish = None
     if f[TYPE] == SHARK :
       if f[STARVED] >= 3:
-        #print "SHARK DYING ->",
-        for i in range(4):
-          f[i] = 0
+        #print "SHARK DIE ->",
         viz_die(p)
+        for i in range(5):
+          f[i] = 0
         return
       # Move to fish and eat it
       fish = getsurroundings(j,i,FISH)
+      #print "BEFORE MOVE",
+      #print _element(f)," at:",j,i,
+      #win.update()
+      #t = raw_input()
     spawn = None
     if fish:
       spawn = randomchoice(fish)
+      #print " fishes nearby ",fish, "choosing ",spawn
     else:
       #Move to empty space
       emptyspaces = getsurroundings(j,i, EMPTY)
       if emptyspaces:
         spawn = randomchoice(emptyspaces)
     if spawn:        
-        move(_from=f,f=p,_to=world[spawn.getX()][spawn.getY()],t=spawn)
+      #if f[TYPE] == SHARK: print "from",f,
+      to = world[spawn.getX()][spawn.getY()]
+      move(_from=f,f=p,_to=to,t=spawn)
+      f = to
+      #if to[TYPE] == SHARK: print " to ",to
+        
     else:
         f[AGE] += 1
-        f[STARVED] += 1
+        if f[TYPE] == SHARK:
+          f[STARVED] += 1
+    #      print "cannont move, starving now ",f[STARVED]
+    #if f[TYPE] == SHARK:
+    #  print "AFTER MOVE"
+    #  win.update()
+    #  t = raw_input()
 
   def getsurroundings(x,y,_type):
     empty = []
@@ -87,9 +105,11 @@ def worldpart (part_id,cIN, barR, barW):
       if _from[TYPE] == SHARK:
         if _to[TYPE] == FISH:
           _to[STARVED] = 0
+          viz_die(t)
           #print " EATING ->",
         else:
           _to[STARVED] = _from[STARVED] + 1
+          #print "in move, starving ",_to[STARVED]
 
       _to[AGE] = _from[AGE]+1
       _to[MOVED] = 1
@@ -101,23 +121,13 @@ def worldpart (part_id,cIN, barR, barW):
         for i in range(5):
           _from[i] = 0
       else:
-        #print " MULTIPLYING ->",
+        #if _to[TYPE] == SHARK : print " MULTIPLYING ->",
         _to[AGE] = 0
         _from[AGE] = 0
         _from[MOVED] = 1
         _from[GUI] = create_gui(_from[TYPE],f.getX(),f.getY())
         _from[GUI].draw(win) 
         #print _element(_to),_element(_from)
-
-  """def viz(x,y):
-      _x = x*multiplier
-      _y = y*multiplier
-      
-      point1 = Point(_x,_y)
-      point2 = Point(_x+multiplier,_y+multiplier)
-      rec = Rectangle(point1,point2)
-      rec.setFill(color[world[x][y][TYPE]])
-      rec.draw(win)"""
 
   def viz_move(_from, _to):
       dx =  _to.getX() - _from.getX() 
@@ -139,8 +149,6 @@ def worldpart (part_id,cIN, barR, barW):
         for j in range(start_col,start_col+part_width):
           element_iteration(j,i)
             
- 
-
   try:
     while True:
       main_iteration()
@@ -167,7 +175,7 @@ def visualize(barR,barW):
     barW(1)
     barR()
     win.update()
-    t = raw_input()
+    #t = raw_input()
     barW(1)
     barR()
   poison(barW,barR)   
@@ -196,13 +204,13 @@ def create(type):
   world[x][y][GUI] = create_gui(type,x,y)
   world[x][y][GUI].draw(win)
 
-world_height = 60
-world_width = 80 
-worldparts = 5 
-starting_fish = 600
-starting_sharks = 257
+world_height = 80
+world_width = 100 
+worldparts = 1 
+starting_fish = 900
+starting_sharks = 61
 multiplier = 10
-iterations = 100
+iterations = 500
 assert world_height*world_width >= starting_fish+starting_sharks #make sure we have room for fish+sharks
 world = zeros((world_width,world_height,5),object)
 
