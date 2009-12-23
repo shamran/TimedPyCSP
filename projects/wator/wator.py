@@ -233,6 +233,8 @@ pygame.init()
 
 shark_img = pygame.image.load(os.path.join("images","shark2_ms.jpg"))
 fish_img = pygame.image.load(os.path.join("images","fish2_s.jpg"))
+shark_img = pygame.transform.smoothscale(shark_img,(10,10))
+fish_img = pygame.transform.smoothscale(fish_img,(10,10))
 assert shark_img.get_height() == shark_img.get_width()
 assert fish_img.get_height() == fish_img.get_width()
 assert shark_img.get_bounding_rect() == fish_img.get_bounding_rect()
@@ -244,9 +246,9 @@ screen = pygame.display.set_mode((world_width*multiplier,world_height*multiplier
 screen.fill(color["blue"])
 
 assert 0 == world_width%world_parts
-starting_fish = 900
-starting_sharks = 61
-iterations = 50
+starting_fish = world_width*world_height*0.5 
+starting_sharks = world_width*world_height*0.1 
+iterations = 250
 assert world_height*world_width >= starting_fish+starting_sharks #make sure we have room for fish+sharks
 world = zeros((world_width,world_height,5),object)
 
