@@ -194,7 +194,7 @@ def create(type):
 if __name__ == "__main__":
 #Constants
   world_parts = 5
-  iterations = 50
+  iterations = 300
   pct_fish = 0.5
   pct_shark = 0.1
   multiplier = 10
