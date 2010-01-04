@@ -1,0 +1,11 @@
+<doc>
+  <process name="robot" package="default">
+    <process name="robot">
+      <channelend direction="in" name="in0" target="robotFunc.in0" type="unknown"/>
+      <channelend direction="out" name="out0" target="robotFunc.out0" type="unknown"/>
+      <code configurable="yes" func="robotFunc" src="robot"/>
+    </process>
+    <channelend direction="in" name="in0" target="robot.in0"/>
+    <channelend direction="out" name="out0" target="robot.out0"/>
+  </process>
+</doc>
