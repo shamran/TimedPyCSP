@@ -2,7 +2,8 @@
 
 \section{Hajer og fisk på Wator} Som eksempel på en \des har vi valgt at tage 
 udgangspunkt i det scenarie som A. K. Dewdney
-beskrev i artiklen \fixme[inline]{reference}. Artiklen beskriver den
+beskrev i artiklen \cite{wator}. \fixme[inline]{reference}. Artiklen beskriver 
+den
 fiktive planet Wator, der har form som en torus og er fuldstændig
 dækket af vand. Verdenen er inddelt i felter som beskrevet på side
 20 i \fixme[inline]{ref}. Disse felter kan være tomme, indeholde en
@@ -31,8 +32,20 @@ samt hvor mange fisk og hajer der er til stede fra start. Disse fisk og
 hajer placeres tilfældigt i verdenen.
 
 Såfremt de initielle parametre understøtter en bæredygtig bestand
-forventer vi at se bestanden af henholdsvis fisk og hajer oscillere
+forventer vi at se bestanden af henholdsvis fisk og hajer oscillerer
 afhængigt af hinanden.
+
+
+\section{uden tid}
+For at simulere Wator verdenen i et CSP-system hvori tidsbegrebet ikke er 
+introduceret, er vi nødt til at udføre en synkronisering af de enkelte 
+processers arbejde. Initielt skal vi bestemme hvad en proces skal arbejde 
+repræsentere. Dette kan være en enkelt fisk eller haj, en proces for fisk og en 
+for hajer, eller en opdeling af verdenen i dele der styres af processer.
+Baseret på Peter Welch's\fixme[inline]{ref, artikel om crew}
+
+
+
 
 \section{Kunder i en bank} Et klassisk eksempel inden for \des er at simulere  
 en række kunder der alle ankommer til en butik, hvor de skal serviceres. Dette 
