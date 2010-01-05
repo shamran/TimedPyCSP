@@ -1,0 +1,19 @@
+
+
+1. Vi har lavet en watorløsning efter principperne skitseret af Welch med barrierer og med en CREW tilgang til delt datastruktur.
+   - Vi har desuden ændret  i løsningen så det bruger simulation.
+
+2. Vi har lavet bank løsningen både som løsning hvr hver proces holdt styr på tiden via en barriere og internt ur, samt med en løsning på der brugte simulationte
+2. Der er dele af Simpy som er smart udformet, som vi gerne vil bruge, hvordan skan vi komme til at kopiere?
+
+Vi har siden sidst, færdiggjort wator, arbejdet med implementation af simpy, og kan nu også bruge buffered channels.
+
+ 
+Tidsplanen for nærmeste fremtid; vi skal nu til at skrive. Beskrive de forskellige løsningsmodeller til wator som den før
+
+
+
+
+
+Tiden i logisk skal også bruges med alternation. så man kan sætte en guard til større mindre og lig med en tid i guarden. 
+Wait
