@@ -2,20 +2,21 @@
 
 \section{Hajer og fisk på Wator} Som eksempel på en \des har vi valgt at tage 
 udgangspunkt i det scenarie som A. K. Dewdney
-beskrev i artiklen \cite{wator}. \fixme[inline]{reference}. Artiklen beskriver 
-den
+beskrev i artiklen \cite{wator}. Artiklen beskriver den
 fiktive planet Wator, der har form som en torus og er fuldstændig
 dækket af vand. Verdenen er inddelt i felter som beskrevet på side
-20 i \fixme[inline]{ref}. Disse felter kan være tomme, indeholde en
+20 i \cite{wator}. Disse felter kan være tomme, indeholde en
 fisk eller en haj. Følgende karakteristika beskriver fisk og hajers
 opførsel.
 
 
-Fisk - bevæger sig og forplanter sig Lever af plankton, en ressource
-som er uendelig. Hvis der er et ledigt tilstødende felt bevæger en
-fisk sig til dette felt. Hvis der er flere ledige felter vælges et
-tilfældigt. Hvis en fisk overlever 3 livscykler forplanter den sig.
-
+\emph{Fisk - bevæger sig og forplanter sig}
+\begin{itemize}
+\item Lever af plankton, en ressource som er uendelig
+\item Hvis der er et ledigt tilstødende felt bevæger en fisk sig til dette 
+  felt. Hvis der er flere ledige felter vælges et tilfældigt.  
+\item Hvis en fisk overlever 3 livscykler forplanter den sig.
+\end{itemize}
 
 Hajer - jager og forplanter sig Såfremt der er fisk i et eller flere
 tilstødende felter flytter hajen sig herhen og spiser fisken. Hvis der
@@ -36,13 +37,13 @@ forventer vi at se bestanden af henholdsvis fisk og hajer oscillerer
 afhængigt af hinanden.
 
 
-\section{uden tid}
+\subsection{uden tid}
 For at simulere Wator verdenen i et CSP-system hvori tidsbegrebet ikke er 
 introduceret, er vi nødt til at udføre en synkronisering af de enkelte 
-processers arbejde. Initielt skal vi bestemme hvad en proces skal arbejde 
-repræsentere. Dette kan være en enkelt fisk eller haj, en proces for fisk og en 
-for hajer, eller en opdeling af verdenen i dele der styres af processer.
-Baseret på Peter Welch's\fixme[inline]{ref, artikel om crew}
+processers arbejde. Initielt skal vi bestemme hvad en proces skal repræsentere.  
+Dette kan f.eks. være en enkelt fisk eller haj, en proces for fisk og en for 
+hajer, eller en opdeling af verdenen i dele der styres af processer.
+Baseret på \cite{crew}. 
 
 
 
