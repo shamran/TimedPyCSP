@@ -1,0 +1,13 @@
+\section{Repræcentation af tid}<+isifdi+>
+
+i PyCSP foregår kommunikation kun når begge kanalender er klar dvs. når både 
+en kanalende der vil
+skrive og en kanalende der vil læse er klar. Hvis kun en af kanalende er
+klar vil processen vente indtil den findes minumum en kanalende af hver type 
+der er klar og først, der vil kommunikationen foregå. Ønskes der ikke  findes 
+der i modulet Alternation
+mulighed for at tilknytte en timeout til en kanal. Dette indikere at
+funktionen kun er villig på at kanalen bliver klar inden til for et
+findes der allerede \fxnote[inline]{vi skal kunne angive at vi ønsker
+at kommunikere men KUN i det tidsskridt vi er i, og at hvis dette ikke
+kan lade sig gøre skal vi breake noget alla at have en timeout på 0}
