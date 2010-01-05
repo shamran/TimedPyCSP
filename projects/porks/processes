@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <process name="untitled" package="default">
+    <processlink file="SYS_Printer.csp" h="70" name="Printer" process="Printer" w="150" x="430" y="270">
+      <config data="KGxwMQpTJycKYVMnXFxuJwpwMgphSTEwMDAwCmEu" process="Printer"/>
+    </processlink>
+    <processlink file="Robot.csp" h="70" name="Robot" process="Robot" w="130" x="490" y="30"/>
+    <processlink file="Camera.csp" h="70" name="Camera" process="Camera" w="140" x="90" y="30"/>
+    <processlink file="analysis.csp" h="70" name="Analysis" process="analysis" w="160" x="290" y="30"/>
+    <channel name="chan0">
+      <connection direction="out" target="Camera.out0"/>
+      <connection direction="in" target="Analysis.in0"/>
+    </channel>
+    <channel name="chan1">
+      <connection direction="out" target="Analysis.out0"/>
+      <connection direction="in" target="Robot.in0"/>
+    </channel>
+    <channel name="chan2">
+      <connection direction="out" target="Robot.out0"/>
+      <connection direction="in" target="Printer.in0"/>
+    </channel>
+  </process>
+</doc>
