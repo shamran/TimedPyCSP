@@ -8,6 +8,7 @@ from pycsp.simulation import *
 #from pycsp.greenlets import *
 from random import expovariate,seed
 from heapq import *
+from SimPy import *
 seed(12)
 class Customer:
   def __init__(self, name="",meanTBA=10.0):
@@ -71,8 +72,10 @@ def Bank(meanWait,customerREADER):
 if __name__ == "__main__":
   print "main starting"
   nprocesses = 2 
-  customer = Channel()
-  numberCustomers=5
+  mon = Monitor()
+  customer = Channel(buffer=2,mon = mon)
+  
+  numberCustomers=10
   meanTBA = 10.0
   meanWT = 50.0
   Parallel(
@@ -80,3 +83,10 @@ if __name__ == "__main__":
     [Generator(i,numberCustomers,meanTBA,-customer)
       for i in range (nprocesses)]
   )
+  Histo = mon.histogram(high=10,nbins=numberCustomers)
+
+  plt = SimPlot()                                                  
+  plt.plotHistogram(Histo,xlab='Time (min)',                       
+                    title="Time in the Bank",
+                    color="red",width=2)                         
+  plt.mainloop()   
