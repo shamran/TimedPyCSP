@@ -1,7 +1,7 @@
 mkdir tmp
 pdflatex -output-directory tmp skelet
 cd tmp
-#bibtex skelet 
+bibtex skelet 
 cd ..
 pdflatex  -interaction=batchmode -output-directory tmp skelet
 pdflatex  -interaction=batchmode -output-directory tmp skelet
