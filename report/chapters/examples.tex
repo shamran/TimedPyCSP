@@ -37,13 +37,17 @@ forventer vi at se bestanden af henholdsvis fisk og hajer oscillerer
 afhængigt af hinanden.
 
 
-\subsection{uden tid}
+\subsection{Uden tid}
+\fixme[inline]{bedre overskrift}
 For at simulere Wator verdenen i et CSP-system hvori tidsbegrebet ikke er 
 introduceret, er vi nødt til at udføre en synkronisering af de enkelte 
-processers arbejde. Initielt skal vi bestemme hvad en proces skal repræsentere.  
-Dette kan f.eks. være en enkelt fisk eller haj, en proces for fisk og en for 
-hajer, eller en opdeling af verdenen i dele der styres af processer.
-Baseret på \cite{crew}. 
+processers arbejde. Denne synkronisering kan ske ved brug af barrierer, hvor 
+alle processer udfører en handling og mødes i barrieren før de fortsætter.
+Vi har valgt at basere vores model på \cite{crew}, hvor verdenen repræsenteres 
+som en delt datastruktur og adgangen styres med barrierer. I vores model er 
+hver proces derved ansvarlig for en del af verdenen og tilgangen til den delte 
+datastruktur sker ud fra CREW-princippet (Concurrent Read, Exclusive Write) som 
+angivet i artiklen, og styres vha. af barrierer. 
 
 
 
