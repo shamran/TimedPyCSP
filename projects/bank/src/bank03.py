@@ -8,24 +8,23 @@ from pycsp.simulation import *
 #from pycsp.greenlets import *
 from random import expovariate,seed
 from heapq import *
-from SimPy import *
 seed(12)
 class Customer:
-  def __init__(self, name="",meanTBA=10.0):
+  def __init__(self, name="",meanWT=10.0):
     self.name = name
-    self.waittime = round(expovariate(1/meanTBA))
+    self.waittime = round(expovariate(1/meanWT))
 
   def __repr__(self):
     return "(%s,%s)"%(self.waittime,self.name)
 
 @process
-def Generator(i,number,meanTBA, customerWRITER):
+def Generator(i,number,meanTBA, meanWT, customerWRITER):
   """Generaters a customer with a given time difference"""
   t_event = 0
   numberInserted = 0
   while numberInserted<number:
     Wait(t_event)
-    c = Customer(name = "Customer%d:%02d"%(i,numberInserted),meanTBA=meanTBA)
+    c = Customer(name = "Customer%d:%02d"%(i,numberInserted),meanWT = meanWT)
     print "%64.0f: G%d: %s =%s"%(Now(),i,numberInserted,c.name)
     customerWRITER(c)
     print "%64.0f: G%d: sent customer %s =%s"%(Now(),i,numberInserted,c.name)
@@ -40,12 +39,14 @@ def Bank(meanWait,customerREADER):
   """Handles the action inside the bank """
   t = False
   customers =  []
-  
+  mon = Monitor() 
   try:
     while True:
+      print "%94.0f: blocking wait to receive customer"%(Now())
       msg = customerREADER()
+      print "%94.0f: %s enter bank"%(Now(),msg.name)
       heappush(customers,(Now()+msg.waittime,msg))
-
+      mon.observe(len(customers))
       while len(customers)>0:
         print "%94.0f: B: timeout is:%f"%(Now(),customers[0][0]-Now())
         (g,msg) = Alternation([(customerREADER,None),
@@ -53,11 +54,12 @@ def Bank(meanWait,customerREADER):
                              ]).select()
         if g == customerREADER:
           heappush(customers,(Now()+msg.waittime,msg))
+          print "%94.0f: %s enter bank"%(Now(),msg.name)
         else:
           ntime,ncust = heappop(customers)
           print "%94.0f: %s left bank"%(Now(),ncust.name)
-
-        print "%94.0f: B:"%(Now())
+        mon.observe(len(customers))
+        #print "%94.0f: B:"%(Now())
         #show_tree(customers,total_width=140,offset=10)
         #print customers
         print "%94.0f: Length of queue in bank %d"%(Now(),len(customers))
@@ -65,28 +67,41 @@ def Bank(meanWait,customerREADER):
     """All generators have retired just empty the queue"""
     print "%94.0f: All genreators have retired"%Now()
     while(len(customers)>0):
-      ntime,ncust = heappop(customers)
-      print "%94.0f: %s left bank"%(ntime,ncust.name)
+        Wait(customers[0][0]-Now())
+        ntime,ncust = heappop(customers)
+        mon.observe(len(customers))
+        print "%94.0f: %s left bank"%(Now(),ncust.name)
+    Histo = mon.histogram()
+    plt = SimPlot()
+    plt.plotHistogram(Histo,xlab='length of queue',ylab='number of observation', 
+                    title="# customers in bank",
+                    color="red",width=1)                         
+    plt.mainloop()  
     return
 
 if __name__ == "__main__":
   print "main starting"
-  nprocesses = 2 
+  nprocesses = 10 
   mon = Monitor()
-  customer = Channel(buffer=2,mon = mon)
+  customer = Channel(buffer=9,mon = mon)
   
-  numberCustomers=10
-  meanTBA = 10.0
-  meanWT = 50.0
+  numberCustomersprprocess=100
+  meanTBA = 1.0
+  meanWT =  3.0
+  b = Bank(meanWT,+customer)
   Parallel(
-    Bank(meanWT,+customer),
-    [Generator(i,numberCustomers,meanTBA,-customer)
+    b,
+    [Generator(i,numberCustomersprprocess,meanTBA, meanWT,-customer)
       for i in range (nprocesses)]
   )
-  Histo = mon.histogram(high=10,nbins=numberCustomers)
-
+  print b.executed
+  print "end"
+  Histo = mon.histogram(high=9,nbins=9)
+  mon.setHistogram(high=9, nbins=9)
+  print mon.printHistogram()
   plt = SimPlot()                                                  
-  plt.plotHistogram(Histo,xlab='Time (min)',                       
-                    title="Time in the Bank",
-                    color="red",width=2)                         
-  plt.mainloop()   
+  plt.plotHistogram(Histo,xlab='length of queue',ylab='number of observation', 
+                    title="# customers i channelqueue",
+                    color="red",width=1)                         
+  plt.mainloop()  
+

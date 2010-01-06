@@ -119,8 +119,8 @@ def Barrier(nprocesses, barrierIN, signalOUT):
 
 if __name__ == "__main__":
   print "main starting"
-  nprocesses = 2
-  customer = Channel()
+  nprocesses = 1
+  customer = Channel(buffer=110)
   barrierDone = Channel()
   barrierContinue = Channel()
   numberCustomers=5
