@@ -28,16 +28,29 @@ fra tidpunktet indtil det kommunktationen lykedes. Dette kan dermed laves helt
 uden en alternation, men ved blot med de to funktioner Wait(time), Cin(). 
 
 At ville være villig til at kommuikere til et given tidspunkt, medfører en ny 
-problemstilling, da det introducere muligheden for deadlocks og 
-nondeterminisme\fxnote{Er det korrekt?}, for det er ikke defineret hvad tiden 
-er hvis det ikke lykkedes at kommunikere i det givne tidsskridt. Der findes to 
-muligheder, enten skal scheduleren signalere at der ikke findes mere arbejde 
-til dette tidsskridt, og lade processerne fortsætte i samme tidsskridt. 
-Alternativt skal tiden tælles op til næste event, hvorefter processerne 
-signaleres med at kommunkationen ikke lykkedes. Hvis processerne signalleres 
-i samme tidsskridt kan man vælge enten at signallere hver proces en af gangen 
-eller samtidigt at signallerer alle processerne. ingen af mulig
+problemstilling, da det kan introducere muligheden for deadlocks og 
+nondeterminisme, \fxnote{Er det korrekt?}, for det er ikke defineret hvad 
+tiden er hvis det ikke lykkedes at kommunikere i det givne tidsskridt. Der 
+findes to muligheder, enten skal scheduleren signalere at der ikke findes mere 
+arbejde til dette tidsskridt, og lade processerne fortsætte i samme 
+tidsskridt. Alternativt skal tiden tælles op til næste event, hvorefter 
+processerne signaleres med at kommunkationen ikke lykkedes. 
 
+Hvis processerne signaleres i samme tidsskridt kan man vælge enten at 
+signalere hver proces en af gangen, og lade den fortsætte, eller samtidigt at 
+signallerer til alle ventende processerne at de skal fortsætte.
+Ved at signallere samtlige processer indføres muligheden for en livelock. 
+Dette kan ske ved at have to eller flere processe synkroniseret  til samme 
+tidsrytme. Hvis de  alle i samme periode prøver først at modtage data, for 
+derefter at sende data. Her vil alle processerne vente på hinanden i en 
+deadlock, men med en timeout vil de alle fortsætte samtidigt og indgå i en ny 
+deadlock. Udefra vil det kunne konstatere at tiden går, men da der ikke 
+foregår reelt arbejde indtræder der en livelock\fxnote{skal vi introducere 
+begrebet deadlock, livelock mv.}. 
+
+Ved at aktivere en proces af gangen har denne proces mulighed for i samme til 
+den  samme tid at indgå i en kommunikation med en af de andre ventende 
+processer, dermed har man muligheden for at løse livelock problemet med
 processen fortsætte  tildet under antagelsen af problemer.
 
 
