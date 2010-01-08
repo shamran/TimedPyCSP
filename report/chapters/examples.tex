@@ -44,11 +44,22 @@ introduceret, er vi nødt til at udføre en synkronisering af de enkelte
 processers arbejde. Denne synkronisering kan ske ved brug af barrierer, hvor 
 alle processer udfører en handling og mødes i barrieren før de fortsætter.
 Vi har valgt at basere vores model på \cite{crew}, hvor verdenen repræsenteres 
-som en delt datastruktur og adgangen styres med barrierer. I vores model er 
-hver proces derved ansvarlig for en del af verdenen og tilgangen til den delte 
-datastruktur sker ud fra CREW-princippet (Concurrent Read, Exclusive Write) som 
-angivet i artiklen, og styres vha. af barrierer. 
+som en delt datastruktur og adgangen til denne styres med barrierer. I vores 
+model er hver proces derved ansvarlig for en del af verdenen og tilgangen til 
+den delte datastruktur sker ud fra CREW-princippet (Concurrent Read, Exclusive 
+Write) som angivet i artiklen, og styres vha. af barrierer. 
 
+Vi deler verdenen lodret, hvor hver proces styrer en verdensdel. Hver proces 
+gennemgår sin verdensdel og udfører en mulig handling for hver fisk og haj, dog 
+vil fisk og hajer i de sidste to kolonner i hver verdensdel ikke bliver 
+opdateret på nuværende tidspunkt. Dette skyldes at henholdsvis processen selv 
+og den umiddelbar titl højre for den, har skriverettigheder til disse to 
+kolonner.
+Når denne opdatering er fuldført mødes processerne i en barriere, hvorefter 
+hver proces opdaterer de to sidste kolonner. Herefter mødes processerne igen i 
+barrieren, og når alle kolonner er opdateret, kan der foretages en 
+visualisering af de udførte opdateringer. Disse skridt udføres et forudbestemt 
+antal iterationer. 
 
 
 
