@@ -1,5 +1,5 @@
 \section{Repræcentation af tid}
-
+\fxnote{dette skal gennemlæses for logisk tid ifh til deadline osv.}
 I PyCSP foregår kommunikation kun når begge kanalender er klar dvs.
 når der findes både en kanalende der vil skrive og en kanalende der vil læse. 
 Hvis kun en af kanalenderne er klar, vil den vente indtil
@@ -19,8 +19,9 @@ læse fra Cin.
 
 Med et simuleringsmiljø er det ikke nok udelukkende kan kunne specifiere en 
 timeout på kanalen, det er også nødvændigt at man kan specificere at en proces 
-er villig til at kommunikere fra et tidspunkt, samt at den kanalen kun er 
-villig til at kommunikere på nuværende tidpunkt, men ikke ud i fremtiden. 
+er villig til at kommunikere på et specifikt tidspunkt, samt at den kanalen 
+kun er villig til at kommunikere på nuværende tidpunkt, men ikke ud 
+i fremtiden. 
 
 At ville kommunikere fra et given tidspunkt i fremtiden,  svare til at vente 
 uden at lave noget indtil det givne tidspunkt for så at forsøge at kommunikere 
@@ -64,13 +65,11 @@ med  timeout, og dermed har man risikoen for starvation\fxnote{ref?} hvis det
 er den/de samme processer der bliver signaleret.
 
 
-\subsection{Vores valg}<++>
+\subsection{Vores valg}#<++>
+
+Timeouts i Timed PyCSP er en af de vigtigste funktioner, da det disse giver en
 der ikke er data, mtimeout processen fortsætte  tildet under antagelsen af 
 problemer.
-
-
-
-
 
 når tiden er  tidspunkt
 til for et findes der allerede \fxnote[inline]{vi skal kunne angive
