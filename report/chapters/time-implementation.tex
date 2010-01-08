@@ -36,22 +36,38 @@ arbejde til dette tidsskridt, og lade processerne fortsætte i samme
 tidsskridt. Alternativt skal tiden tælles op til næste event, hvorefter 
 processerne signaleres med at kommunkationen ikke lykkedes. 
 
-Hvis processerne signaleres i samme tidsskridt kan man vælge enten at 
-signalere hver proces en af gangen, og lade den fortsætte, eller samtidigt at 
-signallerer til alle ventende processerne at de skal fortsætte.
-Ved at signallere samtlige processer indføres muligheden for en livelock. 
-Dette kan ske ved at have to eller flere processe synkroniseret  til samme 
-tidsrytme. Hvis de  alle i samme periode prøver først at modtage data, for 
-derefter at sende data. Her vil alle processerne vente på hinanden i en 
-deadlock, men med en timeout vil de alle fortsætte samtidigt og indgå i en ny 
-deadlock. Udefra vil det kunne konstatere at tiden går, men da der ikke 
-foregår reelt arbejde indtræder der en livelock\fxnote{skal vi introducere 
-begrebet deadlock, livelock mv.}. 
+Hvis man vælger at processerne skal signaleres i samme tidsskridt, vil en 
+timeout efterligne en SKIP guard, men hvor en alternation med en SKIP guard 
+med det samme kan fortsætte vil en timeout kræve at der blev ventet indtil der 
+ikke var flere processer der kunne processeres i samme tidsskridt. Når der 
+ikke er flere processer at vælge imellem skal de ventende processer fortsætte. 
+Her er muligheden enten at signalere hver proces en af gangen, og lade den 
+fortsætte inden næste proces signaleres, eller alternativt, samtidigt at 
+signalerer alle de ventende processerne.
 
-Ved at aktivere en proces af gangen har denne proces mulighed for i samme til 
-den  samme tid at indgå i en kommunikation med en af de andre ventende 
-processer, dermed har man muligheden for at løse livelock problemet med
-processen fortsætte  tildet under antagelsen af problemer.
+Ved at signalere samtlige processer indføres muligheden for en livelock. Dette
+sker hvis to eller flere processer er  synkroniseret i den samme tidsrytme.
+Et eksempel er hvis de alle i samme periode først ønsker at modtage data, for 
+derefter at sende data. Her vil alle processerne uden timeouts vente på 
+hinanden i en deadlock, men med en timeout vil de alle fortsætte samtidigt og 
+indgå i en ny deadlock, PyCSP vil derfor med timeouts gå fra en deadlock til 
+en livelock. En livelock er defineret som hvor tilstandenen i ændres men der
+foregår ikke reelt arbejde\fxnote{skal vi introducere begrebet deadlock, 
+livelock mv.}. 
+
+Ved at aktivere en proces ad gangen har denne proces mulighed for i samme 
+tidsskridt at indgå i kommunikation med en af de andre ventende processer. 
+Deadlocken kan man dermed løse og man har mulighed for at undgå livelock 
+problemet, ved samtidig signalering.
+Ulemperne er at der skal foretages et valg om hvilke processer der signaleres 
+med  timeout, og dermed har man risikoen for starvation\fxnote{ref?} hvis det 
+er den/de samme processer der bliver signaleret.
+
+
+\subsection{Vores valg}<++>
+der ikke er data, mtimeout processen fortsætte  tildet under antagelsen af 
+problemer.
+
 
 
 
