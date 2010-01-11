@@ -38,12 +38,13 @@ article
 
 \usepackage{nameref}
 \usepackage[danish]{varioref} % smarte krydsreferencer via \vref
-%\usepackage[colorlinks, linkcolor=blue, citecolor=blue, urlcolor=blue, final=true]{hyperref}
+\usepackage[colorlinks, linkcolor=blue, citecolor=blue, urlcolor=blue, 
+final=true]{hyperref}
 
 %giver mulighed for at hoppe i pdf'filen via referencerne.
 %hyperref er ustabil med varieof,
 %og skal udkommenteres hvis der opstår problemer.
-%specielt skal udkommenteres når man kompilere i final
+%specielt skal udkommenteres når man kompilere i final til print
 
 \renewcommand\danishhyphenmins{22} % bedre orddeling
 \addto\captionsdanish{%brug bedrer danske ord for de faste tekster
@@ -51,6 +52,7 @@ article
 \renewcommand\appendixname{Appendiks}
 }
 
+\usepackage{csquotes}
 \usepackage[style=numeric-comp,sorting=nyt]{biblatex}
 \DefineBibliographyStrings{danish}{%
 references      = {Litteraturliste},
