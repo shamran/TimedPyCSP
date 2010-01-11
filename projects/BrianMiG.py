@@ -53,7 +53,7 @@ def NewSlot(jobs, out, channel_input):
 
 @process
 def Grid(user, resource_in, resource_out):
-   jobs=simList(Monitored=True)
+   jobs=SimList(Monitored=True)
    interupt = 0
    try:
       while True:
