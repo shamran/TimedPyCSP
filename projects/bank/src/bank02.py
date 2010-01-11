@@ -4,8 +4,8 @@
 __author__="shamran"
 __date__ ="$Dec 1, 2009 3:59:26 PM$"
 
-from pycsp.simulation import *
-#from pycsp.greenlets import *
+#from pycsp.simulation import *
+from pycsp.greenlets import *
 from random import expovariate,seed
 from heapq import *
 seed(12)
@@ -68,7 +68,7 @@ def Bank(meanWait,customerREADER,barrierWRITER, barrierR):
     while True:
       print "%94.0f: B: enters barrier"%time
       barrierWRITER(0)
-      while not t:
+      while True:
         print "%94.0f: B: waits in alt"%time
         (g,msg) = Alternation([{
         barrierR:None,
@@ -120,7 +120,7 @@ def Barrier(nprocesses, barrierIN, signalOUT):
 if __name__ == "__main__":
   print "main starting"
   nprocesses = 1
-  customer = Channel(buffer=110)
+  customer = Channel()
   barrierDone = Channel()
   barrierContinue = Channel()
   numberCustomers=5

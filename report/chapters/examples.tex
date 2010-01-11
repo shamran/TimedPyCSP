@@ -83,13 +83,59 @@ også udvidet med en service disk, hvor alle kunderne skal betjenes af en
 servicemedarbejder. Alle kunder ankommer til banken i tilfældig orden og 
 stiller sig i kø til at blive serviceret. Dette  svare til en M/M/1\fixme{hvad  
 er en m/m/1 kø} kø.
+\subsection{Uden tid}\fxnote{bedre overskrift}
+I SimPy er kunderne en process og det vil derfor være nærliggende ligeledes at 
+modelere eksemplet i PyCSP med kunder som en proces. i Simpy kalder 
+generatorfunktionen kunderne og kan kører den parallelt med sig selv. 
+I PyCSP\fxnote{hvorfor?- kan man lave child processes der køre i samme 
+parallel kald som dets parent?}, er standard metoden\fxnote{set fra 
+kodeeksempler} at modelere mere statiske objekter, med en source og sink 
+process og lade arbejdet flyttes mellem processerne. Derfor er modellen ændret 
+så  generatorprocesen stadigt fungere som en source, men vi introducerer en 
+bankproces som sink, og lader kunderne være arbejdet der flyttes mellem dem. 
 
+Mens SimPy  kalder kundeprocessen og lader denne stå for håndteringen af 
+kunden og tiden hun befinder sig i banken, har bankprocessen i PyCSP ikke 
+mulighed for at kende tid og skal derfor selv holde en liste med kunderne 
+i banken og  til hver tidskridt vide hvilke af kunderne der skal forlade 
+banken. 
 
-\section{Eksisterende PYCSP}
-For at modellere eksemplet med kunder i en bank i PyCSP, skal der foretages en række valg. Først og fremmest skal det besluttes hvad der skal være processer, og hvordan  kanalerne skal forbindes. 
-I DES findes der i modsætningen til PDES \fixme{referencer} en global tid og alle processerne skal derfor have  en fælles tid der tæller op samtidigt. Den en brugt metode er at  bruge en barrier \vref{barrier}.
+Tiden er igen modelleret ved brug af barrier se \autoref{barrier}, men 
+i stedet for  at kalde barrierens to krævede kald, lige efter hinanden, som 
+normalt for at være sikker på vi er i samme tidsskridt lader vi bank
+processen gå ind i barrieren i starten af tidsskridtet, og så modtage kunderi, 
+indtil banken modtager et kald om at forsætte til næste tidsskridt af 
+barrieren.
+\begin{lstlisting}[label=bank-alternation-imp,caption=modtag kunder eller 
+	barrier i Bankproces]
+while True:
+		(g,msg) = Alternation([{
+		barrierREADER:None,
+    customerREADER:None
+    }]).select()
+		if g == barrierREADER:
+			break
+    elif g == customerREADER:
+			heappush(customers,(time+msg.waittime,msg))
+\end{lstlisting}
+Dette er smart, og nødvændigt for at lade banken have mulighed for at modtage 
+et vilkårligt antal kunder i samme tidsskridt, samt vide hvornår der ikke vil  
+komme flere kunder. Vi kan resonere os til at barrieren stadigt virker efter 
+hensigten da for at generatoren kan komme foran med et tidsskridt og sende en 
+kunde i et forkert tidsskridt skal have kaldt begge kald til barrieren, men 
+barriernen vil ikke modtage et kald fra nogle før det har kaldt bankprocessen, 
+og derfor må generatoren vente i første kald til barrieren indtil banken har 
+modtaget sit kald fra barrieren. 
 
-\begin{lstlisting}[label=barrier,caption=A barrier in PyCSP]
+\section{Barrierer}\label{barrier}
+For at modellere eksemplet med kunder i en bank i PyCSP, skal der foretages en 
+række valg. Først og fremmest skal det besluttes hvad der skal være processer, 
+og hvordan  kanalerne skal forbindes. I \des findes der i modsætningen til 
+PDES \fixme{referencer} en global tid og alle processerne skal derfor have  en 
+fælles tid der tæller op samtidigt. Den mest brugte metode i CSP sammenhæng er 
+at bruge en barrier \vref{barrier-imp}.
+
+\begin{lstlisting}[label=barrier-imp,caption=En barrier i PyCSP]
 @process
 def Barrier(nprocesses, signalIN, signalOUT):
 	while True:
@@ -99,9 +145,12 @@ def Barrier(nprocesses, signalIN, signalOUT):
 			signalOUT(0)
 \end{lstlisting}
 
-Barrier blev introduceret i MPI, og sikrer at alle tråde har nået dette punkt før de må fortsætte. 
-I PyCSP er det trivielt at have  denne egenskab, da processer til begge kanalender er klar, og med to kanaler kan man sikre at ingen proces modtager et signal før alle processer har sendt et signal til barrieren.
-
-I SimPy er hver customer en process og det vil være nærliggende at 
+Barrier blev introduceret i MPI, og sikrer at alle tråde har nået dette punkt 
+før de må fortsætte. I PyCSP er det trivielt at have  denne egenskab, da 
+processer til begge kanalender er klar, og med to kanaler kan man sikre at 
+ingen proces modtager et signal før alle processer har sendt et signal til 
+barrieren.
+\fxnote[inline]{fortsættes med ulemper med barriere og generelt hvorfor vi 
+skal holdes os fra det. noget med at man skal kalde barrieren to  gange}
 
 
