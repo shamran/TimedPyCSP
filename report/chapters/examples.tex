@@ -1,6 +1,8 @@
-\chapter{Eksempler}
+\section{Eksempel}
+\fxnote[inline]{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}
 
-\section{Hajer og fisk på Wator} Som eksempel på en \des har vi valgt at tage 
+
+\subsection{Hajer og fisk på Wator} Som eksempel på en \des har vi valgt at tage 
 udgangspunkt i det scenarie som A. K. Dewdney
 beskrev i artiklen \cite{wator}. Artiklen beskriver den
 fiktive planet Wator, der har form som en torus og er fuldstændig
@@ -37,7 +39,7 @@ forventer vi at se bestanden af henholdsvis fisk og hajer oscillerer
 afhængigt af hinanden.
 
 
-\subsection{Uden tid}
+\textbf{Uden tid}
 \fixme[inline]{bedre overskrift}
 For at simulere Wator verdenen i et CSP-system hvori tidsbegrebet ikke er 
 introduceret, er vi nødt til at udføre en synkronisering af de enkelte 
@@ -63,7 +65,7 @@ antal iterationer.
 
 
 
-\section{Kunder i en bank} Et klassisk eksempel inden for \des er at simulere  
+\subsection{Kunder i en bank} Et klassisk eksempel inden for \des er at simulere  
 en række kunder der alle ankommer til en butik, hvor de skal serviceres. Dette 
 simple problem kan bruges til at modellere mange forskellige 
 problemstillinger, som hvordan flowet ændrer sig hvis man varier en parameter 
@@ -83,7 +85,7 @@ også udvidet med en service disk, hvor alle kunderne skal betjenes af en
 servicemedarbejder. Alle kunder ankommer til banken i tilfældig orden og 
 stiller sig i kø til at blive serviceret. Dette  svare til en M/M/1\fixme{hvad  
 er en m/m/1 kø} kø.
-\subsection{Uden tid}\fxnote{bedre overskrift}
+\textbf{Uden tid}\fxnote{bedre overskrift}
 I SimPy er kunderne en process og det vil derfor være nærliggende ligeledes at 
 modelere eksemplet i PyCSP med kunder som en proces. i Simpy kalder 
 generatorfunktionen kunderne og kan kører den parallelt med sig selv. 
