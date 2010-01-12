@@ -28,24 +28,10 @@
 %\input{../husk}
 \savepagenumber
 \mainmatter
-\linespread{1,5}
+\linespread{1.5}
 \selectfont
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\input{../problemformulering}
-%\newpage
-\input{chapters/examples}
-%\newpage
-%\input{../litteratur}
-%\newpage
-\input{chapters/time-implementation}
-%\newpage
-%\input{../implementation}
-
-%\input{../test.tex}
-\newpage
-%\input{../konklusion.tex}
-
-%\input{../jxta-services}
+\include{chapters/tidsplan}
 \chapter{Introduktion}
   \section{Problem}
   \section{Kontekst}
@@ -59,8 +45,10 @@
   \section{Eksempel}
     \fxnote[inline]{Beskrivelse af eksemplet og hvordan det er relateret til 
     problemet/modellen. Beskrivelse af løsning uden vores tid}
+    \input{chapters/examples}
   \section{Design og implementation}
     \fxnote[inline]{Beskrivelse af design med udgangspunkt i eksemplet}
+    \input{chapters/time-implementation}
   \section{Evaluering}
     \fxnote[inline]{Evaluering af hvordan eksemplet løses efter den valgte 
     implementation benyttes. Inkluderer test+performance}
