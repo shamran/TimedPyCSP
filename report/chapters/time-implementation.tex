@@ -1,4 +1,4 @@
-\section{Repræcentation af tid}
+\section{Repræsentation af tid}
 \fxnote{dette skal gennemlæses for logisk tid ifh til deadline osv.}
 I PyCSP foregår kommunikation kun når begge kanalender er klar dvs.
 når der findes både en kanalende der vil skrive og en kanalende der vil læse. 
@@ -25,7 +25,7 @@ i fremtiden.
 
 At ville kommunikere fra et given tidspunkt i fremtiden,  svare til at vente 
 uden at lave noget indtil det givne tidspunkt for så at forsøge at kommunikere 
-fra tidpunktet indtil det kommunktationen lykedes. Dette kan dermed laves helt 
+fra tidpunktet indtil kommunktationen lykedes. Dette kan dermed laves helt 
 uden en alternation, men ved blot med de to funktioner Wait(time), Cin(). 
 
 At ville være villig til at kommuikere til et given tidspunkt, medfører en ny 
@@ -37,6 +37,7 @@ arbejde til dette tidsskridt, og lade processerne fortsætte i samme
 tidsskridt. Alternativt skal tiden tælles op til næste event, hvorefter 
 processerne signaleres med at kommunkationen ikke lykkedes. 
 
+\textbf{Timeout i samme tidsskridt}\\
 Hvis man vælger at processerne skal signaleres i samme tidsskridt, vil en 
 timeout efterligne en SKIP guard, men hvor en alternation med en SKIP guard 
 med det samme kan fortsætte vil en timeout kræve at der blev ventet indtil der 
@@ -64,8 +65,21 @@ Ulemperne er at der skal foretages et valg om hvilke processer der signaleres
 med  timeout, og dermed har man risikoen for starvation\fxnote{ref?} hvis det 
 er den/de samme processer der bliver signaleret.
 
+\textbf{Timeout i et efterfølgende tidsskridt}\\
+Ved at vælge at en timeout først forekommer i et efterfølgende tidsskridt, har 
+alle processer haft den maksimale mulighed for at indgå i en kommunikation. 
+Desuden kan alle processerne signaleres samtidigt, da et alle  timeouts er 
+overskredet. Man skal dog vælge enten at fortolke en timeout i samme tidskridt  
+som en timeout efter $\epsilon$, hvor $\epsilon$ sættes til et vilkårligt 
+lille tidsinterval. Da tiden springer i vilkårligt små tidsskridt i  en 
+simuleringen, vil en fast størrelse af $\epsilon$ risikere at påvirke 
+rækkefølgen af events. Alternativt kan man vælge at lade tiden springe til 
+nærste event, og der signalere alle timeouts. Begge muligheder har dog 
+implicit det problem at timeout var sat til 0 og ikke til hverken et 
+vilkårligt lille $\epsilon$ eller anden tidsenhed og man derfor ændrer på 
+fortolkningen af kode.
 
-\subsection{Vores valg} >>>>>>> 
+\subsection{Vores valg} 
 
 Timeouts i Timed PyCSP er en af de vigtigste funktioner, da det disse giver en
 der ikke er data, mtimeout processen fortsætte  tildet under antagelsen af 
