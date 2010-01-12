@@ -1,3 +1,35 @@
+\chapter{\des}
+  \section{Beskrivelse/teori}
+    \fxnote[inline]{Beskrivelse af tidsmodellen, teorien omkring den og 
+    hvor/hvad den benyttes til. Teori: henvisning til litteratur, bl.a.  
+    matematik/beviser for modellen}
+    
+\subsection*{Barrierer}\label{barrier}
+For at modellere eksemplet med kunder i en bank i PyCSP, skal der foretages en 
+række valg. Først og fremmest skal det besluttes hvad der skal være processer, 
+og hvordan  kanalerne skal forbindes. I \des findes der i modsætningen til 
+PDES \fixme{referencer} en global tid og alle processerne skal derfor have  en 
+fælles tid der tæller op samtidigt. Den mest brugte metode i CSP sammenhæng er 
+at bruge en barrier \vref{barrier-imp}.
+
+\begin{lstlisting}[label=barrier-imp,caption=En barrier i PyCSP]
+@process
+def Barrier(nprocesses, signalIN, signalOUT):
+	while True:
+		for i in range (nprocesses):
+			signalIN()
+		for i in range (nprocesses):
+			signalOUT(0)
+\end{lstlisting}
+
+Barrier blev introduceret i MPI, og sikrer at alle tråde har nået dette punkt 
+før de må fortsætte. I PyCSP er det trivielt at have  denne egenskab, da 
+processer til begge kanalender er klar, og med to kanaler kan man sikre at 
+ingen proces modtager et signal før alle processer har sendt et signal til 
+barrieren.
+\fxnote[inline]{fortsættes med ulemper med barriere og generelt hvorfor vi 
+skal holdes os fra det. noget med at man skal kalde barrieren to  gange}
+
 \section{Eksempel}
 \fxnote[inline]{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}
 
@@ -129,30 +161,11 @@ barriernen vil ikke modtage et kald fra nogle før det har kaldt bankprocessen,
 og derfor må generatoren vente i første kald til barrieren indtil banken har 
 modtaget sit kald fra barrieren. 
 
-\section{Barrierer}\label{barrier}
-For at modellere eksemplet med kunder i en bank i PyCSP, skal der foretages en 
-række valg. Først og fremmest skal det besluttes hvad der skal være processer, 
-og hvordan  kanalerne skal forbindes. I \des findes der i modsætningen til 
-PDES \fixme{referencer} en global tid og alle processerne skal derfor have  en 
-fælles tid der tæller op samtidigt. Den mest brugte metode i CSP sammenhæng er 
-at bruge en barrier \vref{barrier-imp}.
-
-\begin{lstlisting}[label=barrier-imp,caption=En barrier i PyCSP]
-@process
-def Barrier(nprocesses, signalIN, signalOUT):
-	while True:
-		for i in range (nprocesses):
-			signalIN()
-		for i in range (nprocesses):
-			signalOUT(0)
-\end{lstlisting}
-
-Barrier blev introduceret i MPI, og sikrer at alle tråde har nået dette punkt 
-før de må fortsætte. I PyCSP er det trivielt at have  denne egenskab, da 
-processer til begge kanalender er klar, og med to kanaler kan man sikre at 
-ingen proces modtager et signal før alle processer har sendt et signal til 
-barrieren.
-\fxnote[inline]{fortsættes med ulemper med barriere og generelt hvorfor vi 
-skal holdes os fra det. noget med at man skal kalde barrieren to  gange}
-
-
+  \section{Design og implementation}
+    \fxnote[inline]{Beskrivelse af design med udgangspunkt i eksemplet}
+    \input{chapters/time-implementation}
+  \section{Evaluering}
+    \fxnote[inline]{Evaluering af hvordan eksemplet løses efter den valgte 
+    implementation benyttes. Inkluderer test+performance}
+  \section{Fremtidigt arbejde}
+  \section{Opsummering}
