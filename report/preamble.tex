@@ -121,10 +121,14 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 \newcommand{\des}[0]{Discrete event simulation }
 \newcommand{\ds}[0]{Deadline scheduling }
 \newcommand{\is}[0]{Interaktive scheduling }
+
+ 
 % OPSÆTNING TIL INKLUDERING AF SOURCE CODE
 \usepackage[final]{listings}
-\usepackage{courier}
- \lstset{
+\renewcommand{\lstlistingname}{Kodesnip}
+\renewcommand{\lstlistlistingname}{Kodesnippets}
+	\usepackage{courier}
+ \lstset{ 
          basicstyle=\footnotesize\ttfamily, % Standardschrift
          %numbers=left,               % Ort der Zeilennummern
          numberstyle=\tiny,          % Stil der Zeilennummern

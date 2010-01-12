@@ -4,13 +4,12 @@
     hvor/hvad den benyttes til. Teori: henvisning til litteratur, bl.a.  
     matematik/beviser for modellen}
     
-\subsection*{Barrierer}\label{barrier}
-For at modellere eksemplet med kunder i en bank i PyCSP, skal der foretages en 
-række valg. Først og fremmest skal det besluttes hvad der skal være processer, 
-og hvordan  kanalerne skal forbindes. I \des findes der i modsætningen til 
-PDES \fixme{referencer} en global tid og alle processerne skal derfor have  en 
+\subsection{Barrierer}\label{barrier}
+For at modellere tid i PyCSP, skal der foretages en 
+række valg. I \des findes der i modsætningen til 
+Parallel \des \fixme{referencer} en global tid og alle processerne skal derfor have  en 
 fælles tid der tæller op samtidigt. Den mest brugte metode i CSP sammenhæng er 
-at bruge en barrier \vref{barrier-imp}.
+at implementere en barrier som en selvstændig process. Eksempelvis kan den implementers som i \autoref{barrier-imp}.
 
 \begin{lstlisting}[label=barrier-imp,caption=En barrier i PyCSP]
 @process
@@ -95,8 +94,6 @@ barrieren, og når alle kolonner er opdateret, kan der foretages en
 visualisering af de udførte opdateringer. Disse skridt udføres et forudbestemt 
 antal iterationer. 
 
-
-
 \subsection{Kunder i en bank} Et klassisk eksempel inden for \des er at simulere  
 en række kunder der alle ankommer til en butik, hvor de skal serviceres. Dette 
 simple problem kan bruges til at modellere mange forskellige 
@@ -118,12 +115,12 @@ servicemedarbejder. Alle kunder ankommer til banken i tilfældig orden og
 stiller sig i kø til at blive serviceret. Dette  svare til en M/M/1\fixme{hvad  
 er en m/m/1 kø} kø.
 \textbf{Uden tid}\fxnote{bedre overskrift}
-I SimPy er kunderne en process og det vil derfor være nærliggende ligeledes at 
-modelere eksemplet i PyCSP med kunder som en proces. i Simpy kalder 
+I SimPy er kunderne en proces og det vil derfor være nærliggende ligeledes at 
+modellere eksemplet i PyCSP med kunder som en proces. i SimPy kalder 
 generatorfunktionen kunderne og kan kører den parallelt med sig selv. 
 I PyCSP\fxnote{hvorfor?- kan man lave child processes der køre i samme 
 parallel kald som dets parent?}, er standard metoden\fxnote{set fra 
-kodeeksempler} at modelere mere statiske objekter, med en source og sink 
+kodeeksempler} at modellere mere statiske objekter, med en source og sink 
 process og lade arbejdet flyttes mellem processerne. Derfor er modellen ændret 
 så  generatorprocesen stadigt fungere som en source, men vi introducerer en 
 bankproces som sink, og lader kunderne være arbejdet der flyttes mellem dem. 
@@ -134,14 +131,14 @@ mulighed for at kende tid og skal derfor selv holde en liste med kunderne
 i banken og  til hver tidskridt vide hvilke af kunderne der skal forlade 
 banken. 
 
-Tiden er igen modelleret ved brug af barrier se \autoref{barrier}, men 
+Tiden er igen modelleret ved brug af barrier se afsnit \vref{barrier}, men 
 i stedet for  at kalde barrierens to krævede kald, lige efter hinanden, som 
-normalt for at være sikker på vi er i samme tidsskridt lader vi bank
-processen gå ind i barrieren i starten af tidsskridtet, og så modtage kunderi, 
+normalt, for at være sikker på vi er i samme tidsskridt lader vi bank
+processen gå ind i barrieren i starten af tidsskridtet, og så modtage kunder, 
 indtil banken modtager et kald om at forsætte til næste tidsskridt af 
 barrieren.
-\begin{lstlisting}[label=bank-alternation-imp,caption=modtag kunder eller 
-	barrier i Bankproces]
+\begin{lstlisting}[label=bank-alternation-imp,caption=Modtage en kunde eller 
+	barrier i Bankprocessen]
 while True:
 		(g,msg) = Alternation([{
 		barrierREADER:None,
@@ -152,15 +149,16 @@ while True:
     elif g == customerREADER:
 			heappush(customers,(time+msg.waittime,msg))
 \end{lstlisting}
-Dette er smart, og nødvændigt for at lade banken have mulighed for at modtage 
+Dette er smart, og nødvendigt for at lade banken have mulighed for at modtage 
 et vilkårligt antal kunder i samme tidsskridt, samt vide hvornår der ikke vil  
-komme flere kunder. Vi kan resonere os til at barrieren stadigt virker efter 
-hensigten da for at generatoren kan komme foran med et tidsskridt og sende en 
-kunde i et forkert tidsskridt skal have kaldt begge kald til barrieren, men 
-barriernen vil ikke modtage et kald fra nogle før det har kaldt bankprocessen, 
-og derfor må generatoren vente i første kald til barrieren indtil banken har 
+komme flere kunder. Vi kan ressonere os til at barrieren stadigt virker efter 
+hensigten ved at indse at for at generatoren kan komme foran med et tidsskridt og sende en 
+kunde i et forkert tidsskridt skal den have fuldført begge begge kald til barrieren, men 
+barrieren vil ikke modtage et kald fra nogle før det har kaldt bankprocessen, 
+og derfor må generatoren vente i sit første kald til barrieren indtil banken har 
 modtaget sit kald fra barrieren. 
 
+For at kunderne kan tilgå den samme begrænsede ressource kræves en kø, og denne kan i PyCSP modeleres på flere måder, afhængigt at hvilken proces der skal have ansvaret for at vedligeholde køen. En metode er internt i en proces at have en liste, og lade det være processen ansvar. Processen med ansvaret kan så enten være den begrænsede ressource, eller en separat proces hvis eneste formål er at vedligeholde køen. For nyligt er der i PyCSP blevet introduceret ''buffered channels'', og man kan også vælge at bruge disse som en kø. Dermed kan man modellere sin ressource og lade den læse fra kanalen når den er klar uden at skulle beskæftige sig med køen. I eksemplet 
   \section{Design og implementation}
     \fxnote[inline]{Beskrivelse af design med udgangspunkt i eksemplet}
     \input{chapters/time-implementation}
