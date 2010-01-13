@@ -9,12 +9,12 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="744.09448819"
-   height="1052.3622047"
+   width="381.84235"
+   height="300.39062"
    id="svg2"
    version="1.1"
    inkscape:version="0.47pre4 r22446"
-   sodipodi:docname="wator.pdf">
+   sodipodi:docname="wator.svg">
   <defs
      id="defs4">
     <inkscape:path-effect
@@ -40,36 +40,36 @@
     <marker
        inkscape:stockid="StopL"
        orient="auto"
-       refY="0.0"
-       refX="0.0"
+       refY="0"
+       refX="0"
        id="StopL"
        style="overflow:visible">
       <path
          id="path3875"
-         d="M 0.0,5.65 L 0.0,-5.65"
-         style="fill:none;fill-opacity:0.75000000;fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt"
-         transform="scale(0.8)" />
+         d="M 0,5.65 0,-5.65"
+         style="fill:none;stroke:#000000;stroke-width:1pt"
+         transform="scale(0.8,0.8)" />
     </marker>
     <marker
        style="overflow:visible"
        id="DistanceStart"
-       refX="0.0"
-       refY="0.0"
+       refX="0"
+       refY="0"
        orient="auto"
        inkscape:stockid="DistanceStart">
       <g
          id="g2300">
         <path
-           style="fill:none;stroke:#ffffff;stroke-width:1.15;stroke-linecap:square"
-           d="M 0,0 L 2,0"
+           style="fill:none;stroke:#ffffff;stroke-width:1.14999998;stroke-linecap:square"
+           d="M 0,0 2,0"
            id="path2306" />
         <path
            style="fill:#000000;fill-rule:evenodd;stroke:none"
-           d="M 0,0 L 13,4 L 9,0 13,-4 L 0,0 z "
+           d="M 0,0 13,4 9,0 13,-4 0,0 z"
            id="path2302" />
         <path
            style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:square"
-           d="M 0,-4 L 0,40"
+           d="M 0,-4 0,40"
            id="path2304" />
       </g>
     </marker>
@@ -181,8 +181,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.5"
-     inkscape:cx="264.71032"
-     inkscape:cy="815.13212"
+     inkscape:cx="265.63149"
+     inkscape:cy="153.79881"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -201,7 +201,11 @@
      inkscape:guide-bbox="true">
     <inkscape:grid
        type="xygrid"
-       id="grid2816" />
+       id="grid2816"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -218,7 +222,8 @@
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     transform="translate(0.92117486,-91.971558)">
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.55603111;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect5234"
@@ -257,7 +262,7 @@
          x="287.30762"
          y="102.36218">P2</tspan></text>
     <path
-       style="fill:none;stroke:#000000;stroke-width:1.55023026;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4.65069079,4.65069079;stroke-dashoffset:0;marker-start:url(#StopL);marker-mid:url(#StopL);marker-end:url(#StopL)"
+       style="fill:none;stroke:#000000;stroke-width:1.55023026;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4.65069079, 4.65069079;stroke-dashoffset:0;marker-start:url(#StopL);marker-mid:url(#StopL);marker-end:url(#StopL)"
        d="m 0.37425701,372.36636 149.45428299,0 40.32714,0 150.72714,0 38.27724,0"
        id="path3698"
        inkscape:path-effect="#path-effect3700"
