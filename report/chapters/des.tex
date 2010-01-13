@@ -42,7 +42,6 @@ fiktive planet Wator, der har form som en torus og er fuldstændig
 dækket af vand. Verdenen er inddelt i felter \cite[s. 20]{wator}, og disse felter kan være tomme, indeholde en
 fisk eller en haj. Følgende karakteristika beskriver fisk og hajers
 opførsel.
-\fxnote[inline]{Hvorfor har vi valgt dette eksempel. Hvorfor er dette eksempel relevant til brug i parallel computing. Hvorfor forventer vi at det kan gøres smartere med introdsuktionen af tid.}
 
 \begin{itemize}
 \item[Fisk]
@@ -67,13 +66,28 @@ Såfremt de initielle parametre for antal fisk og hajer understøtter en
 bæredygtig bestand forventer vi at se bestanden af henholdsvis fisk og hajer 
 oscillerer afhængigt af hinanden.
 
+\fxnote[inline]{Hvorfor har vi valgt dette eksempel. Hvorfor er dette eksempel 
+relevant til brug i parallel computing. Hvorfor forventer vi at det kan gøres 
+smartere med introdsuktionen af tid.}
+
+Vi har valgt dette eksempel, da det er enkelt og let forståeligt, men samtidig 
+introducerer problemstilinger omkring synkronisering når det paralleliseres.  
+Disse problemstillinger optræder fordi en opdatering af hvert felt er afhængigt 
+af de omkringliggende felter, og vil derfor være afhængig af felter fra andre 
+processer i grænsetilfælde. Ud over at være afhængig af information fra andre 
+processer, kan en opdatering også påvirke data hos andre processer. Dette er 
+tilfældet hvis en fisk eller haj skal bevæge sig fra et område styret af èn 
+proces til et område styret af en anden proces.  \fxnote[inline]{Noget om real 
+world applikation?}
+
 \subsubsection*{Før introduktion af et tidsbegreb i CSP} 
 For at simulere Wator verdenen i et CSP-system hvori tidsbegrebet ikke er 
 introduceret, er vi nødt til at udføre en synkronisering af de enkelte 
 processers arbejde. Denne synkronisering kan ske ved brug af barrierer, hvor 
 alle processer udfører en handling og mødes i barrieren før de fortsætter.
 
-\fxnote[inline]{MAV af model, hvorfor ikke en bedre csp approch med forsendelse af shadowrows og totalt seperapelt data}
+\fxnote[inline]{MAV af model, hvorfor ikke en bedre csp approch med forsendelse 
+af shadowrows og totalt seperapelt data}
 Vi har valgt at basere vores model på \cite{crew}, hvor verdenen repræsenteres 
 som en delt datastruktur og adgangen til denne styres med barrierer. I vores 
 model er hver proces derved ansvarlig for en del af verdenen og tilgangen til 
@@ -95,6 +109,11 @@ En representation af opdelingen ses på \autoref{fig:wator}. Her er verdenen
 opdelt mellem to processer, og de to kolonner mellem hver del opdateres i et 
 seperat tidsskridt. Når disse to tidsskridt er udført kan der foretages en 
 visualisering, hovrefter næste iteration af opdateringer kan begyndes.  
+
+Vi har valgt denne model frem for en mere ren CSP model, da denne model 
+klarlægger brugen af barrierer bedre. I en mere ren CSP-model ville man 
+foretage en direkte udveksling af data mellem 
+processerne,\fxnote[inline]{mere\ldots} 
 
 \fxnote{konklusion hvordan var det at implementerer og hvor stor parallelitet kan man opnå. }
 
