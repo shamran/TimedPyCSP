@@ -51,21 +51,36 @@ def Generator(i,number,meanTBA, meanWT,customerWRITER,barrierWRITER,barrierREADE
     print "%64.0f: G%d: got poison"%(time,i) 
 
 @process
-def Servicedisk(customerREADER):
+def Servicedisk(barrierREADER,barrierWRITER,customerREADER):
+    time = 0
     try:
         while True:
-            customer = customerREADER()
-            print Now(),": ",customer, "entered servicedisk"
-            Wait(customer.meanWT)
-            print Now(),": ",customer, "left servicedisk"
+            barrierWRITER(0)
+            print "%0.0f: S: enters alt"%time
+            (g,customer) = Alternation([{
+                barrierREADER:None,
+                customerREADER:None
+            }]).select()
+            if g == barrierREADER:
+                print "%0.0f: S: done alt, incrementing time"%time
+                time += 1
+                continue
+            elif g == customerREADER:
+                print time,": S :",customer," entered servicedisk, wait to ", customer.waittime
+                for i in range(customer.waittime):
+                    barrierREADER()
+                    print time, ": S: in wait incrementing time"
+                    time+=1
+                    barrierWRITER(0)
+                    print time, " : S: done barrierWrite"
+                print time,": ",customer, "left servicedisk"
     except ChannelPoisonException:
         pass
 
 @process
-def Bank(customerREADER,barrierWRITER, barrierREADER, servicediskWRITER ):
+def Bank(customerREADER,barrierREADER, barrierWRITER, servicediskWRITER ):
   """Handles the action inside the bank """
   t = False
-  customers =  []
   time = 0
   
   @choice
@@ -86,18 +101,10 @@ def Bank(customerREADER,barrierWRITER, barrierREADER, servicediskWRITER ):
         }]).select()
         if g == barrierREADER:
           print "%94.0f: B: done alt"%time
-          print "%94.0f: B: Length of queue in bank %d"%(time,len(customers))
           break
         elif g == customerREADER:
           print "%94.0f: B: adding a customer %s"%(time,msg)
-          heappush(customers,(time+msg.waittime,msg))
-          print "%94.0f: B:"%(time)
-          #show_tree(customers,offset=93)
-          print customers
-      while len(customers)>0 and customers[0][0]<=time:
-        ntime,ncust = customers.pop()
-        print "%94.0f: %s left bank"%(ntime,ncust.name)
-      print "%94.0f: Length of queue in bank %d"%(time,len(customers))
+          servicediskWRITER(msg)
       time+=1
   except ChannelRetireException:
     """All generators have retired just empty the queue"""
@@ -134,14 +141,14 @@ if __name__ == "__main__":
   customer = Channel()
   barrierDone = Channel()
   barrierContinue = Channel()
-  queue = Channel(10000)
+  queue = Channel(buffer=10000)
   numberCustomers=5
   meanTBA = 3.0
   meanWT = 3.0
   Parallel(
-    Servicedisk(+queue),
-    Bank(+customer,-barrierDone,+barrierContinue,-queue),
+    Servicedisk(+barrierContinue,-barrierDone,+queue),
+    Bank(+customer,+barrierContinue,-barrierDone,-queue),
     [Generator(i,numberCustomers,meanTBA, meanWT, -customer,-barrierDone,+barrierContinue)
       for i in range (nprocesses)],
-    Barrier(nprocesses+1,+barrierDone,-barrierContinue)
+    Barrier(nprocesses+2,+barrierDone,-barrierContinue)
   )
