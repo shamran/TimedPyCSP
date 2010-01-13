@@ -39,10 +39,10 @@ skal holdes os fra det. noget med at man skal kalde barrieren to  gange}
 udgangspunkt i det scenarie som A. K. Dewdney
 beskrev i artiklen \cite{wator}. Artiklen beskriver den
 fiktive planet Wator, der har form som en torus og er fuldstændig
-dækket af vand. Verdenen er inddelt i felter som beskrevet på side
-20 i \cite{wator}. Disse felter kan være tomme, indeholde en
+dækket af vand. Verdenen er inddelt i felter \cite[s. 20]{wator}, og disse felter kan være tomme, indeholde en
 fisk eller en haj. Følgende karakteristika beskriver fisk og hajers
 opførsel.
+\fxnote[inline]{Hvorfor har vi valgt dette eksempel. Hvorfor er dette eksempel relevant til brug i parallel computing. Hvorfor forventer vi at det kan gøres smartere med introdsuktionen af tid.}
 
 \begin{itemize}
 \item[Fisk]
@@ -65,13 +65,15 @@ samt hvor mange fisk og hajer der er til stede fra start. Disse fisk og
 hajer placeres tilfældigt i verdenen.
 Såfremt de initielle parametre for antal fisk og hajer understøtter en 
 bæredygtig bestand forventer vi at se bestanden af henholdsvis fisk og hajer 
-oscillerer afhængigt af hinanden.\\
-\\
-\textbf{Før introduktion af et tidsbegreb i CSP}\\
+oscillerer afhængigt af hinanden.
+
+\subsubsection*{Før introduktion af et tidsbegreb i CSP} 
 For at simulere Wator verdenen i et CSP-system hvori tidsbegrebet ikke er 
 introduceret, er vi nødt til at udføre en synkronisering af de enkelte 
 processers arbejde. Denne synkronisering kan ske ved brug af barrierer, hvor 
 alle processer udfører en handling og mødes i barrieren før de fortsætter.
+
+\fxnote[inline]{MAV af model, hvorfor ikke en bedre csp approch med forsendelse af shadowrows og totalt seperapelt data}
 Vi har valgt at basere vores model på \cite{crew}, hvor verdenen repræsenteres 
 som en delt datastruktur og adgangen til denne styres med barrierer. I vores 
 model er hver proces derved ansvarlig for en del af verdenen og tilgangen til 
@@ -87,12 +89,14 @@ kolonner.
 Når denne opdatering er fuldført mødes processerne i en barriere, hvorefter 
 hver proces opdaterer de to sidste kolonner. Herefter mødes processerne igen i 
 barrieren, og når alle kolonner er opdateret, kan der foretages en 
-visualisering af de udførte opdateringer.  
+visualisering af de udførte opdateringer.  \fxnote[inline]{pseudo kode eksempel?}
 
-En representation af opdelingen ses på figur \ref{fig:wator}. Her er verdenen 
+En representation af opdelingen ses på figur \vref{fig:wator}. Her er verdenen 
 opdelt mellem to processer, og de to kolonner mellem hver del opdateres i et 
 seperat tidsskridt. Når disse to tidsskridt er udført kan der foretages en 
 visualisering, hovrefter næste iteration af opdateringer kan begyndes.  
+
+\fxnote{konklusion hvordan var det at implementerer og hvor stor parallelitet kan man opnå. }
 
 \begin{figure}
   \begin{center}
