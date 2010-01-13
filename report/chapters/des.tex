@@ -44,7 +44,6 @@ dækket af vand. Verdenen er inddelt i felter som beskrevet på side
 fisk eller en haj. Følgende karakteristika beskriver fisk og hajers
 opførsel.
 
-
 \begin{itemize}
 \item[Fisk]
 Lever af plankton, en ressource som er uendelig. Hvis der er en ledigt 
@@ -59,21 +58,16 @@ ikke spiser i 3 tidsskridt dør den. Overlever den i 10 tidsskridt forplanter
 den sig.
 \end{itemize}
 
-
 For hvert tidsskridt vil alle fisk og hajer udføre en handling ud fra
 ovenstående opførsel.
-
 Til at initiere systemet skal der defineres en størrelse af verdenen,
 samt hvor mange fisk og hajer der er til stede fra start. Disse fisk og
 hajer placeres tilfældigt i verdenen.
-
-Såfremt de initielle parametre understøtter en bæredygtig bestand
-forventer vi at se bestanden af henholdsvis fisk og hajer oscillerer
-afhængigt af hinanden.
-
-
-\textbf{Uden tid}
-\fixme[inline]{bedre overskrift}
+Såfremt de initielle parametre for antal fisk og hajer understøtter en 
+bæredygtig bestand forventer vi at se bestanden af henholdsvis fisk og hajer 
+oscillerer afhængigt af hinanden.\\
+\\
+\textbf{Før introduktion af et tidsbegreb i CSP}\\
 For at simulere Wator verdenen i et CSP-system hvori tidsbegrebet ikke er 
 introduceret, er vi nødt til at udføre en synkronisering af de enkelte 
 processers arbejde. Denne synkronisering kan ske ved brug af barrierer, hvor 
@@ -93,8 +87,21 @@ kolonner.
 Når denne opdatering er fuldført mødes processerne i en barriere, hvorefter 
 hver proces opdaterer de to sidste kolonner. Herefter mødes processerne igen i 
 barrieren, og når alle kolonner er opdateret, kan der foretages en 
-visualisering af de udførte opdateringer. Disse skridt udføres et forudbestemt 
-antal iterationer. 
+visualisering af de udførte opdateringer.  
+
+En representation af opdelingen ses på figur \ref{fig:wator}. Her er verdenen 
+opdelt mellem to processer, og de to kolonner mellem hver del opdateres i et 
+seperat tidsskridt. Når disse to tidsskridt er udført kan der foretages en 
+visualisering, hovrefter næste iteration af opdateringer kan begyndes.  
+
+\begin{figure}
+  \begin{center}
+  \includegraphics[scale=0.75]{images/wator}
+  \caption{Opdeling af verdenen mellem to processer. Der er for hver verdensdel 
+  to kolonner som opdateres i et seperat tidsskridt.}
+  \label{fig:wator}
+  \end{center}
+\end{figure}
 
 \subsection{Kunder i en bank} Et klassisk eksempel inden for \des er at simulere  
 en række kunder der alle ankommer til en butik, hvor de skal serviceres. Dette 
