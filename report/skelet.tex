@@ -1,4 +1,7 @@
 \input{preamble}
+\setlength{\cftbeforechapterskip}{1.0em plus 0.1em minus 0.1 em}
+\setlength{\cftbeforesectionskip}{0em plus 0em minus 0em}
+\setlength{\cftbeforesubsectionskip}{0em plus 0em minus 0em}
 
 \bibliography{bibliography} %indsaet en reference til bib filen
 \usepackage{biblatex}
@@ -13,8 +16,9 @@
 
 
 \frontmatter
-\small
-\tableofcontents
+
+
+\tableofcontents*
 \normalsize
 \newpage
 
@@ -26,7 +30,7 @@
 \savepagenumber
 \mainmatter
 \linespread{1.5}
-\selectfont
+\selectfont 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \include{chapters/timeplan}
 \chapter{Introduktion}
@@ -42,7 +46,7 @@
   \section{Evaluering}
   \section{Fremtidigt arbejde}
   \section{Opsummering}
-\chapter{Interaktiv tid}
+\chapter{\is}
   \section{Beskrivelse/teori}
   \section{Eksempel}
   \section{Design og implementation}

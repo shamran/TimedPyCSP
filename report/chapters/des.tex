@@ -10,8 +10,9 @@ række valg. I \des findes der i modsætningen til
 Parallel \des \fixme{referencer} en global tid og alle processerne skal derfor have  en 
 fælles tid der tæller op samtidigt. Den mest brugte metode i CSP sammenhæng er 
 at implementere en barrier som en selvstændig process. Eksempelvis kan den implementers som i \autoref{barrier-imp}.
+%\begin{minipage}[b]{1\linewidth}
 
-\begin{lstlisting}[label=barrier-imp,caption=En barrier i PyCSP]
+\begin{lstlisting}[float, label=barrier-imp,caption=En barrier i PyCSP]
 @process
 def Barrier(nprocesses, signalIN, signalOUT):
 	while True:
@@ -20,6 +21,7 @@ def Barrier(nprocesses, signalIN, signalOUT):
 		for i in range (nprocesses):
 			signalOUT(0)
 \end{lstlisting}
+%\end{minipage}
 
 Barrier blev introduceret i MPI, og sikrer at alle tråde har nået dette punkt 
 før de må fortsætte. I PyCSP er det trivielt at have  denne egenskab, da 
@@ -137,7 +139,7 @@ normalt, for at være sikker på vi er i samme tidsskridt lader vi bank
 processen gå ind i barrieren i starten af tidsskridtet, og så modtage kunder, 
 indtil banken modtager et kald om at forsætte til næste tidsskridt af 
 barrieren.
-\begin{lstlisting}[label=bank-alternation-imp,caption=Modtage en kunde eller 
+\begin{lstlisting}[float,label=bank-alternation-imp,caption=Modtage en kunde eller 
 	barrier i Bankprocessen]
 while True:
 		(g,msg) = Alternation([{

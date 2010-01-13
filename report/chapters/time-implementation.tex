@@ -7,7 +7,7 @@ der findes minumum en kanalende af hver type, der er klar. I alternation
 findes muligheden for at tilknytte en timeout til en guard. Dette
 giver muligheden for at en process, kun er villig til at vente på at kanalen 
 bliver klar inden for en given tidsperiode. 
-\begin{lstlisting}[label=Timeout,
+\begin{lstlisting}[float, label=Timeout,
   caption=Timeout i Alternation (fra dokumentationen til PyCSP)]
   Alternation([{Timeout(seconds=0.5):None},
                {Cin:None}]).select()

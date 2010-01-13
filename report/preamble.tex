@@ -112,21 +112,19 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 % \setlength{\itemsep}{0pt}
 %  \setlength{\parskip}{0pt}}
 
-
-
 %Linjeafstand: (1,5 = siderne bliver ca. til ns)
-\linespread{1,5}
+\linespread{1,5} 
 \selectfont
 
 \newcommand{\des}[0]{Discrete event simulation }
 \newcommand{\ds}[0]{Deadline scheduling }
-\newcommand{\is}[0]{Interaktive scheduling }
+\newcommand{\is}[0]{Interaktiv scheduling }
 
  
 % OPSÆTNING TIL INKLUDERING AF SOURCE CODE
 \usepackage[final]{listings}
-\renewcommand{\lstlistingname}{Kodesnip}
-\renewcommand{\lstlistlistingname}{Kodesnippets}
+\renewcommand{\lstlistingname}{Kodestump}
+\renewcommand{\lstlistlistingname}{Kodestumper}
 	\usepackage{courier}
  \lstset{ 
          basicstyle=\footnotesize\ttfamily, % Standardschrift
@@ -136,13 +134,13 @@ typeeditors 	= {{udgivere}{udg\adddot}},
          numbersep=5pt,              % Abstand der Nummern zum Text
          tabsize=2,                  % Groesse von Tabs
          extendedchars=true,         %
-         breaklines=true,            % Zeilen werden Umgebrochen
+         breaklines=false,            % Zeilen werden Umgebrochen
          keywordstyle=\color{red},
                 frame=b,         
- %        keywordstyle=[1]\textbf,    % Stil der Keywords
- %        keywordstyle=[2]\textbf,    %
- %        keywordstyle=[3]\textbf,    %
- %        keywordstyle=[4]\textbf,   \sqrt{\sqrt{}} %
+         keywordstyle=[1]\textbf,    % Stil der Keywords
+         keywordstyle=[2]\textbf,    %
+         keywordstyle=[3]\textbf,    %
+         keywordstyle=[4]\textbf,   %\sqrt{\sqrt{}} %
          stringstyle=\color{white}\ttfamily, % Farbe der String
          showspaces=false,           % Leerzeichen anzeigen ?
          showtabs=false,             % Tabs anzeigen ?
@@ -154,14 +152,18 @@ typeeditors 	= {{udgivere}{udg\adddot}},
          showstringspaces=false      % Leerzeichen in Strings anzeigen ?        
  }
  \lstloadlanguages{% Check Dokumentation for further languages ...
-         %[Visual]Basic
-         %Pascal
-         %C
-         %C++
-         %XML
-         %HTML
-         PYTHON
+         [Visual]Basic,
+         Pascal,
+         C,
+         C++,
+         XML,
+         HTML,
+         PYTHON,
  }
+\lstset{language=Python}
+\lstset{emph={@process, @choise, Alternation, Skip,Timeout,Parallel,Sequence, Spawn,@io,ChannelPoisonException, ChannelRetireException},emphstyle=\underbar}
+
+
     %\DeclareCaptionFont{blue}{\color{blue}} 
 
   %\captionsetup[lstlisting]{singlelinecheck=false, labelfont={blue}, textfont={blue}}
