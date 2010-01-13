@@ -85,8 +85,8 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 % man ikke har angivet noget
 
 \makeatletter
-\renewcommand\fps@figure{htbp}
-\renewcommand\fps@table{htbp}
+\renewcommand\fps@figure{hbtp}
+\renewcommand\fps@table{hbtp}
 \makeatother
 \usepackage{amsmath,amssymb} % bedre matematik og ekstra fonte
 \usepackage{textcomp} % adgagn til tekstsymboler
@@ -95,10 +95,10 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 % anvend option final
 
 
-\setsecnumdepth{subsubsection} % eller hvor dybt man nu ønsker at har
+\setsecnumdepth{section} % eller hvor dybt man nu ønsker at har
 % overskrifterne nummereret
-\maxsecnumdepth{subsubsection}
-\settocdepth{subsubsection} % hvor dybt ned vi ønsker ting med i
+\maxsecnumdepth{section}
+\settocdepth{subsection} % hvor dybt ned vi ønsker ting med i
 
 % OPSÆTNING AF SÆTNINGER etc.
 \usepackage[amsmath,thmmarks]{ntheorem} % bedre fleksimibitet
@@ -109,14 +109,6 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 %\usepackage{pstricks}
 \usepackage{tikz}
 
-%\newcommand{\tightlist}{%
-% \setlength{\itemsep}{0pt}
-%  \setlength{\parskip}{0pt}}
-
-%Linjeafstand: (1,5 = siderne bliver ca. til ns)
-\linespread{1,5} 
-\selectfont
-
 \newcommand{\des}[0]{Discrete event simulation }
 \newcommand{\ds}[0]{Deadline scheduling }
 \newcommand{\is}[0]{Interaktiv scheduling }
@@ -124,9 +116,9 @@ typeeditors 	= {{udgivere}{udg\adddot}},
  
 % OPSÆTNING TIL INKLUDERING AF SOURCE CODE
 \usepackage[final]{listings}
-\renewcommand{\lstlistingname}{Kodestump}
+\renewcommand{\lstlistingname}{kodestump}
 \renewcommand{\lstlistlistingname}{Kodestumper}
-	\usepackage{courier}
+\usepackage{courier}
  \lstset{ 
          basicstyle=\footnotesize\ttfamily, % Standardschrift
          %numbers=left,               % Ort der Zeilennummern

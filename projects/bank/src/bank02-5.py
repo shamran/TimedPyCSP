@@ -18,8 +18,6 @@ class Customer:
     return "%s,%s"%(self.waittime,self.name)
 
 
-  
-
 @process
 def Generator(i,number,meanTBA, meanWT,customerWRITER,barrierWRITER,barrierREADER):
   """Generaters a customer with a given time difference"""
@@ -34,9 +32,9 @@ def Generator(i,number,meanTBA, meanWT,customerWRITER,barrierWRITER,barrierREADE
       print "%64.0f: G%d: sent customer %s =%s"%(time,i,numberInserted,c.name)
       t_event = time + round(expovariate(1/meanTBA))
       numberInserted+=1
-    print "%64.0f: G%d: enters barrier "%(time,i)
+    print "%64.0f: G%d: enters barrierW "%(time,i)
     barrierWRITER(0)
-    print "%64.0f: G%d: enters barrier2 "%(time,i)
+    print "%64.0f: G%d: enters barrierR "%(time,i)
     barrierREADER()
     print "%64.0f: G%d: increments time "%(time,i)
     time+=1
@@ -55,8 +53,8 @@ def Servicedisk(barrierREADER,barrierWRITER,customerREADER):
     time = 0
     try:
         while True:
+            print time, ": S:True: enters barrierW"
             barrierWRITER(0)
-            print "%0.0f: S: enters alt"%time
             (g,customer) = Alternation([{
                 barrierREADER:None,
                 customerREADER:None
@@ -71,10 +69,10 @@ def Servicedisk(barrierREADER,barrierWRITER,customerREADER):
                     barrierREADER()
                     print time, ": S: in wait incrementing time"
                     time+=1
-                    barrierWRITER(0)
-                    print time, " : S: done barrierWrite"
+                    if i<customer.waittime-1:barrierWRITER(0)
                 print time,": ",customer, "left servicedisk"
     except ChannelPoisonException:
+        poison(barrierREADER,barrierWRITER)
         pass
 
 @process
@@ -91,7 +89,7 @@ def Bank(customerREADER,barrierREADER, barrierWRITER, servicediskWRITER ):
 
   try:
     while True:
-      print "%94.0f: B: enters barrier"%time
+      print "%94.0f: B: enters barrierW"%time
       barrierWRITER(0)
       while True:
         print "%94.0f: B: waits in alt"%time
@@ -107,13 +105,16 @@ def Bank(customerREADER,barrierREADER, barrierWRITER, servicediskWRITER ):
           servicediskWRITER(msg)
       time+=1
   except ChannelRetireException:
-    """All generators have retired just empty the queue"""
+    """All generators have retired just cotinue untill queue is empty"""
     print "%94.0f: All genreators have retired"%time
-    poison(barrierWRITER,barrierREADER,servicediskWRITER)
-    while(len(customers)>0):
-      ntime,ncust = heappop(customers)
-      print "%94.0f: %s left bank"%(ntime,ncust.name)
-    return
+    poison(servicediskWRITER)
+    try:
+        while True:
+            barrierREADER()
+            time +=1
+            barrierWRITER(0)
+    except ChannelPoisonException:
+        return
 
 @process
 def Barrier(nprocesses, barrierREADER, signalWRITER):

@@ -4,7 +4,7 @@
     hvor/hvad den benyttes til. Teori: henvisning til litteratur, bl.a.  
     matematik/beviser for modellen}
     
-\subsection{Barrierer}\label{barrier}
+\subsection*{Barrierer}\label{barrier}
 For at modellere tid i PyCSP, skal der foretages en 
 række valg. I \des findes der i modsætningen til 
 Parallel \des \fixme{referencer} en global tid og alle processerne skal derfor have  en 
@@ -111,23 +111,24 @@ visualisering, hovrefter næste iteration af opdateringer kan begyndes.
 en række kunder der alle ankommer til en butik, hvor de skal serviceres. Dette 
 simple problem kan bruges til at modellere mange forskellige 
 problemstillinger, som hvordan flowet ændrer sig hvis man varier en parameter 
-i systemet. Programmeringssproget SimPy har som et af deres eksempel, en 
+i systemet. Programmeringssproget SimPy\fxnote{ref} har som et af deres eksempel, en 
 simulering af kunder i en bank. SimPy bruger dette som en gennemgående 
 eksempler hvor de løbende udvider deres model for at vise forskellige 
-egenskaber ved deres model. For at nemt at kunne sammenligne SimPy  med vores 
-model vil vi bruge dette eksempel.
+egenskaber ved deres model. For senere at kunne sammenligne SimPy  med vores 
+implementation af logisk tid vil vi implementere to af SimPYs eksempler i PyCSP.
 
 I det simple tilfælde af eksemplet ankommer der en kunde til banken på på et 
 tilfældigt tidspunkt. Hun opholder sig i banken i et tidsrum, hvorefter hun 
 igen forlader banken.
 
-I det simple eksempel kan der ikke uddrages meget information, da banken ikke 
-består af en begrænset ressource som kunderne skal tilgå.  Eksemplet er derfor 
-også udvidet med en service disk, hvor alle kunderne skal betjenes af en 
-servicemedarbejder. Alle kunder ankommer til banken i tilfældig orden og 
+I det simple eksempel kan der ikke uddrages meget information, men det viser hvordan en simpel model er opbygget for at håndtere tid.
+I det andet eksempel er modellen 
+udvidet med en service disk. Her skal alle kunderne betjenes af en 
+servicemedarbejder, som kun kan ekspedere en kunde af gangen. Alle kunder ankommer til banken i tilfældig orden og 
 stiller sig i kø til at blive serviceret. Dette  svare til en M/M/1\fixme{hvad  
-er en m/m/1 kø} kø.
-\textbf{Uden tid}\fxnote{bedre overskrift}
+er en m/m/1 kø} kø. Dette er stadigt en meget simpel model, men ud fra køen kan der måles hvor lang tid det tager i gennemsnit for kunderne at blive betjent af servicemedarbejdere, samt hvor lang køen er over tid. 
+
+\subsubsection{Før introduktion af et tidsbegreb i PyCSP}
 I SimPy er kunderne en proces og det vil derfor være nærliggende ligeledes at 
 modellere eksemplet i PyCSP med kunder som en proces. i SimPy kalder 
 generatorfunktionen kunderne og kan kører den parallelt med sig selv. 
@@ -149,8 +150,16 @@ i stedet for  at kalde barrierens to krævede kald, lige efter hinanden, som
 normalt, for at være sikker på vi er i samme tidsskridt lader vi bank
 processen gå ind i barrieren i starten af tidsskridtet, og så modtage kunder, 
 indtil banken modtager et kald om at forsætte til næste tidsskridt af 
-barrieren.
-\begin{lstlisting}[float,label=bank-alternation-imp,caption=Modtage en kunde eller 
+barrieren (se \autoref{bank-alternation-imp}). Dette er smart, og nødvendigt for at lade banken have mulighed for at modtage 
+et vilkårligt antal kunder i samme tidsskridt, samt vide hvornår der ikke vil  
+komme flere kunder. Vi kan ressonere os til at barrieren stadigt virker efter 
+hensigten ved at indse at for at generatoren kan komme foran med et tidsskridt og sende en 
+kunde i et forkert tidsskridt skal den have fuldført begge begge kald til barrieren, men 
+barrieren vil ikke modtage et kald fra nogle før det har kaldt bankprocessen, 
+og derfor må generatoren vente i sit første kald til barrieren indtil banken har 
+modtaget sit kald fra barrieren. 
+
+\begin{lstlisting}[float=hbtp,label=bank-alternation-imp,caption=Modtage en kunde eller 
 	barrier i Bankprocessen]
 while True:
 		(g,msg) = Alternation([{
@@ -162,16 +171,20 @@ while True:
     elif g == customerREADER:
 			heappush(customers,(time+msg.waittime,msg))
 \end{lstlisting}
-Dette er smart, og nødvendigt for at lade banken have mulighed for at modtage 
-et vilkårligt antal kunder i samme tidsskridt, samt vide hvornår der ikke vil  
-komme flere kunder. Vi kan ressonere os til at barrieren stadigt virker efter 
-hensigten ved at indse at for at generatoren kan komme foran med et tidsskridt og sende en 
-kunde i et forkert tidsskridt skal den have fuldført begge begge kald til barrieren, men 
-barrieren vil ikke modtage et kald fra nogle før det har kaldt bankprocessen, 
-og derfor må generatoren vente i sit første kald til barrieren indtil banken har 
-modtaget sit kald fra barrieren. 
 
-For at kunderne kan tilgå den samme begrænsede ressource kræves en kø, og denne kan i PyCSP modeleres på flere måder, afhængigt at hvilken proces der skal have ansvaret for at vedligeholde køen. En metode er internt i en proces at have en liste, og lade det være processen ansvar. Processen med ansvaret kan så enten være den begrænsede ressource, eller en separat proces hvis eneste formål er at vedligeholde køen. For nyligt er der i PyCSP blevet introduceret ''buffered channels'', og man kan også vælge at bruge disse som en kø. Dermed kan man modellere sin ressource og lade den læse fra kanalen når den er klar uden at skulle beskæftige sig med køen. I eksemplet 
+
+Da dette eksempel er taget fra SimPy, for at vise fordelene ved simulering, egner det sig selvfølgelig godt til simulering, og fra eksemplet kan man også se at der findes meget kode til bookkeping, som eksmplerne i SimPY ikke har. Det drejer sig om kode der sørge for at hver proces kender tiden, samt at den er synkroniseret på tværs af processerne. Vi forventer derfor at koden skal kunne simplificeres i PyCSP med tid, så det bliver lige så simpelt som i SimPY.
+
+I det mere avancerede eksempel hvor kunderne skal tilgå den samme begrænsede ressource dannes en kø. Denne kan i PyCSP modeleres på flere måder, afhængigt at hvilken proces der skal have ansvaret for at vedligeholde køen. En metode er internt i en proces at have en liste, og lade det være processens ansvar at håndtere køen. Processen med ansvaret kan så enten være den begrænsede ressource, eller en separat proces hvis eneste formål er at vedligeholde køen. For nyligt er der i PyCSP blevet introduceret ''buffered channels'', og disse kan også bruges som en kø. Dermed kan man modellere sin ressource og lade den læse fra kanalen når den er klar uden at skulle beskæftige sig med køen, og uden at skulle implementerer en hjælper proces til håndtering af køen. Vi har i dette eksempel valgt at lade køen være repræsenteret ved en ''buffered channel'', men den kunne lige så godt være repræsenteret som en liste i servicedisk processen.
+
+I SimPy findes begrebet ressource direkte i sproget som en type og servicedisken er blot en instans af denne type, og ressourcen står selv for at håndterer køen. I PyCSP modelleres servicedisken som en separat proces, og bankprocessen er reduceret til blot at sende kunden videre til servicedisken og lade kanalen håndtere køen. En ulempe ved denne implementation er dog at kanalen har en fast størrelse på sin buffer, og dermed riskere man ved brug af buffers og barrierer en deadlock hvis ikke processen i samme tidsskridt kan foretage transmissionen og kalde barrieren. det kan du løses med en alternation og skip guard, men så skal banken håndtere fejlede forsendelser og må introducere en sekundær kø hvilket gør at introduktionen af en ''buffered channel'' er irrelevant. Vi har valgt blot at angive en maksimal størrelse på bufferen som er større end det totale antal kunder banken modtager.
+
+ULEMPER MED BARRIER:
+En stor ulempe ved den simple form for barrierer er at antallet af processer skal være konstant gennem hele kørslen.
+
+Dette er f.eks. et problem i bank eksmplet hvor generatorfunktionen kan slutte lige efter at have genereret den sidste kunde, og før denne er færdig processeret af servicedisken. Her må den nødvændigvis fortsætte indtil alle processer kan slutte. Alternativt må barrierprocessen ændres så den dynamisk kan ændre på hvor mange processer der skal synkroniseres.
+
+
   \section{Design og implementation}
     \fxnote[inline]{Beskrivelse af design med udgangspunkt i eksemplet}
     \input{chapters/time-implementation}
