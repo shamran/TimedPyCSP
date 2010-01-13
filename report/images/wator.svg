@@ -14,9 +14,29 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47pre4 r22446"
-   sodipodi:docname="wator.svg">
+   sodipodi:docname="wator.pdf">
   <defs
      id="defs4">
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect4875"
+       is_visible="true" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect4871"
+       is_visible="true" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect4867"
+       is_visible="true" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect4863"
+       is_visible="true" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect4859"
+       is_visible="true" />
     <marker
        inkscape:stockid="StopL"
        orient="auto"
@@ -160,9 +180,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="12"
-     inkscape:cx="345.12699"
-     inkscape:cy="707.16546"
+     inkscape:zoom="1.5"
+     inkscape:cx="264.71032"
+     inkscape:cy="815.13212"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -173,7 +193,7 @@
      inkscape:window-maximized="1"
      inkscape:object-nodes="true"
      inkscape:snap-nodes="false"
-     inkscape:snap-grids="true"
+     inkscape:snap-grids="false"
      inkscape:snap-to-guides="true"
      inkscape:snap-global="true"
      showguides="true"
@@ -200,49 +220,12 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.97948325;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.55603111;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect5234"
-       width="149.52049"
-       height="199.27455"
-       x="0.48974162"
-       y="152.85193" />
-    <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.99899381;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect5236"
-       width="20.001007"
-       height="199.25504"
-       x="149.9995"
-       y="152.86168"
-       ry="0" />
-    <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.99818319;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect5238"
-       width="20.001818"
-       height="199.25584"
-       x="169.99908"
-       y="152.86127" />
-    <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.99536026;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect5240"
-       width="160.00464"
-       height="199.25867"
-       x="189.49768"
-       y="152.85986"
-       ry="0" />
-    <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.09799433;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect5238-1"
-       width="23.902"
-       height="199.15602"
-       x="340.54901"
-       y="152.91118" />
-    <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.92358893;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect5238-7"
-       width="19.07641"
-       height="199.33046"
-       x="360.46179"
-       y="152.82397" />
+       width="378.44397"
+       height="198.698"
+       x="0.77801555"
+       y="153.1402" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1.08830988px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="M -0.37701992,142.79743 C 0.64356228,102.14005 95.04756,140.10074 94.53726,102.90634 c -0.17375,37.05297 95.65873,-0.51991 94.91427,39.89109"
@@ -274,7 +257,7 @@
          x="287.30762"
          y="102.36218">P2</tspan></text>
     <path
-       style="fill:none;stroke:#000000;stroke-width:1.55023026;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:9.3013819, 1.55023032;stroke-dashoffset:0;marker-start:url(#StopL);marker-mid:url(#StopL);marker-end:url(#StopL)"
+       style="fill:none;stroke:#000000;stroke-width:1.55023026;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4.65069079,4.65069079;stroke-dashoffset:0;marker-start:url(#StopL);marker-mid:url(#StopL);marker-end:url(#StopL)"
        d="m 0.37425701,372.36636 149.45428299,0 40.32714,0 150.72714,0 38.27724,0"
        id="path3698"
        inkscape:path-effect="#path-effect3700"
@@ -336,5 +319,45 @@
    style="font-size:8px"
    id="tspan4729-2-7"
    dy="2.4000003">2</tspan></tspan></text>
+    <rect
+       y="153.1402"
+       x="0.77801555"
+       height="198.698"
+       width="378.44397"
+       id="rect4838"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       ry="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 150,351.36218 0,-198.5"
+       id="path4857"
+       inkscape:path-effect="#path-effect4859"
+       inkscape:original-d="m 150,351.36218 0,-198.5" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 170,351.86218 0,-198.5"
+       id="path4861"
+       inkscape:path-effect="#path-effect4863"
+       inkscape:original-d="m 170,351.86218 0,-198.5"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 190,153.36218 0,198.5"
+       id="path4865"
+       inkscape:path-effect="#path-effect4867"
+       inkscape:original-d="m 190,153.36218 0,198.5" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.00125241px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 340.5,351.86093 0,-198.9975"
+       id="path4869"
+       inkscape:path-effect="#path-effect4871"
+       inkscape:original-d="m 340.5,351.86093 0,-198.9975" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.00083733px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 360.08375,352.27843 0.0825,-198.91583"
+       id="path4873"
+       inkscape:path-effect="#path-effect4875"
+       inkscape:original-d="m 360.08375,352.27843 0.0825,-198.91583"
+       sodipodi:nodetypes="cc" />
   </g>
 </svg>
