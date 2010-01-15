@@ -26,34 +26,127 @@ openany%, % anvnedes hvis kapitler bare skal starte på den næste side
 \checkandfixthelayout % laver forskellige beregninger og sætter de
 % almindelige længder op
 \usepackage[utf8]{inputenc} % eller utf8 eller ansinew eller ...
-\usepackage[danish]{babel} %direktiv til at bruge det danske sprog
-
+\usepackage[english, danish]{babel} %direktiv til at bruge det danske sprog
+%\selectlanguage{danish}
 \usepackage[draft]{fixme} % til at skrive \fixme kommentarer til sig
 
 %\newenvironment{Draft}{\fixme{HUSK at ændre kommenteringen i preamble når man skifter mellem draft og final} }{  }
 \let\Draft=\comment \let\endDraft=\endcomment
 
-
+ 
 %har vi ord der bliver delt forkert kan de indsættes i hyphernation med bindestreg alle steder hvor ordet kan deles
 \hyphenation{tit-len mo-del-len pro-du-ce-rer an-svars-hav-ende om-for-deles for-bind-elses-mulig-heder ska-ber æn-dring-er net-værks-en-hed-er peer backup backup-system fast-track backup-systemer nabo-peers frame-work efter-som Grund-lag-et plads-effek-tivi-teten audits}
 
 
 \usepackage{nameref}
 \usepackage[danish]{varioref} % smarte krydsreferencer via \vref
-\usepackage[colorlinks, linkcolor=blue, citecolor=blue, urlcolor=blue, 
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0,0.1,0.5}
+\usepackage[colorlinks, linkcolor=darkblue, citecolor=darkblue, urlcolor=darkblue, 
 final=true]{hyperref}
-\def\figureautorefname{figur}
-
 %giver mulighed for at hoppe i pdf'filen via referencerne.
 %hyperref er ustabil med varieof,
 %og skal udkommenteres hvis der opstår problemer.
 %specielt skal udkommenteres når man kompilere i final til print
 
-\renewcommand\danishhyphenmins{22} % bedre orddeling
-\addto\captionsdanish{%brug bedrer danske ord for de faste tekster
-\renewcommand\contentsname{Indholdsfortegnelse}
-\renewcommand\appendixname{Appendiks}
-}
+\AtBeginDocument{\let\orgaddcontentsline\addcontentsline
+\renewcommand{\addcontentsline}[3]{
+        \ifthenelse{\equal{#1}{toc}}
+                {\ifthenelse{\equal{#2}{subsection}}
+                        {\orgaddcontentsline{#1}{section}{#3}}
+                        {\orgaddcontentsline{#1}{#2}{#3}}}
+                {\orgaddcontentsline{#1}{#2}{#3}}}}
+%
+%% Include hyperref for link support
+%%\usepackage[dvipdfmx,   % If need dvipdfmx
+%%\usepackage[dvips,      % If need dvips
+%\usepackage[%           % Fine in most cases
+%            pdfpagelabels,hypertexnames=true,
+%            plainpages=false,
+%            naturalnames=false]{hyperref}
+%
+%% Configure the hyperlink color
+%\usepackage{color}
+%\definecolor{darkblue}{rgb}{0,0.1,0.5}
+%\hypersetup{colorlinks,
+%            linkcolor=darkblue,
+%            anchorcolor=darkblue,
+%            citecolor=darkblue}
+%
+%% In the future, it would be nice to use the package
+%%
+%%    cleveref
+%%
+%% Right now, it breaks svjour3 and svjour2, so we just have to use
+%% autoref and labelformat :(.
+%
+%% Make sure \autoref puts parentheses around 
+%% equations and enumeration items (similar to \eqref)
+%% NOTE: This allows us to use \ref instead of \eqref
+\labelformat{equation}{\textup{(#1)}}
+\labelformat{enumi}{\textup{(#1)}}
+
+%
+%% Make sure equations are numbered by section
+%\numberwithin{equation}{section}
+%
+%%% We need to redefine \autoref. We should use 
+%%% abbreviations inside the sentence and full names 
+%%% at the beginning of sentences. Additionally,
+%%% need to handle the plural cases.
+%
+%% \Autoref is for the beginning of the sentence
+\let\orgautoref\autoref
+%\providecommand{\Autoref}
+%        {\def\equationautorefname{Equation}%
+%         \def\figureautorefname{Figure}%
+%         \def\subfigureautorefname{Figure}%
+%         \def\sectionautorefname{Section}%
+%         \def\subsectionautorefname{Section}%
+%         \def\subsubsectionautorefname{Section}%
+%         \def\Itemautorefname{Item}%
+%         \def\tableautorefname{Table}%
+%         \orgautoref}
+%
+%% \Autorefs is plural for the beginning of the sentence
+%\providecommand{\Autorefs}
+%        {\def\equationautorefname{Equations}%
+%         \def\figureautorefname{Figures}%
+%         \def\subfigureautorefname{Figures}%
+%         \def\sectionautorefname{Sections}%
+%         \def\subsectionautorefname{Sections}%
+%         \def\subsubsectionautorefname{Sections}%
+%         \def\Itemautorefname{Items}%
+%         \def\tableautorefname{Tables}%
+%         \orgautoref}
+%
+%% \autoref is used inside a sentence 
+%% (this is a renew of the standard)
+\renewcommand{\autoref}
+        {\def\equationautorefname{Ligning}%
+         \def\figureautorefname{Figur}%
+         \def\subfigureautorefname{Figur}%
+         \def\sectionautorefname{Afsnit}%
+         \def\subsectionautorefname{Afsnit}%
+         \def\subsubsectionautorefname{Afsnit}%
+         \def\Itemautorefname{item}%
+         \def\tableautorefname{Tabel}%
+         \orgautoref}
+%
+%% \autorefs is plural for inside a sentence
+%\providecommand{\autorefs}
+%        {\def\equationautorefname{Eqs.}%
+%         \def\figureautorefname{Figs.}%
+%         \def\subfigureautorefname{Figs.}%
+%         \def\sectionautorefname{Sects.}%
+%         \def\subsectionautorefname{Sects.}%
+%         \def\subsubsectionautorefname{Sects.}%
+%         \def\Itemautorefname{items}%
+%         \def\tableautorefname{Tables}%
+%         \orgautoref}
+
+
+\newcommand{\cref}[1]{\autoref{#1}\xspace\vpageref{#1}}
 
 \usepackage[style=numeric-comp,sorting=nyt]{biblatex}
 \DefineBibliographyStrings{danish}{%

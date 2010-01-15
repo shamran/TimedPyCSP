@@ -1,11 +1,10 @@
 \chapter{\des}
-  \section{Beskrivelse/teori}
+  \section{Beskrivelse/teori}\label{sec:des-theory}
     \inline{Beskrivelse af tidsmodellen, teorien omkring den og 
     hvor/hvad den benyttes til. Teori: henvisning til litteratur, bl.a.  
     matematik/beviser for modellen}
-
-    
-\subsection*{Barrierer}\label{barrier}
+   
+\subsection{Barrierer}\label{barrier}
 I \des findes der i modsætningen til 
 Parallel \des \fixme{referencer} en global tid og alle processerne skal derfor have en 
 fælles tid der tæller op samtidigt. 
@@ -14,7 +13,7 @@ En global viden som tiden er kræver synkronisering af alle processerne\fxnote{r
 Barrier blev først introduceret i MPI\fxnote{ref}, og hvor den bruges til at sikrer at alle tråde venter i barrieren 
 før de kan fortsætte. 
 
-I \pycsp kan man udnytte at begge kanalender skal være klar, før der kan kommunikeres og at en process der er indgår i en kommunikation vil vente indtil den anden ende er klar før den fortsætter. Ved hjælp af kanaler kan man derfor lave en simple barrier trivielt ved brug af kommunkation over kanaler. En implementation af en barrier som en selvstændig process kan eksempelvis implementers som i \autoref{barrier-imp}.
+I \pycsp kan man udnytte at begge kanalender skal være klar, før der kan kommunikeres og at en process der er indgår i en kommunikation vil vente indtil den anden ende er klar før den fortsætter. Ved hjælp af kanaler kan man derfor lave en simple barrier trivielt ved brug af kommunkation over kanaler. En implementation af en barrier som en selvstændig process kan eksempelvis implementers som i \cref{barrier-imp}.
 
 \begin{lstlisting}[float, label=barrier-imp,caption=En barrier i \pycsp]
 @process
@@ -26,21 +25,12 @@ def Barrier(nprocesses, signalIN, signalOUT):
 			signalOUT(0)
 \end{lstlisting}
 
-Denne implementering af en barrier kræver i modsætning til MPI versionen af en barrier to kald. det første sender en variable til barrier processen, mens det andet kald modtager en dummyværdi fra barrierprocessen. Det kræver to kanaler at implementere barrieren. På den ene kanal er barrieren den eneste der læser værdierne, og en besked sendt på denne kanal vil derfor altid modtages af barrieren. På den anden kanal er barrieren den eneste der skriver
+Denne implementering af en barrier kræver i modsætning til MPI versionen af en barrier to kald. det første sender en variable til barrier processen, mens det andet kald modtager en dummyværdi fra barrierprocessen. Det kræver to kanaler at implementere barrieren. På den ene kanal er barrieren den eneste der læser værdierne; en besked sendt på denne kanal vil derfor altid modtages af barrieren. På den anden kanal er barrieren den eneste der skriver, og en modtaget besked må derfor komme fra barrieren.
 
-.  Vi kan overbevise os om at barrieren fungere korrekt ved at se at først går alle processerne ind i barrieren ved at sende en værdi til barrieren. Hvis barrieren ikke er klar sikre CSP at processerne venter indtil barrieren er klar til at modtage værdierne. først når barrieren har modtaget en værdi fra alle processerne, begynder barrieren at sende en værdi . De. Her Her  vises 
-, klar, og med to kanaler kan man sikre at 
-ingen proces modtager et signal før alle processer har sendt et signal til 
-barrieren.
+Vi kan overbevise os om korrektheden af barrieren, da alle processerne først går ind i barrieren ved at sende en værdi til barrieren. Hvis barrieren ikke er klar sikre CSP at processerne venter indtil barrieren er klar til at modtage værdierne. Først når barrieren har modtaget en værdi fra alle processerne, begynder barrieren at sende sin værdi, og det er først når en proces modtager denne værdi fra barrieren at den må fortsætte. Når en proces modtager værdien fra barrieren fortsætter den og man kan risikere at den ønsker at gå ind i barrieren inden denne har sendt sin værdi til alle processer. den første proces vil gå i stå ved forsendelsen af sin værdi til barrieren, da barrieren først kan modtage værdier fra processer når den har sendt sin værdi til alle processer.
 
-metode i CSP sammenhæng  som er 
-
-
-
-ULEMPER MED BARRIER:
-En ulempe ved denne simple form for barrierer er at antallet af processer skal være konstant gennem hele kørslen.
-
-Dette er f.eks. et problem i bankeksemplet (se afsnit\vref{bank-eksempel}) hvor generatorfunktionen kan slutte lige efter at have genereret den sidste kunde. Her må den fortsætte med blot at kalde barrieren, indtil servicedisken har processeret alle kunderne, før hele programmet kan afslutte. Alternativt må barrierprocessen ændres så den dynamisk kan ændre på hvor mange processer der skal synkroniseres. \inline{skal vi fortælle hvordan der kan gøres i \pycsp}
+En ulempe ved denne simple barrierer er at antallet af processer skal være konstant gennem hele kørslen.
+Dette er f.eks. et problem i bankeksemplet (\cref{bank-eksempel}) hvor generatorfunktionen kan slutte lige efter at have genereret den sidste kunde. Her må den fortsætte med blot at kalde barrieren, indtil servicedisken har processeret alle kunderne, før hele programmet kan afslutte. Alternativt må barrierprocessen ændres så den dynamisk kan ændre på hvor mange processer der skal synkroniseres. \inline{skal vi fortælle hvordan der kan gøres i \pycsp}
 
 \fxnote[inline]{fortsættes med ulemper med barriere og generelt hvorfor vi 
 skal holdes os fra det. noget med at man skal kalde barrieren to  gange}
