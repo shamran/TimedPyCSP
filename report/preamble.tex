@@ -109,11 +109,14 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 %\usepackage{pstricks}
 \usepackage{tikz}
 
-\newcommand{\des}[0]{Discrete event simulation }
-\newcommand{\ds}[0]{Deadline scheduling }
-\newcommand{\is}[0]{Interaktiv scheduling }
-%\newcommand\ifx[1]{\fxnote[inline]{#1}
- 
+\usepackage{xspace}
+%
+\newcommand{\des}[0]{Discrete event simulation\xspace}
+\newcommand{\ds}[0]{Deadline scheduling\xspace}
+\newcommand{\is}[0]{Interaktiv scheduling\xspace}
+\newcommand{\inline}[1]{\fxnote[inline]{#1}}
+\newcommand{\simpy}[0]{SimPy\xspace}
+\newcommand{\pycsp}[0]{PyCSP\xspace}
 % OPSÆTNING TIL INKLUDERING AF SOURCE CODE
 \usepackage[final]{listings}
 \renewcommand{\lstlistingname}{kodestump}
