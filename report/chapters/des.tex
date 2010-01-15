@@ -26,7 +26,9 @@ def Barrier(nprocesses, signalIN, signalOUT):
 			signalOUT(0)
 \end{lstlisting}
 
-Her  vises 
+Denne implementering af en barrier kræver i modsætning til MPI versionen af en barrier to kald. det første sender en variable til barrier processen, mens det andet kald modtager en dummyværdi fra barrierprocessen. Det kræver to kanaler at implementere barrieren. På den ene kanal er barrieren den eneste der læser værdierne, og en besked sendt på denne kanal vil derfor altid modtages af barrieren. På den anden kanal er barrieren den eneste der skriver
+
+.  Vi kan overbevise os om at barrieren fungere korrekt ved at se at først går alle processerne ind i barrieren ved at sende en værdi til barrieren. Hvis barrieren ikke er klar sikre CSP at processerne venter indtil barrieren er klar til at modtage værdierne. først når barrieren har modtaget en værdi fra alle processerne, begynder barrieren at sende en værdi . De. Her Her  vises 
 , klar, og med to kanaler kan man sikre at 
 ingen proces modtager et signal før alle processer har sendt et signal til 
 barrieren.
