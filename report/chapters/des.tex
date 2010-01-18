@@ -13,9 +13,14 @@ En global viden som tiden er kræver synkronisering af alle processerne\fxnote{r
 Barrier blev først introduceret i MPI\fxnote{ref}, og hvor den bruges til at sikrer at alle tråde venter i barrieren 
 før de kan fortsætte. 
 
-I \pycsp kan man udnytte at begge kanalender skal være klar, før der kan kommunikeres og at en process der er indgår i en kommunikation vil vente indtil den anden ende er klar før den fortsætter. Ved hjælp af kanaler kan man derfor lave en simple barrier trivielt ved brug af kommunkation over kanaler. En implementation af en barrier som en selvstændig process kan eksempelvis implementers som i \cref{barrier-imp}.
+I \pycsp kan man udnytte at begge kanalender skal være klar, før der kan 
+kommunikeres og at en process der er indgår i en kommunikation vil vente indtil 
+den anden ende er klar før den fortsætter. Ved hjælp af kanaler kan man derfor 
+lave en simple barrier trivielt ved brug af kommunkation over kanaler. En 
+implementation af en barriere som en selvstændig process kan eksempelvis 
+implementers som i \cref{barrier-imp}.
 
-\begin{lstlisting}[float, label=barrier-imp,caption=En barrier i \pycsp]
+\begin{lstlisting}[float, label=barrier-imp,caption=En barriere i \pycsp]
 @process
 def Barrier(nprocesses, signalIN, signalOUT):
 	while True:
@@ -25,7 +30,13 @@ def Barrier(nprocesses, signalIN, signalOUT):
 			signalOUT(0)
 \end{lstlisting}
 
-Denne implementering af en barrier kræver i modsætning til MPI versionen af en barrier to kald. det første sender en variable til barrier processen, mens det andet kald modtager en dummyværdi fra barrierprocessen. Det kræver to kanaler at implementere barrieren. På den ene kanal er barrieren den eneste der læser værdierne; en besked sendt på denne kanal vil derfor altid modtages af barrieren. På den anden kanal er barrieren den eneste der skriver, og en modtaget besked må derfor komme fra barrieren.
+Denne implementering af en barriere kræver i modsætning til MPI versionen af en 
+barriere to kald. Det første sender en variabel til barriereprocessen, mens det 
+andet kald modtager en dummyværdi fra barriereprocessen. Det kræver derved to 
+kanaler at implementere barrieren. På den ene kanal er barrieren den eneste der 
+læser værdierne; en besked sendt på denne kanal vil derfor altid modtages af 
+barrieren. På den anden kanal er barrieren den eneste der skriver, og en 
+modtaget besked må derfor komme fra barrieren.
 
 Vi kan overbevise os om korrektheden af barrieren, da alle processerne først går ind i barrieren ved at sende en værdi til barrieren. Hvis barrieren ikke er klar sikre CSP at processerne venter indtil barrieren er klar til at modtage værdierne. Først når barrieren har modtaget en værdi fra alle processerne, begynder barrieren at sende sin værdi, og det er først når en proces modtager denne værdi fra barrieren at den må fortsætte. Når en proces modtager værdien fra barrieren fortsætter den og man kan risikere at den ønsker at gå ind i barrieren inden denne har sendt sin værdi til alle processer. den første proces vil gå i stå ved forsendelsen af sin værdi til barrieren, da barrieren først kan modtage værdier fra processer når den har sendt sin værdi til alle processer.
 
@@ -40,8 +51,8 @@ skal holdes os fra det. noget med at man skal kalde barrieren to  gange}
 
 
 \subsection{Hajer og fisk på Wator} Som eksempel på en \des har vi valgt at 
-udgangspunkt i det scenarie som A. K. Dewdney
-beskrev i artiklen \cite{wator}. Artiklen beskriver den
+tage  udgangspunkt i det scenarie som A. K. Dewdney
+beskrev i artiklen \citetitle{wator}\cite{wator}. Artiklen beskriver den
 fiktive planet Wator, der har form som en torus og er fuldstændig
 dækket af vand. Verdenen er inddelt i felter \cite[20]{wator}, og disse felter kan være tomme, indeholde en
 fisk eller en haj. Følgende karakteristika beskriver fisk og hajers
@@ -71,14 +82,12 @@ bæredygtig bestand forventer vi at se bestanden af henholdsvis fisk og hajer
 oscillerer afhængigt af hinanden.
 
 Vi har valgt dette eksempel, da det er enkelt og let forståeligt, men samtidig 
-introducerer problemstilinger omkring synkronisering når det paralleliseres.  
+introducerer problemstillinger omkring synkronisering når det paralleliseres.  
 Disse problemstillinger optræder fordi en opdatering af hvert felt er afhængigt 
 af de omkringliggende felter, og vil derfor være afhængig af felter fra andre 
 processer i grænsetilfælde. Ud over at være afhængig af information fra andre 
-processer, kan en opdatering også påvirke data hos andre processer. Dette er 
-tilfældet hvis en fisk eller haj skal bevæge sig fra et område styret af én 
-proces til et område styret af en anden proces.  \fxnote[inline]{Noget om real 
-world applikation?}
+processer, kan en opdatering også påvirke data hos andre processer.   
+\fxnote[inline]{Noget om real world applikation?}
 
 \subsubsection*{Før introduktion af et tidsbegreb i CSP} For at simulere Wator 
 verdenen i et CSP-system hvori tidsbegrebet ikke er introduceret, er vi nødt 
@@ -86,9 +95,8 @@ til at udføre en synkronisering af de enkelte processers arbejde. Denne
 synkronisering kan ske ved brug af barrierer, hvor alle processer udfører en 
 handling og mødes i barrieren før de fortsætter.
 
-\fxnote[inline]{MAV af model, hvorfor ikke en bedre csp approch med forsendelse 
-af shadowrows og totalt seperapelt data}
-Vi har valgt at basere vores model på \citetitle{crew}\cite{crew}\fxnote{Brian: Hvad er din holdning til litteraturhenvisninger.}, hvor verdenen repræsenteres 
+Vi har valgt at basere vores model på \citetitle{crew}\cite{crew}\fxnote{Brian: 
+Hvad er din holdning til litteraturhenvisninger.}, hvor verdenen repræsenteres 
 som en delt datastruktur og adgangen til denne styres med barrierer. I vores 
 model er hver proces derved ansvarlig for en del af verdenen og tilgangen til 
 den delte datastruktur sker ud fra CREW-princippet (Concurrent Read, Exclusive 
@@ -98,14 +106,13 @@ Vi deler verdenen lodret, hvor hver proces styrer en verdensdel. Hver proces
 gennemgår sin verdensdel og udfører en mulig handling for hver fisk og haj, dog 
 vil fisk og hajer i de sidste to kolonner i hver verdensdel ikke bliver 
 opdateret på nuværende tidspunkt. Dette skyldes at henholdsvis processen selv 
-og den umiddelbar til højre for den, har skriverettigheder til disse to 
-kolonner.
-Når denne opdatering er fuldført mødes processerne i en barriere, hvorefter 
-hver proces opdaterer de to sidste kolonner. Herefter mødes processerne igen i 
-barrieren, og når alle kolonner er opdateret, kan der foretages en 
-visualisering af de udførte opdateringer. Til slut mødes alle i en barriere 
-igen før processerne kan begynde en ny iteration \fxnote[inline]{pseudo kode 
-eksempel?}
+og den umiddelbart til højre for den, har skriverettigheder til disse to 
+kolonner.  Når denne opdatering er fuldført mødes processerne i en barriere, 
+hvorefter hver proces opdaterer de to sidste kolonner. Herefter mødes 
+processerne igen i barrieren, og når alle kolonner er opdateret, kan der 
+foretages en visualisering af de udførte opdateringer. Til slut mødes alle i en 
+barriere igen før processerne kan begynde en ny iteration 
+\fxnote[inline]{pseudo kode eksempel?}
 
 En representation af opdelingen ses på \autoref{fig:wator}. Her er verdenen 
 opdelt mellem to processer, og de to kolonner mellem hver del opdateres i et 
