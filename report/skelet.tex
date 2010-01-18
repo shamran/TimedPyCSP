@@ -1,64 +1,42 @@
 \input{preamble}
-%\setlength{\cftbeforechapterskip}{1.0em plus 0.1em minus 0.1 em}
-%\setlength{\cftbeforesectionskip}{0em plus 0em minus 0em}
-%\setlength{\cftbeforesubsectionskip}{0em plus 0em minus 0em}
-
 \bibliography{bibliography} %indsaet en reference til bib filen
 \usepackage{biblatex}
-%\usepackage[babel]{csquotes} %bedrer mulighed for at citerer
+\usepackage[babel]{csquotes} %bedrer mulighed for at citerer
 
 \title{Peer-to-peer Backup}
 \author{Simon Christiano Bognolo og Rasmus Ebdrup Sørensen}
+\includeonly{chapters/timeplan,chapters/des}
 \begin{document}
 %\begin{titlingpage}
 %\maketitle
 %\end{titlingpage}
 
-
 \frontmatter
-
-
-\tableofcontents*
-\normalsize
-\newpage
+\include{chapters/abstract}
+\tableofcontents
+%\newpage
 
 \listoffixmes
- \newpage
-\lstlistoflistings
- \newpage
+%\newpage
+\lstlistoflistings   
+%\newpage
 
-\savepagenumber
-\mainmatter
+%\savepagenumber
+
 \include{chapters/timeplan}
-\linespread{1.5}
-\selectfont 
+\mainmatter
+%\linespread{1.5}
+%\selectfont 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Introduktion}
-  \section{Problem}	 
-  \section{Kontekst}
-  \section{Fremgangsmåde}
-  \section{``contributions''}
-\input{chapters/des}
-\chapter{\ds}
-  \section{Beskrivelse/teori}
-  \section{Eksempel}
-  \section{Design og implementation}
-  \section{Evaluering}
-  \section{Fremtidigt arbejde}
-  \section{Opsummering}
-\chapter{\is}
-  \section{Beskrivelse/teori}
-  \section{Eksempel}
-  \section{Design og implementation}
-  \section{Evaluering}
-  \section{Fremtidigt arbejde}
-  \section{Opsummering}
-\chapter{Konklusion}
+\include{chapters/introduction}
+\include{chapters/des}
+\include{chapters/deadline}
+\include{chapters/interactive}
+\include{chapters/conclusion} 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\input{../dibs} / skal det bruges og hvor?
 
-\newpage
-\backmatter
+%\newpage
+%\backmatter
 %\appendix
 %\chapter{Billag}
 
