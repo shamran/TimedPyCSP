@@ -50,21 +50,21 @@ skal holdes os fra det. noget med at man skal kalde barrieren to  gange}
 \fxnote[inline]{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}
 
 
-\subsection{Hajer og fisk på Wator} Som eksempel på en \des har vi valgt at 
+\subsection{Hajer og fisk på Wator} Som et eksempel på en \des har vi valgt at 
 tage  udgangspunkt i det scenarie som A. K. Dewdney
 beskrev i artiklen \citetitle{wator}\cite{wator}. Artiklen beskriver den
 fiktive planet Wator, der har form som en torus og er fuldstændig
-dækket af vand. Verdenen er inddelt i felter \cite[20]{wator}, og disse felter kan være tomme, indeholde en
+dækket af vand. Verdenen er inddelt i felter \cite[20]{wator}, som kan være tomme, indeholde en
 fisk eller en haj. Følgende karakteristika beskriver fisk og hajers
 opførsel.
 
 \begin{itemize}
-\item[Fisk]
-Lever af plankton, en ressource som er uendelig. Hvis der er en ledigt 
-tilstødende felt, bevæger en fisk sig til dette felt. Hvis der er flere ledige 
+\item[\textbf{Fisk}]
+Lever af plankton, en ressource som er uendelig. Hvis der er èt ledigt 
+tilstødende felt, bevæger den sig til dette felt. Hvis der er flere ledige 
 felter vælges et tilfældigt. Såfremt en fisk overlever 3 tidsskridt forplanter 
 den sig.
-\item[Hajer]
+\item[\textbf{Hajer}]
 Såfremt der er fisk i et eller flere tilstødende felter, vil hajen bevæge sig 
 til et af disse felter og spise fisken. Hvis der er ikke er nogen fisk i et af 
 disse felter flytter hajen sig til et tilfældigt valgt ledigt felt. Hvis en haj 
@@ -87,7 +87,7 @@ Disse problemstillinger optræder fordi en opdatering af hvert felt er afhængig
 af de omkringliggende felter, og vil derfor være afhængig af felter fra andre 
 processer i grænsetilfælde. Ud over at være afhængig af information fra andre 
 processer, kan en opdatering også påvirke data hos andre processer.   
-\fxnote[inline]{Noget om real world applikation?}
+\fxnote[inline]{Noget om real world applikation? - s: jeg synes det er fint sådan her}
 
 \subsubsection*{Før introduktion af et tidsbegreb i CSP} For at simulere Wator 
 verdenen i et CSP-system hvori tidsbegrebet ikke er introduceret, er vi nødt 
@@ -100,32 +100,38 @@ Hvad er din holdning til litteraturhenvisninger.}, hvor verdenen repræsenteres
 som en delt datastruktur og adgangen til denne styres med barrierer. I vores 
 model er hver proces derved ansvarlig for en del af verdenen og tilgangen til 
 den delte datastruktur sker ud fra CREW-princippet (Concurrent Read, Exclusive 
-Write)\cite[5]{crew}, der styres vha. af barrierer. 
+Write)\cite[5]{crew}, der styres vha. barrierer. 
 
 Vi deler verdenen lodret, hvor hver proces styrer en verdensdel. Hver proces 
 gennemgår sin verdensdel og udfører en mulig handling for hver fisk og haj, dog 
 vil fisk og hajer i de sidste to kolonner i hver verdensdel ikke bliver 
-opdateret på nuværende tidspunkt. Dette skyldes at henholdsvis processen selv 
-og den umiddelbart til højre for den, har skriverettigheder til disse to 
-kolonner.  Når denne opdatering er fuldført mødes processerne i en barriere, 
+opdateret på nuværende tidspunkt. Dette skyldes at i disse to kolonner vil en opdatering\inline{bedre ord} af fisk og hajer kunne risikere en race condition\fxnote{ref}, fra hhv. processen selv og processen til højre.
+ Når denne opdatering er fuldført mødes processerne i en barriere, 
 hvorefter hver proces opdaterer de to sidste kolonner. Herefter mødes 
 processerne igen i barrieren, og når alle kolonner er opdateret, kan der 
 foretages en visualisering af de udførte opdateringer. Til slut mødes alle i en 
-barriere igen før processerne kan begynde en ny iteration 
+barriere igen før processerne kan begynde en ny iteration.
 \fxnote[inline]{pseudo kode eksempel?}
 
-En representation af opdelingen ses på \autoref{fig:wator}. Her er verdenen 
+En repræsentation af opdelingen ses på \cref{fig:wator}. Her er verdenen 
 opdelt mellem to processer, og de to kolonner mellem hver del opdateres i et 
-seperat tidsskridt. Når disse to tidsskridt er udført kan der foretages en 
-visualisering, hovrefter næste iteration af opdateringer kan begyndes.  
+separat tidsskridt. Når disse to tidsskridt er udført kan der foretages en 
+visualisering, hvorefter næste iteration af opdateringer kan begyndes. \inline{gentagelse}
+\begin{figure}[hbtp] \begin{center}
+  \includegraphics[scale=0.75]{images/wator}
+  \caption{Opdeling af verdenen mellem to processer. Der er for hver verdensdel 
+  to kolonner som opdateres i et separat tidsskridt.}
+  \label{fig:wator}
+  \end{center}
+\end{figure}
 
 I en mere ren CSP-model ville man foretage en direkte udveksling af data mellem 
 processerne, og undgå den delte datastruktur vi har i vores model.  Vi har 
 valgt denne model frem for den mere rene CSP model, da den klarlægger brugen af 
 barrierer bedre.  Det bliver meget eksplicit i koden hvornår hvilke dele 
-opdateres, og hvornår processerne venter i en barriere.
+opdateres, og hvornår processerne venter i en barriere.\inline{flyttes langt op.. til valg af CREW model}
 
-\noindent 
+\begin{figure}[hbtp]
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[label=wator-worldpart,caption=Uddrag af processen 
   \emph{worldpart} i Wator]
@@ -165,25 +171,17 @@ opdateres, og hvornår processerne venter i en barriere.
    poison(barW,barR)
 \end{lstlisting}
 
-\texttt{barW(1)} og \texttt{barR()} er henholdsvis skrivning og læsning til og 
-fra en barriere som defineret i \vref{barrier}. 
-
+\texttt{\emph{barW(1)} og \emph{barR()} er henholdsvis skrivning og læsning til og 
+fra en barriere som defineret i \cref{barrier}}. 
+\vspace{1cm}
 \end{minipage}
-
+\end{figure}
 Afviklingen af programmet sker ved at et antal \emph{worldpart}-, en 
 \emph{visualize}- og en \emph{barrier}-process køres parallelt. Af 
-kodeuddragene \autoref{wator-worldpart} og \ref{wator-visualize}, ses brugen 
-tydeligt 
+ \autoref{wator-worldpart} og \vref{wator-visualize}, ses det overordnede design af hhv. \emph{worldpart}- og \emph{vizualize}processen.  Værd at bemærke er det store antal barrierkald til visualizeprocessen. Dette er til for at man kan benytte den samme barrier som wordpartprocessen. Alternativt kunne man have to barriererprocesser; en til synkronisering af \emph{worldpart} med \emph{vizualize}, samt en som \emph{worldpart}processerne brugte til synkroniseringen af opdatering af verdensdelen og de to sidste kolonner. 
 
 \fxnote{konklusion hvordan var det at implementerer og hvor stor parallelitet kan man opnå. }
 
-\begin{figure}[hbtp] \begin{center}
-  \includegraphics[scale=0.75]{images/wator}
-  \caption{Opdeling af verdenen mellem to processer. Der er for hver verdensdel 
-  to kolonner som opdateres i et separat tidsskridt.}
-  \label{fig:wator}
-  \end{center}
-\end{figure}
 
 \subsection{Kunder i en bank}\label{bank-eksempel}
 Et klassisk eksempel inden for \des er at simulere  
