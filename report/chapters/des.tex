@@ -32,7 +32,7 @@ def Barrier(nprocesses, signalIN, signalOUT):
 \end{lstlisting}
 
 Denne implementation af en barriere kræver, i modsætning til MPI versionen af 
-en barriere, to kald. Det første sender en variabel til barriereprocessen, mens 
+en barriere, to kald. Det første sender en variabel til barriereprocessen, mens ,
 det andet kald modtager en dummyværdi fra barriereprocessen. Det kræver derved 
 to kanaler at implementere barrieren. På den ene kanal er barrieren den eneste 
 der læser værdierne; en besked sendt på denne kanal vil derfor altid modtages 
@@ -46,11 +46,9 @@ værdierne. Først når barrieren har modtaget en værdi fra alle processerne,
 begynder barrieren at sende sin værdi, og det er først når en proces modtager 
 denne værdi fra barrieren at den må fortsætte. Når en proces modtager værdien 
 fra barrieren fortsætter den og man kan risikere at den ønsker at gå ind i 
-barrieren inden denne har sendt sin værdi til alle processer. den første proces 
-vil gå i stå ved forsendelsen af sin værdi til barrieren\inline{skriv mere 
-eksplicit at det her forhindrer processer i at komme foran}, da barrieren først 
-kan modtage værdier fra processer når den har sendt sin værdi til alle 
-processer.
+barrieren inden denne har sendt sin værdi til alle processer. Den første proces 
+vil da gå i stå mens den venter på at sende sin værdi til barrieren, det skyldes at i CSP skal begge processer  være klar til at kommunikere før selve kommunikationen kan foregå, og det er denne egenskab ved kanaltransmission der  forhindrer processen i at komme foran. Først når barrieren har sendt sin værdi til alle 
+processer kan den modtage værdien fra processer, og denne kan fortsætte. \fxnote{S: bedre?}
 
 En ulempe ved denne simple barriere er at antallet af processer skal være 
 konstant gennem hele kørslen.
