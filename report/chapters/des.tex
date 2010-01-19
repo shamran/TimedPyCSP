@@ -31,8 +31,7 @@ def Barrier(nprocesses, signalIN, signalOUT):
 			signalOUT(0)
 \end{lstlisting}
 
-Denne implementation af en barriere kræver, i modsætning til MPI versionen af 
-en barriere, to kald. Det første sender en variabel til barriereprocessen, mens ,
+Denne implementation af en barriere kræver, i modsætning til de fleste andre implementationer af barrierer\cites{mpi-barrier, crew}, to kald. Det første sender en variabel til barriereprocessen, mens,
 det andet kald modtager en dummyværdi fra barriereprocessen. Det kræver derved 
 to kanaler at implementere barrieren. På den ene kanal er barrieren den eneste 
 der læser værdierne; en besked sendt på denne kanal vil derfor altid modtages 
@@ -59,8 +58,14 @@ processeret alle kunderne, før hele programmet kan afslutte. Alternativt må
 barriereprocessen ændres, så den dynamisk kan ændre på hvor mange processer der 
 skal synkroniseres. \inline{skal vi fortælle hvordan der kan gøres i \pycsp}
 
-\fxnote[inline]{fortsættes med ulemper med barriere og generelt hvorfor vi 
+     \fxnote[inline]{fortsættes med ulemper med barriere og generelt hvorfor vi 
 skal holdes os fra det. noget med at man skal kalde barrieren to  gange}
+
+Barrierer er en meget effektiv metode til at synkronisere processer der kører parallelt, og er brugt flitigt i MPI. I \csp er der dog en konflikt i brugen af barrierer da hver proces fungerer i isolation, og den eneste interaktion der skal være mellem processerne er når der kommunikeres via kanalerne. Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp. \tcite{crew} beskriver brugen af barrierer som:                                \begin{otherlanguage}{english}
+\begin{quote}
+[\ldots] where the barriers may be used to maintain global and/or localised models of time and to synchronise safe access to shared data [\ldots]
+\end{quote}
+\end{otherlanguage}
 
 \section{Eksempel}
 \fxnote[inline]{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}
@@ -195,7 +200,7 @@ fra en barriere som defineret i \cref{barrier}.}
 \end{figure}
 Afviklingen af programmet sker ved at et antal \emph{worldpart}-, en 
 \emph{visualize}- og en \emph{barrier}-process køres parallelt. Af 
- \autoref{wator-worldpart} og \vref{wator-visualize}, ses det overordnede design af hhv. \emph{worldpart}- og \emph{vizualize}processen.  Værd at bemærke er det store antal barrierkald til visualizeprocessen. Dette er til for at man kan benytte den samme barrier som wordpartprocessen. Alternativt kunne man have to barriererprocesser; en til synkronisering af \emph{worldpart} med \emph{vizualize}, samt en som \emph{worldpart}processerne brugte til synkroniseringen af opdatering af verdensdelen og de to sidste kolonner. 
+ \autoref{wator-worldpart} og \pageref{wator-visualize}\fixme{ændrer pageref til vpageref i final}, ses det overordnede design af hhv. \emph{worldpart}- og \emph{vizualize}processen.  Værd at bemærke er det store antal barrierkald til visualizeprocessen. Dette er til for at man kan benytte den samme barrier som wordpartprocessen. Alternativt kunne man have to barriererprocesser; en til synkronisering af \emph{worldpart} med \emph{vizualize}, samt en som \emph{worldpart}processerne brugte til synkroniseringen af opdatering af verdensdelen og de to sidste kolonner. 
 
 \fxnote{konklusion hvordan var det at implementerer og hvor stor parallelitet kan man opnå. }
 
