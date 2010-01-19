@@ -260,22 +260,25 @@ tidskridt vide hvilke kunder der skal forlade den.
 Tiden er igen modelleret ved brug af barrierer, se afsnit \cref{barrier}. I 
 stedet for at have de to kald til barrieren som den kræver, lige efter hinanden, lader 
 vi bankprocessen gå ind i barrieren i starten af tidsskridtet, og så modtage 
-kunder, indtil bankeprocessen modtager det andet kald fra barrieren(se \cref{bank-alternation-imp})\inline{lang uklar sætning, omformuler S: bredre?}. 
-Dette er smart og nødvendigt for at lade banken have mulighed for 
-at modtage et vilkårligt antal kunder i samme tidsskridt, samt vide hvornår der 
-ikke vil komme flere kunder.  
-Vi kan ræsonnere os frem til at barrieren stadig virker efter hensigten ved  simpel indsigt.
+kunder, indtil bankeprocessen modtager det andet kald fra barrieren(se 
+\cref{bank-alternation-imp}). Dette er nødvendigt for at lade banken have 
+mulighed for at modtage et vilkårligt antal kunder i samme tidsskridt, samt 
+vide hvornår der ikke vil komme flere kunder.  Vi kan ræsonnere os frem til at 
+barrieren stadig virker efter hensigten ved  simpel indsigt.
 For at generatorprocessen kan komme foran med et tidsskridt og sende en kunde i et forkert tidsskridt,
-skal den have fuldført begge begge kald til barrieren, mens barrieren ikke har modtaget et kald fra barrieren. Barrieren vil dog ikke modtage kald fra nogle, før den har  kaldt bankprocessen. Derfor må generatorprocessen vente i sit første kald til barrieren, indtil banken har modtaget 
-sit kald fra barrieren, før den kan sende en ny kunde.
-Når bankprocessen har modtaget et kald fra barrieren 
-er denne, ikke længere villig til at modtage kunder,  før i det efterfølgende 
-tidsskridt\inline{lang uklar sætning - s:bedre?}. Vi kan bruge samme analogi til at 
-ræsonnere os frem til at bankprocessen ikke kan komme et tidsskridt foran 
-generatorfunktionen, og derfor virker barrieren stadigt som forventet. 
+skal den have fuldført begge begge kald til barrieren, mens bankprocessen ikke 
+har modtaget et kald fra barrieren. Barrieren vil dog ikke modtage kald fra 
+nogle, før den har  kaldt bankprocessen. Derfor må generatorprocessen vente i 
+sit første kald til barrieren, indtil banken har modtaget sit kald fra 
+barrieren, før den kan sende en ny kunde.
+Når bankprocessen har modtaget et kald fra barrieren er den ikke længere villig 
+til at modtage kunder, før i det efterfølgende tidsskridt. Vi kan bruge samme 
+analogi til at ræsonnere os frem til at bankprocessen ikke kan komme et 
+tidsskridt foran generatorfunktionen, og derfor virker barrieren stadigt som 
+forventet. 
 
-\begin{lstlisting}[float=hbtp,label=bank-alternation-imp,caption=Modtage en kunde eller 
-	barrier i Bankprocessen]
+\begin{lstlisting}[float=hbtp,label=bank-alternation-imp,caption=Modtage en 
+  kunde eller barrierekald i Bankprocessen]
 while True:
 		(g,msg) = Alternation([{
 		barrierREADER:None,
@@ -294,14 +297,14 @@ at hvilken proces der skal have ansvaret for at vedligeholde køen. En metode er
 internt i en proces at have en liste af kunder der venter, og lade det være 
 processens ansvar at håndtere denne liste som en kø. Processen med ansvaret for køen kan 
 så enten være den begrænsede ressource, eller en separat proces hvis eneste 
-formål er at vedligeholde køen\inline{bedre brug af ordet liste? s: bedre?}. For nyligt\footnote{d. 22. december 2009} er 
+formål er at vedligeholde køen. For nyligt\footnote{d. 22. december 2009} er 
 der i \pycsp blevet introduceret ''buffered channels''\cite{pycsp-r147}, og 
-disse kan også bruges som en kø. Dermed kan man modellere sin ressource og lade 
-den læse fra kanalen når den er klar uden at skulle beskæftige sig med køen, og 
-uden at skulle implementere en hjælperproces til håndtering af køen. Vi har i 
-dette eksempel valgt at lade køen være repræsenteret ved en ''buffered 
-channel'', da denne  kræver færrest linjer kode, men den kunne lige så godt 
-være repræsenteret som en liste i servicedisk processen.
+disse kan også bruges som en kø. Dermed kan man modellere sin ressource uden 
+hensyntagen til håndtering af køen internt eller vha. andre processer, og blot 
+lade processen læse fra kanalen når den er klar. Vi har i dette eksempel valgt 
+at lade køen være repræsenteret ved en ''buffered channel'', da denne  kræver 
+færrest linjer kode, men den kunne lige så godt være repræsenteret som en liste 
+i servicedisk processen.
 
 
 \subsubsection*{Konklusion - evaluering - ?}
