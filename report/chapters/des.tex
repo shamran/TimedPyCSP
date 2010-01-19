@@ -1,10 +1,10 @@
-\chapter{\des}
-  \section{Beskrivelse/teori}\label{sec:des-theory}
+\chapter{\Des}
+  \section{Beskrivelse/teori}\label{sec:des-teori}
     \inline{Beskrivelse af tidsmodellen, teorien omkring den og hvor/hvad den 
     benyttes til. Teori: henvisning til litteratur, bl.a.  matematik/beviser 
     for modellen}
    
-\subsection{Barrierer}\label{barrier}
+\subsection{Barrierer}\label{sec:barrierer}
 I \des findes der i modsætningen til Parallel \des \fixme{referencer} en global 
 tid og alle processerne skal derfor have en fælles tid der tæller op samtidigt.  
 En global viden som tid kræver synkronisering af alle processerne\fxnote{ref}, 
@@ -158,7 +158,7 @@ separat tidsskridt.
 \begin{figure}[hbtp]
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[label=code:wator-worldpart,caption=Uddrag af processen 
-  \emph{worldpart} i Wator]
+  \code{worldpart} i Wator]
   @process
   def worldpart (part_id, barR, barW):
   
@@ -196,8 +196,8 @@ separat tidsskridt.
 \end{lstlisting}
 
 \end{minipage}
-\caption[test]{\texttt{barW(1)} og \texttt{barR()} er henholdsvis skrivning og læsning til og 
-fra en barriere som defineret i \cref{barrier}.}
+\caption[test]{\code{barW(1)} og \code{barR()} er henholdsvis skrivning og læsning til og 
+fra en barriere som defineret i \cref{sec:barrierer}.}
 \end{figure}
 Afviklingen af programmet sker ved at et antal \emph{worldpart}-, en 
 \emph{visualize}- og en \emph{barrier}-process køres parallelt. Af 
@@ -208,7 +208,7 @@ visualizeprocessen. Dette er til for at man kan benytte den samme barriere som
 wordpartprocessen. Alternativt kunne man have to barriereprocesser; en til 
 synkronisering af \emph{worldpart} med \emph{vizualize}, samt en som 
 \emph{worldpart}processerne brugte til synkroniseringen af opdatering af 
-verdensdelen og de to sidste kolonner. 
+verdensdelen og de to sidste kolonner.\fixme{hvad skal emphs og hvad skal med stå med code og hvad skal fjernes.} 
 
 \fxnote{konklusion hvordan var det at implementere og hvor stor parallelitet 
 kan man opnå. }
@@ -259,7 +259,7 @@ og den tid hun befinder sig i banken, kender bankprocessen i \pycsp ikke tid som
 sådan. Bankprocessen skal derfor selv vedligeholde en liste med kunderne, der findes inden i banken og til hver 
 tidskridt vide hvilke kunder der skal forlade den. 
 
-Tiden er igen modelleret ved brug af barrierer, se afsnit \cref{barrier}. I 
+Tiden er igen modelleret ved brug af barrierer, se afsnit \cref{sec:barrierer}. I 
 stedet for at have de to kald til barrieren som den kræver, lige efter hinanden, lader 
 vi bankprocessen gå ind i barrieren i starten af tidsskridtet, og så modtage 
 kunder, indtil bankeprocessen modtager det andet kald fra barrieren(se 
@@ -337,9 +337,16 @@ kunder banken modtager.
 
   \section{Design og implementation}
     \fxnote[inline]{Beskrivelse af design med udgangspunkt i eksemplet}
-    %\input{chapters/time-implementation}
+    Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret tid som et alternativ til barrierer. Dels ønsker vi med diskret tid at åbne for mulighederne for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Med disse ændringer er håbet at vi opnår en model der ligger tætter på intentionen bag \csp og så man kan udfase brugen af barrierer, samt med den underliggende parallelitet i \csp kan udnyttes til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.
+    
+Der findes et åbenlyst problem med introduktionen a \des i \csp, som vi kort berørte i \cref{sec:barrierer}. Dette er at \csp er lavet med henblik på at  ligestillede processer der arbejder samtidigt, og uafhængigt af hinanden, mens \des  ikke er parallelt, men skedulere sine begivenheder linært efter hvornår de sker og så kronologisk \fxnote{Dette skal vidst i teori}løber begivenhederne igennem, til der enten ikke er flere begivenheder eller tiden når et vidst punkt. Alternativet til  \des  er \pdes hvor processerne kan have at tiden løbe uafhængigt af hinanden. Dette introducere muligheden for størrer parallelitet, men samtidigt risikere de processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. Det har der vidst sig at omkostningerne ved at lade tiden kører parallelt er omkostningerne størrer end ved at holde tiden synkront på tværs af processerne.
+    
+I \pycsp findes der tre versioner der implementerer \csp: \emph{Process, threads, greenlets}\cite{Friborg2009}. Muligheden for at introducere \des, i de forskellige versioner afhænger af hvordan processerne styres, og dermed hvordan \des kan  implementeres i de forskellige versioner. I process og threads versionen af \pycsp styres processerne af operativsystemet uafhængig af hinanden \inline{ref?}. Når \pycsp afgiver kontrollen med processerne kører de parallel, men samtidigt har \pycsp ikke mulighed for fra  et central område at diktere tiden i de forskellige processer. I greenlets køres processerne på bruger-nivau som en del af Python. Processerne har ikke mulighed for at køre parallelt, og processerne fortsætter med deres kørsel indtil de frivilligt afgive kontrol. Til gengæld findes der central scheduler der står for koordinering af de forskellige processer. 
+    \input{chapters/time-implementation} 
+    \subsection{Hvordan skal events gemmes}
+    
   \section{Evaluering}
     \fxnote[inline]{Evaluering af hvordan eksemplet løses efter den valgte 
     implementation benyttes. Inkluderer test+performance}
-  \section{Fremtidigt arbejde}
+  \section{Freamtidigt arbejde}
   \section{Opsummering}

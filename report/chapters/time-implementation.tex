@@ -1,4 +1,4 @@
-\section{Repræsentation af tid}
+\subsection{Repræsentation af tid}
 \fxnote{dette skal gennemlæses for logisk tid ifh. til deadline osv.}
 I PyCSP foregår kommunikation kun når begge kanalender er klar dvs.
 når der findes både en kanalende der vil skrive og en kanalende der vil læse. 
@@ -35,7 +35,7 @@ arbejde til dette tidsskridt, og lade processerne fortsætte i samme
 tidsskridt. Alternativt skal tiden tælles op til næste event, hvorefter 
 processerne signaleres med at kommunkationen ikke lykkedes. 
 
-\textbf{Timeout i samme tidsskridt}\\
+\subsubsection{Timeout i samme tidsskridt}
 Hvis man vælger at processerne skal signaleres i samme tidsskridt, vil en 
 timeout efterligne en SKIP guard, men hvor en alternation med en SKIP guard 
 med det samme kan fortsætte vil en timeout kræve at der blev ventet indtil der 
@@ -63,7 +63,7 @@ Ulemperne er at der skal foretages et valg om hvilke processer der signaleres
 med  timeout, og dermed har man risikoen for starvation\fxnote{ref?} hvis det 
 er den/de samme processer der bliver signaleret.
 
-\textbf{Timeout i et efterfølgende tidsskridt}\\
+\subsubsection{Timeout i et efterfølgende tidsskridt}
 Ved at vælge at en timeout først forekommer i et efterfølgende tidsskridt, har 
 alle processer haft den maksimale mulighed for at indgå i en kommunikation. 
 Desuden kan alle processerne signaleres samtidigt, da et alle  timeouts er 

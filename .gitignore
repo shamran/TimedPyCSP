@@ -4,3 +4,17 @@
 *.swp
 *.orig
 *.out
+*.aux
+*.bak
+*.bbl
+*.blg
+*.ind
+*.log
+*.xml
+*.thm
+*.toc
+*.lox
+*.ilg
+*.lol
+*.d
+*.idx
