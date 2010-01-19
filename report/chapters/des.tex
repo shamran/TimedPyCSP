@@ -120,26 +120,33 @@ Hvad er din holdning til litteraturhenvisninger.}, hvor verdenen repræsenteres
 som en delt datastruktur og adgangen til denne styres med barrierer. I vores 
 model er hver proces derved ansvarlig for en del af verdenen og tilgangen til 
 den delte datastruktur sker ud fra CREW-princippet (Concurrent Read, Exclusive 
-Write)\cite[5]{crew}, der styres vha. barrierer. 
+Write)\cite[5]{crew}, der styres vha. barrierer.  
+
+I en mere ren CSP-model ville man foretage en direkte udveksling af data mellem 
+processerne, og undgå den delte datastruktur vi har i vores model.  Vi har 
+valgt denne model frem for den mere rene CSP model, da den klarlægger brugen af 
+barrierer bedre.  Det bliver meget eksplicit i koden hvornår hvilke dele 
+opdateres, og hvornår processerne venter i en barriere.
 
 Vi deler verdenen lodret, hvor hver proces styrer en verdensdel. Hver proces 
 gennemgår sin verdensdel og udfører en mulig handling for hver fisk og haj, dog 
 vil fisk og hajer i de sidste to kolonner i hver verdensdel ikke bliver 
-opdateret på nuværende tidspunkt. Dette skyldes at i disse to kolonner vil en 
-opdatering\inline{bedre ord} af fisk og hajer kunne risikere en race 
-condition\footnote{En race condition opstår når et program ikke gør som 
-forventet, på grund af at en uforudset række af hændelser resulterer i strid om 
-en ressource}, fra hhv.  processen selv og processen til højre.
- Når denne opdatering er fuldført mødes processerne i en barriere, hvorefter 
- hver proces opdaterer de to sidste kolonner. Herefter mødes processerne igen i 
- barrieren, og når alle kolonner er opdateret, kan der foretages en 
- visualisering af de udførte opdateringer. Til slut mødes alle i en barriere 
- igen før processerne kan begynde en ny iteration.
+opdateret på nuværende tidspunkt. Dette skyldes at der kan opstå en en race 
+condition hvis disse to kolonner opdateres samtidig med de andre. Årsagen til 
+dette er at både processen der er ansvarlig for kolonnerne, og processen 
+umiddelbart til højre for den skal have mulighed for at flytte fisk og hajer 
+ind i dette område. Hvis der i samme tidsskridt er mulighed for at flytte dem 
+ud af området, vil opførslen afhænge af hvad der sker først.  Når denne 
+opdatering er fuldført mødes processerne i en barriere, hvorefter hver proces 
+opdaterer de to sidste kolonner. Herefter mødes processerne igen i barrieren, 
+og når alle kolonner er opdateret kan der foretages en visualisering af de 
+udførte opdateringer. Til slut mødes alle i en barriere igen før processerne 
+kan begynde en ny iteration.
 
 En repræsentation af opdelingen ses på \cref{fig:wator}. Her er verdenen 
 opdelt mellem to processer, og de to kolonner mellem hver del opdateres i et 
-separat tidsskridt. Når disse to tidsskridt er udført kan der foretages en 
-visualisering, hvorefter næste iteration af opdateringer kan begyndes. \inline{gentagelse}
+separat tidsskridt.  
+
 \begin{figure}[hbtp] \begin{center}
   \includegraphics[scale=0.75]{images/wator}
   \caption{Opdeling af verdenen mellem to processer. Der er for hver verdensdel 
@@ -148,15 +155,10 @@ visualisering, hvorefter næste iteration af opdateringer kan begyndes. \inline{
   \end{center}
 \end{figure}
 
-I en mere ren CSP-model ville man foretage en direkte udveksling af data mellem 
-processerne, og undgå den delte datastruktur vi har i vores model.  Vi har 
-valgt denne model frem for den mere rene CSP model, da den klarlægger brugen af 
-barrierer bedre.  Det bliver meget eksplicit i koden hvornår hvilke dele 
-opdateres, og hvornår processerne venter i en barriere.\inline{flyttes langt op.. til valg af CREW model}
 
 \begin{figure}[hbtp]
 \begin{minipage}{\linewidth}
-\begin{lstlisting}[label=wator-worldpart,caption=Uddrag af processen 
+\begin{lstlisting}[label=code:wator-worldpart,caption=Uddrag af processen 
   \emph{worldpart} i Wator]
   @process
   def worldpart (part_id, barR, barW):
@@ -179,8 +181,8 @@ opdateres, og hvornår processerne venter i en barriere.\inline{flyttes langt op
       barR()
 \end{lstlisting}
 
-\begin{lstlisting}[label=wator-visualize,caption=Processen \emph{visualize} i 
-  Wator]
+\begin{lstlisting}[label=code:wator-visualize,caption=Processen 
+  \emph{visualize} i Wator]
 @process
  def visualize(barR,barW):
    for i in xrange(iterations):
@@ -200,9 +202,17 @@ fra en barriere som defineret i \cref{barrier}.}
 \end{figure}
 Afviklingen af programmet sker ved at et antal \emph{worldpart}-, en 
 \emph{visualize}- og en \emph{barrier}-process køres parallelt. Af 
- \autoref{wator-worldpart} og \pageref{wator-visualize}\fixme{ændrer pageref til vpageref i final}, ses det overordnede design af hhv. \emph{worldpart}- og \emph{vizualize}processen.  Værd at bemærke er det store antal barrierkald til visualizeprocessen. Dette er til for at man kan benytte den samme barrier som wordpartprocessen. Alternativt kunne man have to barriererprocesser; en til synkronisering af \emph{worldpart} med \emph{vizualize}, samt en som \emph{worldpart}processerne brugte til synkroniseringen af opdatering af verdensdelen og de to sidste kolonner. 
+\autoref{code:wator-worldpart} og \pageref{code:wator-visualize}\fixme{ændrer pageref til vref i final}, ses det 
+overordnede design af henholdsvis \emph{worldpart}- og 
+\emph{vizualize}processen.  Værd at bemærke er det store antal barrierekald i 
+visualizeprocessen. Dette er til for at man kan benytte den samme barriere som 
+wordpartprocessen. Alternativt kunne man have to barriereprocesser; en til 
+synkronisering af \emph{worldpart} med \emph{vizualize}, samt en som 
+\emph{worldpart}processerne brugte til synkroniseringen af opdatering af 
+verdensdelen og de to sidste kolonner. 
 
-\fxnote{konklusion hvordan var det at implementerer og hvor stor parallelitet kan man opnå. }
+\fxnote{konklusion hvordan var det at implementere og hvor stor parallelitet 
+kan man opnå. }
 
 
 \subsection{Kunder i en bank}\label{bank-eksempel}
@@ -253,22 +263,25 @@ tidskridt vide hvilke kunder der skal forlade den.
 Tiden er igen modelleret ved brug af barrierer, se afsnit \cref{barrier}. I 
 stedet for at have de to kald til barrieren som den kræver, lige efter hinanden, lader 
 vi bankprocessen gå ind i barrieren i starten af tidsskridtet, og så modtage 
-kunder, indtil bankeprocessen modtager det andet kald fra barrieren(se \cref{bank-alternation-imp})\inline{lang uklar sætning, omformuler S: bredre?}. 
-Dette er smart og nødvendigt for at lade banken have mulighed for 
-at modtage et vilkårligt antal kunder i samme tidsskridt, samt vide hvornår der 
-ikke vil komme flere kunder.  
-Vi kan ræsonnere os frem til at barrieren stadig virker efter hensigten ved  simpel indsigt.
+kunder, indtil bankeprocessen modtager det andet kald fra barrieren(se 
+\cref{bank-alternation-imp}). Dette er nødvendigt for at lade banken have 
+mulighed for at modtage et vilkårligt antal kunder i samme tidsskridt, samt 
+vide hvornår der ikke vil komme flere kunder.  Vi kan ræsonnere os frem til at 
+barrieren stadig virker efter hensigten ved  simpel indsigt.
 For at generatorprocessen kan komme foran med et tidsskridt og sende en kunde i et forkert tidsskridt,
-skal den have fuldført begge begge kald til barrieren, mens barrieren ikke har modtaget et kald fra barrieren. Barrieren vil dog ikke modtage kald fra nogle, før den har  kaldt bankprocessen. Derfor må generatorprocessen vente i sit første kald til barrieren, indtil banken har modtaget 
-sit kald fra barrieren, før den kan sende en ny kunde.
-Når bankprocessen har modtaget et kald fra barrieren 
-er denne, ikke længere villig til at modtage kunder,  før i det efterfølgende 
-tidsskridt\inline{lang uklar sætning - s:bedre?}. Vi kan bruge samme analogi til at 
-ræsonnere os frem til at bankprocessen ikke kan komme et tidsskridt foran 
-generatorfunktionen, og derfor virker barrieren stadigt som forventet. 
+skal den have fuldført begge begge kald til barrieren, mens bankprocessen ikke 
+har modtaget et kald fra barrieren. Barrieren vil dog ikke modtage kald fra 
+nogle, før den har  kaldt bankprocessen. Derfor må generatorprocessen vente i 
+sit første kald til barrieren, indtil banken har modtaget sit kald fra 
+barrieren, før den kan sende en ny kunde.
+Når bankprocessen har modtaget et kald fra barrieren er den ikke længere villig 
+til at modtage kunder, før i det efterfølgende tidsskridt. Vi kan bruge samme 
+analogi til at ræsonnere os frem til at bankprocessen ikke kan komme et 
+tidsskridt foran generatorfunktionen, og derfor virker barrieren stadigt som 
+forventet. 
 
-\begin{lstlisting}[float=hbtp,label=bank-alternation-imp,caption=Modtage en kunde eller 
-	barrier i Bankprocessen]
+\begin{lstlisting}[float=hbtp,label=bank-alternation-imp,caption=Modtage en 
+  kunde eller barrierekald i Bankprocessen]
 while True:
 		(g,msg) = Alternation([{
 		barrierREADER:None,
@@ -287,14 +300,14 @@ at hvilken proces der skal have ansvaret for at vedligeholde køen. En metode er
 internt i en proces at have en liste af kunder der venter, og lade det være 
 processens ansvar at håndtere denne liste som en kø. Processen med ansvaret for køen kan 
 så enten være den begrænsede ressource, eller en separat proces hvis eneste 
-formål er at vedligeholde køen\inline{bedre brug af ordet liste? s: bedre?}. For nyligt\footnote{d. 22. december 2009} er 
+formål er at vedligeholde køen. For nyligt\footnote{d. 22. december 2009} er 
 der i \pycsp blevet introduceret ''buffered channels''\cite{pycsp-r147}, og 
-disse kan også bruges som en kø. Dermed kan man modellere sin ressource og lade 
-den læse fra kanalen når den er klar uden at skulle beskæftige sig med køen, og 
-uden at skulle implementere en hjælperproces til håndtering af køen. Vi har i 
-dette eksempel valgt at lade køen være repræsenteret ved en ''buffered 
-channel'', da denne  kræver færrest linjer kode, men den kunne lige så godt 
-være repræsenteret som en liste i servicedisk processen.
+disse kan også bruges som en kø. Dermed kan man modellere sin ressource uden 
+hensyntagen til håndtering af køen internt eller vha. andre processer, og blot 
+lade processen læse fra kanalen når den er klar. Vi har i dette eksempel valgt 
+at lade køen være repræsenteret ved en ''buffered channel'', da denne  kræver 
+færrest linjer kode, men den kunne lige så godt være repræsenteret som en liste 
+i servicedisk processen.
 
 
 \subsubsection*{Konklusion - evaluering - ?}
