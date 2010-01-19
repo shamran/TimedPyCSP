@@ -61,11 +61,13 @@ skal synkroniseres. \inline{skal vi fortælle hvordan der kan gøres i \pycsp}
      \fxnote[inline]{fortsættes med ulemper med barriere og generelt hvorfor vi 
 skal holdes os fra det. noget med at man skal kalde barrieren to  gange}
 
-Barrierer er en meget effektiv metode til at synkronisere processer der kører parallelt, og er brugt flitigt i MPI. I \csp er der dog en konflikt i brugen af barrierer da hver proces fungerer i isolation, og den eneste interaktion der skal være mellem processerne er når der kommunikeres via kanalerne. Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp. \tcite{crew} beskriver brugen af barrierer som:                                \begin{otherlanguage}{english}
+Barrierer er en meget effektiv metode til at synkronisere processer der kører parallelt, og er brugt flitigt i MPI. I \csp er der dog en konflikt i brugen af barrierer da hver proces fungerer i isolation, og den eneste interaktion der skal være mellem processerne er når der kommunikeres via kanalerne. Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp. \tcite{crew} beskriver brugen af barrierer som:
+\begin{otherlanguage}{english}
 \begin{quote}
 [\ldots] where the barriers may be used to maintain global and/or localised models of time and to synchronise safe access to shared data [\ldots]
 \end{quote}
 \end{otherlanguage}
+Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun  lokalt data. Hvis der er data er delt pga. arkitekturen \csp er implementeret på, bør dette abstraheres væk men udnyttes internt i kanalerne. At introducere hjælpemidler for styre delt data, er derfor at tilskynde til en forkert brug af \csp.
 
 \section{Eksempel}
 \fxnote[inline]{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}

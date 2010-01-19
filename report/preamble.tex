@@ -27,7 +27,7 @@ openany%, % anvnedes hvis kapitler bare skal starte på den næste side
 % almindelige længder op
 \usepackage[utf8]{inputenc} % eller utf8 eller ansinew eller ...
 \usepackage[english, danish]{babel} %direktiv til at bruge det danske sprog
-%\selectlanguage{danish}
+\selectlanguage{danish}
 \usepackage[draft]{fixme} % til at skrive \fixme kommentarer til sig
 
 %\newenvironment{Draft}{\fixme{HUSK at ændre kommenteringen i preamble når man skifter mellem draft og final} }{  }
@@ -36,7 +36,6 @@ openany%, % anvnedes hvis kapitler bare skal starte på den næste side
  
 %har vi ord der bliver delt forkert kan de indsættes i hyphernation med bindestreg alle steder hvor ordet kan deles
 \hyphenation{tit-len mo-del-len pro-du-ce-rer an-svars-hav-ende om-for-deles for-bind-elses-mulig-heder ska-ber æn-dring-er net-værks-en-hed-er peer backup backup-system fast-track backup-systemer nabo-peers frame-work efter-som Grund-lag-et plads-effek-tivi-teten audits}
-
 
 \usepackage{nameref}
 \usepackage[danish]{varioref} % smarte krydsreferencer via \vref
@@ -156,6 +155,7 @@ andothers 		= {m\adddot fl\adddot},
 typeeditor      = {{udgiver}{udg\adddot}},
 typeeditors 	= {{udgivere}{udg\adddot}},
 }
+\usepackage[babel, danish=quotes]{csquotes} %bedrer mulighed for at anførselstegn
 
 \usepackage[T1]{fontenc} % bedre orddeling og ofte påkrævet at
 % forskellige fonte
