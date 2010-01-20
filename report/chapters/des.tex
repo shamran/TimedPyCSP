@@ -372,8 +372,10 @@ I \cref{fig:init} kan man se at funktionerne \code{choice, ChannelPoisonExceptio
  \tightlist 
  \item \code{new}: Består af processer som lige er blevet scheduleres for første gang.
  \item \code{next}: Processer der er klar til at blive kørt.  
- \item \code{timers}: Processer der har tilknyttet en timeout, skal først scheduleres på et senere tidspunkt. 
+ \item \code{timers}: Processer der har tilknyttet en timeout, skal først scheduleres på et senere tidspunkt. Listen består af processen samt hvornår denne skal genaktiveres. Denne liste bliver gensorteret hver gang der indsættes en ny proces.
+ \item \code{blocking}: Processer der venter på en IO operation er ikke klar, men heller ikke afsluttet. De findes derfor ikke på nogle liste i scheduleren, men der holdes styr på antallet på deres antal vha. denne variabel.
 \end{list}
+
 %    \input{chapters/time-implementation} 
     \subsection{Hvordan skal events gemmes}
     
