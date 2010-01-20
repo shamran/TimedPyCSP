@@ -45,8 +45,6 @@ article
 \usepackage{tikz}
 \usepackage{xspace}
 
-%\newenvironment{Draft}{\fixme{HUSK at ændre kommenteringen i preamble når man skifter mellem draft og final} }{  }
-\let\Draft=\comment \let\endDraft=\endcomment
 
  
 %har vi ord der bliver delt forkert kan de indsættes i hyphernation med bindestreg alle steder hvor ordet kan deles
@@ -78,9 +76,12 @@ final=true]{hyperref}
 %% NOTE: This allows us to use \ref instead of \eqref
 \labelformat{equation}{\textup{(#1)}}
 \labelformat{enumi}{\textup{(#1)}}
-\usepackage{pdfcomment}
+%\usepackage{pdfcomment}
 \usepackage[draft, danish]{fixme} % til at skrive \fixme kommentarer til sig
+\fxsetup{layout={margin,noinline,index}}
+\fxloadlayouts{pdfnote}
 %\fxuselayouts{pdfcnote}
+\newcommand{\inline}[1]{\fxnote[inline, nomargin]{#1}}
 
 
 
@@ -183,7 +184,7 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 
 
 
-\newcommand{\cref}[1]{\autoref{#1}\xspace\pageref{#1}} %ændres fra pageref til vpageref in final
+\newcommand{\cref}[1]{\autoref{#1}\xspace s. \pageref{#1}} %ændres fra pageref til vpageref in final
 \newcommand{\tcite}[1]{\citetitle{#1}\xspace\cite{#1}}
 
 \newcommand{\des}[0]{discrete event simulation\xspace}
@@ -191,7 +192,7 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 \newcommand{\Des}[0]{Discrete event simulation\xspace}
 \newcommand{\ds}[0]{Deadline scheduling\xspace}
 \newcommand{\is}[0]{Interaktiv scheduling\xspace}
-\newcommand{\inline}[1]{\fxnote[inline]{#1}}
+
 \newcommand{\simpy}[0]{SimPy\xspace}
 \newcommand{\pycsp}[0]{PyCSP\xspace}
 \newcommand{\csp}[0]{CSP\xspace}
@@ -249,7 +250,7 @@ typeeditors 	= {{udgivere}{udg\adddot}},
          PYTHON,
  }
 \lstset{language=Python}
-\lstset{emph={@process, @choise, Alternation, Skip,Timeout,Parallel,Sequence, Spawn,@io,ChannelPoisonException, ChannelRetireException},emphstyle=\underbar}
+\lstset{emph={@process, @choise,choice, Alternation, Skip,Timeout,Parallel,Sequence, Spawn,@io,ChannelPoisonException, ChannelRetireException},emphstyle=\underbar}
 
 
     %\DeclareCaptionFont{blue}{\color{blue}} 

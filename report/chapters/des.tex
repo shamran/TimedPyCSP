@@ -3,7 +3,7 @@
     \inline{Beskrivelse af tidsmodellen, teorien omkring den og hvor/hvad den 
     benyttes til. Teori: henvisning til litteratur, bl.a.  matematik/beviser 
     for modellen}
-   
+
 \subsection{Barrierer}\label{sec:barrierer}
 I \des findes der i modsætningen til Parallel \des \fixme{referencer} en global 
 tid og alle processerne skal derfor have en fælles tid der tæller op samtidigt.  
@@ -58,7 +58,7 @@ processeret alle kunderne, før hele programmet kan afslutte. Alternativt må
 barriereprocessen ændres, så den dynamisk kan ændre på hvor mange processer der 
 skal synkroniseres. \inline{skal vi fortælle hvordan der kan gøres i \pycsp}
 
-Barrierer er en meget effektiv metode til at synkronisere processer der kører parallelt, og er brugt flittigt i MPI. I \csp er der dog en konflikt i brugen af barrierer da hver proces fungerer i isolation, og den eneste interaktion der skal være mellem processerne er når der kommunikeres via kanalerne. Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp. \citetitle{crew} beskriver brugen af barrierer som:
+Barrierer er en meget effektiv metode til at synkronisere processer der kører parallelt, og er brugt flittigt i MPI. I \csp er der dog en konflikt i brugen af barrierer da hver proces fungerer i isolation, og den eneste interaktion der skal være mellem processerne er når der kommunikeres via kanalerne. Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp. \citeauthor{crew} beskriver brugen af barrierer som:
 
 \mycite[1]{crew}{
 \begin{otherlanguage}{english}
@@ -66,10 +66,10 @@ Barrierer er en meget effektiv metode til at synkronisere processer der kører p
 \end{otherlanguage}
 }
 
-Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun  lokalt data. Hvis der er data er delt pga. arkitekturen \csp er implementeret på, bør dette abstraheres væk men udnyttes internt i kanalerne. At introducere hjælpemidler for styre delt data, er derfor at tilskynde til en forkert brug af \csp. Tiden er den anden begrundelse for at benytte barrierer. Men med brugen af barrierer til at modellerer tid, kan man får  en primitiv model for tid, og vi vil i vores speciale vise ved at inkluderer tid i stedet får man et stærkere værktøj der ud over en masse andet også kan erstatte brugen af barrierer.\inline{det sidste er helt tosset og skal hives et niveau op tekstmæssigt}
+Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun  lokalt data. Hvis der er data er delt pga. arkitekturen \csp er implementeret på, bør dette abstraheres væk men udnyttes internt i kanalerne. At introducere hjælpemidler for styre delt data, er derfor at tilskynde til en forkert brug af \csp. Tiden er den anden begrundelse for at benytte barrierer.\fxnote*[nomargin, inline]{Skal hives et niveau op tekstmæssigt}{Men med brugen af barrierer til at modellerer tid, kan man får  en primitiv model for tid, og vi vil i vores speciale vise ved at inkluderer tid i stedet får man et stærkere værktøj der ud over en masse andet også kan erstatte brugen af barrierer.}
 
 \section{Eksempel}
-\fxnote[inline]{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}
+\inline{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}
 
 
 \subsection{Hajer og fisk på Wator} Som et eksempel på en \des har vi valgt at 
@@ -312,7 +312,7 @@ færrest linjer kode, men den kunne lige så godt være repræsenteret som en li
 i servicedisk processen.
 
 
-\subsubsection*{Konklusion - evaluering - ?}
+\subsubsection{Konklusion - evaluering - ?}
 Ved at se på  implementeringen af de to eksempler af kunder i en bank sammenholdt med implementeringen i \simpy kan man se at de egner det sig godt til 
 simulering, og fra eksemplet kan man se at der findes meget kode til 
 vedligeholdes af de interne tidsvariabler, som \simpy ikke har behov for. Det drejer sig 
@@ -338,18 +338,47 @@ irrelevant. For undgå dette har vi i vores tilfælde valgt blot at
 angive en maksimal størrelse på bufferen som er større end det totale antal 
 kunder banken modtager.
 
-  \section{Design og implementering}
-    \fxnote[inline]{Beskrivelse af design med udgangspunkt i eksemplet}
-    Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret tid som et alternativ til barrierer. Dels ønsker vi med diskret tid at åbne for mulighederne for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Med disse ændringer er håbet at vi opnår en model der ligger tætter på intentionen bag \csp og så man kan udfase brugen af barrierer, samt med den underliggende parallelitet i \csp kan udnyttes til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.
+\newpage
+\section{Design og implementering}
+\inline{Beskrivelse af design med udgangspunkt i eksemplet}
+Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret tid som et alternativ til barrierer. Dels ønsker vi med diskret tid at åbne for mulighederne for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Med disse ændringer er håbet at vi opnår en model der ligger tætter på intentionen bag \csp og så man kan udfase brugen af barrierer, samt med den underliggende parallelitet i \csp kan udnyttes til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.
     
-Der findes et åbenlyst problem med introduktionen a \des i \csp, som vi kort berørte i \cref{sec:barrierer}. Dette er at \csp er lavet med henblik på at  ligestillede processer der arbejder samtidigt, og uafhængigt af hinanden, mens \des  ikke er parallelt, men skedulere sine begivenheder linært efter hvornår de sker og så kronologisk \fxnote{Dette skal vidst i teori}løber begivenhederne igennem, til der enten ikke er flere begivenheder eller tiden når et vidst punkt. Alternativet til  \des  er \pdes hvor processerne kan have at tiden løbe uafhængigt af hinanden. Dette introducere muligheden for størrer parallelitet, men samtidigt risikere de processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. Det har der vidst sig at omkostningerne ved at lade tiden kører parallelt er omkostningerne størrer end ved at holde tiden synkront på tværs af processerne.
+Der findes et åbenlyst problem med introduktionen a \des i \csp, som vi kort berørte i \cref{sec:barrierer}. Dette er at \csp er lavet med henblik på at  ligestillede processer der arbejder samtidigt, og uafhængigt af hinanden, mens \des  ikke er parallelt, men schedulere sine begivenheder lineært efter hvornår de sker og så kronologisk \fxnote{Dette skal vidst i teori}løber begivenhederne igennem, til der enten ikke er flere begivenheder eller tiden når et vidst punkt. Alternativet til  \des  er \pdes hvor processerne kan have at tiden løbe uafhængigt af hinanden. Dette introducere muligheden for større parallelitet, men samtidigt risikere de processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. Det har der vidst sig at omkostningerne ved at lade tiden kører parallelt er omkostningerne større end ved at holde tiden synkront på tværs af processerne.
     
-I \pycsp findes der tre versioner der implementerer \csp: \emph{Process, threads, greenlets}\cite{Friborg2009}. Muligheden for at introducere \des, i de forskellige versioner afhænger af hvordan processerne styres, og dermed hvordan \des kan  implementeres i de forskellige versioner. I proces og threads versionen af \pycsp styres processerne af operativsystemet uafhængig af hinanden \inline{ref?}. Dette medfører at \pycsp ikke fra et central område har mulighed for at diktere tiden og om nødvendigt få processer til at vente på hinanden. I greenlets køres processerne derimod på bruger-niveau. Dette betyder at kun en proces kan køre af gangen, og denne kan fortsætte sin kørsel indtil den frivilligt afgiver kontrollen. For at koordinere kørslen af processerne findes der i greenlets en central scheduler der har styr på hvilke processer der er klar til at blive ekseveret og hvilke der venter. Når en proces afgivetr kontrollen tager scheduleren over og udvælger den næste proces der skal eksekveres. Denne har 
-    \input{chapters/time-implementering} 
+\paragraph*{\pycsp versioner:}I \pycsp findes der tre versioner der implementerer \csp: \emph{Process, threads, greenlets}\cite{Friborg2009}. Muligheden for at introducere \des, i de forskellige versioner afhænger af hvordan processerne styres, og dermed hvordan \des kan  implementeres i de forskellige versioner. I proces og threads versionen af \pycsp styres processerne af operativsystemet uafhængig af hinanden \fxnote{ref?}. Dette medfører at \pycsp ikke fra et central område har mulighed for at diktere tiden og om nødvendigt få processer til at vente på hinanden. I greenlets køres processerne derimod på bruger-niveau. Dette betyder at kun en proces kan køre af gangen, og denne kan fortsætte sin kørsel indtil den frivilligt afgiver kontrollen. For at koordinere kørslen af processerne findes der i greenlets en central scheduler der har styr på hvilke processer der er klar til at blive eksekveret og hvilke der venter. Når en proces afgiver kontrollen tager scheduleren over og udvælger den næste proces der skal eksekveres. Denne koordinering i greenlets  egner sig utrolig godt til introduktionen af \des modsat process og threads modellen, hvor der skal ændres betydeligt i den underliggende kode for at kunne koordinere processerne imellem. 
+
+Med den store forskel på de underliggende implementeringer af \csp kan vi ikke gøre os håb om at introducere \des som en pakke, man kan vælge at bruge uafhængigt af hvilken \pycsp-version  der bruges. \Des vil derimod være en en ny version af \pycsp, der ligger sig op ad greenletversionen. 
+
+\paragraph*{Kodestruktur:}  Efter at have valgt at udvider greenletversionen skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at kunne bruge store dele af koden fra greenletversionen, og kun foretage udvidelser på enkle afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale greenletversion. Med denne isolation forventer vi at hvis/når der sker stilrettelser af greenletversionen af \pycsp vil man ikke skulle foretage de samme stilrettelser i \des-versionen. 
+Rent praktisk opnår vi isolationen mellem \des- og greenletversionen ved nedarvning. 
+
+Hvert af de tre moduler har sin egen mappe i pycsp og i hver af disse findes en tilhørende \code{\_\_init\_\_.py} fil, der fungere som et manifest for den givne version\fxnote*{slet?}{, og som dikterer hvilke filer indeholder hvilke funktioner}. Vi opretter vores eget modul kaldet simulation, og opretter en tilhørende mappe på samme niveau som de andre versioner og med sin egen manifestfil. Manifestfilen kan nu bruges til at udvælge de funktioner der skal tages direkte fra greenletversionen i og hvilke funktioner der skal udvides og som derfor vil ligge i den nye mappe.
+
+\begin{lstlisting}[float=hbtp,label=fig:init,caption=Uddrag af \code{\_\_init\_\_.py} for simulationsversionen.]
+from guard import Timeout, Skip
+from pycsp.greenlets.alternation import choice
+from alternation import Alternation
+from pycsp.greenlets.channel import ChannelPoisonException, ChannelRetireException
+\end{lstlisting}
+
+I \cref{fig:init} kan man se at funktionerne \code{choice, ChannelPoisonException} og \code{ChannelRetireException} alle bliver hentet fra greenletmodulet, mens at funktionerne \code{Timeout, Skip} og \code{Alternation} bliver importeret fra samme mappe, og derfor er en modificeret version. For slutbrugeren  vil dette dog være transparent, men vil se simulationversionen som en selvstændig version på lige fod med de andre tre versioner.
+
+\paragraph*{Scheduler:} Med valget af greenletversionen som grundversionen, og med henblik på at hovedparten af vores ændringer vil være i scheduleren, vil vi kort gennemgå denne.
+
+\lstinputlisting[firstline=132, lastline=152,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler]{/home/shamran/pycsp/branches/TimedPyCSP/pycsp/greenlets/scheduling.py}\inline{Koden skal evt flyttes ind i texfilen for at sikre ensartethed }
+
+ I \cref{fig:scheduling} ses et uddrag af initialiseringskoden. Dels findes der tre lister af processer som scheduleren har mulighed for at vælge imellem når der skiftes proces.  
+ \begin{list}
+ \tightlist 
+ \item \code{new}: Består af processer som lige er blevet scheduleres for første gang.
+ \item \code{next}: Processer der er klar til at blive kørt.  
+ \item \code{timers}: Processer der har tilknyttet en timeout, skal først scheduleres på et senere tidspunkt. 
+\end{list}
+%    \input{chapters/time-implementation} 
     \subsection{Hvordan skal events gemmes}
     
   \section{Evaluering}
-    \fxnote[inline]{Evaluering af hvordan eksemplet løses efter den valgte 
+    \inline{Evaluering af hvordan eksemplet løses efter den valgte 
     implementering benyttes. Inkluderer test+performance}
   \section{Freamtidigt arbejde}
   \section{Opsummering}
