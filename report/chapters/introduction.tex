@@ -13,6 +13,46 @@ sammenligning af simulation vs. modellering
 
 simulering - dynamisk - tid (time/space)
 
+Hvor man tidligere har kunne udvikle programmer ud fra en meget sekventiel 
+tankegang, stiller nutidens multi-kerne cpu'er nye krav til udviklerne og de 
+værktøjer der benyttes. \fxnote{mere introduktion før CSP kommer ind  billedet} 
+En metode til at repræsentere den krævede samtidighed på er ved hjælp af 
+CSP\cite{hoare-csp}.  I CSP er der som udgangspunkt ingen delt data mellem 
+processer, og al kommunikation mellem processer sker eksplicit via kanaler.  
+Dette gør det let at overskue og meget egnet til multi-kerne arkitekturer.  
+Ydermere lægger det op til at komplekse systemer opbygges af mindre 
+individuelle enheder, og kobles sammen med kanaler for så til sammen at udgøre 
+systemet som helhed. CSP er tilgængeligt som en udviddelse til en række sprog, 
+heriblandt Java, C++ og Python. I Python hedder udviddelsen PyCSP, og er 
+udviklet i et samarbejde mellem mellem Tromsø og Københavns Universitet, med 
+henblik på at skabe et sprog som er let forståeligt men samtidigt giver den 
+påkrævede mulighed for repræsentation af samtidighed.  Af de implementationer 
+af CSP der findes på nuværende tidspunkt, er der, så vidt vi ved, ingen der har 
+en reel repræsentation af tid indbygget. Det gør at tidsspecifikke programmer, 
+som f.eks. realtids-simuleringer, kræver brug af andre konstruktioner i 
+sproget.
+Vi ønsker at undersøge muligheden for at introducere tid som en indbygget del 
+af PyCSP for derved at kunne lette implementationen af programmer der i større 
+eller mindre grad er bundet op omkring et tidselement. I sin nuværende form 
+kræver styring af tid i PyCSP brug af barrierer\inline{generelt term eller 
+henvisning til MPI?}. Dette skaber et behov for flere kanaler mellem de enkelte 
+processer og de fornødne barrierer, samt kald til en barriere når en proces 
+skal vente på at fortsætte.  Dette resulterer som helhed i mindre overskuelig 
+kode, hvilket vi mener kan gøres mere elegant med indbygget funktionalitet til 
+håndtering af tid. Målet er at give mulighed for at integrere relationen til 
+tid direkte i det udviklede program, i stedet for at benytte 
+
+
+
+
+Med nutidens cpu'er der har adskillige kerner, er der et stigende behov for at 
+udvikle programmer som effektivt kan udnytte flere kerner samtidigt. Hidtil har 
+programmer kunne udvikles ud fra en sekventiel tankegang, men for at udnytte 
+
+
+
+PyCSP er en implementation af CSP i Python. Det formår at kombinere styrkerne 
+fra begge dele, og får dermed 
 
 Simuleringer har længe været et værdifuldt værktøj til at klarlægge hvordan et 
 system fungerer og er specielt brugbart til at repræsentere systemer hvis 
@@ -38,6 +78,6 @@ tilgængelig måde (enter Python?) -> PyCSP
 
 
 
-
-  
+Det er i dag normen at en processor har mere end en kerne, typisk 2-8 i de 
+cpu'er der produceres idag.  
 
