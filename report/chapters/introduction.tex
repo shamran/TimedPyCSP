@@ -11,11 +11,28 @@ sammenligning af simulation vs. modellering
   styrke er samspillet mellem flere elementer/modeller
 
 
-Simuleringer har længe været et værdifuldt værktøj til at klarlægge hvordan et 
-system fungerer og specielt ved større systemer bliver matematiske modeller 
-meget komplekse, hvor en simulering ofte vil være mere overskuelig.  
-
 simulering - dynamisk - tid (time/space)
+
+
+
+Simuleringer har længe været et værdifuldt værktøj til at klarlægge hvordan et 
+system fungerer og er specielt brugbart til at repræsentere systemer hvis 
+tilstand ændres over tid, eller der er interaktion mellem flere systemer. En 
+matematisk model af disse systemer vil ofte være væsentligt mere kompleks og 
+kan være svær at overskue lige så let som en simulering af samme system. 
+
+Simuleringer foretages ofte af andre videskabsfolk end dataloger, og det er 
+derfor vigtigt at de kan repræsenteres i et sprog som er let tilgængeligt og 
+minimerer sandsynligheden for at begå fejl i konstruktionen af simulationen.  
+Til dette formål er programmeringssproget Python oplagt da det netop fokuserer 
+på let tilgængelighed og høj produktivitet for udvikleren. 
+
+Det er oplagt at benytte CSP\cite{hoare-csp} til at repræsentere en simulering.  
+I CSP er interaktionen mellem forskellige processer/systemer eksplicit, og på 
+grund af modulariteten er det nemt at konstruere komplekse systemer ud fra 
+mindre enkle systemer. 
+
+
 
 Der er derfor et stort behov for at kunne udtrykke simuleringer på en let 
 tilgængelig måde (enter Python?) -> PyCSP
