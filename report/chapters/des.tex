@@ -29,21 +29,24 @@ mindre enkle systemer.
     for modellen}
 \inline{Noget med hvilke funktion der er krævet. (Kun en Wait og en Now)}
 \subsection{Barrierer} \label{sec:barrierer}
-I \des findes der i modsætningen til Parallel \des \fixme{referencer} en global 
-tid og alle processerne skal derfor have en fælles tid der tæller op samtidigt.  
-En global viden som tid kræver synkronisering af alle processerne\fxnote{ref}, 
-og til denne koordinering og synkronisering af flere processer er den mest 
-brugte metode at introducere en barriere.
+\fxnote*{RS: Jeg synes det er forkert at starte et afsnit med ``I modsætning 
+til\ldots'' når det ikke er en reference til noget ovenstående}{I \des findes 
+der i modsætningen til Parallel \des} \fixme{referencer} \fixme{referencer} en 
+global tid og alle processerne skal derfor have en fælles tid der tæller op 
+samtidigt.  En global viden som tid kræver synkronisering af alle 
+processerne\fxnote{ref}, og til denne koordinering og synkronisering af flere 
+processer er den mest brugte metode at introducere en barriere.
 
 Barrierer blev først introduceret i MPI\fxnote{ref}, hvor den bruges til at 
 sikre at alle tråde venter i barrieren før de kan fortsætte. 
 
-I \pycsp kan man udnytte at begge kanalender skal være klar, før der kan 
-kommunikeres og at en proces der er indgår i en kommunikation vil vente indtil 
-den anden ende er klar før den fortsætter. Ved hjælp af kanaler kan man derfor 
-lave en simpel barriere trivielt ved brug af kommunikation over kanaler. En 
-implementering af en barriere som en selvstændig proces kan eksempelvis 
-implementeres som i \cref{barrier-imp}.
+I \fxnote*{RS: Gælder vel generelt for CSP}{\pycsp} kan man udnytte at begge 
+kanalender skal være klar, før der der kan kommunikeres og at en proces der er 
+indgår i en kommunikation vil vente indtil den anden ende er klar før den 
+fortsætter.  Ved hjælp af kanaler kan man derfor lave en simpel barriere 
+trivielt ved brug af kommunikation over kanaler.  En implementering af en 
+barriere som en selvstændig proces kan eksempelvis implementeres som i 
+\cref{barrier-imp}.
 
 \begin{lstlisting}[float, label=barrier-imp,caption=En barriere i \pycsp]
 @proces
@@ -69,9 +72,12 @@ værdierne. Først når barrieren har modtaget en værdi fra alle processerne,
 begynder barrieren at sende sin værdi, og det er først når en proces modtager 
 denne værdi fra barrieren at den må fortsætte. Når en proces modtager værdien 
 fra barrieren fortsætter den og man kan risikere at den ønsker at gå ind i 
-barrieren inden denne har sendt sin værdi til alle processer. Den første proces 
-vil da gå i stå mens den venter på at sende sin værdi til barrieren, det skyldes at i \csp skal begge processer  være klar til at kommunikere før selve kommunikationen kan foregå, og det er denne egenskab ved kanaltransmission der  forhindrer processen i at komme foran. Først når barrieren har sendt sin værdi til alle 
-processer kan den modtage værdien fra processer, og denne kan fortsætte. \fxnote{S: bedre?}
+barrieren inden denne har sendt sin værdi til alle processerfor at frigive dem. 
+\fxnote*[nomargin,inline]{RS - JEg synes stadig det knaser lidt, så jeg har prøvet at omskrive det: Processer der ønsker adgang til barrieren vil da gå i stå, idet de prøver at sende til barrieren før den er klar til at modtage på den givne kanal. Først når barrieren har signaleret til alle processer at de må fortsætte, læser den på kanalen for at accepterer processer der ønsker at tilgå barrieren. Det er denne egenskab fra \csp der giver os garanti for at en proces der netop er frigivet fra barrieren ikke går ind i den igen og derved risikerer at komme foran. 
+}{Den første proces vil da gå i stå mens den venter på at sende sin værdi til barrieren, hvilket skyldes at i \csp skal begge processer  være klar til at kommunikere før kommunikationen foregår, og det er denne egenskab ved kanaltransmission der forhindrer processen i at komme foran. Først når barrieren har sendt sin værdi til alle 
+processer kan den modtage værdien fra processer, og denne kan fortsætte. \fxnote{S: bedre?}}
+
+
 
 En ulempe ved denne simple barriere er at antallet af processer skal være 
 konstant gennem hele kørslen.
@@ -81,6 +87,8 @@ Her må den fortsætte med blot at kalde barrieren, indtil servicedisken har
 processeret alle kunderne, før hele programmet kan afslutte. Alternativt må 
 barriereprocessen ændres, så den dynamisk kan ændre på hvor mange processer der 
 skal synkroniseres. \inline{skal vi fortælle hvordan der kan gøres i \pycsp}
+\fxnote{RS: Reference frem i teksten til eksempler der endnu ikke er introduceret}
+
 
 Barrierer er en meget effektiv metode til at synkronisere processer der kører parallelt, og er brugt flittigt i MPI. I \csp er der dog en konflikt i brugen af barrierer da hver proces fungerer i isolation, og den eneste interaktion der skal være mellem processerne er når der kommunikeres via kanalerne. Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp. \citeauthor{crew} beskriver brugen af barrierer som:
 
@@ -257,7 +265,7 @@ I det simple tilfælde af eksemplet ankommer kunderne til banken på
 tilfældige tidspunkter.  De opholder sig i banken i et tilfældigt 
 tidsrum, hvorefter de igen forlader banken. I dette eksempel kan der ikke 
 uddrages meget information, men det viser hvordan en simpel model er opbygget i 
-hhv.  \simpy og \pycsp for at håndtere tid.\inline{bedre ental/flertal}
+hhv.  \simpy og \pycsp for at håndtere tid.
 
 I det andet eksempel er modellen udvidet med en servicedisk. Her skal alle 
 kunderne betjenes af en servicemedarbejder, som kun kan ekspederes en kunde ad 
@@ -365,7 +373,7 @@ kunder banken modtager.
 \inline{Beskrivelse af design med udgangspunkt i eksemplet}
 Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret tid som et alternativ til barrierer. Dels ønsker vi med diskret tid at åbne for mulighederne for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Med disse ændringer er håbet at vi opnår en model der ligger tætter på intentionen bag \csp og så man kan udfase brugen af barrierer, samt med den underliggende parallelitet i \csp kan udnyttes til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.
     
-Der findes et åbenlyst problem med introduktionen a \des i \csp, som vi kort berørte i \cref{sec:barrierer}. Dette er at \csp er lavet med henblik på at  ligestillede processer der arbejder samtidigt, og uafhængigt af hinanden, mens \des  ikke er parallelt, men schedulere sine begivenheder lineært efter hvornår de sker og så kronologisk \fxnote{Dette skal vidst i teori}løber begivenhederne igennem, til der enten ikke er flere begivenheder eller tiden når et vidst punkt. Alternativet til  \des  er \pdes hvor processerne kan have at tiden løbe uafhængigt af hinanden. Dette introducere muligheden for større parallelitet, men samtidigt risikere de processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. Det har der vidst sig at omkostningerne ved at lade tiden kører parallelt er omkostningerne større end ved at holde tiden synkront på tværs af processerne.
+Der findes et åbenlyst problem med introduktionen a \des i \csp, som vi kort berørte i \cref{sec:barrierer}. Dette er at \csp er lavet med henblik på at processer arbejder samtidigt og uafhængigt af hinanden, hvor \des  ikke er parallelt, men schedulere sine begivenheder lineært efter hvornår de sker og så kronologisk \fxnote{Dette skal vidst i teori}løber begivenhederne igennem, til der enten ikke er flere begivenheder eller tiden når et vidst punkt. Alternativet til  \des  er \pdes hvor processerne kan have at tiden løbe uafhængigt af hinanden. Dette introducere muligheden for større parallelitet, men samtidigt risikerer processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. Det har der vidst sig at omkostningerne ved at lade tiden kører parallelt er omkostningerne større end ved at holde tiden synkront på tværs af processerne.
     
 \paragraph*{\pycsp versioner:}I \pycsp findes der tre versioner der implementerer \csp: \emph{Process, threads, greenlets}\cite{Friborg2009}. Muligheden for at introducere \des, i de forskellige versioner afhænger af hvordan processerne styres, og dermed hvordan \des kan  implementeres i de forskellige versioner. I proces og threads versionen af \pycsp styres processerne af operativsystemet uafhængig af hinanden \fxnote{ref?}. Dette medfører at \pycsp ikke fra et central område har mulighed for at diktere tiden og om nødvendigt få processer til at vente på hinanden. I greenlets køres processerne derimod på bruger-niveau. Dette betyder at kun en proces kan køre af gangen, og denne kan fortsætte sin kørsel indtil den frivilligt afgiver kontrollen. For at koordinere kørslen af processerne findes der i greenlets en central scheduler der har styr på hvilke processer der er klar til at blive eksekveret og hvilke der venter. Når en proces afgiver kontrollen tager scheduleren over og udvælger den næste proces der skal eksekveres. Denne koordinering i greenlets  egner sig utrolig godt til introduktionen af \des modsat process og threads modellen, hvor der skal ændres betydeligt i den underliggende kode for at kunne koordinere processerne imellem. 
 
