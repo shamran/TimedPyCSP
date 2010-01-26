@@ -2,21 +2,21 @@ test
 test
 test
 \subsection{Repræsentation af tid}
-\fxnote{dette skal gennemlæses for logisk tid ifh. til deadline osv.}
-I PyCSP foregår kommunikation kun når begge kanalender er klar dvs.
-når der findes både en kanalende der vil skrive og en kanalende der vil læse. 
+Vi vil i dette afsnit gå i dybden med listen \code{timers} der findes i Scheduleren, samt se hvordan den kan inkorporeres i vores design.
+
+I \pycsp foregår kommunikation kun når begge kanalender er klar dvs.
+når der både findes en kanalende der vil skrive og en kanalende der vil læse. 
 Hvis kun en af kanalenderne er klar, vil den vente indtil
-der findes minumum en kanalende af hver type, der er klar. I alternation 
-findes muligheden for at tilknytte en timeout til en guard. Dette
-giver muligheden for at en process, kun er villig til at vente på at kanalen 
-bliver klar inden for en given tidsperiode. 
+der findes minimum en kanalende af hver type, der er klar. Dette medfører risikoen for at processen aldrig kommer videre, men går i deadlock. I \pycsp har man derfor i \code{alternation} mulighed for at tilknytte en timeout til en \code{guard}. Dette
+giver mulighed for at en process, kun er villig til at vente på kommunikation 
+i en given tidsperiode. 
 \begin{lstlisting}[float=hbtp, label=Timeout,
   caption=Timeout i Alternation (fra dokumentationen til PyCSP)]
   Alternation([{Timeout(seconds=0.5):None},
                {Cin:None}]).select()
 \end{lstlisting} 
 
-I \autoref{Timeout} er processen villig til at læse fra Cin i 0.5 sekunder og ellers accepteres timeoutguarden og processen er ikke længere villig til at læse fra Cin.
+I \cref{Timeout} ses et minimalt eksempel hvor processen kun er villig til at læse fra kanalenden \code{Cin} i $0.5$ sekunder. Hvis ikke der er modtaget en besked indenfor 0.5 sekundt, accepteres timeoutguarden og processen er ikke længere villig til at læse fra \code{Cin}, og fortsætter sin kørsel.
 
 Med et simuleringsmiljø er det ikke nok udelukkende kan kunne specifiere en 
 timeout på kanalen, det er også nødvændigt at man kan specificere at en proces 

@@ -3,8 +3,8 @@ final,% Når man skal skifte kompileringsmetode mellem draft og final skal man
       %flytte kommenteringen %  i Draft kommanoerne, nedenfor.
 11pt, % standardstørrelse på fonten
 %openany%, % anvnedes hvis kapitler bare skal starte på den næste side
-oneside,
-article
+oneside%,
+%article
 ]{memoir}%
 % marginer, memoir to to metoder
 % den traditionelle, se memoir manualen
@@ -25,6 +25,14 @@ article
 % \setulmargins{*}{*}{1.3}
 \checkandfixthelayout % laver forskellige beregninger og sætter de
 % almindelige længder op
+
+
+\setsecnumdepth{subsection} % Hvor dybt man nu ønsker at vi har
+\maxsecnumdepth{subsection}% overskrifterne nummereret
+\settocdepth{subsection} % hvor dybt ned vi ønsker ting med i
+
+
+
 \usepackage[utf8]{inputenc} % eller utf8 eller ansinew eller ...
 \usepackage[english, danish]{babel} %direktiv til at bruge det danske sprog
 \selectlanguage{danish}
@@ -68,15 +76,13 @@ final=true]{hyperref}
 %                        {\orgaddcontentsline{#1}{section}{#3}}
 %                        {\orgaddcontentsline{#1}{#2}{#3}}}
 %                {\orgaddcontentsline{#1}{#2}{#3}}}}
-%
-
 
 %% Make sure \autoref puts parentheses around 
 %% equations and enumeration items (similar to \eqref)
 %% NOTE: This allows us to use \ref instead of \eqref
 \labelformat{equation}{\textup{(#1)}}
 \labelformat{enumi}{\textup{(#1)}}
-%\usepackage{pdfcomment}
+
 \usepackage[draft, danish]{fixme} % til at skrive \fixme kommentarer til sig
 \fxsetup{layout={margin,noinline,index}}
 \fxloadlayouts{pdfnote}
@@ -177,14 +183,11 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 \makeatother
 
 
-\setsecnumdepth{subsection} % eller hvor dybt man nu ønsker at har
-% overskrifterne nummereret
-\maxsecnumdepth{section}
-\settocdepth{subsection} % hvor dybt ned vi ønsker ting med i
 
 
 
-\newcommand{\cref}[1]{\autoref{#1}\xspace s. \pageref{#1}} %ændres fra pageref til vpageref in final
+\newcommand{\cref}[1]{\autoref{#1}\textcolor{darkblue}{,~s.}~\pageref{#1}} %ændres fra pageref til vpageref in final
+\newcommand{\nref}[1]{\nameref{#1}\textcolor{darkblue}{,~s.}~\pageref{#1}}
 \newcommand{\tcite}[1]{\citetitle{#1}\xspace\cite{#1}}
 
 \newcommand{\des}[0]{discrete event simulation\xspace}
