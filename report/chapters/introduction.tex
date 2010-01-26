@@ -7,7 +7,7 @@
 
 
 
-Over de diste par år er multi-kerne cpu'er blevet hyldevarer, og er at finde i 
+Over de siste par år er multi-kerne cpu'er blevet hyldevarer, og er at finde i 
 stort set alle computere det sælges nu om dage. For at udnytte den ekstra 
 ydelse der er til rådighed med flere kerner, er softwareudviklere nødt til at 
 ændre på tankegangen og metoderne der hidtil har været brugt til at udvikle 
@@ -58,27 +58,4 @@ give mulighed for at integrere relationen til tid direkte i det udviklede
 program, i stedet for at benytte 
 
 
-sammenligning af simulation vs. modellering
-  simulering er en implementaiton af modellen
-  styrke er samspillet mellem flere elementer/modeller
-
-
-simulering - dynamisk - tid (time/space)
-
-Simuleringer har længe været et værdifuldt værktøj til at klarlægge hvordan et 
-system fungerer og er specielt brugbart til at repræsentere systemer hvis 
-tilstand ændres over tid, eller der er interaktion mellem flere systemer. En 
-matematisk model af disse systemer vil ofte være væsentligt mere kompleks og 
-kan være svær at overskue lige så let som en simulering af samme system. 
-
-Simuleringer foretages ofte af andre videskabsfolk end dataloger, og det er 
-derfor vigtigt at de kan repræsenteres i et sprog som er let tilgængeligt og 
-minimerer sandsynligheden for at begå fejl i konstruktionen af simulationen.  
-Til dette formål er programmeringssproget Python oplagt da det netop fokuserer 
-på let tilgængelighed og høj produktivitet for udvikleren. 
-
-Det er oplagt at benytte CSP\cite{hoare-csp} til at repræsentere en simulering.  
-I CSP er interaktionen mellem forskellige processer/systemer eksplicit, og på 
-grund af modulariteten er det nemt at konstruere komplekse systemer ud fra 
-mindre enkle systemer. 
 
