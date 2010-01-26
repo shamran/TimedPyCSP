@@ -26,9 +26,14 @@ udgøre systemet som helhed.
 Opdelingen af et program i processer skaber nye problemstillinger, som ikke er 
 til stede i sekventielle programmer. Specifikt introduceres der et behov for 
 synkronisering af processerne idet de ofte vil have en indbyrdes afhængighed af 
-større eller mindre grad. Denne synkronisering kan baseres på 
+større eller mindre grad. Denne synkronisering kan ske implicit eller eksplicit 
+i programmet, afhængig af strukturen i det givne program. Ved eksplicit 
+synkronisering forstås at der er i programmet findes elementer hvis primære 
+formål er at håndtere synkronisering. Ved implicit synkronisering sker 
+synkroniseringen ud fra programmets normale kommunikation mellem processerne, 
+og ingen ekstra elementer til håndtering af synkronisering er nødvendige.  
 
-
+\subsection{usammenhængende råtekst}
 Der er, så vidt vi ved, ikke nogen tilgængelige implementationer af CSP der 
 tager 
 
