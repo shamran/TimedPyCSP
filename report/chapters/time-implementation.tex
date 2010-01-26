@@ -1,6 +1,3 @@
-test
-test
-test
 \subsection{Repræsentation af tid}
 Vi vil i dette afsnit gå i dybden med listen \code{timers} der findes i Scheduleren, samt se hvordan den kan inkorporeres i vores design.
 
@@ -18,11 +15,15 @@ i en given tidsperiode.
 
 I \cref{Timeout} ses et minimalt eksempel hvor processen kun er villig til at læse fra kanalenden \code{Cin} i $0.5$ sekunder. Hvis ikke der er modtaget en besked indenfor 0.5 sekundt, accepteres timeoutguarden og processen er ikke længere villig til at læse fra \code{Cin}, og fortsætter sin kørsel.
 
+
+Tid er dermed blevet introduceret i \pycsp, og vi har nu mulighed for at kalde timeout på en proces, der så vil vente i en given tidsperiode.
+
+
 Med et simuleringsmiljø er det ikke nok udelukkende kan kunne specifiere en 
 timeout på kanalen, det er også nødvændigt at man kan specificere at en proces 
 er villig til at kommunikere på et specifikt tidspunkt, samt at den kanalen 
 kun er villig til at kommunikere på nuværende tidpunkt, men ikke ud 
-i fremtiden. 
+i fremtiden.  
 
 At ville kommunikere fra et given tidspunkt i fremtiden,  svare til at vente 
 uden at lave noget indtil det givne tidspunkt for så at forsøge at kommunikere 
@@ -55,7 +56,7 @@ derefter at sende data. Her vil alle processerne uden timeouts vente på
 hinanden i en deadlock, men med en timeout vil de alle fortsætte samtidigt og 
 indgå i en ny deadlock, PyCSP vil derfor med timeouts gå fra en deadlock til 
 en livelock. En livelock er defineret som hvor tilstandenen i ændres men der
-foregår ikke reelt arbejde\fxnote{skal vi introducere begrebet deadlock, 
+foregår ikke reelt arbejde\inline{skal vi introducere begrebet deadlock, 
 livelock mv.}. 
 
 Ved at aktivere en proces ad gangen har denne proces mulighed for i samme 
@@ -87,7 +88,7 @@ der ikke er data, mtimeout processen fortsætte  tildet under antagelsen af
 problemer.
 
 når tiden er  tidspunkt
-til for et findes der allerede \fxnote[inline]{vi skal kunne angive
+til for et findes der allerede \inline{vi skal kunne angive
 at vi ønsker at kommunikere men KUN i det tidsskridt vi er i, og at
 hvis dette ikke kan lade sig gøre skal vi breake noget alla at have en
 timeout på 0} 

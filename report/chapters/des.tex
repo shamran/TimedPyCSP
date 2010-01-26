@@ -371,10 +371,10 @@ I \cref{fig:init} kan man se at funktionerne \code{choice, ChannelPoisonExceptio
  \item \code{new}: Initeres på linje 140, og består af processer som lige er blevet scheduleres for første gang.
  \item \code{next}: Initeres på linje 141, og indeholder de processer der er klar til at blive kørt, og som har været kørt før.  
  \item \code{timers}: Initeres på linje 147, og indeholder de processer der har tilknyttet en timeout. De skal først scheduleres på et senere tidspunkt og venter dermed blot. Hvert element i listen består både af processen samt et tidsstempel for hvornår processen skal genaktiveres. Denne liste bliver gensorteret hver gang der indsættes en ny proces.
- \item \code{blocking}: Processer der venter på IO operationer, er ikke klar til at blive scheduleret, men heller ikke afsluttet. Scheduleren kan derfor ikke schedulere dem, men holdes styr på antallet af ventende processer vha. denne variabel. 
+ \item \code{blocking}: Initieres på linje 150, og er en variabel.Processer der venter på IO operationer, er ikke klar til at blive scheduleret, men heller ikke afsluttet. Scheduleren kan derfor ikke schedulere dem, men holdes styr på antallet af ventende processer vha. denne variabel, for at kunne afgører om Scheduleren skal afslutte eller afvente.
 \end{list}
 
-Scheduleren itererere nu gentagende gange igennem alle tre lister, indtil de alle er tomme, og der ikke er nogle processer der er blokeret, og venter på en IO operation. 
+Scheduleren itererere nu gentagende gange igennem alle tre lister, indtil de alle er tomme, og der ikke er nogle processer der er blokeret. 
 
 \input{chapters/time-implementation} 
     \subsection{Hvordan skal events gemmes}
