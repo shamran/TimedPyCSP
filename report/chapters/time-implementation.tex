@@ -16,8 +16,17 @@ i en given tidsperiode.
 I \cref{Timeout} ses et minimalt eksempel hvor processen kun er villig til at læse fra kanalenden \code{Cin} i $0.5$ sekunder. Hvis ikke der er modtaget en besked indenfor 0.5 sekundt, accepteres timeoutguarden og processen er ikke længere villig til at læse fra \code{Cin}, og fortsætter sin kørsel.
 
 
-Tid er dermed blevet introduceret i \pycsp, og vi har nu mulighed for at kalde timeout på en proces, der så vil vente i en given tidsperiode.
+Tid er dermed blevet introduceret i \pycsp, men kun for at at have mulighed for at tilknytte timeout til en \code{alternation}. Vi ønsker at videreudvikle denne struktur til at håndtere tidsdelen for alle processer, samt for at fungere med diskret tid, modsat den eksisterende løsning hvor tiden er kontinuerligt. Man må forvente at brugen af listen \code{timers}, vil øges betragteligt og at den gennemsnitlige længde af listen vil stige, når alle processerne skal bruge vente på hinanden.
 
+\paragraph*{Timers:} For at forbedre ydelsen af \code{timers} listen, ændrer vi den fra en almindelig liste, til en min"-hob. En hob har flere fordele og er oplagt til brug i schedulering. I en min"-hob vil det mindste element, altid være i roden, og kan hurtigt poppes, så det næstmindste elemet nu står i roden. Efter en indsættelse af et element vil hob"-egenskaben stadigt være overholdt. En hob findes allerede i Python, og effektivt implementeret i C. Den eneste handling der ikke er effektiv med en hob er fjernelsen af et arbitrært element fra hoben. Dette sker i den eksisterende løsning når en proces aktivere et andet valg i \code{alternation} end timeout. Så skal processen ikke vente på sin timeout, men elementet skal fjernes fra \code{timers} listen.  For at fjerne et element i en hob, må man som i en normal liste lave en lineær søgning i hoben, og derefter genoprette hob"-egenskaben i listen. Dette vil dog ikke tage længere tid end det allerede tager da en fjernelse af en timeout allerede på nuværende tidspunkt bruger en lineær søgning, til at finde elementet der skal fjernes. 
+
+
+\paragraph*{Funktion Now:}
+I Python kan man benytte modulet \code{time}, hvis man ønsker at introducer begrebet tid. Med dette modul kan man få af vide hvad klokken er. fra en brugers synsvinkel repræcenteres tiden som kontinuerlig, og hver gang en bruger spørge om klokken, fås et bestemt tidspunkt. Med computere findes tid som kontinuerligt begreb ikke, men derimod er tiden internt repræsenteret som diskrete tidsskridt. Størrelsen af disse tidsskridt varriere af bla. hvilken computer programmet køres på og operativsystem. Når vi ønsker at introducere \des skal det ikke ses som diskret modsat kontinuerligt, men at de enkelte tidsskridt i \des er af variable størrelse modsat i modulet \code {time} der har en konstant størrelse. 
+
+I \code{time} modulet findes der en sammenhæng mellem de diskrete tidsskridt og den kontinuerlige tid, og man kan fra time modulet se et tidsrum mellem 
+
+\paragraph*{Funktion Wait:}
 
 Med et simuleringsmiljø er det ikke nok udelukkende kan kunne specifiere en 
 timeout på kanalen, det er også nødvændigt at man kan specificere at en proces 

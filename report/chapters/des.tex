@@ -27,7 +27,7 @@ mindre enkle systemer.
 \inline{Beskrivelse af tidsmodellen, teorien omkring den og hvor/hvad den 
     benyttes til. Teori: henvisning til litteratur, bl.a.  matematik/beviser 
     for modellen}
-
+\inline{Noget med hvilke funktion der er krævet. (Kun en Wait og en Now)}
 \subsection{Barrierer} \label{sec:barrierer}
 I \des findes der i modsætningen til Parallel \des \fixme{referencer} en global 
 tid og alle processerne skal derfor have en fælles tid der tæller op samtidigt.  
@@ -90,7 +90,7 @@ Barrierer er en meget effektiv metode til at synkronisere processer der kører p
 \end{otherlanguage}
 }
 
-Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun  lokalt data. Hvis der er data er delt pga. arkitekturen \csp er implementeret på, bør dette abstraheres væk men udnyttes internt i kanalerne. At introducere hjælpemidler for styre delt data, er derfor at tilskynde til en forkert brug af \csp. Tiden er den anden begrundelse for at benytte barrierer.\fxnote*[nomargin, inline]{Skal hives et niveau op tekstmæssigt}{Men med brugen af barrierer til at modellerer tid, kan man får  en primitiv model for tid, og vi vil i vores speciale vise ved at inkluderer tid i stedet får man et stærkere værktøj der ud over en masse andet også kan erstatte brugen af barrierer.}
+Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun  lokalt data. Hvis der er data er delt pga. arkitekturen \csp er implementeret på, bør dette abstraheres væk men udnyttes internt i kanalerne. At introducere hjælpemidler for styre delt data, er derfor at tilskynde til en forkert brug af \csp. Tiden er den anden begrundelse for at benytte barrierer.\fxnote*{Skal hives et niveau op tekstmæssigt}{Men med brugen af barrierer til at modellerer tid, kan man får  en primitiv model for tid, og vi vil i vores speciale vise ved at inkluderer tid i stedet får man et stærkere værktøj der ud over en masse andet også kan erstatte brugen af barrierer.}
 
 \section{Eksempel}
 \inline{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}
