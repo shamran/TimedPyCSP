@@ -387,7 +387,30 @@ I \cref{fig:init} kan man se at funktionerne \code{choice, ChannelPoisonExceptio
 
 \paragraph*{Scheduler:} Med valget af greenletversionen som grundversionen, og med henblik på at hovedparten af vores ændringer vil være i scheduleren, vil vi kort gennemgå denne.
 
-\lstinputlisting[firstline=132, lastline=152,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler]{/home/shamran/pycsp/branches/TimedPyCSP/pycsp/greenlets/scheduling.py}\inline{Koden skal evt flyttes ind i texfilen for at sikre ensartethed }
+\begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler]
+    def getInstance(cls, *args, **kargs):
+        '''Static method to have a reference to **THE UNIQUE** instance'''
+        if cls.__instance is None:
+            # (Some exception may be thrown...)
+            # Initialize **the unique** instance
+            cls.__instance = object.__new__(cls)
+
+            # Initialize members for scheduler
+            cls.__instance.new = []
+            cls.__instance.next = []
+            cls.__instance.current = None
+            cls.__instance.greenlet = greenlet.getcurrent()
+
+            # Timer specific  value = (activation time, process)
+            # On update we do a sort based on the activation time
+            cls.__instance.timers = []
+
+            # Io specific
+            cls.__instance.cond = threading.Condition()
+            cls.__instance.blocking = 0
+\end{lstlisting}
+
+\inline{Koden skal evt flyttes ind i texfilen for at sikre ensartethed }
 
  I \cref{fig:scheduling} ses et uddrag af initialiseringskoden. Dels findes der tre lister af processer som scheduleren har mulighed for at vælge imellem når der skiftes proces.  
  \begin{list}
