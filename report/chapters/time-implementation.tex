@@ -1,11 +1,15 @@
-\subsection{Repræsentation af tid}
-Vi vil i dette afsnit gå i dybden med listen \code{timers} der findes i Scheduleren, samt se hvordan den kan inkorporeres i vores design.
 
+For at markere at vi vi ikke kun skal foretage en planlægning af processerne, men foretage en simulering, har vi lavet en \code{Simulation} klasse der arver fra \code{Scheduler}. Alle ændringer vi skal foretage for at gå fra en almindelig \sched ~til en simulerings \sched, vil således indkapsles i denne klasse, mens alt hvad de to kalsser har til fælles vil være isoleret i greenlets versionen af \sched klassen. Dette har yderligere den fordel at man tydeligt kan se at alle klasserne i simulation versionen arver en simulerings \sched ~og ikke en \sched ~fra greenletsversionen. 
+
+%\fxnote{dårlig overskrift}{\subsection{Repræsentation af tid}}
+%Vi vil i dette afsnit gå i dybden med listen \code{timers} der findes i klassen \code{Scheduler}, samt se hvordan den kan inkorporeres i vores design.
+
+\paragraph*{Tid i greenletsversionen:}
 I \pycsp foregår kommunikation kun når begge kanalender er klar dvs.
 når der både findes en kanalende der vil skrive og en kanalende der vil læse. 
 Hvis kun en af kanalenderne er klar, vil den vente indtil
 der findes minimum en kanalende af hver type, der er klar. Dette medfører risikoen for at processen aldrig kommer videre, men går i deadlock. I \pycsp har man derfor i \code{alternation} mulighed for at tilknytte en timeout til en \code{guard}. Dette
-giver mulighed for at en process, kun er villig til at vente på kommunikation 
+giver mulighed for at en proces, kun er villig til at vente på kommunikation 
 i en given tidsperiode. 
 \begin{lstlisting}[float=hbtp, label=Timeout,
   caption=Timeout i Alternation (fra dokumentationen til PyCSP)]
@@ -15,21 +19,57 @@ i en given tidsperiode.
 
 I \cref{Timeout} ses et minimalt eksempel hvor processen kun er villig til at læse fra kanalenden \code{Cin} i $0.5$ sekunder. Hvis ikke der er modtaget en besked indenfor 0.5 sekundt, accepteres timeoutguarden og processen er ikke længere villig til at læse fra \code{Cin}, og fortsætter sin kørsel.
 
-
 Tid er dermed blevet introduceret i \pycsp, men kun for at at have mulighed for at tilknytte timeout til en \code{alternation}. Vi ønsker at videreudvikle denne struktur til at håndtere tidsdelen for alle processer, samt for at fungere med diskret tid, modsat den eksisterende løsning hvor tiden er kontinuerligt. Man må forvente at brugen af listen \code{timers}, vil øges betragteligt og at den gennemsnitlige længde af listen vil stige, når alle processerne skal bruge vente på hinanden.
 
-\paragraph*{Timers:} For at forbedre ydelsen af \code{timers} listen, ændrer vi den fra en almindelig liste, til en min"-hob. En hob har flere fordele og er oplagt til brug i schedulering. I en min"-hob vil det mindste element, altid være i roden, og kan hurtigt poppes, så det næstmindste elemet nu står i roden. Efter en indsættelse af et element vil hob"-egenskaben stadigt være overholdt. En hob findes allerede i Python, og effektivt implementeret i C. Den eneste handling der ikke er effektiv med en hob er fjernelsen af et arbitrært element fra hoben. Dette sker i den eksisterende løsning når en proces aktivere et andet valg i \code{alternation} end timeout. Så skal processen ikke vente på sin timeout, men elementet skal fjernes fra \code{timers} listen.  For at fjerne et element i en hob, må man som i en normal liste lave en lineær søgning i hoben, og derefter genoprette hob"-egenskaben i listen. Dette vil dog ikke tage længere tid end det allerede tager da en fjernelse af en timeout allerede på nuværende tidspunkt bruger en lineær søgning, til at finde elementet der skal fjernes. 
+\paragraph*{Timers:} For at forbedre ydelsen af \code{timers} listen, ændrer vi den fra en almindelig liste, til en min"-hob. En hob har flere fordele og er oplagt til brug i \sched. I en min"-hob vil det mindste element, altid være i roden, og kan hurtigt poppes, så det næstmindste elemet nu står i roden. Efter en indsættelse af et element vil hob"-egenskaben stadigt være overholdt. En hob findes allerede i Python, og effektivt implementeret i C. Den eneste handling der ikke er effektiv med en hob er fjernelsen af et arbitrært element fra hoben. Dette sker i den eksisterende løsning når en proces aktivere et andet valg i \code{alternation} end timeout. Så skal processen ikke vente på sin timeout, men elementet skal fjernes fra \code{timers} listen.  For at fjerne et element i en hob, må man som i en normal liste lave en lineær søgning i hoben, og derefter genoprette hob"-egenskaben i listen. Dette vil dog ikke tage længere tid end det allerede tager da en fjernelse af en timeout allerede på nuværende tidspunkt bruger en lineær søgning, til at finde elementet der skal fjernes. 
 
 
-\paragraph*{Funktion Now:}
-I Python kan man benytte modulet \code{time}, hvis man ønsker at introducer begrebet tid. Med dette modul kan man få af vide hvad klokken er. fra en brugers synsvinkel repræcenteres tiden som kontinuerlig, og hver gang en bruger spørge om klokken, fås et bestemt tidspunkt. Med computere findes tid som kontinuerligt begreb ikke, men derimod er tiden internt repræsenteret som diskrete tidsskridt. Størrelsen af disse tidsskridt varriere af bla. hvilken computer programmet køres på og operativsystem. Når vi ønsker at introducere \des skal det ikke ses som diskret modsat kontinuerligt, men at de enkelte tidsskridt i \des er af variable størrelse modsat i modulet \code {time} der har en konstant størrelse.  Da man i \code{time} modulet har en fast tidsskridt og tid i det kontinuerlig tifælde også er inddelt i faste størrelse som eks. sekunder, kan man med time modulet måle tidsintevaller der korrospondere med den kontinuerlige tid. I \des findes der ikke en sammenhæng mellem den kontinuerlige tid og dens egen repræsentation af tid. for \des er tid derimod blot et tal der starter som 0, og stiger i abitrærer tidskridt. Vi har valgt at repræsentere dette tal som et float. 
+\paragraph*{Funktionerne Now og Wait:}
+I Python kan man benytte modulet \code{time}, hvis man ønsker at introducer begrebet tid. Med dette modul kan man få af vide hvad klokken er. fra en brugers synsvinkel repræsenteres tiden som kontinuerlig, og hver gang en bruger spørge om klokken, fås et bestemt tidspunkt. Med computere findes tid som kontinuerligt begreb ikke, men derimod er tiden internt repræsenteret som diskrete tidsskridt. Størrelsen af disse tidsskridt varriere af bla. hvilken computer programmet køres på og operativsystem. Når vi ønsker at introducere \des skal det ikke ses som diskret modsat kontinuerligt, men at de enkelte tidsskridt i \des er af variable størrelse modsat i modulet \code {time} der har en konstant størrelse.  Da man i \code{time} modulet har en fast tidsskridt og tid i det kontinuerlig tifælde også er inddelt i faste størrelse som eks. sekunder, kan man med time modulet måle tidsintevaller der korrespondere med den kontinuerlige tid. I \des findes der ikke en sammenhæng mellem den kontinuerlige tid og dens egen repræsentation af tid. For \des er tid derimod blot et tal der starter som 0, og stiger i abitrærer tidskridt. Når tiden i \des på denne måde er afkoplet en relation almindelig tid, kan man heller ikke snakke om at et tidsrum har sekunder eller timer. I \pycsp kan man i timeout planlægge en begivenhed til at ske om f.eks. 5. sekunder. I \des findes sekunder som begreb ikke, men man kan angiver at når tiden er talt op med 5 skal begivenheden ske. \inline{Skal dette splittes oop og halvdelen skal i teori?} 
 
-\paragraph*{Funktion Wait:}
+Når et problem modeleres i \des, vil der altid være behov for at tilføje en sammenhæng mellem tid i problemet og et tid i modellen. Da der der ikke findes en fast sammenhæng, skal modellen derfor eksplicit definere om 5 sekunder skal repræsenteres som, at tiden internt i \pycsp tælles op med  5, 0.5 eller 0.05.
 
+Vi har valgt at repræsentere tiden som en intern variabel i \sched. Dette kan vi gøre da \sched ~er en singelton og der findes derfor kun en variabel med tid. For processer der ønsker at kende tiden har vi introduceret funktionen \code{Now()} der returnere hvad tiden er på et given tidspunkt. 
+
+
+\inline{På det teoretiske plan snakker vi om at planlægge begivenheder, mens vi i implantationen snakker om Wait og at ''stall'' en process }
+
+
+I programmeringssproget \simpy lader man en proces vente ved at foretage kaldet \code{yield}. Dette yield sørger for at processen ikke fortsætter før et foruddefineret tidsrum er gået. 
+
+\begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left, float=hbtp, label=yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)]
+ def visit(self,timeInBank):       
+        print now(), self.name," Here I am"             
+        yield hold,self,timeInBank
+        print now(), self.name," I must leave"  
+\end{lstlisting}  
+
+I \cref{yield} ses hvordan en kundeproces ankommer til banken, printer tiden, foretager et yield, og når processen fortsætter fra dette kald er tiden steget med værdien \code{timeInBank}. Til slut printer processen igen tiden.  Brugen af yield er knyttet til implementeringen af \simpy og skyldes at \simpy implementere hver process som en \code{corutine}. 
+Vi skal i \pycsp have en ligende mulighed for at lade en proces vente. Da dette allerede er implementeret via timeout i greenlets versionen af \pycsp, kan vi uden at ændre i den eksisterende \sched tilføje en ny funktion \code{Wait} der fungere som timeout, men kan kaldes af processerne på et vilkårligt tidspunkt.
+\fxerror{Dette skal måske ændres da jeg ikke har talt med run om nødvændigheden af while now}
+\begin{lstlisting}[firstnumber=20,float=hbtp, label=wait, caption=Wait i simuleringsversionen.]
+def Wait(seconds):
+    logging.debug("calling wait")
+    Simulation().timer_wait(Simulation().current, seconds)
+    t = Now()+seconds
+    while Now()<t:
+        p = Simulation().getNext() 
+        logging.debug("Wait swicthing from %s to %s"%(Simulation().current, p))
+        p.greenlet.switch()  
+\end{lstlisting}
+
+ giver en proces mulighed for at at en proces venter i et givent tidsrum. Dette kan bruges til at planlægge en begivenhed og er essentielt det eneste der skal til for at gøre det muligt at have en \des. I Programmeringssproget \simpy  
+
+
+Basalt set kan en process i \des to ting der relatere sig til simuleringen. Det kan vide hvad klokken er og så kan det planlægge en begivenhed til senere. Med funktion Now har vi givet mulighed for at vide hvad klokken er, og funktion kan  tingat at vente har 
+
+
+
+\paragraph*{Timeout}
 Med et simuleringsmiljø er det ikke nok udelukkende kan kunne specifiere en 
-timeout på kanalen, det er også nødvændigt at man kan specificere at en proces 
+timeout på kanalen ud i fremtiden, det er også nødvendigt at man kan specificere at en proces 
 er villig til at kommunikere på et specifikt tidspunkt, samt at den kanalen 
-kun er villig til at kommunikere på nuværende tidpunkt, men ikke ud 
+villig til at kommunikere på nuværende tidpunkt, men ikke ud 
 i fremtiden.  
 
 At ville kommunikere fra et given tidspunkt i fremtiden,  svare til at vente 
@@ -41,7 +81,7 @@ At ville være villig til at kommuikere til et given tidspunkt, medfører en ny
 problemstilling, da det kan introducere muligheden for deadlocks og 
 nondeterminisme, \fxnote{Er det korrekt?}, for det er ikke defineret hvad 
 tiden er hvis det ikke lykkedes at kommunikere i det givne tidsskridt. Der 
-findes to muligheder, enten skal scheduleren signalere at der ikke findes mere 
+findes to muligheder, enten skal \sched en signalere at der ikke findes mere 
 arbejde til dette tidsskridt, og lade processerne fortsætte i samme 
 tidsskridt. Alternativt skal tiden tælles op til næste event, hvorefter 
 processerne signaleres med at kommunkationen ikke lykkedes. 
