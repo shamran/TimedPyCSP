@@ -1,6 +1,6 @@
 \chapter{\Des}
 sammenligning af simulation vs. modellering
-  simulering er en implementaiton af modellen
+  simulering er en implementation af modellen
   styrke er samspillet mellem flere elementer/modeller
 
 
@@ -8,11 +8,17 @@ simulering - dynamisk - tid (time/space)
 
 Simuleringer har længe været et værdifuldt værktøj til at klarlægge hvordan et 
 system fungerer og er specielt brugbart til at repræsentere systemer hvis 
-tilstand ændres over tid, eller der er interaktion mellem flere systemer. En 
+tilstand ændres over tid, eller såfremt der er interaktion mellem flere systemer. En 
 matematisk model af disse systemer vil ofte være væsentligt mere kompleks og 
 kan være svær at overskue lige så let som en simulering af samme system. 
 
-Simuleringer foretages ofte af andre videskabsfolk end dataloger, og det er 
+Indenfor simulering er \des meget udbredt til at 
+
+
+
+
+
+Simuleringer foretages ofte af andre videnskabsfolk end dataloger, og det er 
 derfor vigtigt at de kan repræsenteres i et sprog som er let tilgængeligt og 
 minimerer sandsynligheden for at begå fejl i konstruktionen af simulationen.  
 Til dette formål er programmeringssproget Python oplagt da det netop fokuserer 
@@ -28,10 +34,20 @@ mindre enkle systemer.
     benyttes til. Teori: henvisning til litteratur, bl.a.  matematik/beviser 
     for modellen}
 \inline{Noget med hvilke funktion der er krævet. (Kun en Wait og en Now)}
+\des 
+
+
+
+
+forklaring af hvad DES er
+Beskriv modellen - tilstande, overgange, diskrete tidsskridt(events i sig selv tager ikke tid, tiden tikker mellem events)
+Hvad bruges DES til? styrker/svagheder?
+Henvis til DE-simulation.ps
+
 \subsection{Barrierer} \label{sec:barrierer}
 \fxnote*{RS: Jeg synes det er forkert at starte et afsnit med ``I modsætning 
 til\ldots'' når det ikke er en reference til noget ovenstående}{I \des findes 
-der i modsætningen til Parallel \des} \fixme{referencer} \fixme{referencer} en 
+der i modsætningen til Parallel \des} \fixme{referencer} en 
 global tid og alle processerne skal derfor have en fælles tid der tæller op 
 samtidigt.  En global viden som tid kræver synkronisering af alle 
 processerne\fxnote{ref}, og til denne koordinering og synkronisering af flere 
@@ -72,10 +88,8 @@ værdierne. Først når barrieren har modtaget en værdi fra alle processerne,
 begynder barrieren at sende sin værdi, og det er først når en proces modtager 
 denne værdi fra barrieren at den må fortsætte. Når en proces modtager værdien 
 fra barrieren fortsætter den og man kan risikere at den ønsker at gå ind i 
-barrieren inden denne har sendt sin værdi til alle processerfor at frigive dem. 
-\fxnote*[nomargin,inline]{RS - JEg synes stadig det knaser lidt, så jeg har prøvet at omskrive det: Processer der ønsker adgang til barrieren vil da gå i stå, idet de prøver at sende til barrieren før den er klar til at modtage på den givne kanal. Først når barrieren har signaleret til alle processer at de må fortsætte, læser den på kanalen for at accepterer processer der ønsker at tilgå barrieren. Det er denne egenskab fra \csp der giver os garanti for at en proces der netop er frigivet fra barrieren ikke går ind i den igen og derved risikerer at komme foran. 
-}{Den første proces vil da gå i stå mens den venter på at sende sin værdi til barrieren, hvilket skyldes at i \csp skal begge processer  være klar til at kommunikere før kommunikationen foregår, og det er denne egenskab ved kanaltransmission der forhindrer processen i at komme foran. Først når barrieren har sendt sin værdi til alle 
-processer kan den modtage værdien fra processer, og denne kan fortsætte. \fxnote{S: bedre?}}
+barrieren inden denne har sendt sin værdi til alle processerfor at frigive dem.
+Processer der ønsker adgang til barrieren vil da gå i stå, idet de prøver at sende til barrieren før den er klar til at modtage på den givne kanal. Først når barrieren har signaleret til alle processer at de må fortsætte, læser den på kanalen for at accepterer processer der ønsker at tilgå barrieren. Det er denne egenskab fra \csp der giver os garanti for at en proces der netop er frigivet fra barrieren ikke går ind i den igen og derved risikerer at komme foran. 
 
 
 
@@ -367,7 +381,7 @@ skal bankprocessen håndtere fejlede forsendelser og må nødvendigvis introduce
 sekundær kø hvilket gør at introduktionen af en ''\code{buffered channel}'' er 
 irrelevant. For undgå dette har vi i vores tilfælde valgt blot at 
 angive en maksimal størrelse på bufferen som er større end det totale antal 
-kunder banken modtager.
+kunder banken modtager.\fxnote{husk at m/m/1 køer har uendelig længde, se $http://en.wikipedia.org/wiki/M/M/1_model$}
 
 \section{Design og implementering}
 \inline{Beskrivelse af design med udgangspunkt i eksemplet}
