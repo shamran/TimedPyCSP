@@ -23,9 +23,10 @@ risikoen for at processen aldrig kommer videre, men går i deadlock.
 I \pycsp har man derfor i \code{alternation} mulighed for at
 tilknytte en timeout til en \code{guard}. Dette giver mulighed for
 at en proces, kun er villig til at vente på kommunikation i en
-given tidsperiode. \begin{lstlisting}[float=hbtp, label=Timeout,
-caption=Timeout i Alternation (fra dokumentationen til PyCSP)]
-Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
+given tidsperiode. 
+\begin{lstlisting}[float=hbtp, label=Timeout,caption=Timeout i Alternation (fra dokumentationen til PyCSP)]
+Alternation([{Timeout(seconds=0.5):None}, 
+             {Cin:None}]).select()
 \end{lstlisting}
 
 I \cref{Timeout} ses et minimalt eksempel hvor processen kun er villig
@@ -109,11 +110,12 @@ I programmeringssproget \simpy lader man en proces vente ved at
 foretage kaldet \code{yield}. Dette yield sørger for at processen ikke
 fortsætter før et foruddefineret tidsrum er gået.
 
-\begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,
-float=hbtp, label=yield, caption= Et yield i \simpy (Taget fra
-Bank05.py i eksemplet fra \simpy)] def visit(self,timeInBank): print
-now(), self.name," Here I am" yield hold,self,timeInBank print now(),
-self.name," I must leave" \end{lstlisting}
+\begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)] 
+def visit(self,timeInBank): 
+  print now(), self.name," Here I am" 
+  yield hold,self,timeInBank print now(),
+  self.name," I must leave" 
+\end{lstlisting}
 
 I \cref{yield} ses hvordan en kundeproces ankommer til banken,
 printer tiden, foretager et yield, og når processen fortsætter
@@ -127,11 +129,15 @@ uden at ændre i den eksisterende \sched tilføje en ny funktion
 \code{Wait} der fungere som timeout, men kan kaldes af processerne
 på et vilkårligt tidspunkt. \fxerror{Dette skal måske ændres
 da jeg ikke har talt med run om nødvændigheden af while now}
-\begin{lstlisting}[firstnumber=20,float=hbtp, label=wait, caption=Wait i
-simuleringsversionen.] def Wait(seconds): logging.debug("calling wait")
-Simulation().timer_wait(Simulation().current, seconds) t = Now()+seconds
-while Now()<t: p = Simulation().getNext() logging.debug("Wait swicthing
-from %s to %s"%(Simulation().current, p)) p.greenlet.switch()
+
+\begin{lstlisting}[firstnumber=20,float=hbtp, label=wait, caption=Wait i simuleringsversionen.] 
+def Wait(seconds): 
+  logging.debug("calling wait")
+  Simulation().timer_wait(Simulation().current, seconds) 
+  t = Now()+seconds
+  while Now()<t: 
+    p = Simulation().getNext() 
+    logging.debug("Wait swicthing from %s to %s"%(Simulation().current, p)) p.greenlet.switch()
 \end{lstlisting}
 
  giver en proces mulighed for at at en proces venter i et givent
