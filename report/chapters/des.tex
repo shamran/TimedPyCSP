@@ -12,12 +12,6 @@ tilstand ændres over tid, eller såfremt der er interaktion mellem flere system
 matematisk model af disse systemer vil ofte være væsentligt mere kompleks og 
 kan være svær at overskue lige så let som en simulering af samme system. 
 
-Indenfor simulering er \des meget udbredt til at 
-
-
-
-
-
 Simuleringer foretages ofte af andre videnskabsfolk end dataloger, og det er 
 derfor vigtigt at de kan repræsenteres i et sprog som er let tilgængeligt og 
 minimerer sandsynligheden for at begå fejl i konstruktionen af simulationen.  
@@ -34,13 +28,33 @@ mindre enkle systemer.
     benyttes til. Teori: henvisning til litteratur, bl.a.  matematik/beviser 
     for modellen}
 \inline{Noget med hvilke funktion der er krævet. (Kun en Wait og en Now)}
-\des 
 
 
+Indenfor simulering er \des en meget brugt metode til at modellere systemer. I 
+\des anskues tid som diskrete tidsskridt som er uden kobling til realtid. I 
+disse tidsskridt udføres en eller flere begivenheder, som ved afslutning kan 
+føre det modellerede system over i en ny tilstand, og herved et nyt tidsskridt. 
+Det er irrelevant hvor lang tid det tager at udføre en begivenhed målt i 
+realtid, der sker først en overgang til en ny tilstand når alle begivenheder 
+for et givet diskret tidsskridt er udført. Dette er årsagen til at der ikke er 
+nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan 
+variere arbitrært i realtid. Begivenhederne der skal udføres af systemet kan 
+enten være givet på forhånd, eller blive skemaplanlagt dynamisk af andre 
+begivenheder. 
+
+
+begivenheder - liste - statisk, dynamisk skemalægning 
+stokastisk varians
+
+
+målepunkter - brugbare data - hvad kan vi få af information: kølængde, 
+gennemsnitlig/min/max behandlingstid, 
+fordele
 
 
 forklaring af hvad DES er
-Beskriv modellen - tilstande, overgange, diskrete tidsskridt(events i sig selv tager ikke tid, tiden tikker mellem events)
+Beskriv modellen - tilstande, overgange, diskrete tidsskridt(events i sig selv 
+tager ikke tid, tiden tikker mellem events)
 Hvad bruges DES til? styrker/svagheder?
 Henvis til DE-simulation.ps
 
