@@ -88,7 +88,9 @@ def Barrier(nprocesses, signalIN, signalOUT):
 			signalOUT(0)
 \end{lstlisting}
 
-Denne implementering af en barriere kræver, i modsætning til de fleste andre implementeringer af barrierer\cites{mpi-barrier, crew}, to kald. Det første sender en variabel til barriereprocessen, mens,
+Denne implementering af en barriere kræver, i modsætning til de fleste andre 
+implementeringer af barrierer\cites{mpi-barrier, crew}, to kald. Det første 
+sender en variabel til barriereprocessen, mens,
 det andet kald modtager en dummyværdi fra barriereprocessen. Det kræver derved 
 to kanaler at implementere barrieren. På den ene kanal er barrieren den eneste 
 der læser værdierne; en besked sendt på denne kanal vil derfor altid modtages 
@@ -103,7 +105,13 @@ begynder barrieren at sende sin værdi, og det er først når en proces modtager
 denne værdi fra barrieren at den må fortsætte. Når en proces modtager værdien 
 fra barrieren fortsætter den og man kan risikere at den ønsker at gå ind i 
 barrieren inden denne har sendt sin værdi til alle processerfor at frigive dem.
-Processer der ønsker adgang til barrieren vil da gå i stå, idet de prøver at sende til barrieren før den er klar til at modtage på den givne kanal. Først når barrieren har signaleret til alle processer at de må fortsætte, læser den på kanalen for at accepterer processer der ønsker at tilgå barrieren. Det er denne egenskab fra \csp der giver os garanti for at en proces der netop er frigivet fra barrieren ikke går ind i den igen og derved risikerer at komme foran. 
+Processer der ønsker adgang til barrieren vil da gå i stå, idet de prøver at 
+sende til barrieren før den er klar til at modtage på den givne kanal. Først 
+når barrieren har signaleret til alle processer at de må fortsætte, læser den 
+på kanalen for at accepterer processer der ønsker at tilgå barrieren. Det er 
+denne egenskab fra \csp der giver os garanti for at en proces der netop er 
+frigivet fra barrieren ikke går ind i den igen og derved risikerer at komme 
+foran. 
 
 
 
@@ -118,7 +126,12 @@ skal synkroniseres. \inline{skal vi fortælle hvordan der kan gøres i \pycsp}
 \fxnote{RS: Reference frem i teksten til eksempler der endnu ikke er introduceret}
 
 
-Barrierer er en meget effektiv metode til at synkronisere processer der kører parallelt, og er brugt flittigt i MPI. I \csp er der dog en konflikt i brugen af barrierer da hver proces fungerer i isolation, og den eneste interaktion der skal være mellem processerne er når der kommunikeres via kanalerne. Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp. \citeauthor{crew} beskriver brugen af barrierer som:
+Barrierer er en meget effektiv metode til at synkronisere processer der kører 
+parallelt, og er brugt flittigt i MPI. I \csp er der dog en konflikt i brugen 
+af barrierer da hver proces fungerer i isolation, og den eneste interaktion der 
+skal være mellem processerne er når der kommunikeres via kanalerne. 
+Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp. 
+\citeauthor{crew} beskriver brugen af barrierer som:
 
 \mycite[1]{crew}{
 \begin{otherlanguage}{english}
