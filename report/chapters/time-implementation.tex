@@ -1,3 +1,39 @@
+\subsection{Scheduler}
+Med valget af greenletversionen som grundversionen, og med henblik på at hovedparten af vores ændringer vil være i scheduleren, vil vi kort gennemgå denne.
+
+\begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i greenletsversionen.]
+    def getInstance(cls, *args, **kargs):
+        '''Static method to have a reference to **THE UNIQUE** instance'''
+        if cls.__instance is None:
+            # (Some exception may be thrown...)
+            # Initialize **the unique** instance
+            cls.__instance = object.__new__(cls)
+
+            # Initialize members for scheduler
+            cls.__instance.new = []
+            cls.__instance.next = []
+            cls.__instance.current = None
+            cls.__instance.greenlet = greenlet.getcurrent()
+
+            # Timer specific  value = (activation time, process)
+            # On update we do a sort based on the activation time
+            cls.__instance.timers = []
+
+            # Io specific
+            cls.__instance.cond = threading.Condition()
+            cls.__instance.blocking = 0
+\end{lstlisting}
+
+ I \cref{fig:scheduling} ses et uddrag af initialiseringskoden. Dels findes der tre lister af processer som scheduleren har mulighed for at vælge imellem når der skiftes proces.  
+ \begin{list}
+ \tightlist 
+ \item \code{new}: Initeres på linje 140, og består af processer som lige er blevet scheduleres for første gang.
+ \item \code{next}: Initeres på linje 141, og indeholder de processer der er klar til at blive kørt, og som har været kørt før.  
+ \item \code{timers}: Initeres på linje 147, og indeholder de processer der har tilknyttet en timeout. De skal først scheduleres på et senere tidspunkt og venter dermed blot. Hvert element i listen består både af processen samt et tidsstempel for hvornår processen skal genaktiveres. Denne liste bliver gensorteret hver gang der indsættes en ny proces.
+ \item \code{blocking}: Initieres på linje 150, og er en variabel.Processer der venter på IO operationer, er ikke klar til at blive scheduleret, men heller ikke afsluttet. Scheduleren kan derfor ikke schedulere dem, men holdes styr på antallet af ventende processer vha. denne variabel, for at kunne afgører om Scheduleren skal afslutte eller afvente.
+\end{list}
+
+Scheduleren itererere nu gentagende gange igennem alle tre lister, indtil de alle er tomme, og der ikke er nogle processer der er blokeret. 
 
 For at markere at vi vi ikke kun skal foretage en planlægning
 af processerne, men foretage en simulering, har vi lavet en
@@ -14,7 +50,7 @@ ikke en \sched ~fra greenletsversionen.
 %klassen \code{Scheduler}, samt se hvordan den kan inkorporeres i vores
 %design.
 
-\paragraph*{Tid i greenletsversionen:} I \pycsp foregår kommunikation
+\subsection{Tid i greenletsversionen} I \pycsp foregår kommunikation
 kun når begge kanalender er klar dvs. når der både findes en
 kanalende der vil skrive og en kanalende der vil læse. Hvis
 kun en af kanalenderne er klar, vil den vente indtil der findes
@@ -44,7 +80,7 @@ listen \code{timers}, vil øges betragteligt og at den gennemsnitlige
 længde af listen vil stige, når alle processerne skal bruge vente på
 hinanden.
 
-\paragraph*{Timers:} For at forbedre ydelsen af \code{timers} listen,
+\subsection{Timers} For at forbedre ydelsen af \code{timers} listen,
 ændrer vi den fra en almindelig liste, til en min"-hob. En hob har
 flere fordele og er oplagt til brug i \sched. I en min"-hob vil det
 mindste element, altid være i roden, og kan hurtigt poppes, så det
@@ -60,10 +96,34 @@ en normal liste lave en lineær søgning i hoben, og derefter genoprette
 hob"-egenskaben i listen. Dette vil dog ikke tage længere tid end det
 allerede tager da en fjernelse af en timeout allerede på nuværende
 tidspunkt bruger en lineær søgning, til at finde elementet der skal
-fjernes.
+fjernes. For at se en forskellen mellem greenletversion der bruger en liste og simulationsversionen der bruger en hob kan man sammenligne \cref{sched_timer} linje 205 med \cref{sim_timer} linje 126.
 
 
-\paragraph*{Funktionerne Now og Wait:} I Python kan man benytte modulet
+\subsection{Diskret tid} For at konverterer greenletversionen der knytter sig til reel tid, skal vi ændre de steder som bruger tid. Som vi har beskrevet tidligere er det eneste sted tid er introduceret i forbindelse med timeout og dermed i listen \code{timers}. Vi kan dermed nøjes med at ændre de steder i \sched en som indvolvere \code{timers}. Det første sted hvor timers indgår er i udvælgelsen af hvilken proces skal vælges(\cref{sched_timer}). Her sammenlignes på linje 204  første tidsværdi i timers, med det nuværende tidspunkt i time klassen. Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra timers listen.
+
+Da tiden er diskret, og kræver et aktivt valg før den skifter kan vi tilføje en yderligere begændsning i forhold til greenletsversionen. For simuleringsversionen skal tiden være præcist det der er angivet i \code{timers}, før processen skal aktiveres, og ikke kun størrer end som angivet i greenletsversionen.  Simuleringsversionen af den del der foretager udvælgelser en proces fra  \code{timers} kan ses i \cref{sim_timer}. 
+
+\begin{figure}[hbtp]
+\begin{minipage}[c]{\linewidth}
+\begin{lstlisting}[firstnumber=204, label=sched_timer, caption=Udvælgelse af proces fra listen timers (fra scheduling.py)]
+if self.timers and self.timers[0][0] < time.time():
+  _,self.current = self.timers.pop(0)
+  self.current.greenlet.switch()
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[c]{\linewidth}
+\begin{lstlisting}[firstnumber=124, label=sim_timer, caption=Udvælgelse af proces fra listen timers (fra simulation.py)]
+if self.timers and self.timers[0][0] <= Now():
+  assert self.timers[0][0] == Now()
+  _,self.current = heapq.heappop(self.timers)
+  self.current.greenlet.switch()
+\end{lstlisting}
+\end{minipage}
+\end{figure}
+
+
+
+\subsection{Funktionerne Now og Wait} I Python kan man benytte modulet
 \code{time}, hvis man ønsker at introducer begrebet tid. Med dette
 modul kan man få af vide hvad klokken er. fra en brugers synsvinkel
 repræsenteres tiden som kontinuerlig, og hver gang en bruger spørge
@@ -128,7 +188,7 @@ implementeret via timeout i greenlets versionen af \pycsp, kan vi
 uden at ændre i den eksisterende \sched tilføje en ny funktion
 \code{Wait} der fungere som timeout, men kan kaldes af processerne
 på et vilkårligt tidspunkt. \fxerror{Dette skal måske ændres
-da jeg ikke har talt med run om nødvændigheden af while now}
+da jeg ikke har talt med run om nødvændigheden af while now. Og jeg har derfor ikke beskrevet i teksten hvordan funktionen virker.}
 
 \begin{lstlisting}[firstnumber=20,float=hbtp, label=wait, caption=Wait i simuleringsversionen.] 
 def Wait(seconds): 
@@ -140,20 +200,9 @@ def Wait(seconds):
     logging.debug("Wait swicthing from %s to %s"%(Simulation().current, p)) p.greenlet.switch()
 \end{lstlisting}
 
- giver en proces mulighed for at at en proces venter i et givent
-tidsrum. Dette kan bruges til at planlægge en begivenhed og er
-essentielt det eneste der skal til for at gøre det muligt at have en
-\des. I Programmeringssproget \simpy
+Funktionen \code{Wait} er essentielt det eneste værktøj der skal til for at planlægge en begivenheder ud i fremtiden, og vi har på nuværenede tidspunkt en  simpel begivenhedssimulator der kører i reel tid.
 
-
-Basalt set kan en process i \des to ting der relatere sig til
-simuleringen. Det kan vide hvad klokken er og så kan det planlægge en
-begivenhed til senere. Med funktion Now har vi givet mulighed for at
-vide hvad klokken er, og funktion kan tingat at vente har
-
-
-
-\paragraph*{Timeout} Med et simuleringsmiljø er det ikke nok
+\subsection{Timeout} Med et simuleringsmiljø er det ikke nok
 udelukkende kan kunne specifiere en timeout på kanalen ud i fremtiden,
 det er også nødvendigt at man kan specificere at en proces er villig
 til at kommunikere på et specifikt tidspunkt, samt at den kanalen
