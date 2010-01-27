@@ -416,11 +416,11 @@ Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret 
     
 Der findes et åbenlyst problem med introduktionen a \des i \csp, som vi kort berørte i \cref{sec:barrierer}. Dette er at \csp er lavet med henblik på at processer arbejder samtidigt og uafhængigt af hinanden, hvor \des  ikke er parallelt, men schedulere sine begivenheder lineært efter hvornår de sker og så kronologisk \fxnote{Dette skal vidst i teori}løber begivenhederne igennem, til der enten ikke er flere begivenheder eller tiden når et vidst punkt. Alternativet til  \des  er \pdes hvor processerne kan have at tiden løbe uafhængigt af hinanden. Dette introducere muligheden for større parallelitet, men samtidigt risikerer processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. Det har der vidst sig at omkostningerne ved at lade tiden kører parallelt er omkostningerne større end ved at holde tiden synkront på tværs af processerne.
     
-\paragraph*{\pycsp versioner:}I \pycsp findes der tre versioner der implementerer \csp: \emph{Process, threads, greenlets}\cite{Friborg2009}. Muligheden for at introducere \des, i de forskellige versioner afhænger af hvordan processerne styres, og dermed hvordan \des kan  implementeres i de forskellige versioner. I proces og threads versionen af \pycsp styres processerne af operativsystemet uafhængig af hinanden \fxnote{ref?}. Dette medfører at \pycsp ikke fra et central område har mulighed for at diktere tiden og om nødvendigt få processer til at vente på hinanden. I greenlets køres processerne derimod på bruger-niveau. Dette betyder at kun en proces kan køre af gangen, og denne kan fortsætte sin kørsel indtil den frivilligt afgiver kontrollen. For at koordinere kørslen af processerne findes der i greenlets en central scheduler der har styr på hvilke processer der er klar til at blive eksekveret og hvilke der venter. Når en proces afgiver kontrollen tager scheduleren over og udvælger den næste proces der skal eksekveres. Denne koordinering i greenlets  egner sig utrolig godt til introduktionen af \des modsat process og threads modellen, hvor der skal ændres betydeligt i den underliggende kode for at kunne koordinere processerne imellem. 
+\subsection{\pycsp versioner}I \pycsp findes der tre versioner der implementerer \csp: \emph{Process, threads, greenlets}\cite{Friborg2009}. Muligheden for at introducere \des, i de forskellige versioner afhænger af hvordan processerne styres, og dermed hvordan \des kan  implementeres i de forskellige versioner. I proces og threads versionen af \pycsp styres processerne af operativsystemet uafhængig af hinanden \fxnote{ref?}. Dette medfører at \pycsp ikke fra et central område har mulighed for at diktere tiden og om nødvendigt få processer til at vente på hinanden. I greenlets køres processerne derimod på bruger-niveau. Dette betyder at kun en proces kan køre af gangen, og denne kan fortsætte sin kørsel indtil den frivilligt afgiver kontrollen. For at koordinere kørslen af processerne findes der i greenlets en central scheduler der har styr på hvilke processer der er klar til at blive eksekveret og hvilke der venter. Når en proces afgiver kontrollen tager scheduleren over og udvælger den næste proces der skal eksekveres. Denne koordinering i greenlets  egner sig utrolig godt til introduktionen af \des modsat process og threads modellen, hvor der skal ændres betydeligt i den underliggende kode for at kunne koordinere processerne imellem. 
 
 Med den store forskel på de underliggende implementeringer af \csp kan vi ikke gøre os håb om at introducere \des som en pakke, man kan vælge at bruge uafhængigt af hvilken \pycsp-version  der bruges. \Des vil derimod være en en ny version af \pycsp, der ligger sig op ad greenletversionen. 
 
-\paragraph*{Kodestruktur:}  Efter at have valgt at udvider greenletversionen skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at kunne bruge store dele af koden fra greenletversionen, og kun foretage udvidelser på enkle afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale greenletversion. Med denne isolation forventer vi at hvis/når der sker stilrettelser af greenletversionen af \pycsp vil man ikke skulle foretage de samme stilrettelser i \des-versionen. 
+\subsection{Kodestruktur}  Efter at have valgt at udvider greenletversionen skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at kunne bruge store dele af koden fra greenletversionen, og kun foretage udvidelser på enkle afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale greenletversion. Med denne isolation forventer vi at hvis/når der sker stilrettelser af greenletversionen af \pycsp vil man ikke skulle foretage de samme stilrettelser i \des-versionen. 
 Rent praktisk opnår vi isolationen mellem \des- og greenletversionen ved nedarvning. 
 
 Hvert af de tre moduler har sin egen mappe i pycsp og i hver af disse findes en tilhørende \code{\_\_init\_\_.py} fil, der fungere som et manifest for den givne version\fxnote*{slet?}{, og som dikterer hvilke filer indeholder hvilke funktioner}. Vi opretter vores eget modul kaldet simulation, og opretter en tilhørende mappe på samme niveau som de andre versioner og med sin egen manifestfil. Manifestfilen kan nu bruges til at udvælge de funktioner der skal tages direkte fra greenletversionen i og hvilke funktioner der skal udvides og som derfor vil ligge i den nye mappe.
@@ -434,44 +434,9 @@ from pycsp.greenlets.channel import ChannelPoisonException, ChannelRetireExcepti
 
 I \cref{fig:init} kan man se at funktionerne \code{choice, ChannelPoisonException} og \code{ChannelRetireException} alle bliver hentet fra greenletmodulet, mens at funktionerne \code{Timeout, Skip} og \code{Alternation} bliver importeret fra samme mappe, og derfor er en modificeret version. For slutbrugeren  vil dette dog være transparent, og hun vil blot se simulationversionen som en selvstændig version på lige fod med de andre tre versioner.
 
-\paragraph*{Scheduler:} Med valget af greenletversionen som grundversionen, og med henblik på at hovedparten af vores ændringer vil være i scheduleren, vil vi kort gennemgå denne.
-
-\begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i greenletsversionen.]
-    def getInstance(cls, *args, **kargs):
-        '''Static method to have a reference to **THE UNIQUE** instance'''
-        if cls.__instance is None:
-            # (Some exception may be thrown...)
-            # Initialize **the unique** instance
-            cls.__instance = object.__new__(cls)
-
-            # Initialize members for scheduler
-            cls.__instance.new = []
-            cls.__instance.next = []
-            cls.__instance.current = None
-            cls.__instance.greenlet = greenlet.getcurrent()
-
-            # Timer specific  value = (activation time, process)
-            # On update we do a sort based on the activation time
-            cls.__instance.timers = []
-
-            # Io specific
-            cls.__instance.cond = threading.Condition()
-            cls.__instance.blocking = 0
-\end{lstlisting}
-
- I \cref{fig:scheduling} ses et uddrag af initialiseringskoden. Dels findes der tre lister af processer som scheduleren har mulighed for at vælge imellem når der skiftes proces.  
- \begin{list}
- \tightlist 
- \item \code{new}: Initeres på linje 140, og består af processer som lige er blevet scheduleres for første gang.
- \item \code{next}: Initeres på linje 141, og indeholder de processer der er klar til at blive kørt, og som har været kørt før.  
- \item \code{timers}: Initeres på linje 147, og indeholder de processer der har tilknyttet en timeout. De skal først scheduleres på et senere tidspunkt og venter dermed blot. Hvert element i listen består både af processen samt et tidsstempel for hvornår processen skal genaktiveres. Denne liste bliver gensorteret hver gang der indsættes en ny proces.
- \item \code{blocking}: Initieres på linje 150, og er en variabel.Processer der venter på IO operationer, er ikke klar til at blive scheduleret, men heller ikke afsluttet. Scheduleren kan derfor ikke schedulere dem, men holdes styr på antallet af ventende processer vha. denne variabel, for at kunne afgører om Scheduleren skal afslutte eller afvente.
-\end{list}
-
-Scheduleren itererere nu gentagende gange igennem alle tre lister, indtil de alle er tomme, og der ikke er nogle processer der er blokeret. 
 
 \input{chapters/time-implementation} 
-    \subsection{Hvordan skal events gemmes}
+   \fxnote{Hvordan skal events gemmes}
     
   \section{Evaluering}
     \inline{Evaluering af hvordan eksemplet løses efter den valgte 
