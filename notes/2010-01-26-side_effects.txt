@@ -1,1 +1,2 @@
-Vi skal snakek om at vi nu introducerer sideeffekter. Både ved bookkeeping og wait. en sideeffekt til wait er at tiden er optalt i så mange tidsskridt når man returnerer.
+Vi skal snakek om at vi nu introducerer sideeffekter ved bookkeeping og wait. 
+  - en sideeffekt til wait er at tiden er optalt i så mange tidsskridt når man returnerer.
