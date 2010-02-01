@@ -33,17 +33,17 @@ Med valget af greenletversionen som grundversionen, og med henblik på at hovedp
  \item \code{blocking}: Initieres på linje 150, og er en variabel.Processer der venter på IO operationer, er ikke klar til at blive scheduleret, men heller ikke afsluttet. Scheduleren kan derfor ikke schedulere dem, men holdes styr på antallet af ventende processer vha. denne variabel, for at kunne afgører om Scheduleren skal afslutte eller afvente.
 \end{list}
 
-Scheduleren itererere nu gentagende gange igennem alle tre lister, indtil de alle er tomme, og der ikke er nogle processer der er blokeret. 
+Når \sched en er startet, itererer den igennem alle tre lister, indtil de alle er tomme, og der ikke er nogle processer der er blokeret. Dette betyder at der ikke længere kan komme processer der ønskes at blive lagt på \sched en, og den kan dermed afslutte.
 
-For at markere at vi vi ikke kun skal foretage en planlægning
+For at markere at vi ikke kun skal foretage en planlægning
 af processerne, men foretage en simulering, har vi lavet en
 \code{Simulation} klasse der arver fra \code{Scheduler}. Alle ændringer
 vi skal foretage for at gå fra en almindelig \sched ~til en simulerings
 \sched, vil således indkapsles i denne klasse, mens alt hvad de to
-kalsser har til fælles vil være isoleret i greenlets versionen af
-\sched klassen. Dette har yderligere den fordel at man tydeligt kan se
+klasser har til fælles vil være isoleret i greenlets versionen af
+\code{Scheduler} klassen. Dette har yderligere den fordel at man tydeligt kan se
 at alle klasserne i simulation versionen arver en simulerings \sched ~og
-ikke en \sched ~fra greenletsversionen.
+ikke \code{Scheduler} fra greenletsversionen.
 
 %\fxnote{dårlig overskrift}{\subsection{Repræsentation af tid}} Vi
 %vil i dette afsnit gå i dybden med listen \code{timers} der findes i
@@ -75,28 +75,31 @@ Tid er dermed blevet introduceret i \pycsp, men kun for at at have
 mulighed for at tilknytte timeout til en \code{alternation}. Vi ønsker
 at videreudvikle denne struktur til at håndtere tidsdelen for alle
 processer, samt for at fungere med diskret tid, modsat den eksisterende
-løsning hvor tiden er kontinuerligt. Man må forvente at brugen af
-listen \code{timers}, vil øges betragteligt og at den gennemsnitlige
-længde af listen vil stige, når alle processerne skal bruge vente på
-hinanden.
+løsning hvor tiden er kontinuerligt.
 
-\subsection{Timers} For at forbedre ydelsen af \code{timers} listen,
+\subsection{Timers}  
+Vi forventer at brugen af
+listen \code{timers}, vil øges betragteligt og at den gennemsnitlige
+længde af listen vil stige, når der udvikles simuleringsproblemer. Dermed 
+øges kravet om en effektiv implementation af \code{timers}\fxnote{skal 
+vi evaluere om dette rent faktisk forbedrer ydelsen}. 
+
+For at forbedre ydelsen af \code{timers} listen, 
 ændrer vi den fra en almindelig liste, til en min"-hob. En hob har
-flere fordele og er oplagt til brug i \sched. I en min"-hob vil det
-mindste element, altid være i roden, og kan hurtigt poppes, så det
-næstmindste elemet nu står i roden. Efter en indsættelse af et
-element vil hob"-egenskaben stadigt være overholdt. En hob findes
-allerede i Python, og effektivt implementeret i C. Den eneste handling
-der ikke er effektiv med en hob er fjernelsen af et arbitrært element
+flere fordele ved skemaplanlægning og er nævnt i introduktionen til Pythons implementation af en hob\fxnote{ref til http://docs.python.org/dev/3.0/library/heapq.html}. 
+
+Da en implementation af en hob
+allerede findes i Pythoni modulet \code{Heapq}, som er effektivt implementeret i C, vælger vi at bruge denne. Den eneste handling
+der ikke er som standard er implementeret, er fjernelsen af et arbitrært element
 fra hoben. Dette sker i den eksisterende løsning når en proces
-aktivere et andet valg i \code{alternation} end timeout. Så skal
+aktivere et andet valg i \code{alternation} end timeout. I dette tilfælde skal
 processen ikke vente på sin timeout, men elementet skal fjernes fra
 \code{timers} listen. For at fjerne et element i en hob, må man som i
 en normal liste lave en lineær søgning i hoben, og derefter genoprette
 hob"-egenskaben i listen. Dette vil dog ikke tage længere tid end det
-allerede tager da en fjernelse af en timeout allerede på nuværende
+allerede tager da en fjernelse af en timeout i greenletversionen på nuværende
 tidspunkt bruger en lineær søgning, til at finde elementet der skal
-fjernes. For at se en forskellen mellem greenletversion der bruger en liste og simulationsversionen der bruger en hob kan man sammenligne \cref{sched_timer} linje 205 med \cref{sim_timer} linje 126.
+fjernes, og genoprettelsen af hobegenskaben også tager lineær tid \inline{ref til construction of heaps can be done in linear time using Tarjas algorithm.\\$http://en.wikipedia.org/wiki/Tarjan\%27s\_algorithm$}For at se en forskellen mellem greenletversion der bruger en liste og simulationsversionen der bruger en hob kan man sammenligne \cref{sched_timer} linje 205 med \cref{sim_timer} linje 126.
 
 
 \subsection{Diskret tid} For at konverterer greenletversionen der knytter sig til reel tid, skal vi ændre de steder som bruger tid. Som vi har beskrevet tidligere er det eneste sted tid er introduceret i forbindelse med timeout og dermed i listen \code{timers}. Vi kan dermed nøjes med at ændre de steder i \sched en som indvolvere \code{timers}. Det første sted hvor timers indgår er i udvælgelsen af hvilken proces skal vælges(\cref{sched_timer}). Her sammenlignes på linje 204  første tidsværdi i timers, med det nuværende tidspunkt i time klassen. Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra timers listen.
@@ -202,81 +205,4 @@ def Wait(seconds):
 
 Funktionen \code{Wait} er essentielt det eneste værktøj der skal til for at planlægge en begivenheder ud i fremtiden, og vi har på nuværenede tidspunkt en  simpel begivenhedssimulator der kører i reel tid.
 
-\subsection{Timeout} 
-\inline{kausal tid.}
-Med et simuleringsmiljø er det ikke nok
-udelukkende kan kunne specifiere en timeout på kanalen ud i fremtiden,
-det er også nødvendigt at man kan specificere at en proces er villig
-til at kommunikere på et specifikt tidspunkt, samt at den kanalen
-villig til at kommunikere på nuværende tidpunkt, men ikke ud i
-fremtiden.
 
-At ville kommunikere fra et given tidspunkt i fremtiden, svare til at   
-vente uden at lave noget indtil det givne tidspunkt for så at forsøge 
-at kommunikere fra tidpunktet indtil kommunktationen lykedes. Dette     
-kan dermed laves helt uden en alternation, men ved blot med de to       
-funktioner Wait(time), Cin().                                           
-
-At ville være villig til at kommuikere til et given tidspunkt,         
-medfører en ny problemstilling, da det kan introducere muligheden      
-for deadlocks og nondeterminisme, \fxnote{Er det korrekt?}, for det     
-er ikke defineret hvad tiden er hvis det ikke lykkedes at kommunikere   
-i det givne tidsskridt. Der findes to muligheder, enten skal \sched     
-en signalere at der ikke findes mere arbejde til dette tidsskridt, og   
-lade processerne fortsætte i samme tidsskridt. Alternativt skal tiden  
-tælles op til næste event, hvorefter processerne signaleres med at    
-kommunkationen ikke lykkedes.                                           
-
-\subsubsection{Timeout i samme tidsskridt} Hvis man vælger at
-processerne skal signaleres i samme tidsskridt, vil en timeout
-efterligne en SKIP guard, men hvor en alternation med en SKIP guard med
-det samme kan fortsætte vil en timeout kræve at der blev ventet indtil
-der ikke var flere processer der kunne processeres i samme tidsskridt.
-Når der ikke er flere processer at vælge imellem skal de ventende
-processer fortsætte. Her er muligheden enten at signalere hver proces
-en af gangen, og lade den fortsætte inden næste proces signaleres,
-eller alternativt, samtidigt at signalerer alle de ventende processerne.
-
-Ved at signalere samtlige processer indføres muligheden for en
-livelock. Dette sker hvis to eller flere processer er synkroniseret i
-den samme tidsrytme. Et eksempel er hvis de alle i samme periode først
-ønsker at modtage data, for derefter at sende data. Her vil alle
-processerne uden timeouts vente på hinanden i en deadlock, men med en
-timeout vil de alle fortsætte samtidigt og indgå i en ny deadlock,
-PyCSP vil derfor med timeouts gå fra en deadlock til en livelock. En
-livelock er defineret som hvor tilstandenen i ændres men der foregår
-ikke reelt arbejde\inline{skal vi introducere begrebet deadlock,
-livelock mv.}.
-
-Ved at aktivere en proces ad gangen har denne proces mulighed for i
-samme tidsskridt at indgå i kommunikation med en af de andre ventende
-processer. Deadlocken kan man dermed løse og man har mulighed for at
-undgå livelock problemet, ved samtidig signalering. Ulemperne er at der
-skal foretages et valg om hvilke processer der signaleres med timeout,
-og dermed har man risikoen for starvation\fxnote{ref?} hvis det er
-den/de samme processer der bliver signaleret.
-
-\subsubsection{Timeout i et efterfølgende tidsskridt} Ved at vælge at
-en timeout først forekommer i et efterfølgende tidsskridt, har alle
-processer haft den maksimale mulighed for at indgå i en kommunikation.
-Desuden kan alle processerne signaleres samtidigt, da et alle timeouts
-er overskredet. Man skal dog vælge enten at fortolke en timeout i samme
-tidskridt som en timeout efter $\epsilon$, hvor $\epsilon$ sættes til
-et vilkårligt lille tidsinterval. Da tiden springer i vilkårligt små
-tidsskridt i en simuleringen, vil en fast størrelse af $\epsilon$
-risikere at påvirke rækkefølgen af events. Alternativt kan man vælge
-at lade tiden springe til nærste event, og der signalere alle timeouts.
-Begge muligheder har dog implicit det problem at timeout var sat til
-0 og ikke til hverken et vilkårligt lille $\epsilon$ eller anden
-tidsenhed og man derfor ændrer på fortolkningen af kode.
-
-\subsection{Vores valg}
-
-Timeouts i Timed PyCSP er en af de vigtigste funktioner, da det disse
-giver en der ikke er data, mtimeout processen fortsætte tildet under
-antagelsen af problemer.
-
-når tiden er tidspunkt til for et findes der allerede \inline{vi skal
-kunne angive at vi ønsker at kommunikere men KUN i det tidsskridt vi er
-i, og at hvis dette ikke kan lade sig gøre skal vi breake noget alla at
-have en timeout på 0}

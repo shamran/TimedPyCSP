@@ -134,6 +134,88 @@ Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp.
 
 Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun  lokalt data. Hvis der er data er delt pga. arkitekturen \csp er implementeret på, bør dette abstraheres væk men udnyttes internt i kanalerne. At introducere hjælpemidler for styre delt data, er derfor at tilskynde til en forkert brug af \csp. Tiden er den anden begrundelse for at benytte barrierer.\fxnote*{Skal hives et niveau op tekstmæssigt}{Men med brugen af barrierer til at modellerer tid, kan man får  en primitiv model for tid, og vi vil i vores speciale vise ved at inkluderer tid i stedet får man et stærkere værktøj der ud over en masse andet også kan erstatte brugen af barrierer.}
 
+
+\subsection{Timeout} 
+\inline{kausal tid.}
+Med et simuleringsmiljø er det ikke nok
+udelukkende kan kunne specifiere en timeout på kanalen ud i fremtiden,
+det er også nødvendigt at man kan specificere at en proces er villig
+til at kommunikere på et specifikt tidspunkt, samt at den kanalen
+villig til at kommunikere på nuværende tidpunkt, men ikke ud i
+fremtiden.
+
+At ville kommunikere fra et given tidspunkt i fremtiden, svare til at   
+vente uden at lave noget indtil det givne tidspunkt for så at forsøge 
+at kommunikere fra tidpunktet indtil kommunktationen lykedes. Dette     
+kan dermed laves helt uden en alternation, men ved blot med de to       
+funktioner Wait(time), Cin().                                           
+
+At ville være villig til at kommuikere til et given tidspunkt,         
+medfører en ny problemstilling, da det kan introducere muligheden      
+for deadlocks og nondeterminisme, \fxnote{Er det korrekt?}, for det     
+er ikke defineret hvad tiden er hvis det ikke lykkedes at kommunikere   
+i det givne tidsskridt. Der findes to muligheder, enten skal \sched     
+en signalere at der ikke findes mere arbejde til dette tidsskridt, og   
+lade processerne fortsætte i samme tidsskridt. Alternativt skal tiden  
+tælles op til næste event, hvorefter processerne signaleres med at    
+kommunkationen ikke lykkedes.                                           
+
+\subsubsection{Timeout i samme tidsskridt} Hvis man vælger at
+processerne skal signaleres i samme tidsskridt, vil en timeout
+efterligne en SKIP guard, men hvor en alternation med en SKIP guard med
+det samme kan fortsætte vil en timeout kræve at der blev ventet indtil
+der ikke var flere processer der kunne processeres i samme tidsskridt.
+Når der ikke er flere processer at vælge imellem skal de ventende
+processer fortsætte. Her er muligheden enten at signalere hver proces
+en af gangen, og lade den fortsætte inden næste proces signaleres,
+eller alternativt, samtidigt at signalerer alle de ventende processerne.
+
+Ved at signalere samtlige processer indføres muligheden for en
+livelock. Dette sker hvis to eller flere processer er synkroniseret i
+den samme tidsrytme. Et eksempel er hvis de alle i samme periode først
+ønsker at modtage data, for derefter at sende data. Her vil alle
+processerne uden timeouts vente på hinanden i en deadlock, men med en
+timeout vil de alle fortsætte samtidigt og indgå i en ny deadlock,
+PyCSP vil derfor med timeouts gå fra en deadlock til en livelock. En
+livelock er defineret som hvor tilstandenen i ændres men der foregår
+ikke reelt arbejde\inline{skal vi introducere begrebet deadlock,
+livelock mv.}.
+
+Ved at aktivere en proces ad gangen har denne proces mulighed for i
+samme tidsskridt at indgå i kommunikation med en af de andre ventende
+processer. Deadlocken kan man dermed løse og man har mulighed for at
+undgå livelock problemet, ved samtidig signalering. Ulemperne er at der
+skal foretages et valg om hvilke processer der signaleres med timeout,
+og dermed har man risikoen for starvation\fxnote{ref?} hvis det er
+den/de samme processer der bliver signaleret.
+
+\subsubsection{Timeout i et efterfølgende tidsskridt} Ved at vælge at
+en timeout først forekommer i et efterfølgende tidsskridt, har alle
+processer haft den maksimale mulighed for at indgå i en kommunikation.
+Desuden kan alle processerne signaleres samtidigt, da et alle timeouts
+er overskredet. Man skal dog vælge enten at fortolke en timeout i samme
+tidskridt som en timeout efter $\epsilon$, hvor $\epsilon$ sættes til
+et vilkårligt lille tidsinterval. Da tiden springer i vilkårligt små
+tidsskridt i en simuleringen, vil en fast størrelse af $\epsilon$
+risikere at påvirke rækkefølgen af events. Alternativt kan man vælge
+at lade tiden springe til nærste event, og der signalere alle timeouts.
+Begge muligheder har dog implicit det problem at timeout var sat til
+0 og ikke til hverken et vilkårligt lille $\epsilon$ eller anden
+tidsenhed og man derfor ændrer på fortolkningen af kode.
+
+\subsection{Vores valg}
+
+Timeouts i Timed PyCSP er en af de vigtigste funktioner, da det disse
+giver en der ikke er data, mtimeout processen fortsætte tildet under
+antagelsen af problemer.
+
+når tiden er tidspunkt til for et findes der allerede \inline{vi skal
+kunne angive at vi ønsker at kommunikere men KUN i det tidsskridt vi er
+i, og at hvis dette ikke kan lade sig gøre skal vi breake noget alla at
+have en timeout på 0}
+
+
+
 \section{Eksempel}
 \inline{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}
 
@@ -268,18 +350,18 @@ separat tidsskridt.
 \caption[test]{\code{barW(1)} og \code{barR()} er henholdsvis skrivning og læsning til og 
 fra en barriere som defineret i \nref{sec:barrierer}.}
 \end{figure}
-Afviklingen af programmet sker ved at et antal \emph{worldpart}-, en 
-\emph{visualize}- og en \emph{barrier}-proces køres parallelt. Af 
+Afviklingen af programmet sker ved at et antal worldpart-, en 
+visualize- og en barrier-proces køres parallelt. Af 
 \autoref{code:wator-worldpart} og \pageref{code:wator-visualize}\fixme{ændrer pageref til vref i final}, ses det 
-overordnede design af henholdsvis \emph{worldpart}- og 
-\emph{vizualize}processen.  Værd at bemærke er det store antal barrierekald i 
+overordnede design af henholdsvis worldpart- og 
+vizualize-processen.  Værd at bemærke er det store antal barrierekald i 
 visualizeprocessen. Dette er til for at man kan benytte den samme barriere som 
 wordpartprocessen. Alternativt kunne man have to barriereprocesser; en til 
-synkronisering af \emph{worldpart} med \emph{vizualize}, samt en som 
-\emph{worldpart}processerne brugte til synkroniseringen af opdatering af 
-verdensdelen og de to sidste kolonner.\fixme{hvad skal emphs og hvad skal med stå med code og hvad skal fjernes.} 
+synkronisering af worldpart med vizualize, samt en som 
+worldpart-processerne brugte til synkroniseringen af opdatering af 
+verdensdelen og de to sidste kolonner.\inline{hvad skal emphs og hvad skal med stå med code} 
 
-\fxnote{konklusion hvordan var det at implementere og hvor stor parallelitet 
+\inline{konklusion hvordan var det at implementere og hvor stor parallelitet 
 kan man opnå. }
 
 
@@ -304,7 +386,7 @@ hhv.  \simpy og \pycsp for at håndtere tid.
 I det andet eksempel er modellen udvidet med en servicedisk. Her skal alle 
 kunderne betjenes af en servicemedarbejder, som kun kan ekspederes en kunde ad 
 gangen. Alle kunder ankommer igen til banken i tilfældig orden og stiller sig i 
-kø for at blive serviceret. Dette  svare til en M/M/1\fixme{hvad  er en m/m/1 
+kø for at blive serviceret. Dette  svare til en M/M/1\fxerror{hvad  er en m/m/1 
 kø} kø. Det er igen et tilfældigt tidsrum som kunden bruger på at blive 
 serviceret.  Dette er stadigt en meget simpel model, men med introduktionen af 
 en begrænset ressource kan man uddrage information om den tilhørende kø, f.eks. 
@@ -315,8 +397,8 @@ servicemedarbejdere, samt hvordan køen opfører sig over tid.
 I \simpy er kunderne en proces og det vil derfor være nærliggende ligeledes at 
 modellere eksemplet i \pycsp med kunder som en proces. Dette sker i  \simpy når
 generatorfunktionen laver en kunde og lader denne køre parallelt med sig selv.  
-I \pycsp,\fxnote{hvorfor?- kan man lave child proces der køre i samme parallel 
-kald som dets parent?} er standard metoden\fxnote{set fra kodeeksempler}, at 
+\inline{hvorfor?- man kan lave child proces med spawn, der der køre i samme parallel 
+kald som dets parent? - Hvorfor er dette ikke god CSP stil at bruge} er standard metoden\fxnote{set fra kodeeksempler}I \pycsp 
 modellere mere statiske processer, gerne med en generator- og 
 arbejderproces, og lade arbejdet flyttes 
 mellem processerne igennem kanaler. I \pycsp modellen fungerer 
@@ -401,7 +483,7 @@ skal bankprocessen håndtere fejlede forsendelser og må nødvendigvis introduce
 sekundær kø hvilket gør at introduktionen af en ''\code{buffered channel}'' er 
 irrelevant. For undgå dette har vi i vores tilfælde valgt blot at 
 angive en maksimal størrelse på bufferen som er større end det totale antal 
-kunder banken modtager.\fxnote{husk at m/m/1 køer har uendelig længde, se $http://en.wikipedia.org/wiki/M/M/1_model$}
+kunder banken modtager.\inline{husk at m/m/1 køer har uendelig længde, se $http://en.wikipedia.org/wiki/M/M/1\_model$ - kan bruges som argument for at have channels af uelndelig længde}
 
 \section{Design og implementering}
 \inline{Beskrivelse af design med udgangspunkt i eksemplet}
@@ -434,5 +516,5 @@ I \cref{fig:init} kan man se at funktionerne \code{choice, ChannelPoisonExceptio
   \section{Evaluering}
     \inline{Evaluering af hvordan eksemplet løses efter den valgte 
     implementering benyttes. Inkluderer test+performance}
-  \section{Freamtidigt arbejde}
+  \section{Fremtidigt arbejde}
   \section{Opsummering}
