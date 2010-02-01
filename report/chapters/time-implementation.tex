@@ -126,7 +126,8 @@ if self.timers and self.timers[0][0] <= Now():
 
 
 
-\subsection{Funktionerne Now og Wait} I Python kan man benytte modulet
+\subsection{Funktionerne Now og Wait}
+ I Python kan man benytte modulet
 \code{time}, hvis man ønsker at introducer begrebet tid. Med dette
 modul kan man få af vide hvad klokken er. fra en brugers synsvinkel
 repræsenteres tiden som kontinuerlig, og hver gang en bruger spørge
@@ -148,7 +149,7 @@ en relation almindelig tid, kan man heller ikke snakke om at et tidsrum
 har sekunder eller timer. I \pycsp kan man i timeout planlægge en
 begivenhed til at ske om f.eks. 5. sekunder. I \des findes sekunder som
 begreb ikke, men man kan angiver at når tiden er talt op med 5 skal
-begivenheden ske. \inline{Skal dette splittes oop og halvdelen skal i
+begivenheden ske. \inline{Skal dette splittes op og halvdelen skal i
 teori?}
 
 Når et problem modeleres i \des, vil der altid være behov for at
@@ -163,11 +164,9 @@ en variabel med tid. For processer der ønsker at kende tiden har vi
 introduceret funktionen \code{Now()} der returnere hvad tiden er på et
 given tidspunkt.
 
-
 \inline{På det teoretiske plan snakker vi om at planlægge
-begivenheder, mens vi i implantationen snakker om Wait og at ''stall''
+begivenheder, mens vi i implantationen snakker om Wait og at ''stalle''
 en process }
-
 
 I programmeringssproget \simpy lader man en proces vente ved at
 foretage kaldet \code{yield}. Dette yield sørger for at processen ikke
@@ -190,19 +189,77 @@ ligende mulighed for at lade en proces vente. Da dette allerede er
 implementeret via timeout i greenlets versionen af \pycsp, kan vi
 uden at ændre i den eksisterende \sched tilføje en ny funktion
 \code{Wait} der fungere som timeout, men kan kaldes af processerne
-på et vilkårligt tidspunkt. \fxerror{Dette skal måske ændres
-da jeg ikke har talt med run om nødvændigheden af while now. Og jeg har derfor ikke beskrevet i teksten hvordan funktionen virker.}
+på et vilkårligt tidspunkt. \inline{Dette skal måske ændres
+da jeg ikke har talt med Rune om nødvendigheden af ''while now()<t)''. Og jeg har derfor ikke beskrevet i teksten hvordan funktionen virker.}
 
 \begin{lstlisting}[firstnumber=20,float=hbtp, label=wait, caption=Wait i simuleringsversionen.] 
 def Wait(seconds): 
-  logging.debug("calling wait")
   Simulation().timer_wait(Simulation().current, seconds) 
   t = Now()+seconds
   while Now()<t: 
     p = Simulation().getNext() 
-    logging.debug("Wait swicthing from %s to %s"%(Simulation().current, p)) p.greenlet.switch()
 \end{lstlisting}
 
-Funktionen \code{Wait} er essentielt det eneste værktøj der skal til for at planlægge en begivenheder ud i fremtiden, og vi har på nuværenede tidspunkt en  simpel begivenhedssimulator der kører i reel tid.
+Funktionen \code{Wait} er essentielt det eneste værktøj der skal til for at planlægge en begivenheder ud i fremtiden, og vi har på nuværenede tidspunkt en  simpel begivenhedssimulator der kører i reel tid. 
+
+\subsection{Fra reel tid til diskret tid.}\label{sec:}
+Vi ønsker sædvanligvis at en simulering, kan eksekveres uafhængigt af tiden der simuleres det vil sige at når der ikke sker flere begivenheder til et givent tidspunkt skal tiden fremskrives til det næste tidskridt hvor der sker en begivenhed og ikke kun med et fast tidsskridt. Modsat gælder det også at tiden ikke må tælles op før alle processer har indikeret at de ikke ønsker at foretage mere arbejde. 
+
+I den eksisterende \sched ~ er tiden reel og indkrementeres derfor løbende uafhængigt af processernes tilstand. Dette kan illustreres med et eksempel; Proces 1 har startet en ny thread via et \code{io} kald, og er derfor blokeret. Proces 2 står i en \code{Alternation} med en timeout guard. Uafhængigt af tiden det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide at når timeout'en er indtrådt. Dette er implementeret i \cref{fig:blocking_sleep} på linjerne 242 til 251. For at nå disse linjer findes der processer der er blokeret samt processer der venter på en timeout. Nu startes en separat tråd der signalere \sched en, når næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
+
+Denne ekstra tråd til håndtering er tid i et blokeret kald er slet ikke nødvendigt i \des. For at tiden skal tælles op må ingen processer være blokeret; De skal i stedet enten have kaldt funktionen \code{wait} eller vente på kommunikation.  
+Så længe der findes blokerede processer venter vi på dem, uden at tage hensyn til antallet processer i \code{timers}.
+
+For at at simuleringen kan fortsætte skal tiden tælles op på et tidspunkt, og dette må gøres eksplicit at simulerings \sched en.  Kun i det tilfælde hvor der ikke findes nogle processer der kan planlægges vælger vi at tælle tiden op. Vi ved at der ikke kan foregå flere begivenheder til et tidsskridt når der kun findes processer i \code{timers} listen. Vi kan i det tilfælde finde tidspunktet for den næste begivenhed og sætte tiden til denne begivenhed. Følgende er implementeret i \cref{fig:sim_sleep}.
+\begin{figure}[hbtp]
+\begin{minipage}[c]{\linewidth}
+\begin{lstlisting}[firstnumber=239, label=fig:blocking_sleep, caption=Uddrag af \sched en i \code{Scheduler}]
+self.cond.acquire()
+if not (self.next or self.new):
+    # Waiting on blocking processes or all processes have finished!
+    if self.timers:
+        # Set timer to lowest activation time
+        seconds = self.timers[0][0] - time.time()
+        if seconds > 0:
+            t = threading.Timer(seconds, self.timer_notify)
+            # We don't worry about cancelling, since it makes no 
+            #difference if timer_notify is called one more time.
+            t.start()
+            # Now go to sleep
+            self.cond.wait()
+    elif self.blocking > 0:
+        # Now go to sleep
+        self.cond.wait()
+    else:
+        # Execution finished!
+        self.cond.release()
+        return
+self.cond.release()
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[c]{\linewidth}
+\begin{lstlisting}[firstnumber=158, label=fig:sim_sleep, caption= uddrag af \sched en i \code{Simulation}]
+self.cond.acquire()
+if not (self.next or self.new):
+  # Waiting on blocking processes
+  if self.blocking > 0:
+    # Now go to sleep
+    self.cond.wait()
+  #If there exist only processes in timers we can increment
+  elif  not (self.next or self.new or self.blocking): 
+      if self.timers:
+          # inc timer to lowest activation time
+          self._t = self.timers[0][0]
+      else:
+          # Execution finished!
+          self.cond.release()
+          return
+self.cond.release()  
+\end{lstlisting}
+\end{minipage}
+\end{figure}
+
+\subsection{Ting vi har stjålet fra \simpy.}
+I vores implementering findes der i sagens natur i stort overlap med \simpy, som har været en inspirationskilde til hvordan et simuleringssprog kunne udvikles i Python. En del af arbejdet med \simpy har vi kunne bruge direkte i vore implementering, efter devisen om ikke at genskrive eksisterende god kode. Det drejer sig om funktionalitet til dataindsamling, bearbejdning og visualisering. I \simpy findes en \code{Monitor} klasse. Formålet med denne klasse er at gemme tid/værdi par. Dermed kan man efter endt simulering, analysere på hvordan værdierne ændret sig over tid.
 
 
