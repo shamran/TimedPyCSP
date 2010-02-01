@@ -1,0 +1,18 @@
+implicit/eksplicit synkronisering i forhold til tid - check....koordination languages, CSP Linda, Thilo Kielmann, Objective Linda, Det frie universitet i Amsterdam
+
+Litteraturhenvisninger
+
+Se indholdsfortegnelse igennem
+
+  CSP
+  PyCSP
+  
+
+Motivation: Det skal gøres interessant
+
+
+
+DES - logisk tid, t1 skriv, t2 læs...kan ikke ske i samme tidsskridt
+
+Send hele pdf til Brian
+
