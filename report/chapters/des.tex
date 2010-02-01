@@ -273,18 +273,18 @@ separat tidsskridt.
 \caption[test]{\code{barW(1)} og \code{barR()} er henholdsvis skrivning og læsning til og 
 fra en barriere som defineret i \nref{sec:barrierer}.}
 \end{figure}
-Afviklingen af programmet sker ved at et antal \emph{worldpart}-, en 
-\emph{visualize}- og en \emph{barrier}-proces køres parallelt. Af 
+Afviklingen af programmet sker ved at et antal worldpart-, en 
+visualize- og en barrier-proces køres parallelt. Af 
 \autoref{code:wator-worldpart} og \pageref{code:wator-visualize}\fixme{ændrer pageref til vref i final}, ses det 
-overordnede design af henholdsvis \emph{worldpart}- og 
-\emph{vizualize}processen.  Værd at bemærke er det store antal barrierekald i 
+overordnede design af henholdsvis worldpart- og 
+vizualize-processen.  Værd at bemærke er det store antal barrierekald i 
 visualizeprocessen. Dette er til for at man kan benytte den samme barriere som 
 wordpartprocessen. Alternativt kunne man have to barriereprocesser; en til 
-synkronisering af \emph{worldpart} med \emph{vizualize}, samt en som 
-\emph{worldpart}processerne brugte til synkroniseringen af opdatering af 
-verdensdelen og de to sidste kolonner.\fixme{hvad skal emphs og hvad skal med stå med code og hvad skal fjernes.} 
+synkronisering af worldpart med vizualize, samt en som 
+worldpart-processerne brugte til synkroniseringen af opdatering af 
+verdensdelen og de to sidste kolonner.\inline{hvad skal emphs og hvad skal med stå med code} 
 
-\fxnote{konklusion hvordan var det at implementere og hvor stor parallelitet 
+\inline{konklusion hvordan var det at implementere og hvor stor parallelitet 
 kan man opnå. }
 
 
@@ -309,7 +309,7 @@ hhv.  \simpy og \pycsp for at håndtere tid.
 I det andet eksempel er modellen udvidet med en servicedisk. Her skal alle 
 kunderne betjenes af en servicemedarbejder, som kun kan ekspederes en kunde ad 
 gangen. Alle kunder ankommer igen til banken i tilfældig orden og stiller sig i 
-kø for at blive serviceret. Dette  svare til en M/M/1\fixme{hvad  er en m/m/1 
+kø for at blive serviceret. Dette  svare til en M/M/1\fxerror{hvad  er en m/m/1 
 kø} kø. Det er igen et tilfældigt tidsrum som kunden bruger på at blive 
 serviceret.  Dette er stadigt en meget simpel model, men med introduktionen af 
 en begrænset ressource kan man uddrage information om den tilhørende kø, f.eks. 
@@ -320,8 +320,8 @@ servicemedarbejdere, samt hvordan køen opfører sig over tid.
 I \simpy er kunderne en proces og det vil derfor være nærliggende ligeledes at 
 modellere eksemplet i \pycsp med kunder som en proces. Dette sker i  \simpy når
 generatorfunktionen laver en kunde og lader denne køre parallelt med sig selv.  
-I \pycsp,\fxnote{hvorfor?- kan man lave child proces der køre i samme parallel 
-kald som dets parent?} er standard metoden\fxnote{set fra kodeeksempler}, at 
+\inline{hvorfor?- man kan lave child proces med spawn, der der køre i samme parallel 
+kald som dets parent? - Hvorfor er dette ikke god CSP stil at bruge} er standard metoden\fxnote{set fra kodeeksempler}I \pycsp 
 modellere mere statiske processer, gerne med en generator- og 
 arbejderproces, og lade arbejdet flyttes 
 mellem processerne igennem kanaler. I \pycsp modellen fungerer 
@@ -406,7 +406,7 @@ skal bankprocessen håndtere fejlede forsendelser og må nødvendigvis introduce
 sekundær kø hvilket gør at introduktionen af en ''\code{buffered channel}'' er 
 irrelevant. For undgå dette har vi i vores tilfælde valgt blot at 
 angive en maksimal størrelse på bufferen som er større end det totale antal 
-kunder banken modtager.\fxnote{husk at m/m/1 køer har uendelig længde, se $http://en.wikipedia.org/wiki/M/M/1_model$}
+kunder banken modtager.\inline{husk at m/m/1 køer har uendelig længde, se $http://en.wikipedia.org/wiki/M/M/1\_model$ - kan bruges som argument for at have channels af uelndelig længde}
 
 \section{Design og implementering}
 \inline{Beskrivelse af design med udgangspunkt i eksemplet}

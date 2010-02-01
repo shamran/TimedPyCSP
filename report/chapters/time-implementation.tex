@@ -33,17 +33,17 @@ Med valget af greenletversionen som grundversionen, og med henblik på at hovedp
  \item \code{blocking}: Initieres på linje 150, og er en variabel.Processer der venter på IO operationer, er ikke klar til at blive scheduleret, men heller ikke afsluttet. Scheduleren kan derfor ikke schedulere dem, men holdes styr på antallet af ventende processer vha. denne variabel, for at kunne afgører om Scheduleren skal afslutte eller afvente.
 \end{list}
 
-Scheduleren itererere nu gentagende gange igennem alle tre lister, indtil de alle er tomme, og der ikke er nogle processer der er blokeret. 
+Når \sched en er startet, itererer den igennem alle tre lister, indtil de alle er tomme, og der ikke er nogle processer der er blokeret. Dette betyder at der ikke længere kan komme processer der ønskes at blive lagt på \sched en, og den kan dermed afslutte.
 
-For at markere at vi vi ikke kun skal foretage en planlægning
+For at markere at vi ikke kun skal foretage en planlægning
 af processerne, men foretage en simulering, har vi lavet en
 \code{Simulation} klasse der arver fra \code{Scheduler}. Alle ændringer
 vi skal foretage for at gå fra en almindelig \sched ~til en simulerings
 \sched, vil således indkapsles i denne klasse, mens alt hvad de to
-kalsser har til fælles vil være isoleret i greenlets versionen af
-\sched klassen. Dette har yderligere den fordel at man tydeligt kan se
+klasser har til fælles vil være isoleret i greenlets versionen af
+\code{Scheduler} klassen. Dette har yderligere den fordel at man tydeligt kan se
 at alle klasserne i simulation versionen arver en simulerings \sched ~og
-ikke en \sched ~fra greenletsversionen.
+ikke \code{Scheduler} fra greenletsversionen.
 
 %\fxnote{dårlig overskrift}{\subsection{Repræsentation af tid}} Vi
 %vil i dette afsnit gå i dybden med listen \code{timers} der findes i
@@ -75,28 +75,31 @@ Tid er dermed blevet introduceret i \pycsp, men kun for at at have
 mulighed for at tilknytte timeout til en \code{alternation}. Vi ønsker
 at videreudvikle denne struktur til at håndtere tidsdelen for alle
 processer, samt for at fungere med diskret tid, modsat den eksisterende
-løsning hvor tiden er kontinuerligt. Man må forvente at brugen af
-listen \code{timers}, vil øges betragteligt og at den gennemsnitlige
-længde af listen vil stige, når alle processerne skal bruge vente på
-hinanden.
+løsning hvor tiden er kontinuerligt.
 
-\subsection{Timers} For at forbedre ydelsen af \code{timers} listen,
+\subsection{Timers}  
+Vi forventer at brugen af
+listen \code{timers}, vil øges betragteligt og at den gennemsnitlige
+længde af listen vil stige, når der udvikles simuleringsproblemer. Dermed 
+øges kravet om en effektiv implementation af \code{timers}\fxnote{skal 
+vi evaluere om dette rent faktisk forbedrer ydelsen}. 
+
+For at forbedre ydelsen af \code{timers} listen, 
 ændrer vi den fra en almindelig liste, til en min"-hob. En hob har
-flere fordele og er oplagt til brug i \sched. I en min"-hob vil det
-mindste element, altid være i roden, og kan hurtigt poppes, så det
-næstmindste elemet nu står i roden. Efter en indsættelse af et
-element vil hob"-egenskaben stadigt være overholdt. En hob findes
-allerede i Python, og effektivt implementeret i C. Den eneste handling
-der ikke er effektiv med en hob er fjernelsen af et arbitrært element
+flere fordele ved skemaplanlægning og er nævnt i introduktionen til Pythons implementation af en hob\fxnote{ref til http://docs.python.org/dev/3.0/library/heapq.html}. 
+
+Da en implementation af en hob
+allerede findes i Pythoni modulet \code{Heapq}, som er effektivt implementeret i C, vælger vi at bruge denne. Den eneste handling
+der ikke er som standard er implementeret, er fjernelsen af et arbitrært element
 fra hoben. Dette sker i den eksisterende løsning når en proces
-aktivere et andet valg i \code{alternation} end timeout. Så skal
+aktivere et andet valg i \code{alternation} end timeout. I dette tilfælde skal
 processen ikke vente på sin timeout, men elementet skal fjernes fra
 \code{timers} listen. For at fjerne et element i en hob, må man som i
 en normal liste lave en lineær søgning i hoben, og derefter genoprette
 hob"-egenskaben i listen. Dette vil dog ikke tage længere tid end det
-allerede tager da en fjernelse af en timeout allerede på nuværende
+allerede tager da en fjernelse af en timeout i greenletversionen på nuværende
 tidspunkt bruger en lineær søgning, til at finde elementet der skal
-fjernes. For at se en forskellen mellem greenletversion der bruger en liste og simulationsversionen der bruger en hob kan man sammenligne \cref{sched_timer} linje 205 med \cref{sim_timer} linje 126.
+fjernes, og genoprettelsen af hobegenskaben også tager lineær tid \inline{ref til construction of heaps can be done in linear time using Tarjas algorithm.\\$http://en.wikipedia.org/wiki/Tarjan\%27s\_algorithm$}For at se en forskellen mellem greenletversion der bruger en liste og simulationsversionen der bruger en hob kan man sammenligne \cref{sched_timer} linje 205 med \cref{sim_timer} linje 126.
 
 
 \subsection{Diskret tid} For at konverterer greenletversionen der knytter sig til reel tid, skal vi ændre de steder som bruger tid. Som vi har beskrevet tidligere er det eneste sted tid er introduceret i forbindelse med timeout og dermed i listen \code{timers}. Vi kan dermed nøjes med at ændre de steder i \sched en som indvolvere \code{timers}. Det første sted hvor timers indgår er i udvælgelsen af hvilken proces skal vælges(\cref{sched_timer}). Her sammenlignes på linje 204  første tidsværdi i timers, med det nuværende tidspunkt i time klassen. Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra timers listen.
