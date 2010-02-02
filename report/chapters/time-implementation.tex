@@ -1,7 +1,35 @@
-\subsection{Scheduler}
-Med valget af greenletversionen som grundversionen, og med henblik på at hovedparten af vores ændringer vil være i scheduleren, vil vi kort gennemgå denne.
 
-\begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i greenletsversionen.]
+\section{Design og implementering}
+\inline{Beskrivelse af design med udgangspunkt i eksemplet}
+Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret tid som et alternativ til barrierer. Dels ønsker vi med diskret tid at åbne for mulighederne for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Med disse ændringer er håbet at vi opnår en model der ligger tætter på intentionen bag \csp og så man kan udfase brugen af barrierer, samt med den underliggende parallelitet i \csp kan udnyttes til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.
+
+\subsection{\pycsp versioner}
+\pycsp implementerer tre versioner af \csp: \emph{Process, threads, greenlets}\cite{Friborg2009}. Vi ønsker at evaulere muligheden for at introducere \des, i de forskellige versioner for at finde den eller de versioner der egner sig til at blive  udviddet med en \des. Ideelt set ønsker vi at simuleringsdelen bliver et ekstra modul som kan tilføje alle tre versionen og som virker ens på tværs af versionerne.  
+
+I \des  skal tiden styres fra centralt hold og processerne skal alle have mulighed for at vide hvad klokken er når den kører. Tiden skal altid være den samme på tværs af alle processer og derfor skal der være en central kontrol med processerne, så man kan styre hvilke processer der køre på forskellige tidspunkter.
+
+I de tre versionen ændres implementationen af processerne, og hvordan disse styres.  Dermed, ændres også muligheden for hvordan \des kan implemneteres i de forskellige versioner. I  \emph{proces} og \emph{threads} versionen af \pycsp styres processerne af operativsystemet\fxnote{ref?}. Dermed er det operativsystemet der styrer processerne og ikke \pycsp.  \pycsp har dermed ikke mulighed for at diktere tiden og få processerne til at vente på hinanden. I \emph{greenlets}versionen, er processerne implementeret som greenlets, der kører  på bruger-niveau\fxnote{ref}. Dermed kan kun en proces som standard køres ad gangen, og denne kan fortsætte indtil den frivilligt afgiver kontrollen. For at have samtidighed findes der en central \sched ~der koordinerer processerne, og styrer hvilke processer der er klar til at blive eksekveret og hvilke der venter. Når en proces afgiver kontrollen tager \sched over og udvælger den næste proces der skal eksekveres. Denne koordinering i greenlets egner sig utrolig godt til introduktionen af \des, modsat \emph{process} og \emph{threads}versionen, hvor der skal indføres central koordinering og ændres betydeligt i den underliggende kode for at kunne koordinere processerne imellem. Den centrale koordinering vil også ødelægge meningen ved at have parallelle processer der styres af operativ systemet.
+
+Med den store forskel på de underliggende implementeringer af \csp kan vi ikke gøre os håb om at introducere \des som en pakke, man kan vælge at bruge uafhængigt af hvilken \pycsp-version  der bruges. \Des kan derimod være en en ny version af \pycsp, der arver store dele af \emph{greenlet}versionen. 
+
+\subsection{Kodestruktur}  
+Efter at have valgt at udvider \emph{greenlet}versionen skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra \emph{greenlet}versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale \emph{greenlet}versionen. Med denne isolation forventer vi at hvis/når der sker tilrettelser af \emph{greenlet}versionen af \pycsp vil man ikke skulle foretage de samme tilrettelser i \des versionen. 
+Isolationen mellem \des- og \emph{greenlet}versionen ønsker vi at få ved nedarvning, men således at det fra en brugers synsvinkel ser ud til at \des versionen er en selvstændig version.
+
+Hvert af de tre versioner har sin egen mappe i \pycsp og i hver af disse findes en tilhørende \code{\_\_init\_\_.py} fil, der fungere som et manifest for den givne version. Vi opretter vores eget version kaldet \emph{simulation}, og opretter en tilhørende mappe på samme niveau som de andre versioner og med sin egen manifestfil. Manifestfilen kan nu bruges til at udvælge de funktioner der skal tages direkte fra \emph{greenlet}versionen og hvilke funktioner der skal udvides og som derfor vil ligge i den nye mappe.
+\begin{lstlisting}[float=hbtp,label=fig:init,caption=Uddrag af \code{\_\_init\_\_.py} for simulationsversionen.]
+from guard import Timeout, Skip
+from pycsp.greenlets.alternation import choice
+from alternation import Alternation
+from pycsp.greenlets.channel import ChannelPoisonException, ChannelRetireException
+\end{lstlisting}
+
+I \cref{fig:init} kan man se at funktionerne \code{choice, ChannelPoisonException} og \code{ChannelRetireException} alle bliver hentet fra \emph{greenlet}versionen, mens at funktionerne \code{Timeout, Skip} og \code{Alternation} bliver importeret fra samme mappe, og derfor er en modificeret version. For slutbrugeren  vil dette dog være transparent, og vil blot se \emph{simulation}versionen som en selvstændig version på lige fod med de andre tre versioner.
+
+\subsection{Scheduler}
+Med valget af \emph{greenlet}versionen som grundversionen, og med henblik på at hovedparten af vores ændringer vil være i \sched, vil vi kort gennemgå klassen \code{Scheduler}.
+
+\begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i \emph{greenlets}versionen.]
     def getInstance(cls, *args, **kargs):
         '''Static method to have a reference to **THE UNIQUE** instance'''
         if cls.__instance is None:
@@ -24,25 +52,25 @@ Med valget af greenletversionen som grundversionen, og med henblik på at hovedp
             cls.__instance.blocking = 0
 \end{lstlisting}
 
- I \cref{fig:scheduling} ses et uddrag af initialiseringskoden. Dels findes der tre lister af processer som scheduleren har mulighed for at vælge imellem når der skiftes proces.  
+ I \cref{fig:scheduling} ses et uddrag af initialiseringskoden, der er interessant fordi det er her alle de interne datastrukturer oprettes. Man kan se der findes tre lister af processer som \sched har mulighed for at vælge imellem når der skiftes proces.  
  \begin{list}
  \tightlist 
- \item \code{new}: Initeres på linje 140, og består af processer som lige er blevet scheduleres for første gang.
- \item \code{next}: Initeres på linje 141, og indeholder de processer der er klar til at blive kørt, og som har været kørt før.  
- \item \code{timers}: Initeres på linje 147, og indeholder de processer der har tilknyttet en timeout. De skal først scheduleres på et senere tidspunkt og venter dermed blot. Hvert element i listen består både af processen samt et tidsstempel for hvornår processen skal genaktiveres. Denne liste bliver gensorteret hver gang der indsættes en ny proces.
- \item \code{blocking}: Initieres på linje 150, og er en variabel.Processer der venter på IO operationer, er ikke klar til at blive scheduleret, men heller ikke afsluttet. Scheduleren kan derfor ikke schedulere dem, men holdes styr på antallet af ventende processer vha. denne variabel, for at kunne afgører om Scheduleren skal afslutte eller afvente.
+ \item \code{new}: Initieres på linje 140, og består af processer som lige er blevet planlagt for første gang. Nye processer kan ankomme til listen \code{new} via funktionerne \code{Parallel, Sequence} og \code{Spawn}.
+ \item \code{next}: Initieres på linje 141, og indeholder de processer der er klar til at blive kørt, og som har været kørt på et tidligere tidspunkt. De har har tidligere  frivilligt stoppet deres kørsel, f.eks for at vente på at kunne kommunikere. Kommunikationen er i eksemplet lykkedes og de kan derfor fortsætte deres kørsel og venter derfor på at fortsætte.  
+ \item \code{timers}: Initieres på linje 147, og indeholder de processer der har tilknyttet en timeout. De skal først planlægges på et senere tidspunkt og venter dermed blot. Hvert element i listen består både af processen samt et tidsstempel for hvornår processen skal genaktiveres. Denne liste bliver gensorteret hver gang der indsættes en ny proces.
+ \item \code{blocking}: Initieres på linje 150, og er en variabel. Processer der venter på IO operationer, er ikke klar til at blive planlagt, men heller ikke afsluttet. \sched en kan derfor ikke planlægge dem, men holdes styr på antallet af ventende processer vha. denne variabel. Dette bruges bla. for at kunne afgøre om \sched en har planlagt alle processer.
 \end{list}
 
-Når \sched en er startet, itererer den igennem alle tre lister, indtil de alle er tomme, og der ikke er nogle processer der er blokeret. Dette betyder at der ikke længere kan komme processer der ønskes at blive lagt på \sched en, og den kan dermed afslutte.
+Når \sched en er startet, gennemløber den alle tre lister gentagende gange, indtil de alle er tomme, og der ikke er nogle processer der er blokeret. Dette betyder at der ikke længere kan komme nye processer til der ønsker at blive lagt på \sched en, og den kan dermed afslutte.
 
 For at markere at vi ikke kun skal foretage en planlægning
 af processerne, men foretage en simulering, har vi lavet en
 \code{Simulation} klasse der arver fra \code{Scheduler}. Alle ændringer
 vi skal foretage for at gå fra en almindelig \sched ~til en simulerings
 \sched, vil således indkapsles i denne klasse, mens alt hvad de to
-klasser har til fælles vil være isoleret i greenlets versionen af
+klasser har til fælles vil være isoleret i \emph{greenlets} versionen af
 \code{Scheduler} klassen. Dette har yderligere den fordel at man tydeligt kan se
-at alle klasserne i simulation versionen arver en simulerings \sched ~og
+at alle klasserne i \emph{simulation}versionen arver en simulerings \sched ~og
 ikke \code{Scheduler} fra greenletsversionen.
 
 %\fxnote{dårlig overskrift}{\subsection{Repræsentation af tid}} Vi
@@ -50,10 +78,11 @@ ikke \code{Scheduler} fra greenletsversionen.
 %klassen \code{Scheduler}, samt se hvordan den kan inkorporeres i vores
 %design.
 
-\subsection{Tid i greenletsversionen} I \pycsp foregår kommunikation
+\subsection{Tid i greenletsversionen} 
+I \pycsp foregår kommunikation
 kun når begge kanalender er klar dvs. når der både findes en
 kanalende der vil skrive og en kanalende der vil læse. Hvis
-kun en af kanalenderne er klar, vil den vente indtil der findes
+kun en af kanalenderne er klar, vil processen vente indtil der findes
 minimum en kanalende af hver type, der er klar. Dette medfører
 risikoen for at processen aldrig kommer videre, men går i deadlock.
 I \pycsp har man derfor i \code{alternation} mulighed for at
@@ -65,31 +94,30 @@ Alternation([{Timeout(seconds=0.5):None},
              {Cin:None}]).select()
 \end{lstlisting}
 
-I \cref{Timeout} ses et minimalt eksempel hvor processen kun er villig
+I \cref{Timeout} ses et eksempel på en \code{alternation} hvor processen kun er villig
 til at læse fra kanalenden \code{Cin} i $0.5$ sekunder. Hvis ikke der
-er modtaget en besked indenfor 0.5 sekundt, accepteres timeoutguarden
-og processen er ikke længere villig til at læse fra \code{Cin}, og
-fortsætter sin kørsel.
+er modtaget en besked indenfor 0.5 sekund, accepteres timeoutguarden
+og processen fortsætter sin kørsel uden at have læst fra kanalen.
 
-Tid er dermed blevet introduceret i \pycsp, men kun for at at have
+Tid er dermed blevet introduceret i \pycsp, for i denne specifikke situation at at have
 mulighed for at tilknytte timeout til en \code{alternation}. Vi ønsker
-at videreudvikle denne struktur til at håndtere tidsdelen for alle
-processer, samt for at fungere med diskret tid, modsat den eksisterende
-løsning hvor tiden er kontinuerligt.
+at videreudvikle denne struktur til at håndtere tid generelt for alle
+processer, men ændrer tiden så den fungerer med diskret tid, modsat den eksisterende
+løsning hvor tiden er reel.
 
 \subsection{Timers}  
 Vi forventer at brugen af
 listen \code{timers}, vil øges betragteligt og at den gennemsnitlige
-længde af listen vil stige, når der udvikles simuleringsproblemer. Dermed 
-øges kravet om en effektiv implementation af \code{timers}\fxnote{skal 
+længde af listen derfor vil stige, når \pycsp bruges til simulering. Dermed 
+øges kravet om en effektiv implementering af \code{timers}\fxnote{skal 
 vi evaluere om dette rent faktisk forbedrer ydelsen}. 
 
 For at forbedre ydelsen af \code{timers} listen, 
 ændrer vi den fra en almindelig liste, til en min"-hob. En hob har
-flere fordele ved skemaplanlægning og er nævnt i introduktionen til Pythons implementation af en hob\fxnote{ref til http://docs.python.org/dev/3.0/library/heapq.html}. 
+flere fordele ved skemaplanlægning og er specifikt nævnt i introduktionen til Pythons implementering af en hob\footnote{$http://docs.python.org/dev/3.0/library/heapq.html$}. 
 
-Da en implementation af en hob
-allerede findes i Pythoni modulet \code{Heapq}, som er effektivt implementeret i C, vælger vi at bruge denne. Den eneste handling
+Da en implementering af en hob
+allerede findes i Python i modulet \code{Heapq}, som er effektivt implementeret i C, vælger vi at bruge denne. Den eneste handling
 der ikke er som standard er implementeret, er fjernelsen af et arbitrært element
 fra hoben. Dette sker i den eksisterende løsning når en proces
 aktivere et andet valg i \code{alternation} end timeout. I dette tilfælde skal
@@ -97,9 +125,9 @@ processen ikke vente på sin timeout, men elementet skal fjernes fra
 \code{timers} listen. For at fjerne et element i en hob, må man som i
 en normal liste lave en lineær søgning i hoben, og derefter genoprette
 hob"-egenskaben i listen. Dette vil dog ikke tage længere tid end det
-allerede tager da en fjernelse af en timeout i greenletversionen på nuværende
+allerede tager da en fjernelse af en timeout i \emph{greenlet}versionen på nuværende
 tidspunkt bruger en lineær søgning, til at finde elementet der skal
-fjernes, og genoprettelsen af hobegenskaben også tager lineær tid \inline{ref til construction of heaps can be done in linear time using Tarjas algorithm.\\$http://en.wikipedia.org/wiki/Tarjan\%27s\_algorithm$}For at se en forskellen mellem greenletversion der bruger en liste og simulationsversionen der bruger en hob kan man sammenligne \cref{sched_timer} linje 205 med \cref{sim_timer} linje 126.
+fjernes, og genoprettelsen af hob"-egenskaben også tager lineær tid \inline{ref til construction of heaps can be done in linear time using Tarjas algorithm.\\$http://en.wikipedia.org/wiki/Tarjan\%27s\_algorithm$}For at se en forskellen mellem \emph{greenlets}version der bruger en liste og \emph{simulering}versionen der bruger en hob kan man sammenligne \cref{sched_timer} linje 205 med \cref{sim_timer} linje 126.
 
 
 \subsection{Diskret tid} For at konverterer greenletversionen der knytter sig til reel tid, skal vi ændre de steder som bruger tid. Som vi har beskrevet tidligere er det eneste sted tid er introduceret i forbindelse med timeout og dermed i listen \code{timers}. Vi kan dermed nøjes med at ændre de steder i \sched en som indvolvere \code{timers}. Det første sted hvor timers indgår er i udvælgelsen af hvilken proces skal vælges(\cref{sched_timer}). Her sammenlignes på linje 204  første tidsværdi i timers, med det nuværende tidspunkt i time klassen. Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra timers listen.
@@ -260,6 +288,6 @@ self.cond.release()
 \end{figure}
 
 \subsection{Ting vi har stjålet fra \simpy.}
-I vores implementering findes der i sagens natur i stort overlap med \simpy, som har været en inspirationskilde til hvordan et simuleringssprog kunne udvikles i Python. En del af arbejdet med \simpy har vi kunne bruge direkte i vore implementering, efter devisen om ikke at genskrive eksisterende god kode. Det drejer sig om funktionalitet til dataindsamling, bearbejdning og visualisering. I \simpy findes en \code{Monitor} klasse. Formålet med denne klasse er at gemme tid/værdi par. Dermed kan man efter endt simulering, analysere på hvordan værdierne ændret sig over tid.
+I vores implementering findes der i sagens natur i stort overlap med \simpy, som har været en inspirationskilde til hvordan et simuleringssprog kunne udvikles i Python. En del af arbejdet med \simpy har vi kunne bruge direkte i vore implementering, efter devisen om ikke at genskrive eksisterende god kode. Det drejer sig om funktionalitet til dataindsamling, bearbejdning og visualisering. I \simpy findes en \code{Monitor} klasse. Formålet med denne klasse er at gemme tid/værdi par. Dermed kan man efter endt simulering, analysere på hvordan værdierne har ændret sig over tid. Klassen \code{Monitor} kan bruges direkte af brugere, hvor de står for at at gemme værdier på passende tidspunkter igennem kørslen af programmet. Man ønsker tit at kende længden af en kø, der som oftest er impplementeret via en liste. Vi har derfor lavet vores egen liste der kan indeholde en \code{Monitor}. Når længden af listen ændres gemmes længden af listen i en montor til brug for senere analyse, uden brugeren selv skal stå for at gemme længden af listen.
 
 
