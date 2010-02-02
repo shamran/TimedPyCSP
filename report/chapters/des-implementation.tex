@@ -153,7 +153,7 @@ if self.timers and self.timers[0][0] <= Now():
 \end{figure}
 
 \subsection{Funktionerne Now og Wait}
- I Python kan man benytte modulet
+ I Python kan man benytte modulet \fxnote{Motiver: hvorfor snakker vi om dette / er det relevant}
 \code{time}, hvis man ønsker at introducer begrebet tid. Med dette
 modul kan man få af vide hvad realtiden er. fra en brugers synsvinkel
 repræsenteres tiden som kontinuerlig, og hver gang en bruger spørge
@@ -170,33 +170,31 @@ som eks. sekunder, kan man med \code{time} modulet måle tidsintervaller der
 korrespondere med realtiden. I \des findes der ikke en
 sammenhæng mellem den kontinuerlige tid og dens egen repræsentation af
 tid. For \des er tid derimod blot et tal der starter som 0, og stiger
-i abitrærer tidskridt. Når tiden i \des på denne måde er afkoblet
+i abitrære tidskridt. Når tiden i \des på denne måde er afkoblet
 en relation almindelig tid, kan man heller ikke snakke om at et tidsrum
 har sekunder eller timer. I \pycsp kan man i timeout planlægge en
-begivenhed til at ske om f.eks. 5. sekunder. I \des findes sekunder som
-begreb ikke, men man kan angiver at når tiden er talt op med 5 skal
+begivenhed til at ske om f.eks. 5 sekunder. I \des findes sekunder som
+begreb ikke, men man kan angiver at når tiden \code{t} er talt op med 5 enheder skal
 begivenheden ske. \inline{Skal dette splittes op og halvdelen skal i
 teori?}
 
 Når et problem modeleres i \des, vil der altid være behov for at
-tilføje en sammenhæng mellem tid i problemet og et tid i modellen. Da
-der der ikke findes en fast sammenhæng, skal modellen derfor eksplicit
-definere om 5 sekunder skal repræsenteres som, at tiden internt i
-\pycsp tælles op med 5, 0.5 eller 0.05.
+tilføje en sammenhæng mellem tid i problemet der skal simuleres og tid i simuleringsmodellen, men da
+der der ikke findes en fast sammenhæng, skal modellen  eksplicit
+definere 5 sekunder i problemet som at tiden i simuleringsmodellen tælles op med 5, 0.5 eller 0.05.
 
-Vi har valgt at repræsentere tiden som en intern variabel i \sched.
-Dette kan vi gøre da \sched ~er en singelton og der findes derfor kun
+Vi har valgt at repræsentere tiden som et positivt tal der findes internt i \sched en.
+Ved at have tiden i  \sched ~eren findes der kun er version af tiden der \sched en er en singelton og  derfor findes der kun
 en variabel med tid. For processer der ønsker at kende tiden har vi
-introduceret funktionen \code{Now()} der returnere hvad tiden er på et
-given tidspunkt.
+introduceret funktionen \code{Now()} der returnere tiden når funktionen kaldes. 
 
 \inline{På det teoretiske plan snakker vi om at planlægge
 begivenheder, mens vi i implantationen snakker om Wait og at ''stalle''
 en process }
 
 I programmeringssproget \simpy lader man en proces vente ved at
-foretage kaldet \code{yield}. Dette yield sørger for at processen ikke
-fortsætter før et foruddefineret tidsrum er gået.
+foretage kaldet \code{yield}. Dette \code{yield} sørger for at processen ikke
+fortsætter før et defineret tidsrum er gået.
 
 \begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)] 
 def visit(self,timeInBank): 
@@ -205,17 +203,14 @@ def visit(self,timeInBank):
   self.name," I must leave" 
 \end{lstlisting}
 
-I \cref{yield} ses hvordan en kundeproces ankommer til banken,
-printer tiden, foretager et yield, og når processen fortsætter
-fra dette kald er tiden steget med værdien \code{timeInBank}.
-Til slut printer processen igen tiden. Brugen af yield er knyttet
-til implementeringen af \simpy og skyldes at \simpy implementere
-hver process som en \code{corutine}. Vi skal i \pycsp have en
-ligende mulighed for at lade en proces vente. Da dette allerede er
-implementeret via timeout i greenlets versionen af \pycsp, kan vi
-uden at ændre i den eksisterende \sched tilføje en ny funktion
-\code{Wait} der fungere som timeout, men kan kaldes af processerne
-på et vilkårligt tidspunkt. \inline{Dette skal måske ændres
+I \cref{yield} ses hvordan en kundeproces er ankommet til banken. Processen der repræsenter kunden printer tiden, foretager et \code{yield}, printer tiden igen og slutter. 
+ Når processen har kaldt \code{yield}, er tiden steget med værdien af \code{timeInBank}. Brugen af yield er knyttet
+sig til implementeringen af \simpy og skyldes at \simpy implementerer
+hver proces som en \code{corutine}. Vi ønsker i \pycsp at have en
+ligene mulighed for at lade en proces vente. Heldigvis er dette allerede implementeret via timeout i \emph{greenlets} versionen af \pycsp, og uden ændringer kan vi
+uden i den eksisterende \sched ~tilføje en ny funktion
+\code{Wait} der fungere som timeout, men som kan kaldes af processerne
+på et vilkårligt tidspunkt. \inline{Det nedenstående eksempelskal måske ændres
 da jeg ikke har talt med Rune om nødvendigheden af ''while now()<t)''. Og jeg har derfor ikke beskrevet i teksten hvordan funktionen virker.}
 
 \begin{lstlisting}[firstnumber=20,float=hbtp, label=wait, caption=Wait i simuleringsversionen.] 
