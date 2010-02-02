@@ -10,6 +10,8 @@ tilstand ændres over tid, eller såfremt der er interaktion mellem flere system
 matematisk model af disse systemer vil ofte være væsentligt mere kompleks og 
 kan være svær at overskue lige så let som en simulering af samme system. 
 
+
+
 Simuleringer foretages ofte af andre videnskabsfolk end dataloger, og det er 
 derfor vigtigt at de kan repræsenteres i et sprog som er let tilgængeligt og 
 minimerer sandsynligheden for at begå fejl i konstruktionen af simulationen.  
@@ -39,8 +41,9 @@ nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan
 variere arbitrært i realtid. Begivenhederne der skal udføres af systemet kan 
 enten være givet på forhånd, eller blive skemaplanlagt dynamisk under afviklingen 
 af andre begivenheder. 
+Afhængig af hvad der simuleres, kan man udtrække relevant information om systemet, f.eks. gennemsnitlig behandlingstid for et element, længden af køer i systemet, og den samlede aktivitetstid for hvert delelement i systemet. 
 
-
+for at kunne konstruere en \des skal vi derved have følgende til rådighed; En repræsentation af tid til at styre hvornår vi skifter tidsskridt, en liste over begivenheder der skal udføres i hvert tidsskridt, samt mulighed for at opsamle statistisk data fra simulationen. 
 
 \subsection*{Noter til afsnittet}
 begivenheder - liste - statisk, dynamisk skemalægning \\

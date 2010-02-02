@@ -10,7 +10,7 @@ sekventiel tankegang, er man nu nødt til at muliggøre samtidig afvikling af
 opgaver, således de kan udnytte flere kerner samtidigt. Dette stiller både krav 
 til udviklerne og de værktøjer og sprog de benytter til udvikling.  En metode 
 til at repræsentere den krævede samtidighed på, er ved hjælp af 
-CSP\cite{hoare-csp}.  I CPS opdeles et program i selvstændige processer, der 
+CSP\cite{hoare-csp}. I CSP opdeles et program i selvstændige processer, der 
 kan afvikles samtidigt på hver sin kerne. Der bør som udgangspunkt ike være 
 delt data mellem processer, og al kommunikation mellem processer sker eksplicit 
 via kanaler. Dette gør det let at overskue og meget egnet til multi-kerne 
@@ -44,7 +44,7 @@ tidsspecifikke programmer, som f.eks. realtids-simuleringer, kræver brug af
 andre konstruktioner i sproget.
 Vi ønsker at undersøge muligheden for at introducere tid som en indbygget del 
 af PyCSP for derved at kunne lette implementationen af programmer der i større 
-eller mindre grad er bundet op omkring et tidselement. k
+eller mindre grad er bundet op omkring et tidselement. 
 
 
 I sin nuværende form kræver styring af tid i PyCSP brug af 
