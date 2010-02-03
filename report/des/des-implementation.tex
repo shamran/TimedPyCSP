@@ -1,7 +1,7 @@
 
 \section{Design og implementering}
 \inline{Beskrivelse af design med udgangspunkt i eksemplet}
-Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret tid som et alternativ til barrierer. Dels ønsker vi med diskret tid at åbne for mulighederne for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Med disse ændringer er håbet at vi opnår en model der ligger tætter på intentionen bag \csp og så man kan udfase brugen af barrierer, samt med den underliggende parallelitet i \csp kan udnyttes til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.\fxnote*{RS:hvordan er dette relateret til design/implementation?}
+Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret tid som et alternativ til barrierer. Dels ønsker vi med diskret tid at åbne for mulighederne for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Med disse ændringer er håbet at vi opnår en model der ligger tætter på intentionen bag \csp og så man kan udfase brugen af barrierer, samt med den underliggende parallelitet i \csp kan udnyttes til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.\fxnote*{RS:hvordan er dette relateret til design/implementation? - SB: Det er indledende motivation.}
 
 \subsection{\pycsp versioner}
 \pycsp implementerer tre versioner af \csp: \emph{Process, threads og greenlets}\cite{Friborg2009}. Vi ønsker at evaulere muligheden for at introducere \des, i de forskellige versioner for at finde den eller de versioner der egner sig til at blive  udviddet med en \des. Ideelt set ønsker vi at simuleringsdelen bliver et ekstra modul som kan tilføjes alle tre versioner og som virker ens på tværs af versionerne.  
@@ -9,7 +9,7 @@ Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret 
 I \des  skal tiden styres centralt og processerne skal alle have mulighed for at vide hvad klokken er når den kører. Tiden skal altid være den samme på tværs af alle processer og derfor skal der være en central kontrol med processerne, så man kan styre hvilke processer der køre på forskellige tidspunkter.
 
 Da der er forskel på hvordan CSP processer er implementeret afhængig af hvilken version der benyttes, vil der også være forskel på hvordan de skal udviddes med henblik på at implementere \des. 
-I  \emph{proces} og \emph{threads} versionerne af \pycsp, styres processerne af operativsystemet\fxnote{ref?}. \pycsp har dermed ikke mulighed for at diktere tiden og få processerne til at vente på hinanden. I \emph{greenlets}versionen, er processerne implementeret som greenlets\fxnote*[nomargin, inline]{coroutine is stedet for?}, der kører  på bruger-niveau\fxnote{ref}. Dermed kan kun en proces som standard køres ad gangen, og denne kan fortsætte indtil den frivilligt afgiver kontrollen. For at have samtidighed findes der en central \sched ~der koordinerer processerne, og styrer hvilke processer der er klar til at blive eksekveret og hvilke der venter. Når en proces afgiver kontrollen tager \sched en over og udvælger den næste proces der skal eksekveres. Denne koordinering i greenlets egner sig utrolig godt til introduktionen af \des, modsat \emph{process}- og \emph{threads}-versionen, hvor der skal indføres central koordinering og ændres betydeligt i den underliggende kode for at kunne koordinere processerne imellem. Den centrale koordinering vil også ødelægge meningen ved at have parallelle processer der styres af operativ systemet.
+I  \emph{proces} og \emph{threads} versionerne af \pycsp, styres processerne af operativsystemet\fxnote{ref?}. \pycsp har dermed ikke mulighed for at diktere tiden og få processerne til at vente på hinanden.\fxnote*[nomargin, inline]{coroutine is stedet for?}{ I \emph{greenlets}versionen, er processerne implementeret som greenlets, der kører  på bruger-niveau.}\fxnote{ref} Dermed kan kun en proces som standard køres ad gangen, og denne kan fortsætte indtil den frivilligt afgiver kontrollen. For at have samtidighed findes der en central \sched ~der koordinerer processerne, og styrer hvilke processer der er klar til at blive eksekveret og hvilke der venter. Når en proces afgiver kontrollen tager \sched en over og udvælger den næste proces der skal eksekveres. Denne koordinering i greenlets egner sig utrolig godt til introduktionen af \des, modsat \emph{process}- og \emph{threads}-versionen, hvor der skal indføres central koordinering og ændres betydeligt i den underliggende kode for at kunne koordinere processerne imellem. Den centrale koordinering vil også ødelægge meningen ved at have parallelle processer der styres af operativ systemet.
 
 Med den store forskel på de underliggende implementeringer af \csp kan vi ikke gøre os håb om at introducere \des som en pakke, man kan vælge at bruge uafhængigt af hvilken \pycsp-version  der bruges. \Des kan derimod være en en ny version af \pycsp, der arver store dele af \emph{greenlet}-versionen. 
 
@@ -107,8 +107,8 @@ processer, men ændre tiden så den fungerer med diskret tid, modsat den eksiste
 løsning hvor tiden er realtid.
 
 \subsection{Timers}  
-Vi forventer at brugen af
-listen \code{timers}, vil øges betragteligt og at den gennemsnitlige
+\fxnote*{skriv hvorfor/omformuler}{Vi forventer at brugen af
+listen \code{timers}}, vil øges betragteligt og at den gennemsnitlige
 længde af listen derfor vil stige, når \pycsp bruges til simulering. Dermed 
 øges kravet om en effektiv implementering af \code{timers}\fxnote{skal 
 vi evaluere om dette rent faktisk forbedrer ydelsen}. 
@@ -125,8 +125,7 @@ aktivere et andet valg i \code{alternation} end timeout. I dette tilfælde skal
 processen ikke vente på sin timeout, men elementet skal fjernes fra
 \code{timers} listen. For at fjerne et element i en hob, må man som i
 en normal liste lave en lineær søgning i hoben, og derefter genoprette
-hob"-egenskaben i listen. Dette vil dog ikke tage længere tid end det
-allerede tager da en fjernelse af en timeout i \emph{greenlet}versionen på nuværende
+hob"-egenskaben i listen. Dette vil dog ikke tage længere tid end på den nuværende måde, da en fjernelse af en timeout i \emph{greenlets}"-versionen på nuværende
 tidspunkt bruger en lineær søgning, til at finde elementet der skal
 fjernes, og genoprettelsen af hob"-egenskaben også tager lineær tid.\fxnote{Tarjas algorithm.\\$http://en.wikipedia.org/wiki/Tarjan\%27s\_algorithm$} For at se en forskellen mellem \emph{greenlets}-version der bruger en liste og \emph{simulering}-versionen der bruger en hob kan man sammenligne \cref{sched_timer} linje 205 med \cref{sim_timer} linje 126. 
 
