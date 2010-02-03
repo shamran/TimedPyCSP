@@ -38,7 +38,7 @@ Hvad bruges DES til? styrker/svagheder?\\
 Henvis til DE-simulation.ps\\
 
 \subsection{Barrierer} \label{sec:barrierer}
-\fxnote*{RS: Jeg synes det er forkert at starte et afsnit med ``I modsætning 
+\fxnote*[nomargin,inline]{RS: Jeg synes det er forkert at starte et afsnit med ``I modsætning 
 til\ldots'' når det ikke er en reference til noget ovenstående}{I \des findes 
 der i modsætningen til Parallel \des} \fixme{referencer} en 
 global tid og alle processerne skal derfor have en fælles tid der tæller op 
@@ -49,7 +49,7 @@ processer er den mest brugte metode at introducere en barriere.
 Barrierer blev først introduceret i MPI\fxnote{ref}, hvor den bruges til at 
 sikre at alle tråde venter i barrieren før de kan fortsætte. 
 
-I \fxnote*{RS: Gælder vel generelt for CSP}{\pycsp} kan man udnytte at begge 
+I \csp kan man udnytte at begge 
 kanalender skal være klar, før der der kan kommunikeres og at en proces der er 
 indgår i en kommunikation vil vente indtil den anden ende er klar før den 
 fortsætter.  Ved hjælp af kanaler kan man derfor lave en simpel barriere 
@@ -94,13 +94,11 @@ foran.
 
 En ulempe ved denne simple barriere er at antallet af processer skal være 
 konstant gennem hele kørslen.
-Dette er f.eks. et problem i bankeksemplet (\cref{bank-eksempel}), hvor 
-generatorfunktionen kan slutte lige efter at have genereret den sidste kunde.  
-Her må den fortsætte med blot at kalde barrieren, indtil servicedisken har 
-processeret alle kunderne, før hele programmet kan afslutte. Alternativt må 
-barriereprocessen ændres, så den dynamisk kan ændre på hvor mange processer der 
-skal synkroniseres. \inline{skal vi fortælle hvordan der kan gøres i \pycsp}
-\fxnote{RS: Reference frem i teksten til eksempler der endnu ikke er introduceret}
+\fxnote*{SB: Bedre reference frem i tiden?}{Vi vil senere se på et bankeksempel hvor dette problem opstår (\cref{bank-eksempel}). Her ville nogle af 
+processerne kunne slutte tidligt, men må fortsætte med  at kalde barrieren, indtil alle processerne er klar til at slutte.
+Man kunne ændrer barriereprocessen, så man dynamisk kan ændre på antallet af processer der 
+skal synkroniseres. I de fleste implementationer af barrier er dette en mulighed, men til vores simple illustration af brugen af barrier har vi valgt ikke at implementere det.}
+
 
 
 Barrierer er en meget effektiv metode til at synkronisere processer der kører 
@@ -124,8 +122,8 @@ Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunn
 Med et simuleringsmiljø er det ikke nok
 udelukkende kan kunne specifiere en timeout på kanalen ud i fremtiden,
 det er også nødvendigt at man kan specificere at en proces er villig
-til at kommunikere på et specifikt tidspunkt, samt at den kanalen
-villig til at kommunikere på nuværende tidpunkt, men ikke ud i
+til at kommunikere på et specifikt tidspunkt, samt at kanalen
+er villig til at kommunikere på nuværende tidpunkt, men ikke ud i
 fremtiden.
 
 At ville kommunikere fra et given tidspunkt i fremtiden, svare til at   
@@ -134,9 +132,9 @@ at kommunikere fra tidpunktet indtil kommunktationen lykedes. Dette
 kan dermed laves helt uden en alternation, men ved blot med de to       
 funktioner Wait(time), Cin().                                           
 
-At ville være villig til at kommuikere til et given tidspunkt,         
+\fxnote*{Er det korrekt?}{Kun at være villig til at kommuikere til et given tidspunkt,         
 medfører en ny problemstilling, da det kan introducere muligheden      
-for deadlocks og nondeterminisme, \fxnote{Er det korrekt?}, for det     
+for deadlocks og nondeterminisme}, for det     
 er ikke defineret hvad tiden er hvis det ikke lykkedes at kommunikere   
 i det givne tidsskridt. Der findes to muligheder, enten skal \sched     
 en signalere at der ikke findes mere arbejde til dette tidsskridt, og   

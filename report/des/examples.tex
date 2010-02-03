@@ -2,8 +2,9 @@
 \inline{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}
 
 
-\subsection{Hajer og fisk på Wator} Som et eksempel på en \des har vi valgt at 
-tage  udgangspunkt i det scenarie som \citeauthor{wator}
+\subsection{Hajer og fisk på Wator} 
+Som et eksempel på en \des har vi valgt at 
+tage  udgangspunkt i et predeter/prey scenarie som \citeauthor{wator}
 beskrev i artiklen \citetitle{wator}\cite{wator}. \fxnote{google:lotka,  voltarre} Artiklen beskriver den
 fiktive planet Wator, der har form som en torus og er fuldstændig
 dækket af vand. Verdenen er inddelt i felter, som kan være tomme, indeholde en
@@ -143,9 +144,9 @@ synkronisering af worldpart med vizualize, samt en som
 worldpart-processerne brugte til synkroniseringen af opdatering af 
 verdensdelen og de to sidste kolonner.\inline{hvad skal emphs og hvad skal med stå med code} 
 
+\subsubsection{Konklusion}
 \inline{konklusion hvordan var det at implementere og hvor stor parallelitet 
 kan man opnå. }
-
 
 \subsection{Kunder i en bank}\label{bank-eksempel}
 Et klassisk eksempel inden for \des er at simulere  en række kunder der alle 
@@ -167,25 +168,22 @@ hhv.  \simpy og \pycsp for at håndtere tid.
 
 I det andet eksempel er modellen udvidet med en servicedisk. Her skal alle 
 kunderne betjenes af en servicemedarbejder, som kun kan ekspederes en kunde ad 
-gangen. Alle kunder ankommer igen til banken i tilfældig orden og stiller sig i 
-kø for at blive serviceret. Dette  svare til en M/M/1\fxerror{hvad  er en m/m/1 
-kø} kø. Det er igen et tilfældigt tidsrum som kunden bruger på at blive 
+gangen. Alle kunder ankommer til banken på tilfældige tidspunkter  og stiller sig i 
+kø for at blive serviceret. Dette  svare til en M/M/1 kømodel. Det er igen et tilfældigt tidsrum som kunden bruger på at blive 
 serviceret.  Dette er stadigt en meget simpel model, men med introduktionen af 
 en begrænset ressource kan man uddrage information om den tilhørende kø, f.eks. 
 kan der måles hvor lang det tager for hver kunde at blive betjent af 
 servicemedarbejdere, samt hvordan køen opfører sig over tid. 
 
 \subsubsection{Før introduktion af et tidsbegreb i \pycsp}
-I \simpy er kunderne en proces og det vil derfor være nærliggende ligeledes at 
-modellere eksemplet i \pycsp med kunder som en proces. Dette sker i  \simpy når
-generatorfunktionen laver en kunde og lader denne køre parallelt med sig selv.  
-\inline{hvorfor?- man kan lave child proces med spawn, der der køre i samme parallel 
-kald som dets parent? - Hvorfor er dette ikke god CSP stil at bruge} er standard metoden\fxnote{set fra kodeeksempler}I \pycsp 
-modellere mere statiske processer, gerne med en generator- og 
-arbejderproces, og lade arbejdet flyttes 
-mellem processerne igennem kanaler. I \pycsp modellen fungerer 
-generatorprocessen som i \simpy, men vi introducerer en bankproces 
-som arbejder, og lader kunderne være arbejdet der flyttes mellem dem. 
+\fxnote{SB:giver dette afsnint mening?}
+I \simpy er kunderne en proces, der oprettes dynamisk af en kundegenerator. Det vil  være nærliggende ligeledes at 
+modellere eksemplet i \pycsp med kunder som en proces. I \simpy oprette generatorfunktionen en kundeprocess og  kører den parallelt med sig selv.  
+I \csp og også i \pycsp er processerne mere statiske, gerne med en generator- og 
+arbejderproces, hvor  arbejdet flyttes 
+mellem processerne igennem kanaler. Vi har derfor ændret modellen så   
+generatorprocessen i \pycsp er som i \simpy, men vi introducerer en bankproces i stedet for en kundeproces, og lader kunderne være arbejdet der flyttes mellem dem. 
+I \pycsp findes muligheden for at oprette processer dynamisk med funktionen \code{spawn}, og man kunne derfor god lade generatoprocessen oprette kundeprocesser dynamisk, men vi ønsker ikke kun at kopiere eksemplet fra \simpy til \pycsp, men også konverterer eksemplet så der overholder stilen for et program skrevet til \csp. 
 
 Mens \simpy kalder kundeprocessen fra generatoren og lader denne stå for håndteringen af kunden 
 og den tid hun befinder sig i banken, kender bankprocessen i \pycsp ikke tid som 
@@ -265,6 +263,5 @@ skal bankprocessen håndtere fejlede forsendelser og må nødvendigvis introduce
 sekundær kø hvilket gør at introduktionen af en ''\code{buffered channel}'' er 
 irrelevant. For undgå dette har vi i vores tilfælde valgt blot at 
 angive en maksimal størrelse på bufferen som er større end det totale antal 
-kunder banken modtager.\inline{husk at m/m/1 køer har uendelig længde, se $http://en.wikipedia.org/wiki/M/M/1\_model$ - kan bruges som argument for at have channels af uelndelig længde}
-
+kunder banken modtager. \fxnote*{giver mening?}{Dette medfører så at det ikke længere er en teoretisk korrekt M/M/1 kømodel, da denne specifikt angiver at køen skal have mulighedfor at have uendelig længde. I praksis er det ikke et problem da vi blot an resonere os frem til at køen ikke bliver fuld.}
 
