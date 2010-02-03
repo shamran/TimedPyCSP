@@ -106,33 +106,11 @@ at videreudvikle denne struktur til at håndtere tid generelt for alle
 processer, men ændre tiden så den fungerer med diskret tid, modsat den eksisterende
 løsning hvor tiden er realtid.
 
-\subsection{Timers}  
-\fxnote*{skriv hvorfor/omformuler}{Vi forventer at brugen af
-listen \code{timers}}, vil øges betragteligt og at den gennemsnitlige
-længde af listen derfor vil stige, når \pycsp bruges til simulering. Dermed 
-øges kravet om en effektiv implementering af \code{timers}\fxnote{skal 
-vi evaluere om dette rent faktisk forbedrer ydelsen}. 
-
-For at forbedre ydelsen af \code{timers} listen, 
-ændrer vi den fra en almindelig liste, til en min"-hob. En hob har
-flere fordele ved skemaplanlægning og er specifikt nævnt i introduktionen til Pythons implementering af en hob\footnote{$http://docs.python.org/dev/3.0/library/heapq.html$}. 
-
-Da en implementering af en hob
-allerede findes i Python i modulet \code{Heapq}, som er effektivt implementeret i C, vælger vi at bruge denne. Den eneste handling
-der ikke er som standard er implementeret, er fjernelsen af et arbitrært element
-fra hoben. Dette sker i den eksisterende løsning når en proces
-aktivere et andet valg i \code{alternation} end timeout. I dette tilfælde skal
-processen ikke vente på sin timeout, men elementet skal fjernes fra
-\code{timers} listen. For at fjerne et element i en hob, må man som i
-en normal liste lave en lineær søgning i hoben, og derefter genoprette
-hob"-egenskaben i listen. Dette vil dog ikke tage længere tid end på den nuværende måde, da en fjernelse af en timeout i \emph{greenlets}"-versionen på nuværende
-tidspunkt bruger en lineær søgning, til at finde elementet der skal
-fjernes, og genoprettelsen af hob"-egenskaben også tager lineær tid.\fxnote{Tarjas algorithm.\\$http://en.wikipedia.org/wiki/Tarjan\%27s\_algorithm$} For at se en forskellen mellem \emph{greenlets}-version der bruger en liste og \emph{simulering}-versionen der bruger en hob kan man sammenligne \cref{sched_timer} linje 205 med \cref{sim_timer} linje 126. 
 
 \subsection{Diskret tid} 
 For at konvertere \emph{greenlets}-versionen der knytter sig til realtid frem for diskrettid, skal vi ændre de steder i koden som allerede som bruger tid. Som vi har beskrevet tidligere er det eneste sted tid er introduceret i forbindelse med timeout og dermed i listen \code{timers}. Vi kan dermed nøjes med at ændre de steder i \sched en som involverer \code{timers}. Det første sted hvor \code{timers} indgår er i udvælgelsen af hvilken proces skal køres(\cref{sched_timer}). Her sammenlignes på linje 204  den første tidsværdi i \code{timers}, med det nuværende tidspunkt. Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra timers listen.
 
-Da tiden er diskret står tiden stille mens en proces kører og det kræver et aktivt valg før tiden stiger, kan vi tilføje en yderligere begrænsning i forhold til \emph{greenlets}-versionen. For \emph{simulerings}-versionen skal tiden være præcist det der er angivet i \code{timers}, før processen skal aktiveres, og ikke kun større, som angivet i \emph{greenlets}versionen. En kodestump af den del der foretager udvælgelser en proces fra \code{timers} i \emph{simulerings}-versionen  kan ses i \cref{sim_timer}. 
+Da tiden er diskret står tiden stille mens en proces kører og det kræver et aktivt valg før tiden stiger, kan vi tilføje en yderligere begrænsning i forhold til \emph{greenlets}-versionen. For \emph{simulerings}-versionen skal tiden være præcist det der er angivet i \code{timers}, før processen skal aktiveres, og ikke kun større, som angivet i \emph{greenlets}versionen. En kodestump af den del der foretager udvælgelser en proces fra \code{timers} i \emph{simulerings}-versionen  kan ses i \cref{sim_timer}.
 
 \begin{figure}[hbtp]
 \begin{minipage}[c]{\linewidth}
@@ -152,7 +130,7 @@ if self.timers and self.timers[0][0] <= Now():
 \end{minipage}
 \end{figure}
 
-\subsection{Funktionerne Now og Wait}
+\subsection{Funktionerne Now og Wait}\label{sec:Wait}
  I Python kan man benytte modulet \fxnote{Motiver: hvorfor snakker vi om dette / er det relevant}
 \code{time}, hvis man ønsker at introducere begrebet tid. Med dette
 modul kan man få af vide hvad realtiden er. fra en brugers synsvinkel
@@ -220,7 +198,7 @@ def Wait(seconds):
 
 Funktionen \code{Wait} er essentielt det eneste værktøj der skal til for at planlægge begivenheder ud i fremtiden, og vi har på nuværenede tidspunkt en simpel begivenhedssimulator der kører i realtid. 
 
-\subsection{Fra reel tid til diskret tid.}\label{sec:}
+\subsection{Fra reel tid til diskret tid.}\label{sec:discrete}
 Vi ønsker sædvanligvis at en simulering, kan eksekveres uafhængigt af tiden der simuleres det vil sige at når der ikke sker flere begivenheder til et givent tidspunkt skal tiden fremskrives til det næste tidskridt hvor der sker en begivenhed og ikke kun med et fast tidsskridt. Modsat gælder det også at tiden ikke må tælles op før alle processer har indikeret at de ikke ønsker at foretage mere arbejde. 
 
 I den eksisterende \sched ~ er tiden reel og fremskrives derfor løbende uafhængigt af processernes tilstand. Dette kan illustreres med et eksempel; Proces 1 har startet en ny tråd via et \code{io} kald, og er derfor blokeret. Proces 2 står i en \code{Alternation} med en timeout guard. Uafhængigt af tiden det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide at når timeout'en er indtrådt. Dette er implementeret i \cref{fig:blocking_sleep} på linjerne 242 til 251. For at nå disse linjer findes der processer der er blokeret samt processer der venter på en timeout. Nu startes en separat tråd der signalere \sched en, når næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
@@ -276,6 +254,26 @@ self.cond.release()
 \end{lstlisting}
 \end{minipage}
 \end{figure}
+
+\subsection{Timers}  
+\fxnote*{Hvor?}{som tidligere beskrevet} bruges listen \code{timers} i \pycsp kun til at placere processer der venter på en timeout i alternation. Dette er en niche feature ved \pycsp, som  sjældent vil skulle bruges, og hvor der sjældent er samlet mange processer på en gang. 
+ I \cref{sec:Wait} beskriv vi hvordan processer der ønsker at vente ligges på \code{timers} listen, og i \cref{sec:discrete} beskriver vi hvordan \sched kun tæller tiden op når ingen processer kan foretage sig mere i et givent tidsskridt. Når tiden tælles op vil  alle processer enten vente på kommunikation eller befinde sig i listen \code{timers}. De processer der venter i en alternation og hvor der er tilknyttet en timeout vil ligge begge steder. Gennemsnitslængden af listen vil derfor stige voldsomt og dermed ændres kravene til hvilken  datastruktur der er bedst egnet. 
+ 
+Med en kort, sjældent brugt liste vil omkostningerne til oprettelse og vedligeholdelse af en avanceret datastruktur være større end fordelene. Ved simuleringer ændres brugen af listen og vi skal derfor finde en datastruktur der bedre passer til vores brug. En min"-hob er det åbenlyse valg til skemaplanlægning da  man kan  indsætte elementer i konstant tid og fjerne det mindste element i $O(log\ n)$. Som eksempel på for anvendelsesmulighederne af en hob er skemaplanlægning specifikt nævnt i introduktionen til Pythons implementering\footnote{$http://docs.python.org/dev/3.0/library/heapq.html$}.  \fxnote{SB: ras læs .. er det ok?}
+
+Da en implementering af en hob allerede findes i Python i modulet \code{heapq}, som er effektivt implementeret i C, vælger vi at bruge denne. Den eneste handling
+der ikke er som standard er implementeret, er fjernelsen af et arbitrært element.
+fra hoben. Dette sker i den eksisterende løsning når en proces
+aktivere et andet valg i \code{alternation} end timeout. I dette tilfælde skal
+processen ikke vente på sin timeout, men elementet skal fjernes fra
+\code{timers} listen. Her, må man som i
+en normal liste lave en lineær søgning i hoben, og derefter genoprette
+hob"-egenskaben i listen. Dette vil dog ikke tage længere tid, da en fjernelse af en timeout i \emph{greenlets}"-versionen på nuværende
+tidspunkt bruger en lineær søgning, til at finde elementet der skal
+fjernes, og genoprettelsen af hob"-egenskaben også kan gøres i lineær tid.
+
+Det kræver ikke meget omskrivning for at konvertere en liste til en hob, men man kan sammenligne \cref{sched_timer} linje 205 med \cref{sim_timer} linje 126. 
+
 
 \subsection{Ting vi har stjålet fra \simpy.}
 I vores implementering findes der i sagens natur i overlap med \simpy, som har været en inspirationskilde til hvordan et simuleringssprog kunne udvikles i Python. En del af arbejdet med \simpy har vi kunne bruge direkte i vore implementering, efter devisen om ikke at genskrive eksisterende god kode. Det drejer sig om funktionalitet til dataindsamling, bearbejdning og visualisering. I \simpy findes en \code{Monitor}klasse. Formålet med denne klasse er at gemme en liste af tid/værdi par. Dermed kan man efter endt simulering, analysere  hvordan værdierne har ændret sig over tid. Klassen \code{Monitor} kan bruges direkte af brugere, hvor de så selv  står for at at gemme værdier på passende tidspunkter igennem kørslen af programmet. Man ønsker tit at kende længden af en kø, der som oftest er implementeret via en liste. Vi har derfor lavet vores egen liste der kan indeholde en \code{Monitor}. Når længden af listen ændres gemmes længden af listen i en montor til brug for senere analyse, uden brugeren selv skal stå for at gemme længden af listen. Alternativt kan man lave en separat proces hvis eneste formål der er med en given frekvens at gemme længden listen Fordelen ved denne løsning at er intervallet er jævnt fordelt, og man derfor lettere kan foretage tidsspecifik statistik.
