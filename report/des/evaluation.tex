@@ -5,13 +5,51 @@
   Vi har igennem designet og udviklingen af \code{simulerings}-versionen brugt en Test Driven Development (TDD). I TDD starter man med at skrive tests til en ny egenskab der skal udvikles. Designet er implementeret korrekt når testene kan gennemføres korrekt. Dette medfører at vi løbende i forbindelsen med udviklingen af \emph{simulerings}-versionen har skrevet tests. Desuden har vi integreret alle tests fra \emph{greenlets}-versionen ind i \emph{simulerings}-versionen, således at tests skrevet til \emph{greenlets}-versionen også tester vores version. Resultaterne af testene kan ses i tabel \fxerror{TODO! testene virker ikke:(}
   
 \subsection{Eksempler}
-Til at evaluere 
+for at evaluere fordele og ulemper af simuleringsversionen af \pycsp, har vi genimplementeret eksemplerne fra \cref{sec:des-examples}, men denne gang med  brug af vores udviklede kode. Dermed kan vi sammenholde de to versioner, og se på fordele og ulemper ved simuleringsversionen.
+ers
 \subsection{Kunder i bank}
+I den simple version ...
+
+I den avancerede eksempel 
+
+Ved at sammenligne generator funktionerne kan vi tydeligt se forskellen på de to versioner. Overordnet set kan man se at greenlets versionen bruger 20 linjer kode hvor simulationen kun bruger 6 linjer. 
+
+Den store forskel på de to funktioner er muligheden for i simulationen  at undgå brugen af barriere. Dermed skal processen ikke være aktiv i hvert tidsskridt, men kun i de tidsskridt hvor der skal produceres en kunde. Når processen kun er aktiv i de korekte tidsskridt kan vi undgå en række hjælpevariabler (\code{t\_event, time} og \code{numberInserted}). \code{t\_event}. Desuden kan vi slippe for begrænsningen der kræver at en tiden skal være et heltal (\cref{greenlets_generator} linje 29). Linjerne 35 til 41 er krævet da barrieren kræver det samme antal processer igennem hele kørslen(Se \cref{sec:barrierer}). I alt kan man derfor skrive en mere koncis proces med brugen af simulation. I resten af koden opnår vi lignene kodekonsentration, men vi har også udviddet eksemplet så vi gemmer antallet af kunder der befinder sig i banken i en \code{Monitor}. Dette er ikke strengt nødvændigt, men viser brugen af \code{Monitor} til simulering. Dette var naturligt forventet at koden kunne forbedres, da eksemplet er et typisk \des problem, men det er tilfredstillende at vi opnår de forventede forbedringer i implementeringen af simulationen.
+\begin{lstlisting}[firstnumber=21, label=greenlets_generator, caption=Generatorprocessen for Greenlets versionen]
+@process
+def Generator(i,number,meanTBA, meanWT,customerWRITER,barrierWRITER,barrierREADER):
+  t_event = 0
+  time = 0
+  numberInserted = 0
+  while numberInserted<number:
+    if t_event<=time:
+      customerWRITER(Customer(name = "Customer%d:%02d"%(i,numberInserted),meanWT=meanWT))
+      t_event = time + round(expovariate(1/meanTBA))
+      numberInserted+=1
+    barrierWRITER(0)
+    barrierREADER()
+    time+=1
+  retire(customerWRITER)
+  try:
+    while True:
+      barrierWRITER(0)
+      barrierREADER()
+      time +=1
+  except ChannelPoisonException: 
+    return
+\end{lstlisting}
+\begin{lstlisting}[firstnumber=20, label=simulation_generator, caption=Generatorprocessen for Simulationsversionen]
+@process
+def Generator(i,number,meanTBA, meanWT, customerWRITER):
+  for numberInserted in range(number):
+    Wait(expovariate(1/meanTBA))
+    customerWRITER(Customer(name = "Customer%d:%02d"%(i,numberInserted),meanWT = meanWT))
+  retire(customerWRITER)
+\end{lstlisting}
 
 
 
-
-\subsection{Effektivitet}  
 \inline{skal vi overhoved evaluere performance?}
   
+\subsection{Effektivitet}  
 
