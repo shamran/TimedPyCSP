@@ -42,12 +42,56 @@ def Generator(i,number,meanTBA, meanWT,customerWRITER,barrierWRITER,barrierREADE
 @process
 def Generator(i,number,meanTBA, meanWT, customerWRITER):
   for numberInserted in range(number):
+    customerWRITER(Customer(name = "Customer%d:%02d"%(i,numberInserted),
+                            meanWT = meanWT))
     Wait(expovariate(1/meanTBA))
-    customerWRITER(Customer(name = "Customer%d:%02d"%(i,numberInserted),meanWT = meanWT))
   retire(customerWRITER)
 \end{lstlisting}
 
+\begin{lstlisting}[firstnumber=11, label=simpy_generator, caption=Generator funktion for simpy]
+def generate(self,number,meanTBA,resource):         
+    for i in range(number):
+        c = Customer(name = "Customer%02d"%(i,))
+        activate(c,c.visit(b=resource))              
+        t = expovariate(1.0/meanTBA)               
+        yield hold,self,t
+\end{lstlisting}
 
+En sammenligning af generatorfunktionen mellem \simpy og simulationsversionen viser ikke den store forskel i hvorledes  man  implementere eneratorfunktionen i de to sprog. I \simpy aktivere man kunden direkte, mens man i simulationsversionen sender kunden over en kanal.
+
+\begin{lstlisting}[firstnumber=39,float=hbtp, label=fig:simulation_bank, caption= Uddrag af bank processen i simulation]
+    while True:
+      print "%94.0f: blocking wait to receive customer"%(Now())
+      msg = customerREADER()
+      print "%94.0f: %s enter bank"%(Now(),msg.name)
+      heappush(customers,(Now()+msg.waittime,msg))
+      mon.observe(len(customers))
+      while len(customers)>0:
+        print "%94.0f: B: timeout is:%f"%(Now(),customers[0][0]-Now())
+        (g,msg) = Alternation([(customerREADER,None),
+                               (Timeout(seconds=customers[0][0]- Now()),None)
+                             ]).select()
+        if g == customerREADER:
+          heappush(customers,(Now()+msg.waittime,msg))
+          print "%94.0f: %s enter bank"%(Now(),msg.name)
+        else:
+          ntime,ncust = heappop(customers)
+          print "%94.0f: %s left bank"%(Now(),ncust.name) 
+\end{lstlisting}
+
+\begin{lstlisting}[firstnumber=20 ,float=hbtp, label=fig:simpy_customer, caption=funktionen \code{visit} i \simpy]
+     def visit(self,b):                                
+        arrive = now()
+        print "%8.4f %s: Here I am     "%(now(),self.name)
+        yield request,self,b                          
+        wait = now()-arrive
+        print "%8.4f %s: Waited %6.3f"%(now(),self.name,wait)
+        tib = expovariate(1.0/timeInBank)            
+        yield hold,self,tib                          
+        yield release,self,b                         
+        print "%8.4f %s: Finished      "%(now(),self.name)
+ 
+\end{lstlisting}
 
 \inline{skal vi overhoved evaluere performance?}
   
