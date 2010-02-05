@@ -6,6 +6,11 @@ Kommunikation mellem to processer i CSP kan kun ske når begge processer er klar
 
 en \code{alternation} er en struktur til at foretage valg omkring kommunikation. En \code{alternation} kan indeholde et vilkårligt antal kanalender, samt eventuelt en \code{guard}. Når en \code{alternation} udføres foretages der således et valg mellem de kanaler der er klar eller \code{guarden}. En guard kan enten være en \code{timeout}- eller \code{SKIP-guard}. En \code{timeout-guard} er klar efter en angivent tidspunkt og en \code{SKIP-guard} er altid klar. Dette giver mulighed for konstruktioner som f.eks. "kommuniker hvis der er processer der ønsker at kommunikere med os, ellers fortsæt". 
 
+parallel, sequence, spawn
+buffered channels
+retire
+
+
 
 
 Kanaler, karakteristika for dem
