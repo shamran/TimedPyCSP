@@ -116,7 +116,7 @@ Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp.
 
 Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun  lokalt data. Hvis der er data er delt pga. arkitekturen \csp er implementeret på, bør dette abstraheres væk men udnyttes internt i kanalerne. At introducere hjælpemidler for styre delt data, er derfor at tilskynde til en forkert brug af \csp. Tiden er den anden begrundelse for at benytte barrierer.\fxnote*{Skal hives et niveau op tekstmæssigt}{Men med brugen af barrierer til at modellerer tid, kan man får  en primitiv model for tid, og vi vil i vores speciale vise ved at inkluderer tid i stedet får man et stærkere værktøj der ud over en masse andet også kan erstatte brugen af barrierer.}
 
-
+\begin{shaded}
 \subsection{Timeout} 
 \inline{kausal tid.}
 Med et simuleringsmiljø er det ikke nok
@@ -168,7 +168,7 @@ samme tidsskridt at indgå i kommunikation med en af de andre ventende
 processer. Deadlocken kan man dermed løse og man har mulighed for at
 undgå livelock problemet, ved samtidig signalering. Ulemperne er at der
 skal foretages et valg om hvilke processer der signaleres med timeout,
-og dermed har man risikoen for starvation\fxnote{ref?} hvis det er
+og dermed har man risikoen for starvation\inline{ref?} hvis det er
 den/de samme processer der bliver signaleret.
 
 \subsubsection{Timeout i et efterfølgende tidsskridt} Ved at vælge at
@@ -196,7 +196,7 @@ kunne angive at vi ønsker at kommunikere men KUN i det tidsskridt vi er
 i, og at hvis dette ikke kan lade sig gøre skal vi breake noget alla at
 have en timeout på 0}
 
-
+\end{shaded}
 
 \subsection{Køer i CSP}
 \inline{køer med buffers manuelle køer, og monitors sammen med køer.}
