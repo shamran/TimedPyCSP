@@ -20,16 +20,11 @@ class Customer:
 @process
 def Generator(i,number,meanTBA, meanWT, customerWRITER):
   """Generaters a customer with a given time difference"""
-  t_event = 0
-  numberInserted = 0
-  while numberInserted<number:
-    Wait(t_event)
-    c = Customer(name = "Customer%d:%02d"%(i,numberInserted),meanWT = meanWT)
-    print "%64.0f: G%d: %s =%s"%(Now(),i,numberInserted,c.name)
-    customerWRITER(c)
-    print "%64.0f: G%d: sent customer %s =%s"%(Now(),i,numberInserted,c.name)
-    t_event = round(expovariate(1/meanTBA))
-    numberInserted+=1
+  for numberInserted in range(number):
+    Wait(expovariate(1/meanTBA))
+    #print "%64.0f: G%d: %s =%s"%(Now(),i,numberInserted,c.name)
+    customerWRITER(Customer(name = "Customer%d:%02d"%(i,numberInserted),meanWT = meanWT))
+    #print "%64.0f: G%d: sent customer %s =%s"%(Now(),i,numberInserted,c.name)
   print "%64.0f: G%d: retires"%(Now(),i) 
   retire(customerWRITER)
 
@@ -82,12 +77,11 @@ def Bank(meanWait,customerREADER):
 if __name__ == "__main__":
   print "main starting"
   nprocesses = 10 
-  mon = Monitor()
   customer = Channel(buffer=9,mon = mon)
   
-  numberCustomersprprocess=100
-  meanTBA = 1.0
-  meanWT =  3.0
+  numberCustomersprprocess=10
+  meanTBA = 3.0
+  meanWT =  5.0
   b = Bank(meanWT,+customer)
   Parallel(
     b,
@@ -96,12 +90,4 @@ if __name__ == "__main__":
   )
   print b.executed
   print "end"
-  Histo = mon.histogram(high=9,nbins=9)
-  mon.setHistogram(high=9, nbins=9)
-  print mon.printHistogram()
-  plt = SimPlot()                                                  
-  plt.plotHistogram(Histo,xlab='length of queue',ylab='number of observation', 
-                    title="# customers i channelqueue",
-                    color="red",width=1)                         
-  plt.mainloop()  
 
