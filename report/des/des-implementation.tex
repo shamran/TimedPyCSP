@@ -79,6 +79,9 @@ ikke \code{Scheduler} fra greenletsversionen.
 %klassen \code{Scheduler}, samt se hvordan den kan inkorporeres i vores
 %design.
 
+
+
+\begin{shaded}
 \subsection{Tid i greenletsversionen} 
 I \pycsp foregår kommunikation
 kun når begge kanalender er klar, dvs. når der både findes en
@@ -90,7 +93,8 @@ I \pycsp har man derfor i \code{alternation} mulighed for at
 tilknytte en timeout til en \code{guard}. Dette giver mulighed for
 at en proces, kun er villig til at vente på kommunikation i en
 given tidsperiode. 
-\begin{lstlisting}[float=hbtp, label=Timeout,caption=Timeout i Alternation (fra dokumentationen til PyCSP)]
+\begin{lstlisting}[%float=hbtp, 
+label=Timeout,caption=Timeout i Alternation (fra dokumentationen til PyCSP)]
 Alternation([{Timeout(seconds=0.5):None}, 
              {Cin:None}]).select()
 \end{lstlisting}
@@ -105,6 +109,7 @@ mulighed for at tilknytte timeout til en \code{alternation}. Vi ønsker
 at videreudvikle denne struktur til at håndtere tid generelt for alle
 processer, men ændre tiden så den fungerer med diskret tid, modsat den eksisterende
 løsning hvor tiden er realtid.
+\end{shaded}
 
 
 \subsection{Diskret tid} 
