@@ -3,8 +3,8 @@ draft,% Når man skal skifte kompileringsmetode mellem draft og final skal man
       %flytte kommenteringen %  i Draft kommanoerne, nedenfor.
 11pt, % standardstørrelse på fonten
 openany,%, % anvnedes hvis kapitler bare skal starte på den næste side
-oneside,
-article
+oneside%,
+%article
 ]{memoir}%
 % marginer, memoir to to metoder
 % den traditionelle, se memoir manualen
@@ -268,12 +268,15 @@ typeeditors 	= {{udgivere}{udg\adddot}},
     %\DeclareCaptionFont{blue}{\color{blue}} 
 
   %\captionsetup[lstlisting]{singlelinecheck=false, labelfont={blue}, textfont={blue}}
-  \usepackage{caption}
+\usepackage{caption}
 \DeclareCaptionFont{white}{\color{white}}
 \DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
 \captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
 
 
+\let\oldlstlisting=\lstlisting
+\renewcommand{\lstlisting}{\SingleSpacing\oldlstlisting}
+ 
 
 
 \usepackage{pdfpages}

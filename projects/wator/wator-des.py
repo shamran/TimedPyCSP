@@ -143,14 +143,13 @@ def worldpart (part_id):
   
 @process
 def visualize():
-  Wait(3)
   for i in xrange(iterations):
+    Wait(3)
     pygame.display.flip()
     print "%d: vizualized"%Now()
-    print "%s"%Simulation() 
-    t = raw_input()
-    Wait(3) 
-
+    #print "%s"%Simulation() 
+    #t = raw_input()
+    
 def create_gui(type,point):
   if type == SHARK : screen.blit(shark_img,(point.getX()*multiplier,point.getY()*multiplier))
   if type == FISH : screen.blit(fish_img,(point.getX()*multiplier,point.getY()*multiplier))

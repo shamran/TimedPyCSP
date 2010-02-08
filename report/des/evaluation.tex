@@ -10,13 +10,52 @@ ers
 
  
 \subsection{Hajer og fisk på Wator}
+I dette eksempel har implementeringen i et simulationssprog ikke medført den store omskrivning. Dette skyldes at eksemplet er en kontinuerlig simulation, og alle fisk og hajer ønsker at interagere med omverdenen i hvert tidsskridt. I processen \code{visualize} ser man tydeligst forskellen mellem standard \pycsp og dens brug af barrierer og \code{simulerings}"-versionen og dens brug af tid vha. funktionen \code{Wait}. Hvor standard \pycsp må kalde en barrier tre gange for hver iteration kan man i simuleringsversionen blot angive at visualiseringen ønsker at vente tre tidsskridt. 
 
+\begin{lstlisting}[firstnumber=157 ,float=hbtp, label=fig:green:visualize, caption=\code{Greenlets}"-versionen af visualize]
+@process
+def visualize(barR,barW):
+  for i in xrange(iterations):
+    barW(1)
+    barR()
+    barW(1)
+    barR()
+    pygame.display.flip()
+    barW(1)
+    barR()
+  poison(barW,barR)     
+\end{lstlisting}
+
+\begin{lstlisting}[firstnumber=144 ,float=hbtp, label=fig:sim:visualize, caption=\code{simulerings}"-versionen af visualize]
+@process
+def visualize():
+  for i in xrange(iterations):
+    Wait(3)  
+    pygame.display.flip()
+    print "%d: vizualized"%Now()
+\end{lstlisting}
+
+\begin{lstlisting}[firstnumber=130 ,float=hbtp, label=fig:sim:worker, caption=Uddrag af arbejderprocessen i simulering]
+Wait(1)
+for i in xrange(iterations):
+  #Calc your world part:
+  main_iteration()
+  Wait(1)
+  #Calc the two shadowrows
+  print "%d: shadow row "%Now()
+  for i in range(world_height):
+    for j in range(2):
+      element_iteration(Point(right_shadow_col+j,i))
+  Wait(2)
+\end{lstlisting}
+
+I arbejderprocessen kan man også se hvordan brugen af tid ændre hvordan man kan sikre adgang til en delt ressource. I  \code{greenlets}"-versionen skulle barrieren  kaldes flere gange i træk for at overlade en delt datastruktur til andre processer. Med simulering kan som det ses af \cref{fig:sim:worker} linje 140 nøjes med at vente i to tidsskridt. Dermed har man skab plads til at denne proces ikke har adgang til data, da processen ikke køres i det efterfølgende tidsskridt, men ligger og venter i \code{timers}"-køen. Skal flere forskellige processer have eksklusive rettigheder kan man blot øge antallet af tidsskridt processen venter. Hvis dette skulle opnås med barrierer skulle man lave en løkke der et antal gange lod processen gå igennem barrieren.
 
 \subsection{Kunder i bank}
 Vi har implementeret de to bankeksempler ved brug af den nyudviklede simuleringsversion til \pycsp. Vi vil her se på de dele af koden hvor simuleringsversionen har haft størst indvirkning. 
 
 I generatorfunktionerne er den funktion hvor man tydeligst kan  se forskellen på de to versioner. Overordnet set kan man se at greenlets versionen bruger 20 linjer kode hvor simulationen kun bruger 6 linjer. Den store forskel på de to funktioner er muligheden for i simulationen  at undgå brugen af barriere. Dermed skal processen ikke være aktiv i hvert tidsskridt, men kun i de tidsskridt hvor der skal produceres en kunde. Når processen kun er aktiv i de korekte tidsskridt kan vi undgå en række hjælpevariabler (\code{t\_event, time} og \code{numberInserted}). \code{t\_event}. Desuden kan vi slippe for begrænsningen der kræver at en tiden skal være et heltal (\cref{greenlets_generator} linje 29). Linjerne 35 til 41 er krævet da barrieren kræver det samme antal processer igennem hele kørslen(Se \cref{sec:barrierer}). I alt kan man derfor skrive en mere koncis proces med brugen af simulation. I resten af koden opnår vi lignene kodekonsentration, men vi har også udviddet eksemplet så vi gemmer antallet af kunder der befinder sig i banken i en \code{Monitor}. Dette er ikke strengt nødvendigt, men viser brugen af \code{Monitor} til simulering. Dette var naturligt forventet at koden kunne forbedres, da eksemplet er et typisk \des problem, men det er tilfredstillende at vi opnår de forventede forbedringer i implementeringen af simulationen.
-\begin{lstlisting}[firstnumber=21, label=greenlets_generator, caption=Generatorprocessen for Greenlets versionen]
+\begin{lstlisting}[firstnumber=21, label=fig:green:generator, caption=Generatorprocessen for Greenlets versionen]
 @process
 def Generator(i,number,meanTBA, meanWT,
               customerWRITER,barrierWRITER,barrierREADER):
@@ -41,7 +80,7 @@ def Generator(i,number,meanTBA, meanWT,
   except ChannelPoisonException: 
     return
 \end{lstlisting}
-\begin{lstlisting}[firstnumber=20, label=simulation_generator, caption=Generatorprocessen for Simulationsversionen]
+\begin{lstlisting}[firstnumber=20, label=fig:sim:generator, caption=Generatorprocessen for Simulationsversionen]
 @process
 def Generator(i,number,meanTBA, meanWT, customerWRITER):
   for numberInserted in range(number):
@@ -51,7 +90,7 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
   retire(customerWRITER)
 \end{lstlisting}
 
-\begin{lstlisting}[firstnumber=11, label=simpy_generator, caption=Generator funktion for simpy]
+\begin{lstlisting}[firstnumber=11, label=fig:simpy:generator, caption=Generator funktion for simpy]
 def generate(self,number,meanTBA,resource):         
     for i in range(number):
         c = Customer(name = "Customer%02d"%(i,))
@@ -61,7 +100,7 @@ def generate(self,number,meanTBA,resource):
 \end{lstlisting}
 
 En sammenligning af generatorfunktionen mellem \simpy og simulationsversionen viser ikke den store forskel i hvorledes  man  implementere eneratorfunktionen i de to sprog. I \simpy aktivere man kunden direkte, mens man i simulationsversionen sender kunden over en kanal. Der findes større forskel på de to implementeringer i selve kunde delen. Dette skyldes at i simuleringsversionen findes en bankproce, og denne dermed er delt på tværs af alle kunder, mens man i \simpy har en funktion per kunde. Denne forskel medvirker til at bankprocessen skal have styr på hvornår samtlige kunder ønsker at forlade banken igen hvilket kræver lidt mere kode. I hjertet af bankprocessen findes en \code{alternation}. Her afventer processen hele tide på enten at modtage en ny kunde, eller på at en kunden ønsker at forlade banken.
-\begin{lstlisting}[firstnumber=39,float=hbtp, label=fig:simulation_bank, caption= Uddrag af bank processen i simulation]
+\begin{lstlisting}[firstnumber=39,float=hbtp, label=fig:sim:bank, caption= Uddrag af bank processen i simulation]
     while True:
       msg = customerREADER()
       print "%94.0f: %s enter bank"%(Now(),msg.name)
@@ -79,7 +118,7 @@ En sammenligning af generatorfunktionen mellem \simpy og simulationsversionen vi
           ntime,ncust = heappop(customers)
           print "%94.0f: %s left bank"%(Now(),ncust.name) 
 \end{lstlisting}
-\begin{lstlisting}[firstnumber=20 ,float=hbtp, label=fig:simpy_customer, caption=funktionen \code{visit} i \simpy]
+\begin{lstlisting}[firstnumber=20 ,float=hbtp, label=fig:simpy:customer, caption=funktionen \code{visit} i \simpy]
      def visit(self,b):                                
         arrive = now()
         print "%8.4f %s: Here I am     "%(now(),self.name)
@@ -91,20 +130,22 @@ En sammenligning af generatorfunktionen mellem \simpy og simulationsversionen vi
         yield release,self,b                         
         print "%8.4f %s: Finished      "%(now(),self.name)
 \end{lstlisting}
-\begin{lstlisting}[firstnumber=33 ,float=hbtp, label=fig:simulation_bank2, caption=Bankprocessen hvor banken er en begrænset ressource. ]
+\begin{lstlisting}[firstnumber=33 ,float=hbtp, label=fig:sim:bank2, caption=Bankprocessen hvor banken er en begrænset ressource. ]
   @process
 def Bank(customerREADER):
   try:
       while True:
         print "%94.0f: B: waits for customer"%Now()
         customer = customerREADER()
-        print "%94.0f: B: adding a customer  %s to queue"%(Now(),customer)
+        print "%94.0f: B: adding customer %s to queue"
+               %(Now(),customer)
         Wait(customer.waittime)
-        print "%94.0f: B: customer  %s exits queue"%(Now(),customer)
+        print "%94.0f: B: customer  %s exits queue"
+               %(Now(),customer)
   except ChannelRetireException:
       print "%94.0f: B: got retire"%(Now())
 
 \end{lstlisting}
-I det avancerede eksempel som vist i  \cref{fig:simulation_bank2} indeholder bankprocessen mindre kode end i det simple eksempel. Det skyldes at banken ikke længere skal holde styr på samtlige kunder, men blot skal håndtere en kunde ad gangen mens resten af kunderne befinder sig i køen. Kundefunktionen i \simpy og bankprocessen i det avancerede eksempel minder meget om hinanden og en fordel ved \csp versionen af simulering at man kun foretager en \code{Wait} for at indikere af den begrænsede ressource er optaget, hvor man i \simpy versionen skal foretage tre kald. Først et kald for at få adgang til den begrænsede ressource, så et kald for at holde ressourcen i et tidsperiode, samt et sidste for at slippe ressourcen.
+I det avancerede eksempel som vist i  \cref{fig:simulation:bank2} indeholder bankprocessen mindre kode end i det simple eksempel. Det skyldes at banken ikke længere skal holde styr på samtlige kunder, men blot skal håndtere en kunde ad gangen mens resten af kunderne befinder sig i køen. Kundefunktionen i \simpy og bankprocessen i det avancerede eksempel minder meget om hinanden og en fordel ved \csp versionen af simulering at man kun foretager en \code{Wait} for at indikere af den begrænsede ressource er optaget, hvor man i \simpy versionen skal foretage tre kald. Først et kald for at få adgang til den begrænsede ressource, så et kald for at holde ressourcen i et tidsperiode, samt et sidste for at slippe ressourcen.
 
   
