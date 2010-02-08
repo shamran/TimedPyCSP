@@ -8,6 +8,30 @@ En \code{alternation} er en struktur til at foretage valg omkring kommunikation.
 
 \section{Afvikling af processer}
 I \pycsp findes der tre metoder til at afvikle processer. \code{Parallel}-kaldet benyttes til samtidig afvikling af processer, \code{sequence}-kaldet benyttes når man ønsker at afvikle processer sekventielt og \code{spawn} bruges til planlægge kørsel af processer ved at lægge dem på \sched eren. 
+\fxnote[inline, nomargin]{Hvad skal vi mere sige om dem?}
+
+
+\section{Tre implementeringer}
+I artiklen \citetitle{Friborg2009}\cite{Friborg2009} præsenteres der tre forskellige implementationer af processer i PyCSP. Hver implementation har fordele og ulemper og formålet med at have alle tre til rådighed er at give udvikleren mulighed for at vælge den implementation der passer bedst til en given applikation. Implementationerne deler samme API, så det er let at skifte rundt mellem dem og teste samspillet med den udviklede applikation. 
+
+Implementationerne adskiller sig ved hvordan CSP processerne er implementeret, og derfor hvilke egenskaber der er gældende for dem. De benytter henholdsvis operativsystemets tråde(threads), bruger-tråde(greenlets), og multiprocesseringsmodulet(processes) i Python. Da \emph{Threads}-versionen benytter operativsystemets tråde vil en applikation typisk være begrænset til ca. 1000 samtidige tråde\inline{ref? (taget fra 3 imp. artiklen}.
+
+
+\\
+threads:\\
+standard threading module i python - kernel-level threads\\
+
+greenlets:\\
+lightweight(user-level) threads\\
+IO wrapper - seperat thread\\
+
+
+processes:\\
+multiprocessing in python 2.6\\
+seperat instance af python intepreter\\
+
+
+
 
 
 \subsubsection{noter}
