@@ -7,23 +7,26 @@
 \subsection{Eksempler}
 for at evaluere fordele og ulemper af simuleringsversionen af \pycsp, har vi genimplementeret eksemplerne fra \cref{sec:des-examples}, men denne gang med  brug af vores udviklede kode. Dermed kan vi sammenholde de to versioner, og se på fordele og ulemper ved simuleringsversionen.
 ers
+
+ 
+\subsection{Hajer og fisk på Wator}
+
+
 \subsection{Kunder i bank}
-I den simple version ...
+Vi har implementeret de to bankeksempler ved brug af den nyudviklede simuleringsversion til \pycsp. Vi vil her se på de dele af koden hvor simuleringsversionen har haft størst indvirkning. 
 
-I den avancerede eksempel 
-
-Ved at sammenligne generator funktionerne kan vi tydeligt se forskellen på de to versioner. Overordnet set kan man se at greenlets versionen bruger 20 linjer kode hvor simulationen kun bruger 6 linjer. 
-
-Den store forskel på de to funktioner er muligheden for i simulationen  at undgå brugen af barriere. Dermed skal processen ikke være aktiv i hvert tidsskridt, men kun i de tidsskridt hvor der skal produceres en kunde. Når processen kun er aktiv i de korekte tidsskridt kan vi undgå en række hjælpevariabler (\code{t\_event, time} og \code{numberInserted}). \code{t\_event}. Desuden kan vi slippe for begrænsningen der kræver at en tiden skal være et heltal (\cref{greenlets_generator} linje 29). Linjerne 35 til 41 er krævet da barrieren kræver det samme antal processer igennem hele kørslen(Se \cref{sec:barrierer}). I alt kan man derfor skrive en mere koncis proces med brugen af simulation. I resten af koden opnår vi lignene kodekonsentration, men vi har også udviddet eksemplet så vi gemmer antallet af kunder der befinder sig i banken i en \code{Monitor}. Dette er ikke strengt nødvændigt, men viser brugen af \code{Monitor} til simulering. Dette var naturligt forventet at koden kunne forbedres, da eksemplet er et typisk \des problem, men det er tilfredstillende at vi opnår de forventede forbedringer i implementeringen af simulationen.
+I generatorfunktionerne er den funktion hvor man tydeligst kan  se forskellen på de to versioner. Overordnet set kan man se at greenlets versionen bruger 20 linjer kode hvor simulationen kun bruger 6 linjer. Den store forskel på de to funktioner er muligheden for i simulationen  at undgå brugen af barriere. Dermed skal processen ikke være aktiv i hvert tidsskridt, men kun i de tidsskridt hvor der skal produceres en kunde. Når processen kun er aktiv i de korekte tidsskridt kan vi undgå en række hjælpevariabler (\code{t\_event, time} og \code{numberInserted}). \code{t\_event}. Desuden kan vi slippe for begrænsningen der kræver at en tiden skal være et heltal (\cref{greenlets_generator} linje 29). Linjerne 35 til 41 er krævet da barrieren kræver det samme antal processer igennem hele kørslen(Se \cref{sec:barrierer}). I alt kan man derfor skrive en mere koncis proces med brugen af simulation. I resten af koden opnår vi lignene kodekonsentration, men vi har også udviddet eksemplet så vi gemmer antallet af kunder der befinder sig i banken i en \code{Monitor}. Dette er ikke strengt nødvendigt, men viser brugen af \code{Monitor} til simulering. Dette var naturligt forventet at koden kunne forbedres, da eksemplet er et typisk \des problem, men det er tilfredstillende at vi opnår de forventede forbedringer i implementeringen af simulationen.
 \begin{lstlisting}[firstnumber=21, label=greenlets_generator, caption=Generatorprocessen for Greenlets versionen]
 @process
-def Generator(i,number,meanTBA, meanWT,customerWRITER,barrierWRITER,barrierREADER):
+def Generator(i,number,meanTBA, meanWT,
+              customerWRITER,barrierWRITER,barrierREADER):
   t_event = 0
   time = 0
   numberInserted = 0
   while numberInserted<number:
     if t_event<=time:
-      customerWRITER(Customer(name = "Customer%d:%02d"%(i,numberInserted),meanWT=meanWT))
+      customerWRITER(Customer(name = "Customer%d:%02d"%
+                     (i,numberInserted),meanWT=meanWT))
       t_event = time + round(expovariate(1/meanTBA))
       numberInserted+=1
     barrierWRITER(0)
@@ -57,11 +60,9 @@ def generate(self,number,meanTBA,resource):
         yield hold,self,t
 \end{lstlisting}
 
-En sammenligning af generatorfunktionen mellem \simpy og simulationsversionen viser ikke den store forskel i hvorledes  man  implementere eneratorfunktionen i de to sprog. I \simpy aktivere man kunden direkte, mens man i simulationsversionen sender kunden over en kanal.
-
+En sammenligning af generatorfunktionen mellem \simpy og simulationsversionen viser ikke den store forskel i hvorledes  man  implementere eneratorfunktionen i de to sprog. I \simpy aktivere man kunden direkte, mens man i simulationsversionen sender kunden over en kanal. Der findes større forskel på de to implementeringer i selve kunde delen. Dette skyldes at i simuleringsversionen findes en bankproce, og denne dermed er delt på tværs af alle kunder, mens man i \simpy har en funktion per kunde. Denne forskel medvirker til at bankprocessen skal have styr på hvornår samtlige kunder ønsker at forlade banken igen hvilket kræver lidt mere kode. I hjertet af bankprocessen findes en \code{alternation}. Her afventer processen hele tide på enten at modtage en ny kunde, eller på at en kunden ønsker at forlade banken.
 \begin{lstlisting}[firstnumber=39,float=hbtp, label=fig:simulation_bank, caption= Uddrag af bank processen i simulation]
     while True:
-      print "%94.0f: blocking wait to receive customer"%(Now())
       msg = customerREADER()
       print "%94.0f: %s enter bank"%(Now(),msg.name)
       heappush(customers,(Now()+msg.waittime,msg))
@@ -78,7 +79,6 @@ En sammenligning af generatorfunktionen mellem \simpy og simulationsversionen vi
           ntime,ncust = heappop(customers)
           print "%94.0f: %s left bank"%(Now(),ncust.name) 
 \end{lstlisting}
-
 \begin{lstlisting}[firstnumber=20 ,float=hbtp, label=fig:simpy_customer, caption=funktionen \code{visit} i \simpy]
      def visit(self,b):                                
         arrive = now()
@@ -90,10 +90,21 @@ En sammenligning af generatorfunktionen mellem \simpy og simulationsversionen vi
         yield hold,self,tib                          
         yield release,self,b                         
         print "%8.4f %s: Finished      "%(now(),self.name)
- 
 \end{lstlisting}
+\begin{lstlisting}[firstnumber=33 ,float=hbtp, label=fig:simulation_bank2, caption=Bankprocessen hvor banken er en begrænset ressource. ]
+  @process
+def Bank(customerREADER):
+  try:
+      while True:
+        print "%94.0f: B: waits for customer"%Now()
+        customer = customerREADER()
+        print "%94.0f: B: adding a customer  %s to queue"%(Now(),customer)
+        Wait(customer.waittime)
+        print "%94.0f: B: customer  %s exits queue"%(Now(),customer)
+  except ChannelRetireException:
+      print "%94.0f: B: got retire"%(Now())
 
-\inline{skal vi overhoved evaluere performance?}
+\end{lstlisting}
+I det avancerede eksempel som vist i  \cref{fig:simulation_bank2} indeholder bankprocessen mindre kode end i det simple eksempel. Det skyldes at banken ikke længere skal holde styr på samtlige kunder, men blot skal håndtere en kunde ad gangen mens resten af kunderne befinder sig i køen. Kundefunktionen i \simpy og bankprocessen i det avancerede eksempel minder meget om hinanden og en fordel ved \csp versionen af simulering at man kun foretager en \code{Wait} for at indikere af den begrænsede ressource er optaget, hvor man i \simpy versionen skal foretage tre kald. Først et kald for at få adgang til den begrænsede ressource, så et kald for at holde ressourcen i et tidsperiode, samt et sidste for at slippe ressourcen.
+
   
-\subsection{Effektivitet}  
-

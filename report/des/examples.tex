@@ -134,7 +134,7 @@ fra en barriere som defineret i \cref{sec:barrierer}.}
 \end{figure}
 Afviklingen af programmet sker ved at et antal worldpart-, en 
 visualize- og en barrier-proces køres parallelt. Af 
-\autoref{code:wator-worldpart} og \pageref{code:wator-visualize}\fixme{ændrer pageref til vref i final}, ses det 
+\autoref{code:wator-worldpart} og \pageref{code:wator-visualize}\fxwarning{ændrer pageref til vref i final}, ses det 
 overordnede design af henholdsvis worldpart- og 
 vizualize-processen.  Værd at bemærke er det store antal barrierekald i 
 visualizeprocessen. Dette er til for at man kan benytte den samme barriere som 
@@ -176,6 +176,7 @@ servicemedarbejdere, samt hvordan køen opfører sig over tid.
 
 \subsubsection{Før introduktion af et tidsbegreb i \pycsp}
 \fxnote{SB:giver dette afsnint mening?}
+\begin{shaded}
 I \simpy er kunderne en proces, der oprettes dynamisk af en kundegenerator. Det vil  være nærliggende ligeledes at 
 modellere eksemplet i \pycsp med kunder som en proces. I \simpy oprette generatorfunktionen en kundeprocess og  kører den parallelt med sig selv.  
 I \csp og også i \pycsp er processerne mere statiske, gerne med en generator- og 
@@ -183,7 +184,7 @@ arbejderproces, hvor  arbejdet flyttes
 mellem processerne igennem kanaler. Vi har derfor ændret modellen så   
 generatorprocessen i \pycsp er som i \simpy, men vi introducerer en bankproces i stedet for en kundeproces, og lader kunderne være arbejdet der flyttes mellem dem. 
 I \pycsp findes muligheden for at oprette processer dynamisk med funktionen \code{spawn}, og man kunne derfor god lade generatoprocessen oprette kundeprocesser dynamisk, men vi ønsker ikke kun at kopiere eksemplet fra \simpy til \pycsp, men også konverterer eksemplet så der overholder stilen for et program skrevet til \csp. 
-
+\end{shaded}
 Mens \simpy kalder kundeprocessen fra generatoren og lader denne stå for håndteringen af kunden 
 og den tid hun befinder sig i banken, kender bankprocessen i \pycsp ikke tid som 
 sådan. Bankprocessen skal derfor selv vedligeholde en liste med kunderne, der findes inden i banken og til hver 
