@@ -3,11 +3,50 @@
   implementering benyttes. Inkluderer test+performance}
 \subsection{Test af korrekthed}
   Vi har igennem designet og udviklingen af \code{simulerings}-versionen brugt en Test Driven Development (TDD). I TDD starter man med at skrive tests til en ny egenskab der skal udvikles. Designet er implementeret korrekt når testene kan gennemføres korrekt. Dette medfører at vi løbende i forbindelsen med udviklingen af \emph{simulerings}-versionen har skrevet tests. Desuden har vi integreret alle tests fra \emph{greenlets}-versionen ind i \emph{simulerings}-versionen, således at tests skrevet til \emph{greenlets}-versionen også tester vores version. Resultaterne af testene kan ses i tabel \fxerror{TODO! testene virker ikke:(}
+
+% \begin{table}[htbp]
+% 	\centering
+ 	\begin{longtable}{lr}
+   	\toprule
+    \mc{Test} & \mc{Resultat} \\
+    \midrule
+    \endfirsthead 
+    \mc{Test} & \mc{Resultat} \\
+    \midrule
+    \endhead % slut efterfølgende headere
+    \bottomrule
+    \multicolumn{2}{r}{\textit{fortsættes}}
+    \endfoot % slut footer
+    \bottomrule
+    \endlastfoot % slut sidste footer
+    Doctest: simulation.Simulation & ok\\
+    Doctest: simulation.io & ok\\
+    Doctest: guard.testsuite & ok\\
+    Doctest: alternation.Alternation & ok\\
+    Doctest: alternation.testsuite & ok\\
+    Doctest: channel.Channel & ok\\
+    Doctest: channel.testsuite & ok\\
+    Doctest: process.Parallel & ok\\
+    Doctest: process.Spawn & ok\\
+    Doctest: process.test\_suite & ok\\
+    test\_alternation (test\_simulation.SimulationTestCase) & ok\\
+    test\_buffer (test\_simulation.SimulationTestCase) & ok\\
+    test\_buffered\_channels (test\_simulation.SimulationTestCase) & ok\\
+    test\_decompose (test\_simulation.SimulationTestCase) & ok\\
+    test\_io (test\_simulation.SimulationTestCase) & ok\\
+    test\_timers1 (test\_simulation.SimulationTestCase) & ok\\
+    test\_timers2 (test\_simulation.SimulationTestCase) & ok\\
+    test\_timers3 (test\_simulation.SimulationTestCase) & ok\\
+    test\_timers\_time\_in\_past (test\_simulation.SimulationTestCase) & ok\\
+    test\_wait (test\_io.TestCase) & ok\\
+  \end{longtable}
+% 	\label{tab:korrekthed}
+% \end{table}
+ 
   
 \subsection{Eksempler}
 for at evaluere fordele og ulemper af simuleringsversionen af \pycsp, har vi genimplementeret eksemplerne fra \cref{sec:des-examples}, men denne gang med  brug af vores udviklede kode. Dermed kan vi sammenholde de to versioner, og se på fordele og ulemper ved simuleringsversionen.
 ers
-
  
 \subsection{Hajer og fisk på Wator}
 I dette eksempel har implementeringen i et simulationssprog ikke medført den store omskrivning. Dette skyldes at eksemplet er en kontinuerlig simulation, og alle fisk og hajer ønsker at interagere med omverdenen i hvert tidsskridt. I processen \code{visualize} ser man tydeligst forskellen mellem standard \pycsp og dens brug af barrierer og \code{simulerings}"-versionen og dens brug af tid vha. funktionen \code{Wait}. Hvor standard \pycsp må kalde en barrier tre gange for hver iteration kan man i simuleringsversionen blot angive at visualiseringen ønsker at vente tre tidsskridt. 

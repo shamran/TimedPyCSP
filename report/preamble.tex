@@ -52,7 +52,7 @@ oneside%,
 %\usepackage{pstricks}
 \usepackage{tikz}
 \usepackage{xspace}
-
+\usepackage{longtable}
 
  
 %har vi ord der bliver delt forkert kan de indsættes i hyphernation med bindestreg alle steder hvor ordet kan deles
@@ -221,6 +221,9 @@ typeeditors 	= {{udgivere}{udg\adddot}},
     \ifx\temp\myempty \citep{#2}%
     \else \cite[#1]{#2}%
     \fi  \end{quote}}
+
+%Overskrifter til tabeller - bliver centreret
+\newcommand\mc[1]{\multicolumn{1}{c}{{\textbf #1}}} % sparer plads
 
 % OPSÆTNING TIL INKLUDERING AF SOURCE CODE
 \usepackage[final]{listings}
