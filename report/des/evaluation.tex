@@ -185,6 +185,6 @@ def Bank(customerREADER):
 
 \end{lstlisting}
 
-I det avancerede eksempel som vist i  \cref{fig:simulation:bank2} indeholder bankprocessen mindre kode end i det simple eksempel. Det skyldes at banken ikke længere skal holde styr på samtlige kunder, men blot skal håndtere en kunde ad gangen mens resten af kunderne befinder sig i køen. Kundefunktionen i \simpy og bankprocessen i det avancerede eksempel minder derfor meget om hinanden og en fordel ved \csp versionen af simulering at man kun foretager en \code{Wait} for at indikere af den begrænsede ressource er optaget, hvor man i \simpy versionen skal foretage tre kald. Først et kald for at få adgang til den begrænsede ressource, så et kald for at holde ressourcen i et tidsperiode, samt et sidste for at slippe ressourcen.
+I det avancerede eksempel som vist i  \cref{fig:sim:bank2} indeholder bankprocessen mindre kode end i det simple eksempel. Det skyldes at banken ikke længere skal holde styr på samtlige kunder, men blot skal håndtere en kunde ad gangen mens resten af kunderne befinder sig i køen. Kundefunktionen i \simpy og bankprocessen i det avancerede eksempel minder derfor meget om hinanden og en fordel ved \csp versionen af simulering at man kun foretager en \code{Wait} for at indikere af den begrænsede ressource er optaget, hvor man i \simpy versionen skal foretage tre kald. Først et kald for at få adgang til den begrænsede ressource, så et kald for at holde ressourcen i et tidsperiode, samt et sidste for at slippe ressourcen.
 
   
