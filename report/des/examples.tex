@@ -175,7 +175,7 @@ kan der måles hvor lang det tager for hver kunde at blive betjent af
 servicemedarbejdere, samt hvordan køen opfører sig over tid. 
 
 \subsubsection{Før introduktion af et tidsbegreb i \pycsp}
-\fxnote{SB:giver dette afsnint mening?}
+\fxnote{SB:giver dette afsnit mening? - Jeg synes det skal beholdes som det er, enig?}
 \begin{shaded}
 I \simpy er kunderne en proces, der oprettes dynamisk af en kundegenerator. Det vil  være nærliggende ligeledes at 
 modellere eksemplet i \pycsp med kunder som en proces. I \simpy oprette generatorfunktionen en kundeprocess og  kører den parallelt med sig selv.  
@@ -230,14 +230,14 @@ at hvilken proces der skal have ansvaret for at vedligeholde køen. En metode er
 internt i en proces at have en liste af kunder der venter, og lade det være 
 processens ansvar at håndtere denne liste som en kø. Processen med ansvaret for køen kan 
 så enten være den begrænsede ressource, eller en separat proces hvis eneste 
-formål er at vedligeholde køen. For nyligt\footnote{d. 22. december 2009} er 
+formål er at vedligeholde køen. \fixme*{Skal dette op i \pycsp kapitlet}{For nyligt\footnote{d. 22. december 2009} er 
 der i \pycsp blevet introduceret ''buffered channels''\cite{pycsp-r147}, og 
 disse kan også bruges som en kø. Dermed kan man modellere sin ressource uden 
 hensyntagen til håndtering af køen internt eller vha. andre processer, og blot 
 lade processen læse fra kanalen når den er klar. Vi har i dette eksempel valgt 
 at lade køen være repræsenteret ved en ''buffered channel'', da denne  kræver 
 færrest linjer kode, men den kunne lige så godt være repræsenteret som en liste 
-i servicedisk processen.
+i servicedisk processen.}
 
 
 \subsubsection{Konklusion - evaluering - ?}

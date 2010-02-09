@@ -81,54 +81,38 @@ ikke \code{Scheduler} fra greenletsversionen.
 %klassen \code{Scheduler}, samt se hvordan den kan inkorporeres i vores
 %design.
 
+\subsection{Tid} 
+\CRef{Timeout} viser et eksempel på en \code{alternation} hvor processen kun er villig
+til at læse fra kanalenden \code{Cin} i $0.5$ sekunder. Hvis ikke der
+er modtaget en besked indenfor 0.5 sekunder, accepteres timeoutguarden
+og processen fortsætter sin kørsel uden at have læst fra kanalen.
 
-
-\begin{shaded}
-\subsection{Tid i greenletsversionen} 
-I \pycsp foregår kommunikation
-kun når begge kanalender er klar, dvs. når der både findes en
-kanalende der vil skrive og en kanalende der vil læse. Hvis
-kun en af kanalenderne er klar, vil processen vente indtil der findes
-minimum en kanalende af hver type, der er klar. Dette medfører
-risikoen for at processen aldrig kommer videre, men går i deadlock.
-I \pycsp har man derfor i \code{alternation} mulighed for at
-tilknytte en timeout til en \code{guard}. Dette giver mulighed for
-at en proces, kun er villig til at vente på kommunikation i en
-given tidsperiode. 
 \begin{lstlisting}[%float=hbtp, 
 label=Timeout,caption=Timeout i Alternation (fra dokumentationen til PyCSP)]
 Alternation([{Timeout(seconds=0.5):None}, 
              {Cin:None}]).select()
 \end{lstlisting}
 
-I \cref{Timeout} ses et eksempel på en \code{alternation} hvor processen kun er villig
-til at læse fra kanalenden \code{Cin} i $0.5$ sekunder. Hvis ikke der
-er modtaget en besked indenfor 0.5 sekunder, accepteres timeoutguarden
-og processen fortsætter sin kørsel uden at have læst fra kanalen.
-
 Tid er dermed blevet introduceret i \pycsp, for i denne specifikke situation at at have
 mulighed for at tilknytte timeout til en \code{alternation}. Vi ønsker
 at videreudvikle denne struktur til at håndtere tid generelt for alle
 processer, men ændre tiden så den fungerer med diskret tid, modsat den eksisterende
 løsning hvor tiden er realtid.
-\end{shaded}
 
+For at konvertere \emph{greenlets}-versionen der bruger  til realtid til en simuleringsversion der bruger diskrettid, skal vi ændre de steder i koden som allerede bruger tid. Det eneste sted tid har indflydelse er i listen \code{timers}. Vi kan dermed nøjes med at ændre de steder i \sched en som involverer \code{timers}. Det første sted hvor \code{timers} bruges er i udvælgelsen af hvilken proces skal køres(\cref{fig:green:timer}). Her sammenlignes på linje 204 den første tidsværdi i \code{timers}, med det nuværende tidspunkt. Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra listen.
 
-\subsection{Diskret tid} 
-For at konvertere \emph{greenlets}-versionen der knytter sig til realtid frem for diskrettid, skal vi ændre de steder i koden som allerede som bruger tid. Som vi har beskrevet tidligere er det eneste sted tid er introduceret i forbindelse med timeout og dermed i listen \code{timers}. Vi kan dermed nøjes med at ændre de steder i \sched en som involverer \code{timers}. Det første sted hvor \code{timers} indgår er i udvælgelsen af hvilken proces skal køres(\cref{sched_timer}). Her sammenlignes på linje 204  den første tidsværdi i \code{timers}, med det nuværende tidspunkt. Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra timers listen.
-
-Da tiden er diskret står tiden stille mens en proces kører og det kræver et aktivt valg før tiden stiger, kan vi tilføje en yderligere begrænsning i forhold til \emph{greenlets}-versionen. For \emph{simulerings}-versionen skal tiden være præcist det der er angivet i \code{timers}, før processen skal aktiveres, og ikke kun større, som angivet i \emph{greenlets}versionen. En kodestump af den del der foretager udvælgelser en proces fra \code{timers} i \emph{simulerings}-versionen  kan ses i \cref{sim_timer}.
+Da tiden står tiden stille mens en proces kører i den diskrete tid og processen kan fortsætte så længe den ønsker kræver det et aktivt valg før tiden stiger. Vi kan derfor tilføje en yderligere begrænsning i forhold til \emph{greenlets}-versionen: For \emph{simulerings}-versionen skal tiden være præcist det der er angivet i \code{timers}, før processen skal aktiveres, og ikke kun større, som angivet i \emph{greenlets}versionen. \CRef{fig:sim:timer} viser udvælgelsen af en proces fra \code{timers} i \emph{simulerings}-versionen.
 
 \begin{figure}[hbtp]
 \begin{minipage}[c]{\linewidth}
-\begin{lstlisting}[firstnumber=204, label=sched_timer, caption=Udvælgelse af proces fra listen timers (fra scheduling.py)]
+\begin{lstlisting}[firstnumber=204, label=fig:green:timer, caption=Udvælgelse af proces fra listen timers (fra scheduling.py)]
 if self.timers and self.timers[0][0] < time.time():
   _,self.current = self.timers.pop(0)
   self.current.greenlet.switch()
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[c]{\linewidth}
-\begin{lstlisting}[firstnumber=124, label=sim_timer, caption=Udvælgelse af proces fra listen timers (fra simulation.py)]
+\begin{lstlisting}[firstnumber=124, label=fig:sim:timer, caption=Udvælgelse af proces fra listen timers (fra simulation.py)]
 if self.timers and self.timers[0][0] <= Now():
   assert self.timers[0][0] == Now()
   _,self.current = heapq.heappop(self.timers)
@@ -181,17 +165,16 @@ I programmeringssproget \simpy lader man en proces vente ved at
 foretage kaldet \code{yield}. Dette \code{yield} sørger for at processen ikke
 fortsætter før et defineret tidsrum er gået.
 
-\begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)] 
+\begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=fig:simpy:yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)] 
 def visit(self,timeInBank): 
   print now(), self.name," Here I am" 
   yield hold,self,timeInBank print now(),
   self.name," I must leave" 
 \end{lstlisting}
 
-I \cref{yield} ses hvordan en kundeproces er ankommet til banken. Processen der repræsenterer kunden printer tiden, foretager et \code{yield}, printer tiden igen og afslutter. 
- Når processen har kaldt \code{yield}, er tiden steget med værdien af \code{timeInBank}. Brugen af yield er knyttet til implementeringen af \simpy og skyldes at \simpy implementerer hver proces som en \code{corutine}. Vi ønsker i \pycsp at have en
-lignende mulighed for at lade en proces vente. Dette er allerede implementeret via \code{timeout} i \emph{greenlets}-versionen af \pycsp, og uden ændringer kan vi
- i den eksisterende \sched ~tilføje funktionen \code{Wait} der fungerer som timeout, men som kan kaldes af processerne
+\CRef{fig:simpy:yield} viser hvordan en kunde er ankommet til banken. Kunden printer tiden, foretager et \code{yield}, printer tiden igen og afslutter. 
+ Når funktionen har kaldt \code{yield}, er tiden steget med værdien af \code{timeInBank}. Brugen af yield afgiver dermed kontrol over funktionen i et tidsrum og knytter sig til implementeringen af \simpy og skyldes at funktionen er implementeret ced hjælp af \code{corutine}. Vi ønsker i \pycsp at have en
+lignende mulighed for at lade en proces vente. Dette er heldigvis allerede implementeret via \code{timeout} i \emph{greenlets}-versionen af \pycsp, og vi kan derfor tilføje funktionen \code{Wait}, der fungerer som timeout, men som kan kaldes af processerne
 på et vilkårligt tidspunkt. \inline{Det nedenstående eksempelskal måske ændres
 da jeg ikke har talt med Rune om nødvendigheden af ''while now()<t)''. Og jeg har derfor ikke beskrevet i teksten hvordan funktionen virker.}
 
