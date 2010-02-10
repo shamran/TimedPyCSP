@@ -122,10 +122,9 @@ if self.timers and self.timers[0][0] <= Now():
 \end{figure}
 
 \subsection{Funktionerne Now og Wait}\label{sec:Wait}
- I Python kan man benytte modulet \fxnote{Motiver: hvorfor snakker vi om dette / er det relevant}
-\code{time}, hvis man ønsker at introducere begrebet tid. Med dette
-modul kan man få af vide hvad realtiden er. fra en brugers synsvinkel
-repræsenteres tiden som kontinuerlig, og hver gang en bruger spørge
+ I \pycsp benyttes modulet \fxnote{Motiver: hvorfor snakker vi om dette / er det relevant}
+\code{time} til at håndtere tiden i timeouts. Fra en brugers synsvinkel
+repræsenteres tiden internt som real og derfor kontinuerlig......................., og hver gang en bruger spørge
 efter tiden, fås et bestemt tidspunkt. Med computere findes tid som
 kontinuerligt begreb ikke, men derimod er tiden internt repræsenteret
 som diskrete tidsskridt. Størrelsen af disse tidsskridt varierer
@@ -147,10 +146,8 @@ begreb ikke, men man kan angiver at når tiden \code{t} er talt op med 5 enheder
 begivenheden ske. \inline{Skal dette splittes op og halvdelen skal i
 teori?}
 
-Når et problem modelleres i \des, vil der altid være behov for at
-tilføje en sammenhæng mellem tid i problemet der skal simuleres og tid i simuleringsmodellen, men da
-der der ikke findes en fast sammenhæng, skal modellen  eksplicit
-definere 5 sekunder i problemet som at tiden i simuleringsmodellen tælles op med 5, 0.5 eller 0.05.\fxnote{RS: Jeg synes dette skal omformuleres men jeg ved ikke helt hvordan}
+\fxnote*{RS: Jeg synes dette skal omformuleres men jeg ved ikke helt hvordan}{Når et problem modelleres i \des, skal der altid være en sammenhæng mellem tiden i problemet og tiden i modellen. Da der ikke findes en fast sammenhæng, skal tiden i modellen defineres eksplicit, så 5 sekunder i problemet defineres som en stigning i tiden med f.eks. 5, 0,5 eller 0,05 i simuleringsmodellen.}
+
 
 Vi har valgt at repræsentere tiden som et positivt tal der findes internt i \sched en.
 Ved at have tiden i  \sched en findes der kun en version af tiden der i \sched en er en singelton og derfor findes der kun
@@ -249,7 +246,7 @@ self.cond.release()
 \fxnote*{Hvor?}{som tidligere beskrevet} bruges listen \code{timers} i \pycsp kun til at placere processer der venter på en timeout i alternation. Dette er en niche feature ved \pycsp, som  sjældent vil skulle bruges, og hvor der sjældent er samlet mange processer på en gang. 
  I \cref{sec:Wait} beskriv vi hvordan processer der ønsker at vente ligges på \code{timers} listen, og i \cref{sec:discrete} beskriver vi hvordan \sched kun tæller tiden op når ingen processer kan foretage sig mere i et givent tidsskridt. Når tiden tælles op vil  alle processer enten vente på kommunikation eller befinde sig i listen \code{timers}. De processer der venter i en alternation og hvor der er tilknyttet en timeout vil ligge begge steder. Gennemsnitslængden af listen vil derfor stige voldsomt og dermed ændres kravene til hvilken  datastruktur der er bedst egnet. 
  
-Med en kort, sjældent brugt liste vil omkostningerne til oprettelse og vedligeholdelse af en avanceret datastruktur være større end fordelene. Ved simuleringer ændres brugen af listen og vi skal derfor finde en datastruktur der bedre passer til vores brug. En min"-hob er det åbenlyse valg til skemaplanlægning da  man kan  indsætte elementer i konstant tid og fjerne det mindste element i $O(log\ n)$. Som eksempel på for anvendelsesmulighederne af en hob er skemaplanlægning specifikt nævnt i introduktionen til Pythons implementering\footnote{$http://docs.python.org/dev/3.0/library/heapq.html$}.  \fxnote{SB: ras læs .. er det ok?}
+Med en kort, sjældent brugt liste vil omkostningerne til oprettelse og vedligeholdelse af en avanceret datastruktur være større end fordelene. Ved simuleringer ændres brugen af listen og vi skal derfor finde en datastruktur der bedre passer til vores brug. En min"-hob er det åbenlyse valg til skemaplanlægning da  man kan  indsætte elementer i konstant tid og fjerne det mindste element i $O(log\ n)$. Som eksempel på for anvendelsesmulighederne af en hob er skemaplanlægning specifikt nævnt i introduktionen til Pythons implementering\footnote{$http://docs.python.org/dev/3.0/library/heapq.html$}.  \fxnote{SB: rs, er det ok?}
 
 Da en implementering af en hob allerede findes i Python i modulet \code{heapq}, som er effektivt implementeret i C, vælger vi at bruge denne. Den eneste handling
 der ikke er som standard er implementeret, er fjernelsen af et arbitrært element.
@@ -262,7 +259,7 @@ hob"-egenskaben i listen. Dette vil dog ikke tage længere tid, da en fjernelse 
 tidspunkt bruger en lineær søgning, til at finde elementet der skal
 fjernes, og genoprettelsen af hob"-egenskaben også kan gøres i lineær tid.
 
-Det kræver ikke meget omskrivning for at konvertere en liste til en hob, men man kan sammenligne \cref{sched_timer} linje 205 med \cref{sim_timer} linje 126. 
+Det kræver ikke meget omskrivning for at konvertere en liste til en hob, men man kan sammenligne \cref{fig:green:timer} linje 205 med \cref{fig:sim:timer} linje 126. 
 
 
 \subsection{Ting vi har stjålet fra \simpy.}
