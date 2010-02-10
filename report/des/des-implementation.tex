@@ -146,26 +146,19 @@ Når tiden i \des er uafhængig af realtiden er der ingen grund til at bruge en 
 Ved at have tiden i  \sched en findes der kun en version af tiden da  \sched en er en singelton. For processer der ønsker at kende tiden har vi
 introduceret funktionen \code{Now()} der returnerer tiden når funktionen kaldes. 
 
-\inline{På det teoretiske plan snakker vi om at planlægge
-begivenheder, mens vi i implementationen snakker om Wait og at ''stalle''
-en process }
-
-I \des planlægges begivenheder ud i fremtiden.  teorien
-
-I programmeringssproget \simpy lader man en proces vente ved at
-foretage kaldet \code{yield}. Dette \code{yield} sørger for at processen ikke
-fortsætter før et defineret tidsrum er gået.
+I \des planlægger forskellige instanser hvilke begivenheder der skal foregå ud i fremtiden.  Dette er ikke en farbar vej at gå til udvikling af et simuleringsmiljø som en computer kan evaluerer. Det skyldes at det ikke er praktisk muligt for en computer at kunne håndtere alle de typer begivenheder der skal kunne planlægges. Et alternativ er at ikke at planlægge begivenheder, men istedet at lade instansen vente og så behandle begivenheden med det samme. Dermed skal man ikke kunne planlægge begivenhedder men holde instanser tilbage. 
 
 \begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=fig:simpy:yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)] 
 def visit(self,timeInBank): 
   print now(), self.name," Here I am" 
-  yield hold,self,timeInBank print now(),
+  yield hold,self,timeInBank print now()
   self.name," I must leave" 
 \end{lstlisting}
+I programmeringssproget \simpy benytter man også metoden til at lade en proces vente. Dette gør de ved at
+foretage kaldet \code{yield}, som sørger for at processen ikke
+fortsætter før et defineret tidsrum er gået. \CRef{fig:simpy:yield} viser hvordan en kunde er ankommet til banken. Kunden printer tiden, foretager et \code{yield}, printer tiden igen og afslutter.  Når processen har kaldt \code{yield}, er tiden steget med værdien af \code{timeInBank}. Grunden til at de kan bruge \code{yield}, der er indbygget i Python og at dette kaldeafgiver kontrol over processen i et tidsrum  knytter sig til implementeringen af \simpy og der bruger  \code{corutine} som underliggende teknologi. 
 
-\CRef{fig:simpy:yield} viser hvordan en kunde er ankommet til banken. Kunden printer tiden, foretager et \code{yield}, printer tiden igen og afslutter. 
- Når funktionen har kaldt \code{yield}, er tiden steget med værdien af \code{timeInBank}. Brugen af yield afgiver dermed kontrol over funktionen i et tidsrum og knytter sig til implementeringen af \simpy og skyldes at funktionen er implementeret ced hjælp af \code{corutine}. Vi ønsker i \pycsp at have en
-lignende mulighed for at lade en proces vente. Dette er heldigvis allerede implementeret via \code{timeout} i \emph{greenlets}-versionen af \pycsp, og vi kan derfor tilføje funktionen \code{Wait}, der fungerer som timeout, men som kan kaldes af processerne
+ Vi ønsker i \pycsp at have en lignende mulighed for at lade en proces vente. Denne funktionalitet er heldigvis allerede delvist introduceret via \code{timeout} i \emph{greenlets}-versionen af \pycsp, og vi kan derfor bygge videre på denne funktionalitet med funktionen \code{Wait}, der fungerer som timeout, men som kan kaldes af processerne
 på et vilkårligt tidspunkt. \inline{Det nedenstående eksempelskal måske ændres
 da jeg ikke har talt med Rune om nødvendigheden af ''while now()<t)''. Og jeg har derfor ikke beskrevet i teksten hvordan funktionen virker.}
 
@@ -177,7 +170,7 @@ def Wait(seconds):
     p = Simulation().getNext() 
 \end{lstlisting}
 
-Funktionen \code{Wait} er essentielt det eneste værktøj der skal til for at planlægge begivenheder ud i fremtiden, og vi har på nuværenede tidspunkt en simpel begivenhedssimulator der kører i realtid. 
+Funktionen \code{Wait} er essentielt det eneste værktøj der skal til for at vente/planlægge begivenheder ud i fremtiden, og vi har på nuværenede tidspunkt en simpel \des der kører i realtid. 
 
 \subsection{Fra reel tid til diskret tid.}\label{sec:discrete}
 Vi ønsker sædvanligvis at en simulering, kan eksekveres uafhængigt af tiden der simuleres det vil sige at når der ikke sker flere begivenheder til et givent tidspunkt skal tiden fremskrives til det næste tidskridt hvor der sker en begivenhed og ikke kun med et fast tidsskridt. Modsat gælder det også at tiden ikke må tælles op før alle processer har indikeret at de ikke ønsker at foretage mere arbejde. 
