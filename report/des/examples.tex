@@ -93,10 +93,8 @@ separat tidsskridt.
 \begin{lstlisting}[label=code:wator-worldpart,caption=Uddrag af processen 
   \code{worldpart} i Wator]
   @proces
-  def worldpart (part_id, barR, barW):
-  
-  ...
-  
+  def worldpart (part_id, barR, barW):  
+    ...  
     while True:
       #Calc your world part:
       main_iteration()
@@ -152,7 +150,7 @@ Et klassisk eksempel inden for \des er at simulere  en række kunder der alle
 ankommer til en butik, hvor de skal serviceres. Dette simple problem kan 
 udvides til at modellere mange forskellige problemstillinger, der berører 
 hvordan flowet ændrer sig hvis man varier en eller flere parametre
-i systemet. Programmeringssproget \simpy\fxnote{ref}har, som et af deres 
+i systemet. Programmeringssproget \simpy\footnote{\url{http://simpy.sourceforge.net/}}har, som et af deres 
 eksempler, en simulering af kunder i en bank. \simpy bruger dette som et 
 gennemgående eksempel, hvor de løbende udvider modellen, for at vise 
 forskellige egenskaber ved \simpy. For at kunne sammenligne \simpy  med vores 

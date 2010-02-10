@@ -25,7 +25,7 @@ for at kunne konstruere en \des skal vi derved have følgende til rådighed; En 
 \csp er lavet med henblik på processer der arbejder samtidigt og uafhængigt af hinanden. \Des er derimod ikke parallelt, men schedulere sine begivenheder lineært efter hvornår de sker. I sumuleringen løbes begivenhederne kronologisk igennem til der enten ikke er flere begivenheder eller simuleringen når et forud defineret tidspunkt.
 
 \inline{Der findes et åbenlyst problem med introduktionen a \des i \csp, som vi kort berørte i cref sec:barrierer }
-Alternativet til  \des  er \pdes\fxnote{ref} hvor processerne kører parallelt, og  tiden dermed kan løbe uafhængigt af hinanden. Dette introducere muligheden for større parallelitet, men samtidigt risikerer processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. Det har der vidst sig at omkostningerne ved at lade tiden kører parallelt er omkostningerne større end ved at holde tiden synkront på tværs af processerne.
+Alternativet til  \des  er \pdes hvor processerne kører parallelt, og  tiden dermed kan løbe uafhængigt af hinanden. Dette introducere muligheden for større parallelitet, men samtidigt risikerer processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. Det har der vidst sig at omkostningerne ved at lade tiden kører parallelt er omkostningerne større end ved at holde tiden synkront på tværs af processerne.
 
 \subsection*{Noter til afsnittet}
 \begin{itemize}
@@ -40,15 +40,12 @@ Alternativet til  \des  er \pdes\fxnote{ref} hvor processerne kører parallelt, 
 \end{itemize}
 
 \subsection{Barrierer} \label{sec:barrierer}
-\fxnote*[nomargin,inline]{RS: Jeg synes det er forkert at starte et afsnit med ``I modsætning 
-til\ldots'' når det ikke er en reference til noget ovenstående}{I \des findes 
-der i modsætningen til Parallel \des} \fxnote{referencer} en 
-global tid og alle processerne skal derfor have en fælles tid der tæller op 
+I \des findes der  en global tid og alle processerne skal derfor have en fælles tid der tæller op 
 samtidigt.  En global viden som tid kræver synkronisering af alle 
-processerne\fxnote{ref}, og til denne koordinering og synkronisering af flere 
-processer er den mest brugte metode at introducere en barriere.
+processerne, og til denne koordinering og synkronisering af flere 
+processer er  den mest brugte metode at introducere en barriere.
 
-Barrierer blev først introduceret i MPI\fxnote{ref}, hvor den bruges til at 
+Barrierer blev først introduceret i MPI\cite{mpi-barrier}, hvor den bruges til at 
 sikre at alle tråde venter i barrieren før de kan fortsætte. 
 
 I \csp kan man udnytte at begge 
