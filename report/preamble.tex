@@ -1,3 +1,4 @@
+
 \documentclass[a4paper, % papirstørrelse, skal altid med
 draft,% Når man skal skifte kompileringsmetode mellem draft og final skal man 
       %flytte kommenteringen %  i Draft kommanoerne, nedenfor.
@@ -51,9 +52,9 @@ oneside%,
 \makeindex % hvis man ønsker at lave et index
 %\usepackage{pstricks}
 \usepackage{tikz}
-\usepackage{xspace}
-\usepackage{longtable}
-
+\usepackage{xspace} %Allow for a space after a new command in the right place
+\usepackage{longtable} %allow for tables that span more than one page 
+\usepackage[section]{placeins}%pakke til at stoppe float fra at drifte for længere end til \FloatBarrier. Med en section i option ændrers alle sections til at sætte en barriere.
  
 %har vi ord der bliver delt forkert kan de indsættes i hyphernation med bindestreg alle steder hvor ordet kan deles
 \hyphenation{tit-len mo-del-len pro-du-ce-rer an-svars-hav-ende om-for-deles for-bind-elses-mulig-heder ska-ber æn-dring-er net-værks-en-hed-er peer backup backup-system fast-track backup-systemer nabo-peers frame-work efter-som Grund-lag-et plads-effek-tivi-teten audits}
