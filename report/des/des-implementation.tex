@@ -3,7 +3,7 @@
 \inline{Beskrivelse af design med udgangspunkt i eksemplet}
 Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret tid som et alternativ til barrierer. Dels ønsker vi med diskret tid at åbne for mulighederne for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Med disse ændringer er håbet at vi opnår en model der ligger tætter på intentionen bag \csp og så man kan udfase brugen af barrierer, samt med den underliggende parallelitet i \csp kan udnyttes til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.\fxnote*{RS:hvordan er dette relateret til design/implementation? - SB: Det er indledende motivation.}
 
-I \des  skal tiden styres centralt og processerne skal alle have mulighed for at vide hvad klokken er når den kører. Tiden skal altid være den samme på tværs af alle processer og derfor skal der være en central kontrol med processerne, så man kan styre hvilke processer der køre på forskellige tidspunkter. Dette er let at styre ved hjælp af PyCSP's \sched hvor vi har fuld kontrol over afviklingen af individuelle processer. 
+I \des  skal tiden styres centralt og processerne skal alle have mulighed for at vide hvad klokken er når den kører. Tiden skal altid være den samme på tværs af alle processer og derfor skal der være en central kontrol med processerne, så man kan styre hvilke processer der køre på forskellige tidspunkter. Dette er let at styre ved hjælp af PyCSP's \sched ~i \code{greenlets}"-versionen, hvor vi har fuld kontrol over afviklingen af individuelle processer. 
 
 
 \subsection{Kodestruktur}  
