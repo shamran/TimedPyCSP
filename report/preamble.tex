@@ -84,14 +84,11 @@ final=true]{hyperref}
 \labelformat{equation}{\textup{(#1)}}
 \labelformat{enumi}{\textup{(#1)}}
 
-\usepackage[danish]{fixme} % til at skrive \fixme kommentarer til sig
+\usepackage[danish,layout=margin,innerlayout=inline]{fixme} % til at skrive \fixme kommentarer til sig
 %\usepackage{pdfcomment}
-\fxsetup{layout={margin,noinline,index}}
 %\fxloadlayouts{pdfnote}
 %\fxuselayouts{pdfnote} 
 \newcommand{\inline}[1]{\fxnote[inline, nomargin]{#1}}
-
-
 
 %%% We need to redefine \autoref. We should use 
 %%% abbreviations inside the sentence and full names 
@@ -188,8 +185,7 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 
 
 
-
-
+\fxfatal[layout=index,target=cref]{Ændre pageref til vpageref}
 \newcommand{\cref}[1]{\autoref{#1}\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final
 \newcommand{\CRef}[1]{\Autoref{#1}\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final
 
