@@ -46,8 +46,7 @@ til at udføre en synkronisering af de enkelte processers arbejde. Denne
 synkronisering kan ske ved brug af barrierer, hvor alle processer udfører en 
 handling og mødes i barrieren før de fortsætter.
 
-Vi har valgt at basere vores model på \citetitle{crew}\cite{crew}\fxnote{Brian: 
-Hvad er din holdning til litteraturhenvisninger.}, hvor verdenen repræsenteres 
+Vi har valgt at basere vores model på \citetitle{crew}\cite{crew}, hvor verdenen repræsenteres 
 som en delt datastruktur og adgangen til denne styres med barrierer. I vores 
 model er hver proces derved ansvarlig for en del af verdenen og tilgangen til 
 den delte datastruktur sker ud fra CREW-princippet (Concurrent Read, Exclusive 
@@ -173,16 +172,15 @@ kan der måles hvor lang det tager for hver kunde at blive betjent af
 servicemedarbejdere, samt hvordan køen opfører sig over tid. 
 
 \subsubsection{Før introduktion af et tidsbegreb i \pycsp}
-\fxnote{SB:giver dette afsnit mening? - Jeg synes det skal beholdes som det er, enig?}
-\begin{shaded}
+
 I \simpy er kunderne en proces, der oprettes dynamisk af en kundegenerator. Det vil  være nærliggende ligeledes at 
 modellere eksemplet i \pycsp med kunder som en proces. I \simpy oprette generatorfunktionen en kundeprocess og  kører den parallelt med sig selv.  
 I \csp og også i \pycsp er processerne mere statiske, gerne med en generator- og 
 arbejderproces, hvor  arbejdet flyttes 
 mellem processerne igennem kanaler. Vi har derfor ændret modellen så   
 generatorprocessen i \pycsp er som i \simpy, men vi introducerer en bankproces i stedet for en kundeproces, og lader kunderne være arbejdet der flyttes mellem dem. 
-I \pycsp findes muligheden for at oprette processer dynamisk med funktionen \code{spawn}, og man kunne derfor god lade generatoprocessen oprette kundeprocesser dynamisk, men vi ønsker ikke kun at kopiere eksemplet fra \simpy til \pycsp, men også konverterer eksemplet så der overholder stilen for et program skrevet til \csp. 
-\end{shaded}
+I \pycsp findes muligheden for at oprette processer dynamisk med funktionen \code{spawn}, og man kunne derfor god lade generatoprocessen oprette kundeprocesser dynamisk, men vi ønsker ikke kun at kopiere eksemplet fra \simpy til \pycsp, men også konvertere eksemplet så der overholder stilen for et program skrevet til \csp. 
+
 Mens \simpy kalder kundeprocessen fra generatoren og lader denne stå for håndteringen af kunden 
 og den tid hun befinder sig i banken, kender bankprocessen i \pycsp ikke tid som 
 sådan. Bankprocessen skal derfor selv vedligeholde en liste med kunderne, der findes inden i banken og til hver 
