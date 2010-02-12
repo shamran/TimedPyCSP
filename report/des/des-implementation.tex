@@ -1,10 +1,11 @@
 
 \section{Design og implementering}
 \inline{Beskrivelse af design med udgangspunkt i eksemplet}
-Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret tid som et alternativ til barrierer. Dels ønsker vi med diskret tid at åbne for mulighederne for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Med disse ændringer er håbet at vi opnår en model der ligger tætter på intentionen bag \csp og så man kan udfase brugen af barrierer, samt med den underliggende parallelitet i \csp kan udnyttes til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.\fxnote*{RS:hvordan er dette relateret til design/implementation? - SB: Det er indledende motivation.}
+\begin{shaded}
+Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret tid som et alternativ til barrierer. Dels ønsker vi med diskret tid at åbne for mulighederne for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Med disse ændringer er håbet at vi opnår en model der ligger tætter på intentionen bag \csp og så man kan udfase brugen af barrierer, samt med den underliggende parallelitet i \csp kan udnyttes til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.\inline{RS:hvordan er dette relateret til design/implementation? - SB: Det er indledende motivation.}
 
 I \des  skal tiden styres centralt og processerne skal alle have mulighed for at vide hvad klokken er når den kører. Tiden skal altid være den samme på tværs af alle processer og derfor skal der være en central kontrol med processerne, så man kan styre hvilke processer der køre på forskellige tidspunkter. Dette er let at styre ved hjælp af PyCSP's \sched ~i \code{greenlets}"-versionen, hvor vi har fuld kontrol over afviklingen af individuelle processer. 
-
+\end{shaded}
 
 \subsection{Kodestruktur}  
 Efter at have valgt at udvide \emph{greenlet}-versionen skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra \emph{greenlet}-versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale \emph{greenlet}-versionen. Med denne isolation forventer vi at hvis/når der sker tilrettelser af \emph{greenlet}versionen af \pycsp vil man ikke skulle foretage de samme tilrettelser i \des versionen. 
@@ -20,8 +21,8 @@ from pycsp.greenlets.channel import ChannelPoisonException, ChannelRetireExcepti
 
 I \cref{fig:init} kan man se at funktionerne \code{choice}, \\\code{ChannelPoisonException} og \code{ChannelRetireException} alle bliver hentet fra \emph{greenlet}-versionen, mens at funktionerne \code{Timeout, Skip} og \code{Alternation} bliver importeret fra samme mappe, og derfor er en modificeret version. For slutbrugeren  vil dette dog være transparent, og vil blot se \emph{simulation}-versionen som en selvstændig version på lige fod med de andre tre versioner.
 
-\subsection{Scheduler}
-Med valget af \emph{greenlet}-versionen som grundversion og med henblik på at hovedparten af vores ændringer vil være i \sched, vil vi kort gennemgå klassen \code{Scheduler}.
+\subsection{Scheduler-klassen}
+Med valget af \emph{greenlet}-versionen som grundversion og med henblik på at hovedparten af vores ændringer vil være i \sched en, vil vi kort gennemgå klassen \code{Scheduler}.
 
 \begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i \emph{greenlets}versionen.]
     def getInstance(cls, *args, **kargs):
@@ -46,17 +47,17 @@ Med valget af \emph{greenlet}-versionen som grundversion og med henblik på at h
             cls.__instance.blocking = 0
 \end{lstlisting}
 
- I \cref{fig:scheduling} ses et uddrag af initialiseringskoden, der er interessant fordi det er her alle de interne datastrukturer oprettes. Man kan se der findes tre lister af processer som \sched ~har mulighed for at vælge imellem når der skiftes proces.  
+ I \cref{fig:scheduling} ses et uddrag af initialiseringskoden, der er interessant fordi det er her alle de interne datastrukturer oprettes. Man kan se der findes tre lister af processer som \sched en har til rådighed til at varetage processkifte. 
  \begin{list}
  \tightlist 
  \item \code{new}: Initieres på linje 140, og består af processer som lige er blevet planlagt for første gang. Nye processer kan ankomme til listen \code{new} via funktionerne \code{Parallel, Sequence} og \code{Spawn}.
- \item \code{next}: Initieres på linje 141, og indeholder de processer der er klar til at blive kørt, og som har været kørt på et tidligere tidspunkt. Et eksempel kunne være en proces der har stoppet sin kørsel for at vente på kommunikation, hvor processen vil blive placeret i denne liste når kommunikationen er overstået, da den nu er klar til at fortsætte. 
+ \item \code{next}: Initieres på linje 141, og indeholder de processer der er klar til at blive kørt, og som har været kørt på et tidligere tidspunkt. \fxnote*{omskriv}{Et eksempel kunne være en proces der har stoppet sin kørsel for at vente på kommunikation, hvor processen vil blive placeret i denne liste når kommunikationen er overstået, da den nu er klar til at fortsætte.} 
  \item \code{timers}: Initieres på linje 147, og indeholder de processer der har tilknyttet en timeout. De skal først planlægges på et senere tidspunkt og venter dermed blot. Hvert element i listen består både af processen samt et tidsstempel for hvornår processen skal genaktiveres. 
- \item \code{blocking}: Initieres på linje 151, og er en variabel. Processer der venter på IO operationer, er ikke klar til at blive planlagt, men heller ikke afsluttet. \sched en kan derfor ikke planlægge dem, men holder styr på antallet af ventende processer vha. denne variabel. Dette bruges bla. for at kunne afgøre om \sched en har planlagt alle processer.
+ \item \code{blocking}: Initieres på linje 151, og er en variabel. Processer der venter på IO operationer, er ikke klar til at blive planlagt, men heller ikke afsluttet. \Sched en kan derfor ikke planlægge dem, men holder styr på antallet af ventende processer vha. denne variabel. Dette bruges bla. for at kunne afgøre om \sched en har planlagt alle processer.
 \end{list}
 
 Når \sched en er startet, gennemløber den alle tre lister gentagne gange, indtil de alle er tomme, og der ikke er nogle processer der er blokeret. Dette betyder at der ikke længere kan komme nye processer til der ønsker at blive lagt på \sched en, og den kan dermed afslutte.
-
+\begin{shaded}
 For at markere at vi ikke kun skal foretage en planlægning
 af processerne, men foretage en simulering, har vi lavet en
 \code{Simulation} klasse der arver fra \code{Scheduler}. Alle ændringer
@@ -66,7 +67,7 @@ klasser har til fælles vil være isoleret i \emph{greenlets} versionen af
 \code{Scheduler} klassen. Dette har yderligere den fordel at man tydeligt kan se
 at alle klasserne i \emph{simulation}versionen arver en simulerings \sched ~og
 ikke \code{Scheduler} fra greenletsversionen.
-
+\end{shaded}
 %\fxnote{dårlig overskrift}{\subsection{Repræsentation af tid}} Vi
 %vil i dette afsnit gå i dybden med listen \code{timers} der findes i
 %klassen \code{Scheduler}, samt se hvordan den kan inkorporeres i vores

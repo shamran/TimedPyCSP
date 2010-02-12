@@ -2,10 +2,10 @@
 \inline{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}
 
 
-\subsection{Hajer og fisk på Wator} 
+\subsection{Hajer og fisk på Wa-Tor} 
 Vores første eksempel tager  udgangspunkt i et Lotka-Volterra predator-prey scenarie, som \citeauthor{wator}
 har beskrevet i artiklen \citetitle{wator}\cite{wator}. Artiklen beskriver den
-fiktive planet Wator, der har form som en torus og er fuldstændig
+fiktive planet Wa-Tor, der har form som en torus og er fuldstændig
 dækket af vand. Verdenen er inddelt i felter, som kan være tomme, indeholde en
 fisk eller en haj\cite[20]{wator}. Følgende karakteristika beskriver fisk og hajers
 opførsel.
@@ -38,9 +38,9 @@ introducerer problemstillinger omkring synkronisering når det paralleliseres.
 Disse problemstillinger optræder fordi en opdatering af hvert felt er afhængigt 
 af de omkringliggende felter, og vil derfor være afhængig af felter fra andre 
 processer i grænsetilfælde. Ud over at være afhængig af information fra andre 
-processer, kan en opdatering også påvirke data hos andre processer. \fxnote*{SB:ok?}{Eksemplet er repræsentativt for de problemer der ligger i kategorien af continuous simulation, og viser at hvis vi kan bruge vores implementation af \des til simulering dette eksempel vil man helt generelt kunne bruge det til continuous simulations.}
+processer, kan en opdatering også påvirke data hos andre processer. Eksemplet er repræsentativt for de problemer der ligger i kategorien af continuous simulation, og viser at hvis vi kan bruge vores implementation af \des til simulering af dette eksempel vil man helt generelt kunne bruge det til continuous simulations.
 
-\subsubsection{Før introduktion af et tidsbegreb i \csp} For at simulere Wator 
+\subsubsection{Før introduktion af et tidsbegreb i \csp} For at simulere Wa-Tor 
 verdenen i et \csp-system hvori tidsbegrebet ikke er introduceret, er vi nødt 
 til at udføre en synkronisering af de enkelte processers arbejde. Denne 
 synkronisering kan ske ved brug af barrierer, hvor alle processer udfører en 
@@ -61,12 +61,11 @@ opdateres, og hvornår processerne venter i en barriere.
 Vi deler verdenen lodret, hvor hver proces styrer en verdensdel. Hver proces 
 gennemgår sin verdensdel og udfører en mulig handling for hver fisk og haj, dog 
 vil fisk og hajer i de sidste to kolonner i hver verdensdel ikke bliver 
-opdateret på nuværende tidspunkt. Dette skyldes at der kan opstå en en race 
+opdateret på nuværende tidspunkt. Dette skyldes at der kan opstå en race 
 condition hvis disse to kolonner opdateres samtidig med de andre. Årsagen til 
 dette er at både processen der er ansvarlig for kolonnerne, og processen 
-umiddelbart til højre for den skal have mulighed for at flytte fisk og hajer 
-ind i dette område. Hvis der i samme tidsskridt er mulighed for at flytte dem 
-ud af området, vil opførslen afhænge af hvad der sker først.  Når denne 
+umiddelbart til højre for den skal have mulighed for at flytte fisk og hajer fra og til dette område. 
+Når denne 
 opdatering er fuldført mødes processerne i en barriere, hvorefter hver proces 
 opdaterer de to sidste kolonner. Herefter mødes processerne igen i barrieren, 
 og når alle kolonner er opdateret kan der foretages en visualisering af de 
@@ -131,13 +130,13 @@ fra en barriere som defineret i \cref{sec:barrierer}.}
 \end{figure}
 Afviklingen af programmet sker ved at et antal worldpart-, en 
 visualize- og en barrier-proces køres parallelt. Af 
-\autoref{code:wator-worldpart} og \pageref{code:wator-visualize}, ses det 
+\autoref{code:wator-worldpart} og \cref{code:wator-visualize}, ses det 
 overordnede design af henholdsvis worldpart- og 
 vizualize-processen.  Værd at bemærke er det store antal barrierekald i 
 visualizeprocessen. Dette er til for at man kan benytte den samme barriere som 
-wordpartprocessen. Alternativt kunne man have to barriereprocesser; en til 
+worldpartprocesserne. Alternativt kunne man have to barriereprocesser; en til 
 synkronisering af worldpart med vizualize, samt en som 
-worldpart-processerne brugte til synkroniseringen af opdatering af 
+worldpart-processerne bruger til synkroniseringen af opdatering af 
 verdensdelen og de to sidste kolonner. 
 
 \subsubsection{Konklusion}
@@ -153,7 +152,7 @@ i systemet. Programmeringssproget \simpy\footnote{\url{http://simpy.sourceforge.
 eksempler, en simulering af kunder i en bank. \simpy bruger dette som et 
 gennemgående eksempel, hvor de løbende udvider modellen, for at vise 
 forskellige egenskaber ved \simpy. For at kunne sammenligne \simpy  med vores 
-implementering af logisk tid, vil vi implementere to af eksemplerne med kunder 
+version, vil vi implementere to af eksemplerne med kunder 
 i en bank i \pycsp.
 
 I det simple tilfælde af eksemplet ankommer kunderne til banken på 
@@ -165,7 +164,7 @@ hhv.  \simpy og \pycsp for at håndtere tid.
 I det andet eksempel er modellen udvidet med en servicedisk. Her skal alle 
 kunderne betjenes af en servicemedarbejder, som kun kan ekspederes en kunde ad 
 gangen. Alle kunder ankommer til banken på tilfældige tidspunkter  og stiller sig i 
-kø for at blive serviceret. Dette  svare til en M/M/1 kømodel. Det er igen et tilfældigt tidsrum som kunden bruger på at blive 
+kø for at blive serviceret. Dette  svare til en M/M/1 kømodel\inline{motivér}. Det er igen et tilfældigt tidsrum som kunden bruger på at blive 
 serviceret.  Dette er stadigt en meget simpel model, men med introduktionen af 
 en begrænset ressource kan man uddrage information om den tilhørende kø, f.eks. 
 kan der måles hvor lang det tager for hver kunde at blive betjent af 
@@ -173,9 +172,8 @@ servicemedarbejdere, samt hvordan køen opfører sig over tid.
 
 \subsubsection{Før introduktion af et tidsbegreb i \pycsp}
 
-I \simpy er kunderne en proces, der oprettes dynamisk af en kundegenerator. Det vil  være nærliggende ligeledes at 
-modellere eksemplet i \pycsp med kunder som en proces. I \simpy oprette generatorfunktionen en kundeprocess og  kører den parallelt med sig selv.  
-I \csp og også i \pycsp er processerne mere statiske, gerne med en generator- og 
+I \simpy opretter generatorfunktionen dynamisk en kundeprocess og  kører den parallelt med sig selv. Det vil  være nærliggende ligeledes at 
+modellere eksemplet i \pycsp med kunder som en proces. I \pycsp er processerne mere statiske, gerne med en generator- og 
 arbejderproces, hvor  arbejdet flyttes 
 mellem processerne igennem kanaler. Vi har derfor ændret modellen så   
 generatorprocessen i \pycsp er som i \simpy, men vi introducerer en bankproces i stedet for en kundeproces, og lader kunderne være arbejdet der flyttes mellem dem. 
@@ -186,11 +184,10 @@ og den tid hun befinder sig i banken, kender bankprocessen i \pycsp ikke tid som
 sådan. Bankprocessen skal derfor selv vedligeholde en liste med kunderne, der findes inden i banken og til hver 
 tidskridt vide hvilke kunder der skal forlade den. 
 
-Tiden er igen modelleret ved brug af barrierer, se afsnit \cref{sec:barrierer}. I 
+Tiden er igen modelleret ved brug af barrierer. I 
 stedet for at have de to kald til barrieren som den kræver, lige efter hinanden, lader 
 vi bankprocessen gå ind i barrieren i starten af tidsskridtet, og så modtage 
-kunder, indtil bankeprocessen modtager det andet kald fra barrieren (se 
-\cref{bank-alternation-imp}). Dette er nødvendigt for at lade banken have 
+kunder, indtil bankeprocessen modtager det andet kald fra barrieren (se\cref{bank-alternation-imp}). Dette er nødvendigt for at lade banken have 
 mulighed for at modtage et vilkårligt antal kunder i samme tidsskridt, samt 
 vide hvornår der ikke vil komme flere kunder.  Vi kan ræsonnere os frem til at 
 barrieren stadig virker efter hensigten ved  simpel indsigt.
@@ -202,7 +199,7 @@ sit første kald til barrieren, indtil banken har modtaget sit kald fra
 barrieren, før den kan sende en ny kunde.
 Når bankprocessen har modtaget et kald fra barrieren er den ikke længere villig 
 til at modtage kunder, før i det efterfølgende tidsskridt. Vi kan bruge samme 
-analogi til at ræsonnere os frem til at bankprocessen ikke kan komme et 
+ræsonnement for at bankprocessen heller ikke kan komme et 
 tidsskridt foran generatorfunktionen, og derfor virker barrieren stadigt som 
 forventet. 
 
@@ -226,20 +223,19 @@ at hvilken proces der skal have ansvaret for at vedligeholde køen. En metode er
 internt i en proces at have en liste af kunder der venter, og lade det være 
 processens ansvar at håndtere denne liste som en kø. Processen med ansvaret for køen kan 
 så enten være den begrænsede ressource, eller en separat proces hvis eneste 
-formål er at vedligeholde køen. \fixme*{Skal dette op i \pycsp kapitlet}{For nyligt\footnote{d. 22. december 2009} er 
-der i \pycsp blevet introduceret ''buffered channels''\cite{pycsp-r147}, og 
-disse kan også bruges som en kø. Dermed kan man modellere sin ressource uden 
-hensyntagen til håndtering af køen internt eller vha. andre processer, og blot 
-lade processen læse fra kanalen når den er klar. Vi har i dette eksempel valgt 
-at lade køen være repræsenteret ved en ''buffered channel'', da denne  kræver 
+formål er at vedligeholde køen. For nyligt\footnote{d. 22. december 2009} er 
+der i \pycsp blevet introduceret bufferkanaler\cite{pycsp-r147}, og 
+disse kan også bruges som en kø. Dermed kan man modellere sin proces uden 
+hensyntagen til håndtering af køen, og blot lade processen læse fra kanalen når den er klar. Vi har i dette eksempel valgt 
+at lade køen være repræsenteret ved en bufferkanal, da denne  kræver 
 færrest linjer kode, men den kunne lige så godt være repræsenteret som en liste 
-i servicedisk processen.}
+i servicedisk processen.
 
 
 \subsubsection{Konklusion - evaluering - ?}
-Ved at se på  implementeringen af de to eksempler af kunder i en bank sammenholdt med implementeringen i \simpy kan man se at de egner det sig godt til 
-simulering, og fra eksemplet kan man se at der findes meget kode til 
-vedligeholdes af de interne tidsvariabler, som \simpy ikke har behov for. Det drejer sig 
+\fxnote*{Omskrives}{Ved at se på implementeringen af de to eksempler af kunder i en bank sammenholdt med implementeringen i \simpy, kan man se at de egner sig godt til 
+simulering og fra eksemplet kan man se at der findes meget kode til 
+vedligeholdelse af de interne tidsvariabler, som \simpy ikke har behov for.} Det drejer sig 
 om kode der sørger for at hver proces kender tiden, samt at den er 
 synkroniseret på tværs af processerne. Vi forventer derfor at koden skal kunne 
 simplificeres i \pycsp med tid, så det bliver lige så simpelt at implementere som i 
@@ -247,17 +243,16 @@ simplificeres i \pycsp med tid, så det bliver lige så simpelt at implementere 
 
 I \simpy findes begrebet ressource direkte i sproget, som en type og 
 servicedisken er blot en instans af denne type, og ressourcen står selv for at 
-håndtere køen. I \pycsp modelleres servicedisken som en separat proces, og 
+håndtere køen. \inline{Uddyb lidt om ressource}I \pycsp modelleres servicedisken som en separat proces, og 
 bankprocessen er derfor reduceret til blot at sende kunden videre til 
-servicedisken og lade kanalen håndtere køen. En ulempe ved brugen af ''buffered 
-channels'' som en kø er, at kanalen har en fast størrelse på sin buffer, som 
-angives når kanalen oprettes. Man kan dermed risikere en deadlock ved brug af ''buffered 
-channels'' sammen med barrierer. Dette opstår hvis ikke processen i samme 
+servicedisken og lade kanalen håndtere køen. 
+
+En ulempe ved brugen af bufferkanaler som en kø er, at kanalen har en fast størrelse på sin buffer, som 
+angives når kanalen oprettes. Man kan dermed risikere en deadlock ved brug af bufferkanaler sammen med barrierer. Dette opstår hvis ikke processen i samme 
 tidsskridt kan foretage transmissionen og kalde barrieren.
 Dette kan løses med en \code{alternation} og \code{skip guard}, men så 
 skal bankprocessen håndtere fejlede forsendelser og må nødvendigvis introducere en 
-sekundær kø hvilket gør at introduktionen af en ''\code{buffered channel}'' er 
-irrelevant. For undgå dette har vi i vores tilfælde valgt blot at 
+sekundær kø hvilket gør brugen af en bufferkanal overflødig. For undgå dette har vi i vores tilfælde valgt blot at 
 angive en maksimal størrelse på bufferen som er større end det totale antal 
-kunder banken modtager. \fxnote*{giver mening?}{Dette medfører så at det ikke længere er en teoretisk korrekt M/M/1 kømodel, da denne specifikt angiver at køen skal have mulighedfor at have uendelig længde. I praksis er det ikke et problem da vi blot an resonere os frem til at køen ikke bliver fuld.}
+kunder banken modtager. \fxnote*{giver mening?}{Dette medfører så at det ikke længere er en teoretisk korrekt M/M/1 kømodel, da denne specifikt angiver at køen skal have mulighed for at have uendelig længde. I praksis er det ikke et problem da vi blot kan ræsonnere os frem til at køen ikke bliver fuld.}
 

@@ -10,7 +10,9 @@ sekventiel tankegang, er man nu nødt til at muliggøre samtidig afvikling af
 opgaver, således de kan udnytte flere kerner samtidigt. Dette stiller både krav 
 til udviklerne og de værktøjer og sprog de benytter til udvikling.  En metode 
 til at repræsentere den krævede samtidighed på, er ved hjælp af 
-CSP\cite{hoare-csp}. I CSP opdeles et program i selvstændige processer, der 
+CSP\cite{hoare-csp}. 
+\begin{shaded}
+I CSP opdeles et program i selvstændige processer, der 
 kan afvikles samtidigt på hver sin kerne. Der bør som udgangspunkt ike være 
 delt data mellem processer, og al kommunikation mellem processer sker eksplicit 
 via kanaler. Dette gør det let at overskue og meget egnet til multi-kerne 
@@ -26,7 +28,8 @@ synkronisering forstås at der er i programmet findes elementer hvis primære
 formål er at håndtere synkronisering. Ved implicit synkronisering sker 
 synkroniseringen ud fra programmets normale kommunikation mellem processerne, 
 og ingen ekstra elementer til håndtering af synkronisering er nødvendige.  
-
+\end{shaded}
+\fxnote[inline,nomargin]{Mere her, bl.a. om tidsmodeller}
 \subsection{usammenhængende råtekst}
 Der er, så vidt vi ved, ikke nogen tilgængelige implementationer af CSP der 
 tager... 
