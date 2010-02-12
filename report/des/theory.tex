@@ -176,10 +176,6 @@ Begge muligheder har dog grundliggende den svaghed at den oprindelige timeout va
 tidsenhed og man vil derfor ændrer på fortolkningen af kode. 
 
 \subsection{Vores valg}
-\begin{shaded}
-I \code{greenlets}"-versionen vil processer der venter i en alternation med en timeout der er overskrevet, signalerer processerne en af gange. Dette
-medfører at en proces potentielt indgår i kommunikation med en anden proces selvom dens timeout guard er overskredet. Den nuværende version garantere altså ikke at timeout kun garanterer at processerne kommunikere inden for tidsrammerne. 
-\end{shaded}
-
-
+I PyCSP vil processer der venter i en alternation med en timeout der er overskrevet, blive signaleret en ad gangen. Dette
+medfører at en proces har mulighed for at indgå i kommunikation med en anden proces selvom dens timeout guard er overskredet. 
 
