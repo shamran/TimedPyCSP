@@ -6,12 +6,10 @@ Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret 
 
 \subsection{\pycsp versioner}
 
-%Omskrives
-I \des  skal tiden styres centralt og processerne skal alle have mulighed for at vide hvad klokken er når den kører. Tiden skal altid være den samme på tværs af alle processer og derfor skal der være en central kontrol med processerne, så man kan styre hvilke processer der køre på forskellige tidspunkter.
 
-%Slettes/flyttes op
-Da der er forskel på hvordan CSP processer er implementeret afhængig af hvilken version der benyttes, vil der også være forskel på hvordan de skal udviddes med henblik på at implementere \des. 
-I \emph{greenlets}versionen, er processerne implementeret som greenlets, der kører  på bruger-niveau. \inline{ref} Dermed kan kun en proces som standard køres ad gangen, og denne kan fortsætte indtil den frivilligt afgiver kontrollen. For at have samtidighed findes der en central \sched ~der koordinerer processerne, og styrer hvilke processer der er klar til at blive eksekveret og hvilke der venter. Når en proces afgiver kontrollen tager \sched en over og udvælger den næste proces der skal eksekveres. Denne koordinering i greenlets egner sig utrolig godt til introduktionen af \des, modsat \emph{process}- og \emph{threads}-versionen, hvor der skal indføres central koordinering og ændres betydeligt i den underliggende kode for at kunne koordinere processerne imellem. Den centrale koordinering vil også ødelægge meningen ved at have parallelle processer der styres af operativ systemet.
+I \des  skal tiden styres centralt og processerne skal alle have mulighed for at vide hvad klokken er når den kører. Tiden skal altid være den samme på tværs af alle processer og derfor skal der være en central kontrol med processerne, så man kan styre hvilke processer der køre på forskellige tidspunkter.\fxnote[inline,nomargin]{bør nævnes i teori i stedet}
+
+
 
 \subsection{Kodestruktur}  
 Efter at have valgt at udvide \emph{greenlet}-versionen skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra \emph{greenlet}-versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale \emph{greenlet}-versionen. Med denne isolation forventer vi at hvis/når der sker tilrettelser af \emph{greenlet}versionen af \pycsp vil man ikke skulle foretage de samme tilrettelser i \des versionen. 
