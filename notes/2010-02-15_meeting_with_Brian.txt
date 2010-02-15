@@ -27,3 +27,18 @@ DES:
  - Er alle vores kodestumper relevant, eller skal de om i billag?
 
 
+
+RS noter:
+
+Figurer!
+
+timeout, wake-first - wake-last
+edge-triggering indenfor logik
+
+
+test: overhead i procesnetværk
+
+4-5 ting som vi kan modellere i problemformuleringen...ikke sammenholdt med noget andet. 
+
+lettere at kombinere komponenter
+
