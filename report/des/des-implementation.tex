@@ -163,9 +163,10 @@ introduceret funktionen \code{Now()} der returnerer tiden når funktionen kaldes
 
 I den eksisterende \sched ~ er tiden reel og fremskrives derfor løbende uafhængigt af processernes tilstand. Dette kan illustreres med et eksempel; Proces 1 har startet en ny tråd via \code{io-decoratoren}, og er derfor blokeret. Proces 2 står i en \code{Alternation} med en timeout guard. Uafhængigt af tiden det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide når dens timeout er indtrådt. Dette er implementeret i \code{greenlets}-versionen i \cref{fig:blocking_sleep} på linjerne 242 til 251. For at køre disse linjer må  der findes processer der er blokeret samt processer der venter på en timeout. Nu startes en separat tråd der signalere \sched en, når næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
 
-Denne ekstra tråd til håndtering af tid i et blokeret kald er overflødig i \des. For at tiden skal tælles op må ingen processer være blokeret; de skal i stedet befinde sig i timers listen eller vente på kommunikation. Så længe der findes blokerede processer venter \sched en på dem, uden at tiden tælles op og de ventende  processer..
+I en simulering står tiden stille mens processerne  eksekveres, og kun i det tilfælde hvor der ikke findes nogle processer, der kan eksekveres vælger vi at tælle tiden op.  Den ekstra tråd til håndtering af tid i et blokeret kald er derfor overflødig i \des, for så længe der findes blokerede processer venter \sched en på dem, uden at tiden tælles op, da de potentielt senere vil kunne  generere nye processer der kan eksekveres.
 
-For at at simuleringen kan fortsætte skal tiden tælles op på et tidspunkt, og dette må gøres eksplicit af simulerings \sched en.  Kun i det tilfælde hvor der ikke findes nogle processer der kan planlægges vælger vi at tælle tiden op. Vi ved at der ikke kan foregå flere begivenheder til et tidsskridt når der kun findes processer i \code{timers} listen. Vi kan i det tilfælde finde tidspunktet for den næste begivenhed og sætte tiden til denne begivenhed. Følgende er implementeret i \cref{fig:sim_sleep}.
+Når alle processer venter i enten \code{timers} listen eller på kommunikation kan der ikke ske flere begivenheder før \sched en tæller tiden op. 
+Vi kan i det tilfælde finde tidspunktet for den begivenhed der ligger tættets på den nuværende tidspunkt  og springe til det. Følgende er implementeret i \cref{fig:sim_sleep}.
 \begin{figure}[hbtp]
 \begin{minipage}[c]{\linewidth}
 \begin{lstlisting}[firstnumber=239, label=fig:blocking_sleep, caption=Uddrag af \sched en i \code{Scheduler}]
@@ -178,7 +179,7 @@ if not (self.next or self.new):
         if seconds > 0:
             t = threading.Timer(seconds, self.timer_notify)
             # We don't worry about cancelling, since it makes no 
-            #difference if timer_notify is called one more time.
+            # difference if timer_notify is called one more time.
             t.start()
             # Now go to sleep
             self.cond.wait()
