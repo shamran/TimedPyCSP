@@ -63,20 +63,19 @@ article
 \usepackage[danish]{varioref} % smarte krydsreferencer via \vref
 \usepackage{color}
 \definecolor{darkblue}{rgb}{0,0.1,0.5}
-\usepackage[colorlinks, linkcolor=darkblue, citecolor=darkblue, urlcolor=darkblue, 
-final=true]{hyperref}
+\usepackage[colorlinks, linkcolor=darkblue, citecolor=darkblue,urlcolor=darkblue]{hyperref}
 %giver mulighed for at hoppe i pdf'filen via referencerne.
 %hyperref er ustabil med varieof,
 %og skal udkommenteres hvis der opstår problemer.
 %specielt skal udkommenteres når man kompilere i final til print
 
-%\AtBeginDocument{\let\orgaddcontentsline\addcontentsline
-%\renewcommand{\addcontentsline}[3]{
-%        \ifthenelse{\equal{#1}{toc}}
-%                {\ifthenelse{\equal{#2}{subsection}}
-%                        {\orgaddcontentsline{#1}{section}{#3}}
-%                        {\orgaddcontentsline{#1}{#2}{#3}}}
-%                {\orgaddcontentsline{#1}{#2}{#3}}}}
+\AtBeginDocument{\let\orgaddcontentsline\addcontentsline
+\renewcommand{\addcontentsline}[3]{
+        \ifthenelse{\equal{#1}{toc}}
+                {\ifthenelse{\equal{#2}{subsection}}
+                        {\orgaddcontentsline{#1}{section}{#3}}
+                        {\orgaddcontentsline{#1}{#2}{#3}}}
+                {\orgaddcontentsline{#1}{#2}{#3}}}}
 
 %% Make sure \autoref puts parentheses around 
 %% equations and enumeration items (similar to \eqref)
@@ -85,9 +84,6 @@ final=true]{hyperref}
 \labelformat{enumi}{\textup{(#1)}}
 
 \usepackage[draft, danish,layout=margin,innerlayout=inline]{fixme} % til at skrive \fixme kommentarer til sig
-%\usepackage{pdfcomment}
-%\fxloadlayouts{pdfnote}
-%\fxuselayouts{pdfnote} 
 \newcommand{\inline}[1]{\fxnote[inline, nomargin]{#1}}
 
 %%% We need to redefine \autoref. We should use 
@@ -106,7 +102,7 @@ final=true]{hyperref}
          \def\subsubsectionautorefname{Afsnit}%
          \def\Itemautorefname{Item}%
          \def\tableautorefname{Tabel}%
-         \def\lstlistingname{Kodestump}
+         \def\lstlistingname{Kodestump}%
          \orgautoref}
 %
 %% \Autorefs is plural for the beginning of the sentence
@@ -121,6 +117,8 @@ final=true]{hyperref}
 %         \def\tableautorefname{Tables}%
 %         \orgautoref}
 %
+
+
 %% \autoref is used inside a sentence 
 %% (this is a renew of the standard)
 \renewcommand{\autoref}
@@ -132,7 +130,7 @@ final=true]{hyperref}
          \def\subsubsectionautorefname{afsnit}%
          \def\Itemautorefname{item}%
          \def\tableautorefname{tabel}%
-         \def\lstlistingname{kodestump}
+         \def\lstlistingname{kodestump}%
          \orgautoref}
 %
 %% \autorefs is plural for inside a sentence
@@ -160,14 +158,9 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 }
 \usepackage[babel, danish=quotes]{csquotes} %bedrer mulighed for at anførselstegn
 
-\usepackage[T1]{fontenc} % bedre orddeling og ofte påkrævet at
-% forskellige fonte
-%\usepackage{fourier} % eller mathpazo eller lignende, eller fjern den
-% for at få standard fonten
-% sætter nogle default værdier vedr. floats
+%\usepackage[T1]{fontenc} % bedre orddeling og ofte påkrævet at
 
-\let\newfloat\relax % memoir har allerede defineret denne men det gør
-% float pakken også
+\let\newfloat\relax % memoir har allerede defineret denne men det gør float pakken også
 \usepackage{float}
 \restylefloat{table}
 \floatevery{table}{\centering\small} % alle tabel floats centreres og
