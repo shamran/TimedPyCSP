@@ -113,31 +113,7 @@ if self.timers and self.timers[0][0] <= Now():
 \end{minipage}
 \end{figure}
 
-\subsection{Funktionerne Now og Wait}\label{sec:Wait}
- I \pycsp benyttes modulet \fxnote{Motiver: hvorfor snakker vi om dette / er det relevant}
-\code{time} til at håndtere tiden i timeouts. Fra en brugers synsvinkel
-repræsenteres tiden internt som real og derfor kontinuerlig. Med computere findes tid som
-kontinuerligt dog begreb ikke, men  tiden internt repræsenteret
-som diskrete. Med  \des vil ikke ske en konvertering til diskret
-tid modsat realtid. 
-
-\Des er derimod en konvertering fra at tiden steg i faste tidsskridt til at tiden stiger med en variable tidsskridt. 
-Da man i \code{time} modulet har et fast tidsskridt og
-realtiden også er inddelt i faste størrelser
-som eks. sekunder, kan man med \code{time} modulet måle tidsintervaller der
-korrespondere med realtiden. I \des findes der ikke en
-sammenhæng til  realtiden, da tiden blot et tal der starter som 0, og stiger
-i abitrære tidskridt. Når tiden i \des på denne måde er afkoblet
-en relation til realtid, kan man heller ikke snakke om at et tidsrum
-har sekunder eller timer. I \pycsp kan man i en timeout planlægge en
-begivenhed til at ske om f.eks. 5 sekunder. I \des findes sekunder som
-begreb ikke, men man  angiver i stedet at når tiden er talt op med 5 abitræert enheder skal
-begivenheden ske. Der findes dog ikke en totalt afkobling mellem tiden i \des og realtiden, for givet et konkret problem der skal modelleres i \des, vil der altid være en sammenhæng mellem tiderne. Men da der ikke findes en fast sammenhæng, skal denne defineres eksplicit af brugeren, som f.eks at 5 sekunder i problemet defineres som en stigning i tiden med f.eks 5, 0,5 eller 0,05 i simuleringsmodellen.
-
-Når tiden i \des er uafhængig af realtiden er der ingen grund til at bruge en kompleks modelaftiden og vi har derfor valgt at repræsentere tiden som et positivt tal der findes internt i \sched en.
-Ved at have tiden i  \sched en findes der kun en version af tiden da  \sched en er en singelton. For processer der ønsker at kende tiden har vi
-introduceret funktionen \code{Now()} der returnerer tiden når funktionen kaldes. 
-
+\subsection{Funktionen Wait}\label{sec:Wait}
 I \des planlægger forskellige instanser hvilke begivenheder der skal foregå ud i fremtiden.  Dette er ikke en farbar vej at gå til udvikling af et simuleringsmiljø som en computer kan evaluerer. Det skyldes at det ikke er praktisk muligt for en computer at kunne håndtere alle de typer begivenheder der skal kunne planlægges. Et alternativ er at ikke at planlægge begivenheder, men istedet at lade instansen vente og så behandle begivenheden med det samme. Dermed skal man ikke kunne planlægge begivenhedder men holde instanser tilbage. 
 
 \begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=fig:simpy:yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)] 
@@ -151,26 +127,43 @@ foretage kaldet \code{yield}, som sørger for at processen ikke
 fortsætter før et defineret tidsrum er gået. \CRef{fig:simpy:yield} viser hvordan en kunde er ankommet til banken. Kunden printer tiden, foretager et \code{yield}, printer tiden igen og afslutter.  Når processen har kaldt \code{yield}, er tiden steget med værdien af \code{timeInBank}. Grunden til at de kan bruge \code{yield}, der er indbygget i Python og at dette kaldeafgiver kontrol over processen i et tidsrum  knytter sig til implementeringen af \simpy og der bruger  \code{corutine} som underliggende teknologi. 
 
  Vi ønsker i \pycsp at have en lignende mulighed for at lade en proces vente. Denne funktionalitet er heldigvis allerede delvist introduceret via \code{timeout} i \emph{greenlets}-versionen af \pycsp, og vi kan derfor bygge videre på denne funktionalitet med funktionen \code{Wait}, der fungerer som timeout, men som kan kaldes af processerne
-på et vilkårligt tidspunkt. \inline{Det nedenstående eksempelskal måske ændres
-da jeg ikke har talt med Rune om nødvendigheden af ''while now()<t)''. Og jeg har derfor ikke beskrevet i teksten hvordan funktionen virker.}
-
-\begin{lstlisting}[firstnumber=20,float=hbtp, label=wait, caption=Wait i simuleringsversionen.] 
-def Wait(seconds): 
-  Simulation().timer_wait(Simulation().current, seconds) 
+på et vilkårligt tidspunkt.
+\begin{lstlisting}[firstnumber=20,float=hbtp, label=fig:wait, caption=Wait i simuleringsversionen.] 
+def Wait(seconds):
+  Simulation().timer_wait(Simulation().current, seconds)
   t = Now()+seconds
-  while Now()<t: 
+  while Now()<t:
     p = Simulation().getNext() 
+    p.greenlet.switch()
 \end{lstlisting}
 
-Funktionen \code{Wait} er essentielt det eneste værktøj der skal til for at vente/planlægge begivenheder ud i fremtiden, og vi har på nuværenede tidspunkt en simpel \des der kører i realtid. 
+Funktionen \code{Wait} står for at kalde den interne funktion lavet til timeouts kaldet time\_wait, samt sørge for at først at returnere når tiden er steget til det påkrævede. \code{Wait} er essentielt det eneste værktøj der skal til for at vente/planlægge begivenheder ud i fremtiden, og vi har på nuværenede tidspunkt en simpel \des der kører i realtid. 
 
 \subsection{Fra reel tid til diskret tid.}\label{sec:discrete}
-Vi ønsker sædvanligvis at en simulering, kan eksekveres uafhængigt af tiden der simuleres det vil sige at når der ikke sker flere begivenheder til et givent tidspunkt skal tiden fremskrives til det næste tidskridt hvor der sker en begivenhed og ikke kun med et fast tidsskridt. Modsat gælder det også at tiden ikke må tælles op før alle processer har indikeret at de ikke ønsker at foretage mere arbejde. 
+ I \pycsp benyttes modulet \fxnote{Motiver: hvorfor snakker vi om dette / er det relevant}
+\code{time} til at håndtere tiden i timeouts. Fra en brugers synsvinkel
+repræsenteres tiden internt som realtid der er kontinuerlig. Med computere findes realtid ikke, men  er internt repræsenteret
+som diskret. Med  \des vil der derfor ikke ske en konvertering fra realtid til  diskrettid. 
 
-I den eksisterende \sched ~ er tiden reel og fremskrives derfor løbende uafhængigt af processernes tilstand. Dette kan illustreres med et eksempel; Proces 1 har startet en ny tråd via et \code{io} kald, og er derfor blokeret. Proces 2 står i en \code{Alternation} med en timeout guard. Uafhængigt af tiden det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide at når timeout'en er indtrådt. Dette er implementeret i \cref{fig:blocking_sleep} på linjerne 242 til 251. For at nå disse linjer findes der processer der er blokeret samt processer der venter på en timeout. Nu startes en separat tråd der signalere \sched en, når næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
+\Des er derimod en konvertering fra en diskrettid, med et fast tidsskridt til at tiden stiger med en variable tidsskridt. 
+Da man i \code{time} modulet har et fast tidsskridt og
+realtiden også er inddelt i faste størrelser
+som eks. sekunder, kan man med \code{time} modulet måle tidsintervaller der
+korrespondere med realtiden. I \des findes der ikke en
+sammenhæng til  realtiden, da tiden blot et tal der starter som 0, og stiger
+i abitrære tidskridt. Når tiden i \des på denne måde er afkoblet
+en relation til realtid, kan man heller ikke snakke om at et tidsrum
+har sekunder eller timer. I \pycsp kan man i en timeout planlægge en
+begivenhed til at ske om f.eks. 5 sekunder. I \des findes sekunder som
+begreb ikke, men man  angiver i stedet at når tiden er talt op med 5 abitræert enheder skal
+begivenheden ske. Der findes dog ikke en totalt afkobling mellem tiden i \des og realtiden, for givet et konkret problem der skal modelleres i \des, vil der altid være en sammenhæng mellem tiderne. Men da der ikke findes en fast sammenhæng, skal denne defineres eksplicit af brugeren, som f.eks at 5 sekunder i problemet defineres som en stigning i tiden med f.eks 5, 0,5 eller 0,05 i simuleringsmodellen.
 
-Denne ekstra tråd til håndtering af tid i et blokeret kald er overflødig i \des. For at tiden skal tælles op må ingen processer være blokeret; De skal i stedet enten have kaldt funktionen \code{wait} eller vente på kommunikation.  
-Så længe der findes blokerede processer venter vi på dem, uden at tage hensyn til antallet processer i \code{timers}.
+Når tiden i \des er uafhængig af realtiden er der ingen grund til at bruge en kompleks model af tiden og vi har derfor valgt at repræsentere tiden som et positivt tal der findes internt i \sched en. Ved at have tiden i  \sched en findes der kun en version af tiden da  \sched en er en singelton. For processer der ønsker at kende tiden har vi
+introduceret funktionen \code{Now()} der returnerer tiden når funktionen kaldes. 
+
+I den eksisterende \sched ~ er tiden reel og fremskrives derfor løbende uafhængigt af processernes tilstand. Dette kan illustreres med et eksempel; Proces 1 har startet en ny tråd via \code{io-decoratoren}, og er derfor blokeret. Proces 2 står i en \code{Alternation} med en timeout guard. Uafhængigt af tiden det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide når dens timeout er indtrådt. Dette er implementeret i \code{greenlets}-versionen i \cref{fig:blocking_sleep} på linjerne 242 til 251. For at køre disse linjer må  der findes processer der er blokeret samt processer der venter på en timeout. Nu startes en separat tråd der signalere \sched en, når næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
+
+Denne ekstra tråd til håndtering af tid i et blokeret kald er overflødig i \des. For at tiden skal tælles op må ingen processer være blokeret; de skal i stedet befinde sig i timers listen eller vente på kommunikation. Så længe der findes blokerede processer venter \sched en på dem, uden at tiden tælles op og de ventende  processer..
 
 For at at simuleringen kan fortsætte skal tiden tælles op på et tidspunkt, og dette må gøres eksplicit af simulerings \sched en.  Kun i det tilfælde hvor der ikke findes nogle processer der kan planlægges vælger vi at tælle tiden op. Vi ved at der ikke kan foregå flere begivenheder til et tidsskridt når der kun findes processer i \code{timers} listen. Vi kan i det tilfælde finde tidspunktet for den næste begivenhed og sætte tiden til denne begivenhed. Følgende er implementeret i \cref{fig:sim_sleep}.
 \begin{figure}[hbtp]
@@ -241,7 +234,7 @@ fjernes, og genoprettelsen af hob"-egenskaben også kan gøres i lineær tid.
 Det kræver ikke meget omskrivning for at konvertere en liste til en hob, men man kan sammenligne \cref{fig:green:timer} linje 205 med \cref{fig:sim:timer} linje 126. 
 
 
-\subsection{Ting vi har stjålet fra \simpy.}
+\subsection{Annekteret kode fra \simpy.}
 I vores implementering findes der i sagens natur i overlap med \simpy, som har været en inspirationskilde til hvordan et simuleringssprog kunne udvikles i Python. En del af arbejdet med \simpy har vi kunne bruge direkte i vore implementering, efter devisen om ikke at genskrive eksisterende god kode. Det drejer sig om funktionalitet til dataindsamling, bearbejdning og visualisering. I \simpy findes en \code{Monitor}klasse. Formålet med denne klasse er at gemme en liste af tid/værdi par. Dermed kan man efter endt simulering, analysere  hvordan værdierne har ændret sig over tid. Klassen \code{Monitor} kan bruges direkte af brugere, hvor de så selv  står for at at gemme værdier på passende tidspunkter igennem kørslen af programmet. Man ønsker tit at kende længden af en kø, der som oftest er implementeret via en liste. Vi har derfor lavet vores egen liste der kan indeholde en \code{Monitor}. Når længden af listen ændres gemmes længden af listen i en montor til brug for senere analyse, uden brugeren selv skal stå for at gemme længden af listen. Alternativt kan man lave en separat proces hvis eneste formål der er med en given frekvens at gemme længden listen Fordelen ved denne løsning at er intervallet er jævnt fordelt, og man derfor lettere kan foretage tidsspecifik statistik.
 
 

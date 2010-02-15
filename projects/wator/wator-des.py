@@ -54,7 +54,7 @@ def worldpart (part_id):
       for i in range(world_height):
         for j in range(start_col,start_col+part_width):
           element_iteration(Point(j,i))
-  #@io 
+
   def element_iteration(p):
     f = world[p.getX()][p.getY()]
     if f[TYPE] == EMPTY or f[MOVED] == 1:
@@ -113,7 +113,7 @@ def worldpart (part_id):
         for i in range(4):
           _from[i] = 0
       else:
-        if _from[TYPE] == SHARK :print "shark multipliing"
+        #if _from[TYPE] == SHARK :print "shark multipliing"
         _to[AGE] = 0
         _from[AGE] = 0
         _from[MOVED] = 1
@@ -174,7 +174,7 @@ def create(type):
 if __name__ == "__main__":
 #Constants
   world_parts = 4
-  iterations = 20
+  iterations = 40
   pct_fish = 0.76
   pct_shark = 0.01
   multiplier = 10

@@ -1,7 +1,12 @@
+3.1 CSP er IKKE parallelt men samtidigt.
+
 
 
 Introduktionen:
 Det er det afsnit der er mest usammenhængende, har du tips, triks og  stikord til hvad du synes der skal med.
+
+figur? tidsdrevet simulering gå ned i tidsstyring. måske noget med bollediagram.
+
 
 CSP og PyCSP
  - Er der nogle overordnede ting vi ikke har gennemgået?
@@ -12,8 +17,13 @@ CSP og PyCSP
 
 DES:
  - bruger vi eksemplerne nok/korrekt ifh til implementering
- - timeout, vi har ikke implementeret det,er det så relevant/ skal det væk.
+ -  timeout, vi har ikke implementeret det,er det så relevant/ skal det væk.
+    timeout skal være wake me last, mens wait er wake me last. - edge triggering - 
+ 
  - Evaluering, hvordan er det, hvordan skal vi ellers evaluere vores implementation?
+     Vi vil kunne modeller et diskret tidsevents.   
+     merge komponenter.
+ 
  - Er alle vores kodestumper relevant, eller skal de om i billag?
 
 
