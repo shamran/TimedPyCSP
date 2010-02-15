@@ -1,0 +1,19 @@
+
+
+Introduktionen:
+Det er det afsnit der er mest usammenhængende, har du tips, triks og  stikord til hvad du synes der skal med.
+
+CSP og PyCSP
+ - Er der nogle overordnede ting vi ikke har gennemgået?
+ - Skal vi have mere af teorien af CSP med?
+ - grundigere gennemgang af PyCSP?
+ - Er abstraktionsniveauet tilpas?
+ 
+
+DES:
+ - bruger vi eksemplerne nok/korrekt ifh til implementering
+ - timeout, vi har ikke implementeret det,er det så relevant/ skal det væk.
+ - Evaluering, hvordan er det, hvordan skal vi ellers evaluere vores implementation?
+ - Er alle vores kodestumper relevant, eller skal de om i billag?
+
+
