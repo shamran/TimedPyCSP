@@ -1,6 +1,6 @@
 
 \documentclass[a4paper, % papirstørrelse, skal altid med
-final,% Når man skal skifte kompileringsmetode mellem draft og final skal man 
+draft,% Når man skal skifte kompileringsmetode mellem draft og final skal man 
       %flytte kommenteringen %  i Draft kommanoerne, nedenfor.
 11pt, % standardstørrelse på fonten
 %openany,%, % anvnedes hvis kapitler bare skal starte på den næste side
@@ -213,7 +213,8 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 \newcommand\mc[1]{\multicolumn{1}{c}{{\textbf #1}}} % sparer plads
 
 % OPSÆTNING TIL INKLUDERING AF SOURCE CODE
-\usepackage[final]{listings}
+%\usepackage[final]{listings}
+\usepackage{listings}
 \renewcommand{\lstlistlistingname}{Kodestumper}
 \usepackage{courier}
  \lstset{ 

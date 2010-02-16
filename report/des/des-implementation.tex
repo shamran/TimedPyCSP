@@ -138,7 +138,7 @@ def Wait(seconds):
 Funktionen \code{Wait} står for at kalde den interne funktion lavet til timeouts kaldet time\_wait, samt sørge for at først at returnere når tiden er steget til det påkrævede. \code{Wait} er essentielt det eneste værktøj der skal til for at vente/planlægge begivenheder ud i fremtiden, og vi har på nuværenede tidspunkt en simpel \des der kører i realtid. 
 
 \subsection{Fra reel tid til diskret tid.}\label{sec:discrete}
- I \pycsp benyttes modulet \fxnote{Motiver: hvorfor snakker vi om dette / er det relevant}
+ I \pycsp benyttes modulet \fxnote{Dette skal gennemlæses når deadline/interactive  er skrevet for at se om time modulet skal hives op på et højere niveau}
 \code{time} til at håndtere tiden i timeouts. Fra en brugers synsvinkel
 repræsenteres tiden internt som realtid der er kontinuerlig. Med computere findes realtid ikke, men  er internt repræsenteret
 som diskret. Med  \des vil der derfor ikke ske en konvertering fra realtid til  diskrettid. 
