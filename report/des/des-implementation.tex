@@ -1,17 +1,17 @@
 
 \section{Design og implementering}
 \inline{Beskrivelse af design med udgangspunkt i eksemplet}
-\begin{shaded}
+\fxnote{omformuleres}\begin{shaded}
 Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret tid som et alternativ til barrierer. Dels ønsker vi med diskret tid at åbne for mulighederne for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Med disse ændringer er håbet at vi opnår en model der ligger tætter på intentionen bag \csp og så man kan udfase brugen af barrierer, samt med den underliggende parallelitet i \csp kan udnyttes til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.\inline{RS:hvordan er dette relateret til design/implementation? - SB: Det er indledende motivation.}
 
 I \des  skal tiden styres centralt og processerne skal alle have mulighed for at vide hvad klokken er når den kører. Tiden skal altid være den samme på tværs af alle processer og derfor skal der være en central kontrol med processerne, så man kan styre hvilke processer der køre på forskellige tidspunkter. Dette er let at styre ved hjælp af PyCSP's \sched ~i \code{greenlets}"-versionen, hvor vi har fuld kontrol over afviklingen af individuelle processer. 
 \end{shaded}
 
 \subsection{Kodestruktur}  
-Efter at have valgt at udvide \emph{greenlet}-versionen skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra \emph{greenlet}-versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale \emph{greenlet}-versionen. Med denne isolation forventer vi at hvis/når der sker tilrettelser af \emph{greenlet}versionen af \pycsp vil man ikke skulle foretage de samme tilrettelser i \des versionen. 
-Isolationen mellem \des- og \emph{greenlet}versionen ønsker vi at få ved nedarvning, men således at det fra en brugers synsvinkel ser ud til at \des versionen er en selvstændig version.
+Efter at have valgt at udvide \emph{greenlets}"-versionen skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra \emph{greenlets}"-versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale \emph{greenlets}"-versionen. Med denne isolation forventer vi at hvis/når der sker tilrettelser af \emph{greenlets}"-versionen af \pycsp vil man ikke skulle foretage de samme tilrettelser i vores version. 
+Isolationen mellem de to versioner skal opnås via nedarvning, således at det fra en brugers synsvinkel ser ud til at vores version er fuldstændigt sepereret fra \emph{greenlets}"-versionen.
 
-Hvert af de tre versioner har sin egen mappe i \pycsp og i hver af disse findes en tilhørende \code{\_\_init\_\_.py} fil, der fungerer som et manifest for den givne version. Vi opretter vores egen version kaldet \emph{simulation}, og opretter en tilhørende mappe på samme niveau som de andre versioner og med sin egen manifestfil. Manifestfilen kan nu bruges til at udvælge de funktioner der skal tages direkte fra \emph{greenlet}-versionen og hvilke funktioner der skal udvides og som derfor vil ligge i den nye mappe.
+Hvert af de tre versioner har sin egen mappe i \pycsp og i hver af disse findes en tilhørende \code{\_\_init\_\_.py} fil, der fungerer som et manifest for den givne version. Vi opretter vores egen version kaldet \emph{simulation}, og opretter en tilhørende mappe på samme niveau som de andre versioner og med sin egen manifestfil. Manifestfilen kan nu bruges til at udvælge de funktioner der skal tages direkte fra \emph{greenlets}-versionen og hvilke funktioner der skal udvides og som derfor vil ligge i den nye mappe.
 \begin{lstlisting}[float=hbtp,label=fig:init,caption=Uddrag af \code{\_\_init\_\_.py} for simulationsversionen.]
 from guard import Timeout, Skip
 from pycsp.greenlets.alternation import choice
@@ -19,10 +19,10 @@ from alternation import Alternation
 from pycsp.greenlets.channel import ChannelPoisonException, ChannelRetireException
 \end{lstlisting}
 
-I \cref{fig:init} kan man se at funktionerne \code{choice}, \\\code{ChannelPoisonException} og \code{ChannelRetireException} alle bliver hentet fra \emph{greenlet}-versionen, mens at funktionerne \code{Timeout, Skip} og \code{Alternation} bliver importeret fra samme mappe, og derfor er en modificeret version. For slutbrugeren  vil dette dog være transparent, og vil blot se \emph{simulation}-versionen som en selvstændig version på lige fod med de andre tre versioner.
+I \cref{fig:init} kan man se at funktionerne \code{choice}, \code{ChannelPoisonException} og \code{ChannelRetireException} alle bliver hentet fra \emph{greenlets}"-versionen, mens at funktionerne \code{Timeout, Skip} og \code{Alternation} bliver importeret fra samme mappe, og derfor er en modificeret version. For slutbrugeren  vil dette dog være transparent, og hun vil blot se \emph{simulation}"-versionen som en selvstændig version på lige fod med de andre tre versioner.
 
 \subsection{Scheduler-klassen}
-Med valget af \emph{greenlet}-versionen som grundversion og med henblik på at hovedparten af vores ændringer vil være i \sched en, vil vi kort gennemgå klassen \code{Scheduler}.
+Med valget af \emph{greenlets}"-versionen som grundversion og med henblik på at hovedparten af vores ændringer vil være i \sched en, vil vi kort gennemgå dele af klassen \code{Scheduler}.
 
 \begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i \emph{greenlets}versionen.]
     def getInstance(cls, *args, **kargs):
@@ -47,7 +47,7 @@ Med valget af \emph{greenlet}-versionen som grundversion og med henblik på at h
             cls.__instance.blocking = 0
 \end{lstlisting}
 
- I \cref{fig:scheduling} ses et uddrag af initialiseringskoden, der er interessant fordi det er her alle de interne datastrukturer oprettes. Man kan se der findes tre lister af processer som \sched en har til rådighed til at varetage processkifte. 
+ I \cref{fig:scheduling} ses et uddrag af initialiseringskoden, der er interessant fordi det er her alle de interne datastrukturer oprettes. Man kan her se de  tre lister af processer som \sched en har til rådighed til at varetage processkifte. 
  \begin{list}
  \tightlist 
  \item \code{new}: Initieres på linje 140, og består af processer som lige er blevet planlagt for første gang. Nye processer kan ankomme til listen \code{new} via funktionerne \code{Parallel, Sequence} og \code{Spawn}.
@@ -58,6 +58,7 @@ Med valget af \emph{greenlet}-versionen som grundversion og med henblik på at h
 
 Når \sched en er startet, gennemløber den alle tre lister gentagne gange, indtil de alle er tomme, og der ikke er nogle processer der er blokeret. Dette betyder at der ikke længere kan komme nye processer til der ønsker at blive lagt på \sched en, og den kan dermed afslutte.
 \begin{shaded}
+\fxnote{Hvordan skal dette omskrives?}
 For at markere at vi ikke kun skal foretage en planlægning
 af processerne, men foretage en simulering, har vi lavet en
 \code{Simulation} klasse der arver fra \code{Scheduler}. Alle ændringer
@@ -74,9 +75,10 @@ ikke \code{Scheduler} fra greenletsversionen.
 %design.
 
 \subsection{Tid} \label{sec:tid}
+\inline{Jeg synes dette afsnit er rodet. Vi snakker om tid i starten er dette afsnit, så snakker vi om funktionen Wait, for så at vende tilbage til diskret tid modsat realtid.  kan vi ikke få det flyttet rundt så det bliver mere logisk. og evt. så vi ikke gentager os selv.}
 \CRef{Timeout} viser et eksempel på en \code{alternation} hvor processen kun er villig
 til at læse fra kanalenden \code{Cin} i $0.5$ sekunder. Hvis ikke der
-er modtaget en besked indenfor 0.5 sekunder, accepteres timeoutguarden
+er modtaget en besked indenfor 0.5 sekunder, accepteres dens \code{timeout-guard}
 og processen fortsætter sin kørsel uden at have læst fra kanalen.
 
 \begin{lstlisting}[%float=hbtp, 
@@ -85,13 +87,13 @@ Alternation([{Timeout(seconds=0.5):None},
              {Cin:None}]).select()
 \end{lstlisting}
 
-Tid er dermed blevet introduceret i \pycsp, for i denne specifikke situation at at have
+Tid er dermed blevet introduceret i \pycsp, for i denne specifikke situation at  have
 mulighed for at tilknytte timeout til en \code{alternation}. Vi ønsker
 at videreudvikle denne struktur til at håndtere tid generelt for alle
-processer, men ændre tiden så den fungerer med diskret tid, modsat den eksisterende
-løsning hvor tiden er realtid.
+processer, samt så den fungerer med diskret tid, modsat den eksisterende
+løsning hvor der benyttes realtid.
 
-For at konvertere \emph{greenlets}-versionen der bruger  til realtid til en simuleringsversion der bruger diskrettid, skal vi ændre de steder i koden som allerede bruger tid. Det eneste sted tid har indflydelse er i listen \code{timers}. Vi kan dermed nøjes med at ændre de steder i \sched en som involverer \code{timers}. Det første sted hvor \code{timers} bruges er i udvælgelsen af hvilken proces der skal køres(\cref{fig:green:timer}). \fxnote*{RS: relevans?}{Her sammenlignes på linje 204 den første tidsværdi i \code{timers}, med det nuværende tidspunkt. Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra listen.}
+For at konvertere \emph{greenlets}-versionen der bruger  til realtid til en simuleringsversion der bruger diskrettid, skal vi ændre de steder i koden som allerede bruger tid. Det eneste sted tid har indflydelse er i listen \code{timers}. Vi kan dermed nøjes med at ændre de steder i \sched en som involverer \code{timers}. Det første sted hvor \code{timers} bruges er i udvælgelsen af hvilken proces der skal køres (\cref{fig:green:timer}). \fxnote*{RS: relevans?}{Her sammenlignes på linje 204 den første tidsværdi i \code{timers}, med det nuværende tidspunkt. Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra listen.}
 
 Da tiden står tiden stille mens en proces kører i den diskrete tid og processen kan fortsætte så længe den ønsker kræver det et aktivt valg før tiden stiger. Vi kan derfor tilføje en yderligere begrænsning i forhold til \emph{greenlets}-versionen: \fxnote*{Hvorfor er det relevant - hvad kan vi bruge det til/udnytte?}{For \emph{simulerings}-versionen skal tiden være præcist det der er angivet i \code{timers}, før processen skal aktiveres, og ikke kun større, som angivet i \emph{greenlets}versionen.} \CRef{fig:sim:timer} viser udvælgelsen af en proces fra \code{timers} i \emph{simulerings}-versionen.
 
@@ -114,7 +116,7 @@ if self.timers and self.timers[0][0] <= Now():
 \end{figure}
 
 \subsection{Funktionen Wait}\label{sec:Wait}
-I \des planlægger forskellige instanser hvilke begivenheder der skal foregå ud i fremtiden.  Dette er ikke en farbar vej at gå til udvikling af et simuleringsmiljø som en computer kan evaluerer. Det skyldes at det ikke er praktisk muligt for en computer at kunne håndtere alle de typer begivenheder der skal kunne planlægges. Et alternativ er at ikke at planlægge begivenheder, men istedet at lade instansen vente og så behandle begivenheden med det samme. Dermed skal man ikke kunne planlægge begivenhedder men holde instanser tilbage. 
+\fxnote*{SB: Er det ok?}{I \des planlægger forskellige instanser hvilke begivenheder der skal foregå ud i fremtiden.  Dette er ikke en farbar vej at gå til udvikling af et simuleringsmiljø som en computer kan evaluerer. Det skyldes at det ikke er praktisk muligt for en computer at kunne håndtere alle de typer begivenheder der skal kunne planlægges. Et alternativ er at ikke at planlægge begivenheder, men istedet at lade instansen vente og så behandle begivenheden med det samme. Dermed skal man ikke kunne planlægge begivenhedder men holde instanser tilbage.}
 
 \begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=fig:simpy:yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)] 
 def visit(self,timeInBank): 
@@ -124,11 +126,11 @@ def visit(self,timeInBank):
 \end{lstlisting}
 I programmeringssproget \simpy benytter man også metoden til at lade en proces vente. Dette gør de ved at
 foretage kaldet \code{yield}, som sørger for at processen ikke
-fortsætter før et defineret tidsrum er gået. \CRef{fig:simpy:yield} viser hvordan en kunde er ankommet til banken. Kunden printer tiden, foretager et \code{yield}, printer tiden igen og afslutter.  Når processen har kaldt \code{yield}, er tiden steget med værdien af \code{timeInBank}. Grunden til at de kan bruge \code{yield}, der er indbygget i Python og at dette kaldeafgiver kontrol over processen i et tidsrum  knytter sig til implementeringen af \simpy og der bruger  \code{corutine} som underliggende teknologi. 
+fortsætter før et defineret tidsrum er gået. \CRef{fig:simpy:yield} viser hvordan en kunde er ankommet til banken. Kunden printer tiden, foretager et \code{yield}, printer tiden igen og afslutter.  Når processen har kaldt \code{yield}, er tiden steget med værdien af \code{timeInBank}. Grunden til at de kan bruge \code{yield}, der er indbygget i Python og at dette kald afgiver kontrol over processen i et tidsrum der knytter sig til implementeringen af \simpy der bruger  \code{corutine} som underliggende teknologi. 
 
  Vi ønsker i \pycsp at have en lignende mulighed for at lade en proces vente. Denne funktionalitet er heldigvis allerede delvist introduceret via \code{timeout} i \emph{greenlets}-versionen af \pycsp, og vi kan derfor bygge videre på denne funktionalitet med funktionen \code{Wait}, der fungerer som timeout, men som kan kaldes af processerne
 på et vilkårligt tidspunkt.
-\begin{lstlisting}[firstnumber=20,float=hbtp, label=fig:wait, caption=Wait i simuleringsversionen.] 
+\begin{lstlisting}[firstnumber=20,float=hbtp, label=fig:wait, caption=Wait i \code{simulering}-versionen.] 
 def Wait(seconds):
   Simulation().timer_wait(Simulation().current, seconds)
   t = Now()+seconds
@@ -217,13 +219,12 @@ self.cond.release()
 
 \subsection{Timers}  
 \CRef{sec:tid} viser at listen \code{timers} i \pycsp kun bruges til at placere processer der venter på en timeout i \code{alternation}. Dette er en niche feature ved \pycsp, som  sjældent vil skulle bruges, og hvor der sjældent er samlet mange processer på en gang. 
- I \cref{sec:Wait} beskriv vi hvordan processer der ønsker at vente ligges på \code{timers} listen, og i \cref{sec:discrete} beskriver vi hvordan \sched kun tæller tiden op når ingen processer kan foretage sig mere i et givent tidsskridt. Når tiden tælles op vil  alle processer enten vente på kommunikation eller befinde sig i listen \code{timers}. De processer der venter i en alternation og hvor der er tilknyttet en timeout vil ligge begge steder. Gennemsnitslængden af listen vil derfor stige voldsomt og dermed ændres kravene til hvilken  datastruktur der er bedst egnet. 
+ I \cref{sec:Wait} beskriv vi hvordan processer der ønsker at vente ligges på \code{timers} listen, og i \cref{sec:discrete} beskriver vi hvordan \sched kun tæller tiden op når ingen processer kan foretage sig mere i et givent tidsskridt. Når tiden tælles op vil  alle processer enten vente på kommunikation eller befinde sig i listen \code{timers}. De processer der venter i en \code{alternation} og hvor der er tilknyttet en timeout vil ligge begge steder. Gennemsnitslængden af listen vil derfor stige voldsomt og dermed ændres kravene til hvilken  datastruktur der er bedst egnet. 
  
-Med en kort, sjældent brugt liste vil omkostningerne til oprettelse og vedligeholdelse af en avanceret datastruktur være større end fordelene. Ved simuleringer ændres brugen af listen og vi skal derfor finde en datastruktur der bedre passer til vores brug. En min"-hob er det åbenlyse valg til skemaplanlægning da  man kan  indsætte elementer i konstant tid og fjerne det mindste element i $O(log\ n)$. Som eksempel på for anvendelsesmulighederne af en hob er skemaplanlægning specifikt nævnt i introduktionen til Pythons implementering\footnote{$http://docs.python.org/dev/3.0/library/heapq.html$}.  \fxnote{SB: rs, er det ok?}
+Med en kort, sjældent brugt liste vil omkostningerne til oprettelse og vedligeholdelse af en avanceret datastruktur være større end fordelene. Til skemaplanlægning  vil en min"-hob vøre det åbenlyse valg, da  man kan  indsætte elementer i konstant tid og fjerne det mindste element i $O(log\ n)$. Som eksempel på for anvendelsesmulighederne af en hob er skemaplanlægning specifikt nævnt i introduktionen til Pythons implementering\footnote{$http://docs.python.org/dev/3.0/library/heapq.html$}.  \fxnote{SB: rs, er det ok?}
 
 Da en implementering af en hob allerede findes i Python i modulet \code{heapq}, som er effektivt implementeret i C, vælger vi at bruge denne. Den eneste handling
-der ikke er som standard er implementeret, er fjernelsen af et arbitrært element.
-fra hoben. Dette sker i den eksisterende løsning når en proces
+der ikke er som standard er implementeret, er fjernelsen af et arbitrært element fra hoben. Dette sker i den eksisterende løsning når en proces
 aktivere et andet valg i \code{alternation} end timeout. I dette tilfælde skal
 processen ikke vente på sin timeout, men elementet skal fjernes fra
 \code{timers} listen. Her, må man som i
@@ -232,7 +233,7 @@ hob"-egenskaben i listen. Dette vil dog ikke tage længere tid, da en fjernelse 
 tidspunkt bruger en lineær søgning, til at finde elementet der skal
 fjernes, og genoprettelsen af hob"-egenskaben også kan gøres i lineær tid.
 
-Det kræver ikke meget omskrivning for at konvertere en liste til en hob, men man kan sammenligne \cref{fig:green:timer} linje 205 med \cref{fig:sim:timer} linje 126. 
+Det kræver ikke meget omskrivning for at konvertere en liste til en hob, som man kan se ved at sammenligne \cref{fig:green:timer} linje 205 med \cref{fig:sim:timer} linje 126. 
 
 
 \subsection{Annekteret kode fra \simpy.}

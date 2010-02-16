@@ -43,7 +43,7 @@
 For at evaluere fordele og ulemper af \emph{simulerings}"-versionen af \pycsp, har vi genimplementeret eksemplerne fra \cref{sec:des-examples}, men denne gang med  brug af vores udviklede kode. vi kan nu sammenholde de to versioner, og se på fordele og ulemper ved \emph{simulerings}"-versionen.
  
 \subsection{Hajer og fisk på Wator}
-Implementeringen af dette problem  i et simulationssprog har ikke medført den store omskrivning. Dette skyldes at eksemplet er en kontinuerlig simulation, og alle fisk og hajer ønsker at interagere med omverdenen i hvert tidsskridt. I processen \code{visualize} ser man tydeligst forskellen mellem standard \pycsp og dens brug af barrierer og \emph{simulerings}"-versionen og dens brug af tid vha. funktionen \code{Wait}. Hvor standard \pycsp må kalde en barrier tre gange for hver iteration (\cref{fig:green:visualize}) kan man i \emph{simulerings}"-versionen blot angive at visualiseringen ønsker at vente tre tidsskridt (\cref{fig:sim:visualize}). 
+Implementeringen af dette problem  i et simulationssprog har ikke medført den store omskrivning. Dette skyldes at eksemplet er en kontinuerlig simulation, og alle fisk og hajer ønsker at interagere med omverdenen i hvert tidsskridt. I processen \code{visualize} ser man tydeligst forskellen mellem standard \pycsp og dens brug af barrierer og \emph{simulerings}"-versionen og dens brug af tid vha. funktionen \code{Wait}. Hvor standard \pycsp må kalde en barrier tre gange for hver iteration (\cref{fig:green:visualize}),vers kan man i \emph{simulerings}"-versionen blot angive at visualiseringen ønsker at vente tre tidsskridt (\cref{fig:sim:visualize}). 
 
 \begin{lstlisting}[firstnumber=157 ,float=hbtp, label=fig:green:visualize, caption=\code{Greenlets}"-versionen af visualize]
 @process
@@ -87,7 +87,7 @@ I arbejderprocessen (\cref{fig:sim:worker}) kan man også se hvordan brugen af t
 \subsection{Kunder i bank}
 De to bankeksempler har krævet en betydelig omskrivning for at udnytte den nyudviklede \emph{simulerings}"-version. I Generatorprocessen ses tydeligst forskellen på de to versioner. \emph{Greenlets}"-versionen bruger 20 linjer kode hvor \emph{simulerings}"-versionen kun bruger 6 linjer. Den store forskel på de to funktioner er muligheden for i simulationen  at hoppe fra et tidspunkt til det næste. Dermed skal funktionen ikke være aktiv i hvert tidsskridt, men kun i de tidsskridt hvor der skal produceres en kunde. Når processen kun er aktiv i de korrekte tidsskridt kan vi undgå hjælpevariablerne \code{t\_event, time} og \code{numberInserted}. 
 
-\emph{Simulerings}"-versionen er fri for begrænsningen der er sat i \emph{greenlets}"-versionen, der kræver at en tiden skal være delelig med et givent tidsskridt (\cref{fig:green:generator} linje 29). Linjerne 35 til 41 er krævet da barrieren kræver det samme antal processer igennem hele kørslen (se \cref{sec:barrierer}). 
+\emph{Simulerings}"-versionen er desuden fri for den kunstige begrænsning, der findes i \emph{greenlets}"-versionen, der kræver at en tiden skal være delelig med et givent tidsskridt. I \cref{fig:green:generator} er linjerne 35 til 41 krævet da barrieren behøves det samme antal processer igennem hele kørslen (se \cref{sec:barrierer}). 
 
 \begin{lstlisting}[firstnumber=21, label=fig:green:generator, caption=Generatorprocessen for Greenlets versionen]
 @process
@@ -115,7 +115,7 @@ def Generator(i,number,meanTBA, meanWT,
     return
 \end{lstlisting}
 
-Generatorfunktionen er dermed omskrevet så koden er mere relateret til funktionaliteten og mindre til synkronisering.  I resten af koden opnår vi lignende kodekoncentration, men vi har også udvidet eksemplet så vi gemmer antallet af kunder der befinder sig i banken i en \code{Monitor}. Dette er ikke strengt nødvendigt og gøres ikke i det originale eksempel fra \simpy, men viser godt brugen af en \code{Monitor} udtræk af data for simuleringen. Det var  forventet at koden kunne forbedres, da eksemplet er et typisk \des problem, men det er tilfredsstillende at vi opnår de forventede forbedringer i implementeringen af simulationen i forhold til \emph{greenelts}"-versionen.
+Generatorfunktionen er omskrevet så koden er mere relateret til funktionaliteten og mindre til synkronisering.  I resten af koden opnår vi lignende kodekoncentration, men vi har også udvidet eksemplet så vi gemmer antallet af kunder der befinder sig i banken i en \code{Monitor}. Dette er ikke strengt nødvendigt og gøres ikke i det originale eksempel fra \simpy, men viser godt brugen af en \code{Monitor}, til udtræk af data fra simuleringen. Det var  forventet at koden kunne forbedres, da eksemplet er et typisk \des problem, men det er tilfredsstillende at vi opnår de forventede forbedringer i implementeringen af simulationen i forhold til \emph{greenlets}"-versionen.
 
 
 \begin{lstlisting}[firstnumber=20, label=fig:sim:generator, caption=Generatorprocessen for Simulationsversionen]
@@ -184,7 +184,6 @@ def Bank(customerREADER):
       print "%94.0f: B: got retire"%(Now())
 
 \end{lstlisting}
-
-I det avancerede eksempel som vist i  \cref{fig:sim:bank2} indeholder bankprocessen mindre kode end i det simple eksempel. Det skyldes at banken ikke længere skal holde styr på samtlige kunder, men blot skal håndtere en kunde ad gangen mens resten af kunderne befinder sig i køen. Kundefunktionen i \simpy og bankprocessen i det avancerede eksempel minder derfor meget om hinanden og en fordel ved \csp versionen af simulering at man kun foretager en \code{Wait} for at indikere af den begrænsede ressource er optaget, hvor man i \simpy versionen skal foretage tre kald. Først et kald for at få adgang til den begrænsede ressource, så et kald for at holde ressourcen i et tidsperiode, samt et sidste for at slippe ressourcen.
+I det avancerede eksempel som vist i  \cref{fig:sim:bank2} indeholder bankprocessen mindre kode end i det simple eksempel. Det skyldes at banken ikke længere skal holde styr på samtlige kunder, men blot skal håndtere en kunde ad gangen mens resten af kunderne befinder sig i køen. Kundefunktionen i \simpy og bankprocessen i det avancerede eksempel minder derfor meget om hinanden og en fordel ved \pycsp versionen af simulering er at man kun foretager en \code{Wait} for at indikere af den begrænsede ressource er optaget, hvor man i \simpy versionen skal foretage tre kald. Først et kald for at få adgang til den begrænsede ressource, så et kald for at holde ressourcen i et tidsperiode, samt et sidste for at slippe ressourcen.
 
   

@@ -136,8 +136,7 @@ vizualize-processen.  Værd at bemærke er det store antal barrierekald i
 visualizeprocessen. Dette er til for at man kan benytte den samme barriere som 
 worldpartprocesserne. Alternativt kunne man have to barriereprocesser; en til 
 synkronisering af worldpart med vizualize, samt en som 
-worldpart-processerne bruger til synkroniseringen af opdatering af 
-verdensdelen og de to sidste kolonner. 
+worldpart-processerne bruger til synkroniseringen af de to sidste kolonner. 
 
 \subsubsection{Konklusion}
 \inline{konklusion hvordan var det at implementere og hvor stor parallelitet 
@@ -161,10 +160,10 @@ tidsrum, hvorefter de igen forlader banken. I dette eksempel kan der ikke
 uddrages meget information, men det viser hvordan en simpel model er opbygget i 
 hhv.  \simpy og \pycsp for at håndtere tid.
 
-I det andet eksempel er modellen udvidet med en servicedisk. Her skal alle 
+I det andet eksempel er modellen udvidet med en servicedisk, hvilket giver at eksemplet bliver en M/M/1 kømodel. Her skal alle 
 kunderne betjenes af en servicemedarbejder, som kun kan ekspederes en kunde ad 
 gangen. Alle kunder ankommer til banken på tilfældige tidspunkter  og stiller sig i 
-kø for at blive serviceret. Dette  svare til en M/M/1 kømodel\inline{motivér}. Det er igen et tilfældigt tidsrum som kunden bruger på at blive 
+kø for at blive serviceret. Det er igen et tilfældigt tidsrum som kunden bruger på at blive 
 serviceret.  Dette er stadigt en meget simpel model, men med introduktionen af 
 en begrænset ressource kan man uddrage information om den tilhørende kø, f.eks. 
 kan der måles hvor lang det tager for hver kunde at blive betjent af 
@@ -250,7 +249,7 @@ servicedisken og lade kanalen håndtere køen.
 En ulempe ved brugen af bufferkanaler som en kø er, at kanalen har en fast størrelse på sin buffer, som 
 angives når kanalen oprettes. Man kan dermed risikere en deadlock ved brug af bufferkanaler sammen med barrierer. Dette opstår hvis ikke processen i samme 
 tidsskridt kan foretage transmissionen og kalde barrieren.
-Dette kan løses med en \code{alternation} og \code{skip guard}, men så 
+Det kan løses med en \code{alternation} og \code{skip guard}, men så 
 skal bankprocessen håndtere fejlede forsendelser og må nødvendigvis introducere en 
 sekundær kø hvilket gør brugen af en bufferkanal overflødig. For undgå dette har vi i vores tilfælde valgt blot at 
 angive en maksimal størrelse på bufferen som er større end det totale antal 
