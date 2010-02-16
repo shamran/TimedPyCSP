@@ -1,11 +1,6 @@
 
 \section{Design og implementering}
-\inline{Beskrivelse af design med udgangspunkt i eksemplet}
-\fxnote{omformuleres}\begin{shaded}
-Formålet med introduktionen er to ting. Dels ønsker vi at introducere diskret tid som et alternativ til barrierer. Dels ønsker vi med diskret tid at åbne for mulighederne for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Med disse ændringer er håbet at vi opnår en model der ligger tætter på intentionen bag \csp og så man kan udfase brugen af barrierer, samt med den underliggende parallelitet i \csp kan udnyttes til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.\inline{RS:hvordan er dette relateret til design/implementation? - SB: Det er indledende motivation.}
-
-I \des  skal tiden styres centralt og processerne skal alle have mulighed for at vide hvad klokken er når den kører. Tiden skal altid være den samme på tværs af alle processer og derfor skal der være en central kontrol med processerne, så man kan styre hvilke processer der køre på forskellige tidspunkter. Dette er let at styre ved hjælp af PyCSP's \sched ~i \code{greenlets}"-versionen, hvor vi har fuld kontrol over afviklingen af individuelle processer. 
-\end{shaded}
+%\inline{Beskrivelse af design med udgangspunkt i eksemplet}
 
 \subsection{Kodestruktur}  
 Efter at have valgt at udvide \emph{greenlets}"-versionen skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra \emph{greenlets}"-versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale \emph{greenlets}"-versionen. Med denne isolation forventer vi at hvis/når der sker tilrettelser af \emph{greenlets}"-versionen af \pycsp vil man ikke skulle foretage de samme tilrettelser i vores version. 

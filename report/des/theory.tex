@@ -2,7 +2,10 @@
 \inline{Beskrivelse af tidsmodellen, teorien omkring den og hvor/hvad den 
     benyttes til. Teori: henvisning til litteratur, bl.a.  matematik/beviser 
     for modellen}
-\inline{Noget med hvilke funktion der er krævet. (Kun en Wait og en Now)}
+
+\fxnote{taget fra implementering - skal det bruges her eller slettes?}\begin{shaded}
+Vi ønsker at introducere diskret tid som et alternativ til realtid. Med for have mulighed for at kunne foretage simuleringer, hvor man bruger \csp som model for systemet. Vi ønsker desuden at man med vores model kan udfase brugen af barrierer, samt kunne benytte den underliggende parallelitet i \csp til at øge hastigheden af de simulere modeller, hvis de er begrænset af beregningskapaciteten.
+\end{shaded}
 
 \begin{shaded}
 \fxnote{Gennemlæses og højst sandlysningt omskrives med henblik på sammenhæng og mangler.}
@@ -128,7 +131,6 @@ Men barrierer giver kun en  primitiv model for tid, og vi vil vise at med brugen
 
 
 \section{Timeout} 
-\inline{kausal tid.}
 \inline{timeout, wake-first - wake-last, edge-triggering indenfor logik}
 \begin{shaded}
 Med et diskret simuleringsmiljø kan man forstille sig tre forskellige scenarier for  hvornår  en proces er villig
