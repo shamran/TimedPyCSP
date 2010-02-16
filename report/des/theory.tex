@@ -24,8 +24,23 @@ For at kunne konstruere en \des skal vi have følgende til rådighed; En repræs
     
 \csp er lavet med henblik på processer der arbejder samtidigt og uafhængigt af hinanden. I \des er processerne derimod ikke uafhængige af hinanden, men skal tilpasse sine begivenheder lineært efter hvornår de sker. En simuleringen løber begivenhederne kronologisk igennem til der enten ikke er flere begivenheder eller som det oftere er tilfældet til simuleringen når et forud defineret tidspunkt.
 
-Alternativet til  \des  er \pdes hvor tiden i processerne kan løbe uafhængigt af hinanden. Dette introducerer muligheden for større samtidighed, men samtidigt risikerer processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage.\fxnote*{kilde eller omskrivning af pdes performance}{ Det har der vidst sig at omkostningerne ved at lade tiden kører parallelt er omkostningerne større end ved at holde tiden synkront på tværs af processerne.}
+\fxnote*{Brian: ok brug af parallelitet}{Alternativet til  \des  er \pdes hvor tiden i processerne kan løbe uafhængigt af hinanden. Dette introducerer muligheden for større parallitet, men samtidigt risikerer processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. \pdes har vundet stort indpas i den videnskabelig verden som man kan se af \cref{tab:des}, en grund til dette er at ved at lade tiden kører parallelt er omkostningerne større end ved at holde tiden synkront på tværs af processerne.}
 
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{lrr}
+	\toprule
+	\mc{Periode} & \mc{DES} & \mc{PDES}\\
+	\midrule
+1970 til 1980 &   296 &2\\
+1980 til 1990 & 1.460 &95\\
+1990 til 2000 & 6.190 &1.260\\
+2000 til 2010 &13.100 &1.210\\
+\bottomrule
+	\end{tabular}
+	\caption{Publisering af artikler if. google scholar ved søgning på hhv. ''\des'' og ''parallel \des''}
+	\label{tab:des}
+\end{table}
 \subsection*{Noter til afsnittet}
 \begin{itemize}
 \tightlist

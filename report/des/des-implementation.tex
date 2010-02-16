@@ -116,7 +116,7 @@ if self.timers and self.timers[0][0] <= Now():
 \end{figure}
 
 \subsection{Funktionen Wait}\label{sec:Wait}
-\fxnote*{SB: Er det ok?}{I \des planlægger forskellige instanser hvilke begivenheder der skal foregå ud i fremtiden.  Dette er ikke en farbar vej at gå til udvikling af et simuleringsmiljø som en computer kan evaluerer. Det skyldes at det ikke er praktisk muligt for en computer at kunne håndtere alle de typer begivenheder der skal kunne planlægges. Et alternativ er at ikke at planlægge begivenheder, men istedet at lade instansen vente og så behandle begivenheden med det samme. Dermed skal man ikke kunne planlægge begivenhedder men holde instanser tilbage.}
+\fxnote*{SB: bedre?}{I \des foregår der en dynamisk planlægning hvilke betyder at alle processerne kan planlægge hvilke begivenheder der skal foregå i fremtiden.  Dette er ikke en farbar vej at gå til implementeringen  af et simuleringsmiljø som en computer kan evaluerer. Det skyldes at det ikke er praktisk muligt for en computer at kunne håndtere alle de typer begivenheder der skal kunne planlægges. Et alternativ er at ikke at planlægge begivenheder, men istedet at lade processen vente og så behandle begivenheden med det samme. Dermed skal simuleringen ikke kunne planlægge begivenhedder men istedet holde processer tilbage.}
 
 \begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=fig:simpy:yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)] 
 def visit(self,timeInBank): 
@@ -128,7 +128,7 @@ I programmeringssproget \simpy benytter man også metoden til at lade en proces 
 foretage kaldet \code{yield}, som sørger for at processen ikke
 fortsætter før et defineret tidsrum er gået. \CRef{fig:simpy:yield} viser hvordan en kunde er ankommet til banken. Kunden printer tiden, foretager et \code{yield}, printer tiden igen og afslutter.  Når processen har kaldt \code{yield}, er tiden steget med værdien af \code{timeInBank}. Grunden til at de kan bruge \code{yield}, der er indbygget i Python og at dette kald afgiver kontrol over processen i et tidsrum der knytter sig til implementeringen af \simpy der bruger  \code{corutine} som underliggende teknologi. 
 
- Vi ønsker i \pycsp at have en lignende mulighed for at lade en proces vente. Denne funktionalitet er heldigvis allerede delvist introduceret via \code{timeout} i \emph{greenlets}-versionen af \pycsp, og vi kan derfor bygge videre på denne funktionalitet med funktionen \code{Wait}, der fungerer som timeout, men som kan kaldes af processerne
+ Vi ønsker i \pycsp at have en lignende mulighed for at lade en proces vente. Denne funktionalitet er heldigvis allerede delvist introduceret via \code{timeout} til \code{alternation} i \emph{greenlets}-versionen af \pycsp, og vi kan derfor bygge videre på denne funktionalitet med funktionen \code{Wait}, der fungerer som timeout, men som kan kaldes af processerne
 på et vilkårligt tidspunkt.
 \begin{lstlisting}[firstnumber=20,float=hbtp, label=fig:wait, caption=Wait i \code{simulering}-versionen.] 
 def Wait(seconds):
