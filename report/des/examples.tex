@@ -232,17 +232,17 @@ i servicedisk processen.
 
 
 \subsubsection{Konklusion - evaluering - ?}
-\fxnote*{Omskrives}{Ved at se på implementeringen af de to eksempler af kunder i en bank sammenholdt med implementeringen i \simpy, kan man se at de egner sig godt til 
-simulering og fra eksemplet kan man se at der findes meget kode til 
-vedligeholdelse af de interne tidsvariabler, som \simpy ikke har behov for.} Det drejer sig 
+Ved at se på implementeringen af de to eksempler af kunder i en bank sammenholdt med implementeringen i \simpy, kan man se at \des  egner sig godt til 
+simulering disse problemer, og fra eksemplet kan man se at der findes meget kode til 
+vedligeholdelse af de interne tidsvariabler, som \simpy ikke har behov for. Det drejer sig 
 om kode der sørger for at hver proces kender tiden, samt at den er 
 synkroniseret på tværs af processerne. Vi forventer derfor at koden skal kunne 
 simplificeres i \pycsp med tid, så det bliver lige så simpelt at implementere som i 
 \simpy. 
 
-I \simpy findes begrebet ressource direkte i sproget, som en type og 
-servicedisken er blot en instans af denne type, og ressourcen står selv for at 
-håndtere køen. \inline{Uddyb lidt om ressource}I \pycsp modelleres servicedisken som en separat proces, og 
+I \simpy findes begrebet ressource direkte i sproget, som en type og servicedisken er blot et objekt af denne type. 
+En ressource i \simpy bruges til modellering af en begrænset ressource. Ved oprettelsen af ressourcen angives hvor mange der samtidigt kan tilgå den begrænsede ressource, og ressourcen står selv for at adgang til ressourcen samt den tilhørende kø, der eventuelt måtte opstå. 
+I \pycsp modelleres servicedisken som en separat proces, og 
 bankprocessen er derfor reduceret til blot at sende kunden videre til 
 servicedisken og lade kanalen håndtere køen. 
 
