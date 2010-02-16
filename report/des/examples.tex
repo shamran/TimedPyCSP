@@ -40,8 +40,8 @@ af de omkringliggende felter, og vil derfor være afhængig af felter fra andre
 processer i grænsetilfælde. Ud over at være afhængig af information fra andre 
 processer, kan en opdatering også påvirke data hos andre processer. Eksemplet er repræsentativt for de problemer der ligger i kategorien af continuous simulation, og viser at hvis vi kan bruge vores implementation af \des til simulering af dette eksempel vil man helt generelt kunne bruge det til continuous simulations.
 
-\subsubsection{Før introduktion af et tidsbegreb i \csp} For at simulere Wa-Tor 
-verdenen i et \csp-system hvori tidsbegrebet ikke er introduceret, er vi nødt 
+\subsubsection{Før introduktion af et tidsbegreb i \pycsp}
+For at simulere Wa-Tor verdenen i \pycsp hvori tidsbegrebet ikke er introduceret, er vi nødt 
 til at udføre en synkronisering af de enkelte processers arbejde. Denne 
 synkronisering kan ske ved brug af barrierer, hvor alle processer udfører en 
 handling og mødes i barrieren før de fortsætter.
@@ -132,15 +132,16 @@ Afviklingen af programmet sker ved at et antal worldpart-, en
 visualize- og en barrier-proces køres parallelt. Af 
 \autoref{code:wator-worldpart} og \cref{code:wator-visualize}, ses det 
 overordnede design af henholdsvis worldpart- og 
-vizualize-processen.  Værd at bemærke er det store antal barrierekald i 
-visualizeprocessen. Dette er til for at man kan benytte den samme barriere som 
-worldpartprocesserne. Alternativt kunne man have to barriereprocesser; en til 
+vizualize-processen.  
+\subsubsection{Konklusion}
+%\inline{konklusion hvordan var det at implementere og hvor stor parallelitet kan man opnå. }
+Det var ikke svært at implementere et predator/prey simulering i \pycsp, men da store dele af koden bruges på at simulere  de forskellige fisk, og ikke på synkronisering, forventer vi ikke at introduktionen af tid i \pycsp vil medføre de store ændringer. 
+
+Værd at bemærke er det store antal barrierekald i 
+visualize-processen. Dette er til for at man kan benytte den samme barriere som 
+worldpart-processerne. Alternativt kunne man have to barriere-processer; en til 
 synkronisering af worldpart med vizualize, samt en som 
 worldpart-processerne bruger til synkroniseringen af de to sidste kolonner. 
-
-\subsubsection{Konklusion}
-\inline{konklusion hvordan var det at implementere og hvor stor parallelitet 
-kan man opnå. }
 
 \subsection{Kunder i en bank}\label{bank-eksempel}
 Et klassisk eksempel inden for \des er at simulere  en række kunder der alle 
@@ -253,5 +254,5 @@ Det kan løses med en \code{alternation} og \code{skip guard}, men så
 skal bankprocessen håndtere fejlede forsendelser og må nødvendigvis introducere en 
 sekundær kø hvilket gør brugen af en bufferkanal overflødig. For undgå dette har vi i vores tilfælde valgt blot at 
 angive en maksimal størrelse på bufferen som er større end det totale antal 
-kunder banken modtager. \fxnote*{giver mening?}{Dette medfører så at det ikke længere er en teoretisk korrekt M/M/1 kømodel, da denne specifikt angiver at køen skal have mulighed for at have uendelig længde. I praksis er det ikke et problem da vi blot kan ræsonnere os frem til at køen ikke bliver fuld.}
+kunder banken modtager. \fxnote*{SB:giver mening?}{Dette medfører så at det ikke længere er en teoretisk korrekt M/M/1 kømodel, da denne specifikt angiver at køen skal have mulighed for at have uendelig længde. I praksis er det ikke et problem da vi blot kan ræsonnere os frem til at køen ikke bliver fuld.}
 

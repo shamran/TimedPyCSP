@@ -141,22 +141,19 @@ medføres derimod et designvalg, da det ikke er defineret hvordan simuleringen s
 i det givne tidsskridt. Der findes to muligheder, enten skal \sched     
 en signalere at der ikke findes mere arbejde til dette tidsskridt, og   
 lade processerne fortsætte i samme tidsskridt. Alternativt skal tiden   
-tælles op til næste begivenhed, hvorefter processerne signaleres at    
+tælles op til næste begivenhed, hvorefter processerne aktiveres med besked om  at    
 kommunikationen ikke lykkedes. 
-
-
 \subsubsection{Timeout i samme tidsskridt} 
-\fxnote{signalere udskiftes med aktiveres}
-Hvis man vælger at processerne skal signaleres i samme tidsskridt, vil en timeout
+Hvis man vælger at processerne skal aktiveres i samme tidsskridt, vil en timeout
 efterligne en SKIP guard, men hvor en alternation med en SKIP guard med
 det samme kan fortsætte vil en timeout kræve at der blev ventet indtil
 der ikke var flere processer der kunne processers i samme tidsskridt.
 Når der ikke er flere processer at vælge imellem skal de ventende
-processer fortsætte. Her er muligheden enten at signalere hver proces
-en af gangen, og lade den fortsætte inden næste proces signaleres,
-eller alternativt, samtidigt at signalerer alle de ventende processerne.
+processer fortsætte. Her er muligheden enten at aktivere hver proces
+en af gangen, og lade den fortsætte inden næste proces aktiveres,
+eller alternativt, samtidigt at aktiverer alle de ventende processerne.
 
-Ved at signalere samtlige processer indføres muligheden for en
+Ved at aktivere samtlige processer indføres muligheden for en
 livelock. Dette sker hvis to eller flere processer er synkroniseret i
 den samme tidsrytme. Et eksempel er hvis de alle i samme periode først
 ønsker at modtage data, for derefter at sende data. Her vil alle
@@ -168,26 +165,26 @@ Ved at aktivere en proces ad gangen har denne proces mulighed for i
 samme tidsskridt at indgå i kommunikation med en af de andre ventende
 processer. Deadlocken kan man dermed løse og man har mulighed for at
 undgå livelock problemet, som set ved samtidig signalering. Ulemperne er at der
-foretages et valg om i hvilken rækkefølge  processer signaleres med timeout,
+foretages et valg om i hvilken rækkefølge  processer aktiveres med timeout,
 og dermed har man risikoen for starvation.
 
 
 \subsubsection{Timeout i et efterfølgende tidsskridt} 
 Ved at vælge at en timeout der først forekommer i et efterfølgende tidsskridt, har alle
 processer haft den maksimale mulighed for at indgå i en kommunikation.
-Desuden kan alle processerne signaleres samtidigt, da  alle timeouts
+Desuden kan alle processerne aktiveres samtidigt, da  alle timeouts
 er overskredet. Man kan i dette tilfælde  vælge enten at fortolke en timeout i samme
-tidskridt som hvor der først signaleres efter $\epsilon$, hvor $\epsilon$ sættes til
+tidskridt som hvor processen først aktiveres efter $\epsilon$, hvor $\epsilon$ sættes til
 et vilkårligt lille tidsinterval. Da tiden springer i vilkårligt små
 tidsskridt i en simuleringen, vil en fast størrelse af $\epsilon$
 risikere at påvirke rækkefølgen af begivenheder. Alternativt kan man vælge
-at lade tiden springe til nærste begivenhed, og der signalere alle timeouts.
+at lade tiden springe til nærste begivenhed, og der aktivere alle processer.
 
 Begge muligheder har dog grundliggende den svaghed at den oprindelige timeout var sat til
 0 og ikke til hverken et vilkårligt lille $\epsilon$ eller anden
 tidsenhed og man vil derfor ændrer på fortolkningen af kode. 
-\end{shaded}
 \subsubsection{Vores valg}
-I PyCSP vil processer der venter i en alternation med en timeout der er overskrevet, blive signaleret en ad gangen. Dette
-medfører at en proces har mulighed for at indgå i kommunikation med en anden proces selvom dens timeout guard er overskredet. \fxnote{Mere}
+I PyCSP vil processer der venter i en alternation med en timeout der er overskrevet, blive aktiveret en ad gangen. Dette
+medfører at en proces har mulighed for at indgå i kommunikation med en anden proces selvom dens timeout guard er overskredet. \inline{Mere}
+\end{shaded}
 
