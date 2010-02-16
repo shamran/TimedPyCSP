@@ -161,7 +161,7 @@ tidsrum, hvorefter de igen forlader banken. I dette eksempel kan der ikke
 uddrages meget information, men det viser hvordan en simpel model er opbygget i 
 hhv.  \simpy og \pycsp for at håndtere tid.
 
-I det andet eksempel er modellen udvidet med en servicedisk, hvilket giver at eksemplet bliver en M/M/1 kømodel. Her skal alle 
+I det andet eksempel er modellen udvidet med en servicedisk, hvilket giver at eksemplet bliver en M/M/1 kømodel\fxnote{Brian - er det relevant at snakke om kømodeller?}. Her skal alle 
 kunderne betjenes af en servicemedarbejder, som kun kan ekspederes en kunde ad 
 gangen. Alle kunder ankommer til banken på tilfældige tidspunkter  og stiller sig i 
 kø for at blive serviceret. Det er igen et tilfældigt tidsrum som kunden bruger på at blive 
@@ -254,5 +254,5 @@ Det kan løses med en \code{alternation} og \code{skip guard}, men så
 skal bankprocessen håndtere fejlede forsendelser og må nødvendigvis introducere en 
 sekundær kø hvilket gør brugen af en bufferkanal overflødig. For undgå dette har vi i vores tilfælde valgt blot at 
 angive en maksimal størrelse på bufferen som er større end det totale antal 
-kunder banken modtager. \fxnote*{SB:giver mening?}{Dette medfører så at det ikke længere er en teoretisk korrekt M/M/1 kømodel, da denne specifikt angiver at køen skal have mulighed for at have uendelig længde. I praksis er det ikke et problem da vi blot kan ræsonnere os frem til at køen ikke bliver fuld.}
+kunder banken modtager. \fxnote*{RS: Afhænger af den forrige fixme om M/M/1}{Dette medfører at det ikke længere er en teoretisk korrekt M/M/1 kømodel, da denne specifikt angiver at køen skal have mulighed for at have uendelig længde. I praksis er det ikke et problem da vi blot kan ræsonnere os frem til at køen ikke bliver fuld.}
 

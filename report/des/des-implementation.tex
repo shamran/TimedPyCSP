@@ -91,12 +91,12 @@ løsning hvor der benyttes realtid.
 
 For at konvertere \emph{greenlets}-versionen der bruger  til realtid til en simuleringsversion der bruger diskrettid, skal vi ændre de steder i koden som allerede bruger tid. 
 Det eneste sted tid har indflydelse er i listen \code{timers}. 
-Vi kan dermed nøjes med at ændre de steder i \sched en som involverer \code{timers}. 
+Vi kan dermed nøjes med at ændre de steder i \sched en som involverer denne liste. 
 Det første sted hvor \code{timers} bruges er i udvælgelsen af hvilken proces der skal køres (\cref{fig:green:timer}). 
 Her sammenlignes på linje 204 den første tidsværdi i \code{timers}, med det nuværende tidspunkt.
 Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra listen.
-Som nævnt i \cref{sec:Wait} kan processerne vælge at vente i et specifikt tidsrum, hvor ventetiden skal  være præcist som  angivet, hverken længere eller kortere. Dermed har  \sched en behov for at kunne  styre aktiveringen af processerne på et finere niveau end hvad der er muligt med \code{greenelts}"-versionen.  
-I \code{Simulation}"-verisonen står tiden stille mens processerne eksekveres og det er \sched en der står for at inkrementere tiden. Vi kan derfor i \code{simulerings}"-versionen en finere kontrol over tiden og kan derfor tilføje den  begrænsning der siger at tiden skal være præcist det der er angivet i \code{timers}, før processen skal aktiveres, og ikke kun større, som angivet i \code{greenlets}"-versionen. \CRef{fig:sim:timer} viser udvælgelsen af en proces fra \code{timers} i \code{simulerings}-versionen.\fxnote{SB: OK?}
+Som nævnt i \cref{sec:Wait} kan processerne vælge at vente i et specifikt tidsrum, hvor ventetiden skal  være præcist som  angivet, hverken længere eller kortere. Dermed har  \sched en behov for at kunne  styre aktiveringen af processerne på et finere niveau end hvad der er muligt med \code{greenlets}"-versionen.  
+I \code{Simulation}"-verisonen står tiden stille mens processerne eksekveres og det er \sched en der står for at inkrementere tiden. Vi har dermed fuld kontrol over tiden i \code{simulerings}"-versionen og kan derfor tilføje den begrænsning at tiden skal være præcist det der er angivet i \code{timers}, før processen skal aktiveres, og ikke kun større, som angivet i \code{greenlets}"-versionen. Dermed kan vi opfylde kravet fra \des om at udføre begivenheder i et specifikt tidsskridt, og ikke blot tidligst i det angivne tidsskridt. \CRef{fig:sim:timer} viser udvælgelsen af en proces fra \code{timers} i \code{simulerings}-versionen. 
 
 \begin{figure}[hbtp]
 \begin{minipage}[c]{\linewidth}
@@ -117,11 +117,7 @@ if self.timers and self.timers[0][0] <= Now():
 \end{figure}
 
 \subsection{Funktionen Wait}\label{sec:Wait}
-Vi har valgt at anskue en planlægning af en begivenhed til et tidspunkt, som en venten for den proces der skal udføre begivenheden indtil tiden er nået.
-
-hvilket også svarer til implementationen i \simpy. 
-
-\fxnote*{SB: bedre?}{I \des foregår der en dynamisk planlægning hvilke betyder at alle processerne kan planlægge hvilke begivenheder der skal foregå i fremtiden.  Dette er ikke en farbar vej at gå til implementeringen  af et simuleringsmiljø som en computer kan evaluere. Det skyldes at det ikke er praktisk muligt for en computer at kunne håndtere alle de typer begivenheder der skal kunne planlægges. Et alternativ er at ikke at planlægge begivenheder, men istedet at lade processen vente og så behandle begivenheden med det samme. Dermed skal simuleringen ikke kunne planlægge begivenhedder men istedet holde processer tilbage.}
+Vi har valgt at anskue en planlægning af en begivenhed til et tidspunkt, som en venten for den proces der skal udføre begivenheden indtil tiden er nået. Dette vil i praksis være det samme, men det letter implementationen da vi ikke behøver nogen viden om specifikke begivenheder i vores \sched. 
 
 \begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=fig:simpy:yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)] 
 def visit(self,timeInBank): 
@@ -224,9 +220,9 @@ self.cond.release()
 
 \subsection{Timers}  
 \CRef{sec:tid} viser at listen \code{timers} i \pycsp kun bruges til at placere processer der venter på en timeout i \code{alternation}. Dette er en niche feature ved \pycsp, som  sjældent vil skulle bruges, og hvor der sjældent er samlet mange processer på en gang. 
- I \cref{sec:Wait} beskriv vi hvordan processer der ønsker at vente ligges på \code{timers} listen, og i \cref{sec:discrete} beskriver vi hvordan \sched kun tæller tiden op når ingen processer kan foretage sig mere i et givent tidsskridt. Når tiden tælles op vil  alle processer enten vente på kommunikation eller befinde sig i listen \code{timers}. De processer der venter i en \code{alternation} og hvor der er tilknyttet en timeout vil ligge begge steder. Gennemsnitslængden af listen vil derfor stige voldsomt og dermed ændres kravene til hvilken  datastruktur der er bedst egnet. 
+ I \cref{sec:Wait} beskriv vi hvordan processer der ønsker at vente ligges på \code{timers} listen, og i \cref{sec:discrete} beskriver vi hvordan \sched en kun tæller tiden op når ingen processer kan foretage sig mere i et givent tidsskridt. Når tiden tælles op vil  alle processer enten vente på kommunikation eller befinde sig i listen \code{timers}. De processer der venter i en \code{alternation} og hvor der er tilknyttet en timeout vil ligge begge steder. Gennemsnitslængden af listen vil derfor stige voldsomt og dermed ændres kravene til hvilken  datastruktur der er bedst egnet. 
  
-Med en kort, sjældent brugt liste vil omkostningerne til oprettelse og vedligeholdelse af en avanceret datastruktur være større end fordelene. Til skemaplanlægning  vil en min"-hob vøre det åbenlyse valg, da  man kan  indsætte elementer i konstant tid og fjerne det mindste element i $O(log\ n)$. Som eksempel på for anvendelsesmulighederne af en hob er skemaplanlægning specifikt nævnt i introduktionen til Pythons implementering\footnote{$http://docs.python.org/dev/3.0/library/heapq.html$}.  \fxnote{SB: rs, er det ok?}
+Med en kort, sjældent brugt liste vil omkostningerne til oprettelse og vedligeholdelse af en avanceret datastruktur være større end fordelene. Til vores skemaplanlægning  vil en min"-hob vøre det åbenlyse valg, da  man kan  indsætte elementer i konstant tid og fjerne det mindste element i $O(log\ n)$. Som eksempel på anvendelsesmulighederne for en hob er skemaplanlægning specifikt nævnt i introduktionen til Pythons implementering\footnote{$http://docs.python.org/dev/3.0/library/heapq.html$}.  
 
 Da en implementering af en hob allerede findes i Python i modulet \code{heapq}, som er effektivt implementeret i C, vælger vi at bruge denne. Den eneste handling
 der ikke er som standard er implementeret, er fjernelsen af et arbitrært element fra hoben. Dette sker i den eksisterende løsning når en proces
