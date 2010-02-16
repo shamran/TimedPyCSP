@@ -4,7 +4,8 @@
     for modellen}
 \inline{Noget med hvilke funktion der er krævet. (Kun en Wait og en Now)}
 
-
+\begin{shaded}
+\fxnote{Gennemlæses og højst sandlysningt omskrives med henblik på sammenhæng og mangler.}
 Indenfor simulering er \des en meget brugt metode til at modellere systemer. I 
 \des anskues tid som diskrete tidsskridt som er uden kobling til realtid. I 
 disse tidsskridt udføres en eller flere begivenheder, som ved afslutning kan 
@@ -22,7 +23,7 @@ Afhængig af hvad der simuleres, kan man udtrække relevant information om syste
 For at kunne konstruere en \des skal vi have følgende til rådighed; En repræsentation af tid til at styre hvornår vi skifter tidsskridt, en liste over begivenheder der skal udføres i hvert tidsskridt, samt mulighed for at opsamle statistisk data fra simulationen. 
 
     
-\csp er lavet med henblik på processer der arbejder samtidigt og uafhængigt af hinanden. I \des er processerne derimod ikke uafhængige af hinanden, men skal tilpasse sine begivenheder lineært efter hvornår de sker. En simuleringen løber begivenhederne kronologisk igennem til der enten ikke er flere begivenheder eller som det oftere er tilfældet til simuleringen når et forud defineret tidspunkt.
+I \csp har vi garanti for at de eneste afhængigheder mellem processer vil være kommunikation. I \des har vi ud over kommunikation også en afhængighed af at synkronisere tiden mellem processerne.En simulering løber begivenhederne kronologisk igennem til der enten ikke er flere begivenheder eller som det oftere er tilfældet til simuleringen når et forud defineret tidspunkt.
 
 \fxnote*{Brian: ok brug af parallelitet}{Alternativet til  \des  er \pdes hvor tiden i processerne kan løbe uafhængigt af hinanden. Dette introducerer muligheden for større parallitet, men samtidigt risikerer processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. \pdes har vundet stort indpas i den videnskabelig verden som man kan se af \cref{tab:des}, en grund til dette er at ved at lade tiden kører parallelt er omkostningerne større end ved at holde tiden synkront på tværs af processerne.}
 
@@ -48,6 +49,7 @@ For at kunne konstruere en \des skal vi have følgende til rådighed; En repræs
 	\item Hvad bruges DES til? styrker/svagheder?
 	\item Henvis til DE-simulation.ps
 \end{itemize}
+\end{shaded}
 
 \subsection{Barrierer} \label{sec:barrierer}
 \inline{Hele afsnittet skal skrives om for at få det generelle samlet i starten, og vores specifikke efterfølgende. Evt. have mindre om vores implementation}

@@ -61,9 +61,9 @@ Når \sched en er startet, gennemløber den alle tre lister gentagne gange, indt
 For at markere at vi ikke kun skal  planlægge rækkefølgen
 af processerne, men foretage en planlægning samt styre tiden, har vi lavet en
 \code{Simulation}"-klasse der arver fra \code{Scheduler}"-klassen. Alle ændringer
-vi skal foretage for at kunne foretage planlægningen af processer under hensyntagen til tiden, vil således være indkapslet i denne klasse. 
-Dette har yderligere den fordel at man tydeligt kan se at alle klasserne i \code{simulation}"-versionen arver en korrekt \sched fra \code{Simulation} og
-ikke en \sched \xspace fra \code{greenlets}"-versionen.\fxnote{SB: ok?}
+vi skal foretage for at kunne planlægge processer under hensyntagen til tid, vil således være indkapslet i denne klasse. 
+Dette har yderligere den fordel at man tydeligt kan se at alle klasserne i \code{simulation}"-versionen arver en \sched fra \code{Simulation} og
+ikke en \sched \xspace fra \code{greenlets}"-versionen.
 
 %\fxnote{dårlig overskrift}{\subsection{Repræsentation af tid}} Vi
 %vil i dette afsnit gå i dybden med listen \code{timers} der findes i
@@ -117,7 +117,11 @@ if self.timers and self.timers[0][0] <= Now():
 \end{figure}
 
 \subsection{Funktionen Wait}\label{sec:Wait}
-\fxnote*{SB: bedre?}{I \des foregår der en dynamisk planlægning hvilke betyder at alle processerne kan planlægge hvilke begivenheder der skal foregå i fremtiden.  Dette er ikke en farbar vej at gå til implementeringen  af et simuleringsmiljø som en computer kan evaluerer. Det skyldes at det ikke er praktisk muligt for en computer at kunne håndtere alle de typer begivenheder der skal kunne planlægges. Et alternativ er at ikke at planlægge begivenheder, men istedet at lade processen vente og så behandle begivenheden med det samme. Dermed skal simuleringen ikke kunne planlægge begivenhedder men istedet holde processer tilbage.}
+Vi har valgt at anskue en planlægning af en begivenhed til et tidspunkt, som en venten for den proces der skal udføre begivenheden indtil tiden er nået.
+
+hvilket også svarer til implementationen i \simpy. 
+
+\fxnote*{SB: bedre?}{I \des foregår der en dynamisk planlægning hvilke betyder at alle processerne kan planlægge hvilke begivenheder der skal foregå i fremtiden.  Dette er ikke en farbar vej at gå til implementeringen  af et simuleringsmiljø som en computer kan evaluere. Det skyldes at det ikke er praktisk muligt for en computer at kunne håndtere alle de typer begivenheder der skal kunne planlægges. Et alternativ er at ikke at planlægge begivenheder, men istedet at lade processen vente og så behandle begivenheden med det samme. Dermed skal simuleringen ikke kunne planlægge begivenhedder men istedet holde processer tilbage.}
 
 \begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=fig:simpy:yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)] 
 def visit(self,timeInBank): 
