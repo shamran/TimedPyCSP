@@ -16,7 +16,7 @@ For at kunne konstruere en \des skal vi have følgende til rådighed; En repræs
     
 I \csp har vi garanti for at de eneste afhængigheder mellem processer vil være kommunikation. I \des har vi ud over kommunikation også en afhængighed af at synkronisere tiden mellem processerne.En simulering løber begivenhederne kronologisk igennem til der enten ikke er flere begivenheder eller som det oftere er tilfældet til simuleringen når et forud defineret tidspunkt.
 
-\fxnote*[inline,nomargin]{Brian: ok brug af parallelitet}{Alternativet til  \des  er \pdes hvor tiden i processerne kan løbe uafhængigt af hinanden. Dette introducerer muligheden for større parallitet, men samtidigt risikerer processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. \pdes har vundet stort indpas i den videnskabelig verden som man kan se af \cref{tab:des}, en grund til dette er at ved at lade tiden kører parallelt er omkostningerne større end ved at holde tiden synkront på tværs af processerne.}
+\fxnote*[inline,nomargin]{Brian: ok brug af parallelitet}{Alternativet til  \des  er \pdes hvor tiden i processerne kan løbe uafhængigt af hinanden. Dette introducerer muligheden for større parallitet, men samtidigt risikerer processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. \pdes har ikke vundet stort indpas i den videnskabelig verden som man kan se af \cref{tab:des}, en grund til dette er at når tiden kan køre parallelt vil de deraf følgende omkostningerne resultere i lavere hastighed end ved at holde tiden synkront på tværs af processerne.}
 \end{shaded}
 \begin{table}[ht]
 	\centering
@@ -117,64 +117,22 @@ Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp.
 Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun  lokalt data. Hvis der er data er delt pga. arkitekturen \csp er implementeret på, bør dette abstraheres væk men udnyttes internt i kanalerne. At introducere hjælpemidler for styre delt data, er derfor at tilskynde til en forkert brug af \csp. Tiden er den anden begrundelse for at benytte barrierer.
 Men barrierer giver kun en  primitiv model for tid, og vi vil vise at med brugen af en \des får man et stærkere værktøj, der blandt meget andet også kan erstatte brugen af barrierer.
 
-
 \section{Timeout} 
 \inline{timeout, wake-first - wake-last, edge-triggering indenfor logik}
-\begin{shaded}
-Med et diskret simuleringsmiljø kan man forstille sig tre forskellige scenarier for  hvornår  en proces er villig
-til at kommunikere. En proces ønsker at kommunikere  frem til et givent tidspunkt; processen ønsker kommunikation fra et givent tidspunkt; og endeligt ønsker processen at kommunikere på et specifikt tidspunkt.
-At ville kommunikere fra et given tidspunkt i fremtiden, svare til at   
-vente uden at lave noget indtil det givne tidspunkt for så at kommunikere. Hvilket ikke medfører nogle problemer. Det medfører heller ikke  designmæssig udfordring at kommunikere ud til et tidspunkt i fremtiden.
+I den eksisterende \pycsp findes der som nævnt i \cref{sec:csp} en alternation, hvor brugeren har mulighed for at tilknytte to specielle guards. Det er SKIP-guard der giver mulighed for at kommunikere hvis kanalen er klar og ellers fortsætte uden at kommunikere. Den anden er timeout-guarden der udvider SKIP-guarden så man ønske maksimalt at vente på at kommunikere i en tidsperiode. Med \des ændres tiden og man kan forestille sig at processer måske kunne ønske at kommunikere i et tidsskridt, men ikke i et efterfølgende tidsskridt. I \des kan der ske vilkårligt mange begivnheder i det samme tidsskridt og tiden står stille mens processerne er aktive og derfor kan processen ikke afgøre når de er aktive om kommunikation vil være muligt i det givne tidspunkt.
 
-For processer der kun ønsker at kommunikere til et given tidspunkt,
-medføres derimod et designvalg, da det ikke er defineret hvordan simuleringen skal forholde sig hvis det ikke lykkedes at kommunikere   
-i det givne tidsskridt. Der findes to muligheder, enten skal \sched     
-en signalere at der ikke findes mere arbejde til dette tidsskridt, og   
-lade processerne fortsætte i samme tidsskridt. Alternativt skal tiden   
-tælles op til næste begivenhed, hvorefter processerne aktiveres med besked om  at    
-kommunikationen ikke lykkedes. 
-\subsubsection{Timeout i samme tidsskridt} 
-Hvis man vælger at processerne skal aktiveres i samme tidsskridt, vil en timeout
-efterligne en SKIP guard, men hvor en alternation med en SKIP guard med
-det samme kan fortsætte vil en timeout kræve at der blev ventet indtil
-der ikke var flere processer der kunne processers i samme tidsskridt.
-Når der ikke er flere processer at vælge imellem skal de ventende
-processer fortsætte. Her er muligheden enten at aktivere hver proces
-en af gangen, og lade den fortsætte inden næste proces aktiveres,
-eller alternativt, samtidigt at aktiverer alle de ventende processerne.
-
-Ved at aktivere samtlige processer indføres muligheden for en
-livelock. Dette sker hvis to eller flere processer er synkroniseret i
-den samme tidsrytme. Et eksempel er hvis de alle i samme periode først
-ønsker at modtage data, for derefter at sende data. Her vil alle
-processerne uden timeouts vente på hinanden i en deadlock, men med en
-timeout vil de alle fortsætte samtidigt og indgå i en ny deadlock,
-\pycsp vil derfor gå fra en deadlock til en livelock. 
-
-Ved at aktivere en proces ad gangen har denne proces mulighed for i
-samme tidsskridt at indgå i kommunikation med en af de andre ventende
-processer. Deadlocken kan man dermed løse og man har mulighed for at
-undgå livelock problemet, som set ved samtidig signalering. Ulemperne er at der
-foretages et valg om i hvilken rækkefølge  processer aktiveres med timeout,
-og dermed har man risikoen for starvation.
-
-
-\subsubsection{Timeout i et efterfølgende tidsskridt} 
-Ved at vælge at en timeout der først forekommer i et efterfølgende tidsskridt, har alle
-processer haft den maksimale mulighed for at indgå i en kommunikation.
-Desuden kan alle processerne aktiveres samtidigt, da  alle timeouts
-er overskredet. Man kan i dette tilfælde  vælge enten at fortolke en timeout i samme
-tidskridt som hvor processen først aktiveres efter $\epsilon$, hvor $\epsilon$ sættes til
-et vilkårligt lille tidsinterval. Da tiden springer i vilkårligt små
-tidsskridt i en simuleringen, vil en fast størrelse af $\epsilon$
-risikere at påvirke rækkefølgen af begivenheder. Alternativt kan man vælge
-at lade tiden springe til nærste begivenhed, og der aktivere alle processer.
-
+Vi kan vælge at lade processerne vente indtil et efterfølgende tidsskridt, som enten kan være et kunstigt lille tidsskridt eller indtil den næste begivnhed er planlagt.
+Hvis tiden springer et lille  tidsskridt frem  i en simuleringen, risikere vi at der findes andre begivnheder der har et mindre tidsskridt og vi kan derfor påvirke rækkefølgen af begivenheder. 
+Alternativt kan man vælge at lade tiden springe til nærste begivenhed, og der som det første aktivere alle processer, her vil man ikke risikere at ændre på rækkefølgen.
 Begge muligheder har dog grundliggende den svaghed at den oprindelige timeout var sat til
-0 og ikke til hverken et vilkårligt lille $\epsilon$ eller anden
+0 og ikke til hverken et vilkårligt lille tidsskridt eller anden
 tidsenhed og man vil derfor ændrer på fortolkningen af kode. 
-\subsubsection{Vores valg}
-I PyCSP vil processer der venter i en alternation med en timeout der er overskrevet, blive aktiveret en ad gangen. Dette
-medfører at en proces har mulighed for at indgå i kommunikation med en anden proces selvom dens timeout guard er overskredet. \inline{Mere}
-\end{shaded}
+
+Man kan også vælge at aktiveres processerne i samme tidsskridt, og aktivere de ventende processer når der ikke er flere processer der kan eksekveres i samme tidsskidt.
+Til at aktivere processerne i samme tidsskridt kan vi \fxnote*{illustration}{benytte os af edge-triggering} til at dele hver tidsskridt op i to grupper, wake-first og wake-last.
+I wake-first gruppen foretages eksekveringen af alle processerne der har begivenheder i det givne tidsskridt, mens man wake-last gruppen  aktivere processerne der venter på et timeout.
+
+Med  edge-triggering giver vi dermed mulighed for at eksekvere alle begivnheder som måske resulterer i kommunikation, og først derefter at aktivere de processer der har en timeout til samme tidsskridt.  Ulempen ved denne metode er at vi skal implementere to seperate måde at vente på at tiden tælles op. Dels for begivenheder og dels for timeouts.
+
+
 
