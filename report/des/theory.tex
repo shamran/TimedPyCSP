@@ -3,18 +3,18 @@
     benyttes til. Teori: henvisning til litteratur, bl.a.  matematik/beviser 
     for modellen}
 
-\begin{shaded}
-\fxnote{Gennemlæses og højst sandlysningt omskrives med henblik på sammenhæng og mangler.}
 Indenfor simulering er \des en meget brugt metode til at modellere systemer. I 
 \des anskues tid som diskrete tidsskridt som er uden kobling til realtid. I 
-disse tidsskridt udføres en eller flere begivenheder, som hver især ændrer på systemets tilstand. Når alle begivenheder for et tidsskridt er udført kan tiden tælles op og begivenheder for det nye tidsskridt kan udføres. Der kan være være planlagt et vilkårligt antal beginvenheder til et tidsskridt og hver begivenhed kan variere vilkårligt med henlik på hvor langt tid den tager at udføre i realtid. Det er disse betingelser der forårsager at der ikke er nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan derved variere arbitrært i realtid. Begivenhederne der skal udføres af systemet kan enten være givet på forhånd, eller blive skemaplanlagt dynamisk under afviklingen af andre begivenheder. 
-Afhængig af hvad der simuleres, kan man udtrække relevant information om systemet, f.eks. gennemsnitlig behandlingstid for elementer, længden af køer i systemet, og den samlede aktivitetstid for hvert delelement i systemet.
+disse tidsskridt udføres en eller flere begivenheder, som hver især ændrer på systemets tilstand. Når alle begivenheder for et tidsskridt er udført kan tiden tælles op og begivenheder for det nye tidsskridt kan udføres. Der kan være være planlagt et vilkårligt antal beginvenheder til et tidsskridt og hver begivenhed kan variere vilkårligt med henlik på hvor langt tid den tager at udføre i realtid. Det er disse betingelser der forårsager at der ikke er nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan derved variere vilkårligt i realtid. Begivenhederne der skal udføres af systemet kan enten være givet på forhånd, eller blive skemaplanlagt dynamisk under afviklingen af andre begivenheder. 
 
+Afhængig af hvad der simuleres, kan man udtrække relevant information om systemet, f.eks. gennemsnitlig behandlingstid for elementer, længden af køer i systemet, og den samlede aktivitetstid for hvert delelement i systemet.
 
 For at kunne konstruere en \des skal vi have følgende til rådighed; En repræsentation af tid til at styre hvornår vi skifter tidsskridt, en liste over begivenheder der skal udføres i hvert tidsskridt, samt mulighed for at opsamle statistisk data fra simulationen. 
 
-    
+\begin{shaded}
 I \csp har vi garanti for at de eneste afhængigheder mellem processer vil være kommunikation. I \des har vi ud over kommunikation også en afhængighed af at synkronisere tiden mellem processerne.En simulering løber begivenhederne kronologisk igennem til der enten ikke er flere begivenheder eller som det oftere er tilfældet til simuleringen når et forud defineret tidspunkt.
+\fxwarning{motivation: mindre samtidighed - pdes fejler. (problemstillingen er ikke til stede i greenlets)}
+
 
 \fxnote*[inline,nomargin]{Brian: ok brug af parallelitet}{Alternativet til  \des  er \pdes hvor tiden i processerne kan løbe uafhængigt af hinanden. Dette introducerer muligheden for større parallitet, men samtidigt risikerer processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. \pdes har ikke vundet stort indpas i den videnskabelig verden som man kan se af \cref{tab:des}, en grund til dette er at når tiden kan køre parallelt vil de deraf følgende omkostningerne resultere i lavere hastighed end ved at holde tiden synkront på tværs af processerne.}
 \end{shaded}
@@ -119,10 +119,10 @@ Men barrierer giver kun en  primitiv model for tid, og vi vil vise at med brugen
 
 \section{Timeout} 
 \inline{timeout, wake-first - wake-last, edge-triggering indenfor logik}
-I den eksisterende \pycsp findes der som nævnt i \cref{sec:csp} en alternation, hvor brugeren har mulighed for at tilknytte to specielle guards. Det er SKIP-guard der giver mulighed for at kommunikere hvis kanalen er klar og ellers fortsætte uden at kommunikere. Den anden er timeout-guarden der udvider SKIP-guarden så man ønske maksimalt at vente på at kommunikere i en tidsperiode. Med \des ændres tiden og man kan forestille sig at processer måske kunne ønske at kommunikere i et tidsskridt, men ikke i et efterfølgende tidsskridt. I \des kan der ske vilkårligt mange begivnheder i det samme tidsskridt og tiden står stille mens processerne er aktive og derfor kan processen ikke afgøre når de er aktive om kommunikation vil være muligt i det givne tidspunkt.
+I den eksisterende \pycsp findes der som nævnt i \cref{sec:csp} en alternation, hvor brugeren har mulighed for at tilknytte to specielle guards. Det er SKIP-guard der giver mulighed for at kommunikere hvis kanalen er klar og ellers fortsætte uden at kommunikere. Den anden er timeout-guarden der udvider SKIP-guarden så man ønske maksimalt at vente på at kommunikere i en tidsperiode. Med \des ændres tiden og man kan forestille sig at processer måske kunne ønske at kommunikere i et tidsskridt, men ikke i et efterfølgende tidsskridt. \fxwarning*{uklar og lang sætning}{I \des kan der ske vilkårligt mange begivnheder i det samme tidsskridt og tiden står stille mens processerne er aktive og derfor kan processen ikke afgøre når de er aktive om kommunikation vil være muligt i det givne tidspunkt.}
 
 Vi kan vælge at lade processerne vente indtil et efterfølgende tidsskridt, som enten kan være et kunstigt lille tidsskridt eller indtil den næste begivnhed er planlagt.
-Hvis tiden springer et lille  tidsskridt frem  i en simuleringen, risikere vi at der findes andre begivnheder der har et mindre tidsskridt og vi kan derfor påvirke rækkefølgen af begivenheder. 
+Hvis tiden springer et lille  tidsskridt frem  i simuleringen, risikerer vi at der findes andre begivnheder der har et mindre tidsskridt og vi kan derfor påvirke rækkefølgen af begivenheder. 
 Alternativt kan man vælge at lade tiden springe til nærste begivenhed, og der som det første aktivere alle processer, her vil man ikke risikere at ændre på rækkefølgen.
 Begge muligheder har dog grundliggende den svaghed at den oprindelige timeout var sat til
 0 og ikke til hverken et vilkårligt lille tidsskridt eller anden
