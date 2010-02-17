@@ -5,7 +5,7 @@ For at designe en implementation af simulering i diskret tid i \pycsp skal vi fo
 
 
 \subsection{Kodestruktur}  
-Efter at have valgt at udvide \emph{greenlets}"-versionen skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra \emph{greenlets}"-versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale \emph{greenlets}"-versionen. Med denne isolation forventer vi at hvis/når der sker tilrettelser af \emph{greenlets}"-versionen af \pycsp vil man ikke skulle foretage de samme tilrettelser i vores version. 
+Efter i \cref{sec:csp} at have valgt at udvide \emph{greenlets}"-versionen skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra \emph{greenlets}"-versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale \emph{greenlets}"-versionen. Med denne isolation forventer vi at hvis/når der sker tilrettelser af \emph{greenlets}"-versionen af \pycsp vil man ikke skulle foretage de samme tilrettelser i vores version. 
 Isolationen mellem de to versioner skal opnås via nedarvning, således at det fra en brugers synsvinkel ser ud til at vores version er fuldstændigt sepereret fra \emph{greenlets}"-versionen.
 
 Hvert af de tre versioner har sin egen mappe i \pycsp og i hver af disse findes en tilhørende \code{\_\_init\_\_.py} fil, der fungerer som et manifest for den givne version. Vi opretter vores egen version kaldet \emph{simulation}, og opretter en tilhørende mappe på samme niveau som de andre versioner og med sin egen manifestfil. Manifestfilen kan nu bruges til at udvælge de funktioner der skal tages direkte fra \emph{greenlets}-versionen og hvilke funktioner der skal udvides og som derfor vil ligge i den nye mappe.
@@ -62,6 +62,9 @@ vi skal foretage for at kunne planlægge processer under hensyntagen til tid, vi
 Dette har yderligere den fordel at man tydeligt kan se at alle klasserne i \code{simulation}"-versionen arver en \sched fra \code{Simulation} og
 ikke en \sched \xspace fra \code{greenlets}"-versionen.
 
+
+
+
 %\fxnote{dårlig overskrift}{\subsection{Repræsentation af tid}} Vi
 %vil i dette afsnit gå i dybden med listen \code{timers} der findes i
 %klassen \code{Scheduler}, samt se hvordan den kan inkorporeres i vores
@@ -86,66 +89,10 @@ at videreudvikle denne struktur til at håndtere tid generelt for alle
 processer, samt så den fungerer med diskret tid, modsat den eksisterende
 løsning hvor der benyttes realtid.
 
-For at konvertere \emph{greenlets}-versionen der bruger  til realtid til en simuleringsversion der bruger diskrettid, skal vi ændre de steder i koden som allerede bruger tid. 
-Det eneste sted tid har indflydelse er i listen \code{timers}. 
-Vi kan dermed nøjes med at ændre de steder i \sched en som involverer denne liste. 
-Det første sted hvor \code{timers} bruges er i udvælgelsen af hvilken proces der skal køres (\cref{fig:green:timer}). 
-Her sammenlignes på linje 204 den første tidsværdi i \code{timers}, med det nuværende tidspunkt.
-Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra listen.
-Som nævnt i \cref{sec:Wait} kan processerne vælge at vente i et specifikt tidsrum, hvor ventetiden skal  være præcist som  angivet, hverken længere eller kortere. Dermed har  \sched en behov for at kunne  styre aktiveringen af processerne på et finere niveau end hvad der er muligt med \code{greenlets}"-versionen.  
-I \code{Simulation}"-verisonen står tiden stille mens processerne eksekveres og det er \sched en der står for at inkrementere tiden. Vi har dermed fuld kontrol over tiden i \code{simulerings}"-versionen og kan derfor tilføje den begrænsning at tiden skal være præcist det der er angivet i \code{timers}, før processen skal aktiveres, og ikke kun større, som angivet i \code{greenlets}"-versionen. Dermed kan vi opfylde kravet fra \des om at udføre begivenheder i et specifikt tidsskridt, og ikke blot tidligst i det angivne tidsskridt. \CRef{fig:sim:timer} viser udvælgelsen af en proces fra \code{timers} i \code{simulerings}-versionen. 
-
-\begin{figure}[hbtp]
-\begin{minipage}[c]{\linewidth}
-\begin{lstlisting}[firstnumber=204, label=fig:green:timer, caption=Udvælgelse af proces fra listen timers (fra scheduling.py)]
-if self.timers and self.timers[0][0] < time.time():
-  _,self.current = self.timers.pop(0)
-  self.current.greenlet.switch()
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}[c]{\linewidth}
-\begin{lstlisting}[firstnumber=124, label=fig:sim:timer, caption=Udvælgelse af proces fra listen timers (fra simulation.py)]
-if self.timers and self.timers[0][0] <= Now():
-  assert self.timers[0][0] == Now()
-  _,self.current = heapq.heappop(self.timers)
-  self.current.greenlet.switch()
-\end{lstlisting}
-\end{minipage}
-\end{figure}
-
-\subsection{Funktionen Wait}\label{sec:Wait}
-Vi har valgt at anskue en planlægning af en begivenhed til et tidspunkt, som en venten for den proces der skal udføre begivenheden indtil tiden er nået. Dette vil i praksis være det samme, men det letter implementationen da vi ikke behøver nogen viden om specifikke begivenheder i vores \sched. 
-
-\begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=fig:simpy:yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)] 
-def visit(self,timeInBank): 
-  print now(), self.name," Here I am" 
-  yield hold,self,timeInBank print now()
-  self.name," I must leave" 
-\end{lstlisting}
-I programmeringssproget \simpy benytter man også metoden til at lade en proces vente. Dette gør de ved at
-foretage kaldet \code{yield}, som sørger for at processen ikke
-fortsætter før et defineret tidsrum er gået. \CRef{fig:simpy:yield} viser hvordan en kunde er ankommet til banken. Kunden printer tiden, foretager et \code{yield}, printer tiden igen og afslutter.  Når processen har kaldt \code{yield}, er tiden steget med værdien af \code{timeInBank}. Grunden til at de kan bruge \code{yield}, der er indbygget i Python og at dette kald afgiver kontrol over processen i et tidsrum der knytter sig til implementeringen af \simpy der bruger  \code{corutine} som underliggende teknologi. 
-
- Vi ønsker i \pycsp at have en lignende mulighed for at lade en proces vente. Denne funktionalitet er heldigvis allerede delvist introduceret via \code{timeout} til \code{alternation} i \emph{greenlets}-versionen af \pycsp, og vi kan derfor bygge videre på denne funktionalitet med funktionen \code{Wait}, der fungerer som timeout, men som kan kaldes af processerne
-på et vilkårligt tidspunkt.
-\begin{lstlisting}[firstnumber=20,float=hbtp, label=fig:wait, caption=Wait i \code{simulering}-versionen.] 
-def Wait(seconds):
-  Simulation().timer_wait(Simulation().current, seconds)
-  t = Now()+seconds
-  while Now()<t:
-    p = Simulation().getNext() 
-    p.greenlet.switch()
-\end{lstlisting}
-
-Funktionen \code{Wait} står for at kalde den interne funktion lavet til timeouts kaldet time\_wait, samt sørge for at først at returnere når tiden er steget til det påkrævede. \code{Wait} er essentielt det eneste værktøj der skal til for at vente/planlægge begivenheder ud i fremtiden, og vi har på nuværenede tidspunkt en simpel \des der kører i realtid. 
-
-\subsection{Fra reel tid til diskret tid.}\label{sec:discrete}
  I \pycsp benyttes modulet \fxnote{Dette skal gennemlæses når deadline/interactive  er skrevet for at se om time modulet skal hives op på et højere niveau}
 \code{time} til at håndtere tiden i timeouts. Fra en brugers synsvinkel
-repræsenteres tiden internt som realtid der er kontinuerlig. Med computere findes realtid ikke, men  er internt repræsenteret
-som diskret. Med  \des vil der derfor ikke ske en konvertering fra realtid til  diskrettid. 
-
-\Des er derimod en konvertering fra en diskrettid, med et fast tidsskridt til at tiden stiger med en variable tidsskridt. 
+repræsenteres tiden internt som realtid der er kontinuerlig, men dette er ikke korrekt set fra en implementerings synspunkt. I  computere findes realtid ikke, og time modulet giver ikke mulighed for at benytte realtid, men giver i stdet brugeren en pseudo realtid, med et antal begrænsninger. Den største forskel mellem realtid og time modulets pseudo realtid, er at tiden er diskretiseret i et fast lille tidsskridt. Det vil derfor være forkert at opfatte vores model med diskret tid som at ændre \pycsp fra realtid til diskret tid. Vi skal med vores diskrete tidsmodel foretage en konvertering fra en diskrettid, med et fast tidsskridt til at tiden stiger med en variable tidsskridt. 
+\subsubsection{Sammenhæng mellem enheder i realtid og diskrettid}\label{label}
 Da man i \code{time} modulet har et fast tidsskridt og
 realtiden også er inddelt i faste størrelser
 som eks. sekunder, kan man med \code{time} modulet måle tidsintervaller der
@@ -160,8 +107,8 @@ begivenheden ske. Der findes dog ikke en totalt afkobling mellem tiden i \des og
 
 Når tiden i \des er uafhængig af realtiden er der ingen grund til at bruge en kompleks model af tiden og vi har derfor valgt at repræsentere tiden som et positivt tal der findes internt i \sched en. Ved at have tiden i  \sched en findes der kun en version af tiden da  \sched en er en singelton. For processer der ønsker at kende tiden har vi
 introduceret funktionen \code{Now()} der returnerer tiden når funktionen kaldes. 
-
-I den eksisterende \sched ~ er tiden reel og fremskrives derfor løbende uafhængigt af processernes tilstand. Dette kan illustreres med et eksempel; Proces 1 har startet en ny tråd via \code{io-decoratoren}, og er derfor blokeret. Proces 2 står i en \code{Alternation} med en timeout guard. Uafhængigt af tiden det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide når dens timeout er indtrådt. Dette er implementeret i \code{greenlets}-versionen i \cref{fig:blocking_sleep} på linjerne 242 til 251. For at køre disse linjer må  der findes processer der er blokeret samt processer der venter på en timeout. Nu startes en separat tråd der signalere \sched en, når næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
+\subsubsection{Fremskrivning af tid}
+I pseudo realtid fremskrives tiden uafhængigt af processernes tilstand. Dette kan \fxnote*{skriv tegning}{illustreres} med et eksempel; Proces 1 har startet en ny tråd via \code{io-decoratoren}, og er derfor blokeret. Proces 2 står i en \code{alternation} med en \code{timeout-guard}. Uafhængigt af tiden det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide når dens timeout er indtrådt. Dette er implementeret i \code{greenlets}-versionen i \cref{fig:blocking_sleep} på linjerne 242 til 251. For at køre disse linjer må  der findes processer der er blokeret samt processer der venter på en timeout. Nu startes en separat tråd der signalere \sched en, når næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
 
 I en simulering står tiden stille mens processerne  eksekveres, og kun i det tilfælde hvor der ikke findes nogle processer, der kan eksekveres vælger vi at tælle tiden op.  Den ekstra tråd til håndtering af tid i et blokeret kald er derfor overflødig i \des, for så længe der findes blokerede processer venter \sched en på dem, uden at tiden tælles op, da de potentielt senere vil kunne  generere nye processer der kan eksekveres.
 
@@ -215,9 +162,61 @@ self.cond.release()
 \end{minipage}
 \end{figure}
 
+For at konvertere \emph{greenlets}-versionen der bruger til \code{time}-moduelt til en \code{simulerings}-version der bruger diskrettid, skal vi ændre de steder hvor time modulet bruges. Det eneste sted time modulet bruges er ved udvælgelse af processer fra timers listen(\cref{fig:green:timer}). 
+Her sammenlignes på linje 204 den første tidsværdi i \code{timers}, med det nuværende tidspunkt givet af time modulet.
+Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra listen.
+For at planlægge begivnheder præcist skal processerne også kunne ekskveres på et specifikt tidsrum, som hverken skal være længere eller kortere end angivet. Dermed har  \sched en i simulations-versionen behov for at kunne  styre aktiveringen af processerne på et finere niveau end hvad der er muligt med \code{greenlets}"-versionen.  
+I \code{simulation}"-verisonen kan vi have  fuld kontrol over tiden i \code{simulerings}"-versionen da  tiden står stille mens processerne eksekveres.
+Vi kan derfor tilføje den begrænsning at tiden skal være præcist det der er angivet i \code{timers}, før processen skal aktiveres, og ikke kun større, som angivet i \code{greenlets}"-versionen. \CRef{fig:sim:timer} viser udvælgelsen af en proces fra \code{timers} i \code{simulerings}-versionen. 
+
+\begin{figure}[hbtp]
+\begin{minipage}[c]{\linewidth}
+\begin{lstlisting}[firstnumber=204, label=fig:green:timer, caption=Udvælgelse af proces fra listen timers (fra scheduling.py)]
+if self.timers and self.timers[0][0] < time.time():
+  _,self.current = self.timers.pop(0)
+  self.current.greenlet.switch()
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[c]{\linewidth}
+\begin{lstlisting}[firstnumber=124, label=fig:sim:timer, caption=Udvælgelse af proces fra listen timers (fra simulation.py)]
+if self.timers and self.timers[0][0] <= Now():
+  assert self.timers[0][0] == Now()
+  _,self.current = heapq.heappop(self.timers)
+  self.current.greenlet.switch()
+\end{lstlisting}
+\end{minipage}
+\end{figure}
+
+
+\subsection{Funktionen Wait}\label{sec:Wait}
+Vi har valgt at anskue en planlægning af en begivenhed til et tidspunkt, som en venten for den proces der skal udføre begivenheden indtil tiden er nået. Dette vil i praksis være det samme, men det letter implementationen da vi ikke behøver nogen viden om specifikke begivenheder i vores \sched. 
+
+\begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=fig:simpy:yield, caption= Et yield i \simpy (Taget fra Bank05.py i eksemplet fra \simpy)] 
+def visit(self,timeInBank): 
+  print now(), self.name," Here I am" 
+  yield hold,self,timeInBank print now()
+  self.name," I must leave" 
+\end{lstlisting}
+I programmeringssproget \simpy benytter man også metoden til at lade en proces vente. Dette gør de ved at
+foretage kaldet \code{yield}, som sørger for at processen ikke
+fortsætter før et defineret tidsrum er gået. \CRef{fig:simpy:yield} viser hvordan en kunde er ankommet til banken. Kunden printer tiden, foretager et \code{yield}, printer tiden igen og afslutter.  Når processen har kaldt \code{yield}, er tiden steget med værdien af \code{timeInBank}. Grunden til at de kan bruge \code{yield}, der er indbygget i Python og at dette kald afgiver kontrol over processen i et tidsrum der knytter sig til implementeringen af \simpy der bruger  \code{corutine} som underliggende teknologi. 
+
+ Vi ønsker i \pycsp at have en lignende mulighed for at lade en proces vente. Denne funktionalitet er heldigvis allerede delvist introduceret via \code{timeout} til \code{alternation} i \emph{greenlets}-versionen af \pycsp, og vi kan derfor bygge videre på denne funktionalitet med funktionen \code{Wait}, der fungerer som timeout, men som kan kaldes af processerne
+på et vilkårligt tidspunkt.
+\begin{lstlisting}[firstnumber=20,float=hbtp, label=fig:wait, caption=Wait i \code{simulering}-versionen.] 
+def Wait(seconds):
+  Simulation().timer_wait(Simulation().current, seconds)
+  t = Now()+seconds
+  while Now()<t:
+    p = Simulation().getNext() 
+    p.greenlet.switch()
+\end{lstlisting}
+
+Funktionen \code{Wait} står for at kalde den interne funktion lavet til timeouts kaldet time\_wait, samt sørge for at først at returnere når tiden er steget til det påkrævede. \code{Wait} er essentielt det eneste værktøj der skal til for at vente/planlægge begivenheder ud i fremtiden, og vi har på nuværenede tidspunkt en simpel \des der kører i realtid. 
+
 \subsection{Timers}  
-\CRef{sec:tid} viser at listen \code{timers} i \pycsp kun bruges til at placere processer der venter på en timeout i \code{alternation}. Dette er en niche feature ved \pycsp, som  sjældent vil skulle bruges, og hvor der sjældent er samlet mange processer på en gang. 
- I \cref{sec:Wait} beskriv vi hvordan processer der ønsker at vente ligges på \code{timers} listen, og i \cref{sec:discrete} beskriver vi hvordan \sched en kun tæller tiden op når ingen processer kan foretage sig mere i et givent tidsskridt. Når tiden tælles op vil  alle processer enten vente på kommunikation eller befinde sig i listen \code{timers}. De processer der venter i en \code{alternation} og hvor der er tilknyttet en timeout vil ligge begge steder. Gennemsnitslængden af listen vil derfor stige voldsomt og dermed ændres kravene til hvilken  datastruktur der er bedst egnet. 
+I \pycsp bruges listen \code{timers} til at placere processer der venter på en timeout i \code{alternation}. Dette er en niche feature ved \pycsp, som  sjældent vil skulle bruges, og hvor der sjældent er samlet mange processer på en gang. 
+ I \cref{sec:Wait} beskriv vi hvordan processer der ønsker at vente ligges på \code{timers} listen, og i \cref{sec:tid} beskriver vi hvordan \sched en kun tæller tiden op når ingen processer kan foretage sig mere i et givent tidsskridt. Når tiden tælles op vil  alle processer enten vente på kommunikation eller befinde sig i listen \code{timers}. De processer der venter i en \code{alternation} og hvor der er tilknyttet en timeout vil ligge begge steder. Gennemsnitslængden af listen vil derfor stige voldsomt og dermed ændres kravene til hvilken  datastruktur der er bedst egnet. 
  
 Med en kort, sjældent brugt liste vil omkostningerne til oprettelse og vedligeholdelse af en avanceret datastruktur være større end fordelene. Til vores skemaplanlægning  vil en min"-hob vøre det åbenlyse valg, da  man kan  indsætte elementer i konstant tid og fjerne det mindste element i $O(log\ n)$. Som eksempel på anvendelsesmulighederne for en hob er skemaplanlægning specifikt nævnt i introduktionen til Pythons implementering\footnote{$http://docs.python.org/dev/3.0/library/heapq.html$}.  
 
@@ -232,7 +231,6 @@ tidspunkt bruger en lineær søgning, til at finde elementet der skal
 fjernes, og genoprettelsen af hob"-egenskaben også kan gøres i lineær tid.
 
 Det kræver ikke meget omskrivning for at konvertere en liste til en hob, som man kan se ved at sammenligne \cref{fig:green:timer} linje 205 med \cref{fig:sim:timer} linje 126. 
-
 
 \subsection{Annekteret kode fra \simpy.}
 I vores implementering findes der i sagens natur i overlap med \simpy, som har været en inspirationskilde til hvordan et simuleringssprog kunne udvikles i Python. En del af arbejdet med \simpy har vi kunne bruge direkte i vore implementering, efter devisen om ikke at genskrive eksisterende god kode. Det drejer sig om funktionalitet til dataindsamling, bearbejdning og visualisering. I \simpy findes en \code{Monitor}klasse. Formålet med denne klasse er at gemme en liste af tid/værdi par. Dermed kan man efter endt simulering, analysere  hvordan værdierne har ændret sig over tid. Klassen \code{Monitor} kan bruges direkte af brugere, hvor de så selv  står for at at gemme værdier på passende tidspunkter igennem kørslen af programmet. Man ønsker tit at kende længden af en kø, der som oftest er implementeret via en liste. Vi har derfor lavet vores egen liste der kan indeholde en \code{Monitor}. Når længden af listen ændres gemmes længden af listen i en montor til brug for senere analyse, uden brugeren selv skal stå for at gemme længden af listen. Alternativt kan man lave en separat proces hvis eneste formål der er med en given frekvens at gemme længden listen Fordelen ved denne løsning at er intervallet er jævnt fordelt, og man derfor lettere kan foretage tidsspecifik statistik.
