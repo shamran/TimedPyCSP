@@ -1,6 +1,8 @@
 
 \section{Design og implementering}
 %\inline{Beskrivelse af design med udgangspunkt i eksemplet}
+For at designe en implementation af simulering i diskret tid i \pycsp skal vi foretage en række ændringer i forhold til den nuværende implementation. Specifikt skal vi ændre på planlægningen og eksekveringen af processer, hvortil vi har brug for at kunne repræsentere en diskret tidsmodel. Vi vil i dette afsnit gennemgå de relevante problemstillinger og løsningsmodeller samt give et overblik over hvordan vi har valgt at implementere ændringerne rent praktisk i koden. 
+
 
 \subsection{Kodestruktur}  
 Efter at have valgt at udvide \emph{greenlets}"-versionen skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra \emph{greenlets}"-versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale \emph{greenlets}"-versionen. Med denne isolation forventer vi at hvis/når der sker tilrettelser af \emph{greenlets}"-versionen af \pycsp vil man ikke skulle foretage de samme tilrettelser i vores version. 
