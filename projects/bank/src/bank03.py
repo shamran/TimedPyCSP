@@ -77,6 +77,7 @@ def Bank(meanWait,customerREADER):
 if __name__ == "__main__":
   print "main starting"
   nprocesses = 10 
+  mon = Monitor()
   customer = Channel(buffer=9,mon = mon)
   
   numberCustomersprprocess=10
