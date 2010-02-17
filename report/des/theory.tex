@@ -11,16 +11,8 @@ Vi ønsker at introducere diskret tid som et alternativ til realtid. Med for hav
 \fxnote{Gennemlæses og højst sandlysningt omskrives med henblik på sammenhæng og mangler.}
 Indenfor simulering er \des en meget brugt metode til at modellere systemer. I 
 \des anskues tid som diskrete tidsskridt som er uden kobling til realtid. I 
-disse tidsskridt udføres en eller flere begivenheder, som ved afslutning kan 
-føre det modellerede system over i en ny tilstand, og herved et nyt tidsskridt. 
-Det er irrelevant hvor lang tid det tager at udføre en begivenhed målt i 
-realtid, da der først sker en overgang til en ny tilstand når alle begivenheder 
-for et givet diskret tidsskridt er udført. Dette er årsagen til at der ikke er 
-nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan 
-variere arbitrært i realtid. Begivenhederne der skal udføres af systemet kan 
-enten være givet på forhånd, eller blive skemaplanlagt dynamisk under afviklingen 
-af andre begivenheder. 
-Afhængig af hvad der simuleres, kan man udtrække relevant information om systemet, f.eks. gennemsnitlig behandlingstid for elementer, længden af køer i systemet, og den samlede aktivitetstid for hvert delelement i systemet. \inline{omskriv med henblik på tilstand}
+disse tidsskridt udføres en eller flere begivenheder, som hver især ændrer på systemets tilstand. Når alle begivenheder for et tidsskridt er udført kan tiden tælles op og begivenheder for det nye tidsskridt kan udføres. Der kan være være planlagt et vilkårligt antal beginvenheder til et tidsskridt og hver begivenhed kan variere vilkårligt med henlik på hvor langt tid den tager at udføre i realtid. Det er disse betingelser der forårsager at der ikke er nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan derved variere arbitrært i realtid. Begivenhederne der skal udføres af systemet kan enten være givet på forhånd, eller blive skemaplanlagt dynamisk under afviklingen af andre begivenheder. 
+Afhængig af hvad der simuleres, kan man udtrække relevant information om systemet, f.eks. gennemsnitlig behandlingstid for elementer, længden af køer i systemet, og den samlede aktivitetstid for hvert delelement i systemet.
 
 
 For at kunne konstruere en \des skal vi have følgende til rådighed; En repræsentation af tid til at styre hvornår vi skifter tidsskridt, en liste over begivenheder der skal udføres i hvert tidsskridt, samt mulighed for at opsamle statistisk data fra simulationen. 
