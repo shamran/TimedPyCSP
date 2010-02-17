@@ -3,18 +3,18 @@
     benyttes til. Teori: henvisning til litteratur, bl.a.  matematik/beviser 
     for modellen}
 
+\begin{shaded}
+\fxnote{Gennemlæses og højst sandlysningt omskrives med henblik på sammenhæng og mangler.}
 Indenfor simulering er \des en meget brugt metode til at modellere systemer. I 
 \des anskues tid som diskrete tidsskridt som er uden kobling til realtid. I 
-disse tidsskridt udføres en eller flere begivenheder, som hver især ændrer på systemets tilstand. Når alle begivenheder for et tidsskridt er udført kan tiden tælles op og begivenheder for det nye tidsskridt kan udføres. Der kan være være planlagt et vilkårligt antal beginvenheder til et tidsskridt og hver begivenhed kan variere vilkårligt med henlik på hvor langt tid den tager at udføre i realtid. Det er disse betingelser der forårsager at der ikke er nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan derved variere vilkårligt i realtid. Begivenhederne der skal udføres af systemet kan enten være givet på forhånd, eller blive skemaplanlagt dynamisk under afviklingen af andre begivenheder. 
-
+disse tidsskridt udføres en eller flere begivenheder, som hver især ændrer på systemets tilstand. Når alle begivenheder for et tidsskridt er udført kan tiden tælles op og begivenheder for det nye tidsskridt kan udføres. Der kan være være planlagt et vilkårligt antal beginvenheder til et tidsskridt og hver begivenhed kan variere vilkårligt med henlik på hvor langt tid den tager at udføre i realtid. Det er disse betingelser der forårsager at der ikke er nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan derved variere arbitrært i realtid. Begivenhederne der skal udføres af systemet kan enten være givet på forhånd, eller blive skemaplanlagt dynamisk under afviklingen af andre begivenheder. 
 Afhængig af hvad der simuleres, kan man udtrække relevant information om systemet, f.eks. gennemsnitlig behandlingstid for elementer, længden af køer i systemet, og den samlede aktivitetstid for hvert delelement i systemet.
+
 
 For at kunne konstruere en \des skal vi have følgende til rådighed; En repræsentation af tid til at styre hvornår vi skifter tidsskridt, en liste over begivenheder der skal udføres i hvert tidsskridt, samt mulighed for at opsamle statistisk data fra simulationen. 
 
-\begin{shaded}
+    
 I \csp har vi garanti for at de eneste afhængigheder mellem processer vil være kommunikation. I \des har vi ud over kommunikation også en afhængighed af at synkronisere tiden mellem processerne.En simulering løber begivenhederne kronologisk igennem til der enten ikke er flere begivenheder eller som det oftere er tilfældet til simuleringen når et forud defineret tidspunkt.
-\fxwarning{motivation: mindre samtidighed - pdes fejler. (problemstillingen er ikke til stede i greenlets)}
-
 
 \fxnote*[inline,nomargin]{Brian: ok brug af parallelitet}{Alternativet til  \des  er \pdes hvor tiden i processerne kan løbe uafhængigt af hinanden. Dette introducerer muligheden for større parallitet, men samtidigt risikerer processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. \pdes har ikke vundet stort indpas i den videnskabelig verden som man kan se af \cref{tab:des}, en grund til dette er at når tiden kan køre parallelt vil de deraf følgende omkostningerne resultere i lavere hastighed end ved at holde tiden synkront på tværs af processerne.}
 \end{shaded}
@@ -116,23 +116,19 @@ Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp.
 
 Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun  lokalt data. Hvis der er data er delt pga. arkitekturen \csp er implementeret på, bør dette abstraheres væk men udnyttes internt i kanalerne. At introducere hjælpemidler for styre delt data, er derfor at tilskynde til en forkert brug af \csp. Tiden er den anden begrundelse for at benytte barrierer.
 Men barrierer giver kun en  primitiv model for tid, og vi vil vise at med brugen af en \des får man et stærkere værktøj, der blandt meget andet også kan erstatte brugen af barrierer.
-
 \section{Timeout} 
-\inline{timeout, wake-first - wake-last, edge-triggering indenfor logik}
-I den eksisterende \pycsp findes der som nævnt i \cref{sec:csp} en alternation, hvor brugeren har mulighed for at tilknytte to specielle guards. Det er SKIP-guard der giver mulighed for at kommunikere hvis kanalen er klar og ellers fortsætte uden at kommunikere. Den anden er timeout-guarden der udvider SKIP-guarden så man ønske maksimalt at vente på at kommunikere i en tidsperiode. Med \des ændres tiden og man kan forestille sig at processer måske kunne ønske at kommunikere i et tidsskridt, men ikke i et efterfølgende tidsskridt. \fxwarning*{uklar og lang sætning}{I \des kan der ske vilkårligt mange begivnheder i det samme tidsskridt og tiden står stille mens processerne er aktive og derfor kan processen ikke afgøre når de er aktive om kommunikation vil være muligt i det givne tidspunkt.}
+I den eksisterende \pycsp findes der som nævnt i \cref{sec:csp} en alternation, hvor brugeren har mulighed for at tilknytte to specielle guards. Den ene er en SKIP-guard der giver mulighed for at kommunikere hvis kanalen er klar og ellers fortsætte uden at kommunikere. Den anden er timeout-guarden der udvider SKIP-guarden så man venter på kommunikation en given periode hvorefter man tager SKIP-guarden. 
+Med \des ændres tiden så timeout opererer på tidsskridt fremfor en tidsperiode. Dette medfører at en proces kan ønske at kommunikere i indeværende tidsskridt, men ikke i det efterfølgende.
+Vi kan dog ikke i tidsskridtet evaluere om kommunikation vil være muligt. Dette skyldes at tiden står stille mens processerne er aktive så selvom kommunikation ikke er muligt på et tidspunkt i tidsskridtet kan en efterfølgende begivenhed i samme tidsskridt muliggøre kommunikation.
 
-Vi kan vælge at lade processerne vente indtil et efterfølgende tidsskridt, som enten kan være et kunstigt lille tidsskridt eller indtil den næste begivnhed er planlagt.
-Hvis tiden springer et lille  tidsskridt frem  i simuleringen, risikerer vi at der findes andre begivnheder der har et mindre tidsskridt og vi kan derfor påvirke rækkefølgen af begivenheder. 
-Alternativt kan man vælge at lade tiden springe til nærste begivenhed, og der som det første aktivere alle processer, her vil man ikke risikere at ændre på rækkefølgen.
-Begge muligheder har dog grundliggende den svaghed at den oprindelige timeout var sat til
-0 og ikke til hverken et vilkårligt lille tidsskridt eller anden
-tidsenhed og man vil derfor ændrer på fortolkningen af kode. 
+En løsningsmodel for at kunne håndtere tidsskridt i timeouts er at lade processerne vente indtil et efterfølgende tidsskridt og så tage SKIP-guarden. Det efterfølgende  tidsskridt kan så  enten kan være et kunstigt lille tidsskridt eller indtil den næste begivnhed der er planlagt.
+Hvis tiden springer et lille  tidsskridt frem  i en simuleringen, risikere vi at der findes andre begivnheder der har et mindre tidsskridt og vi  kan derfor  påvirke rækkefølgen af begivenheder der skal eksekveres. 
+Alternativt kan man vælge at lade tiden springe til den næste begivenhed der er planlagt og der som det første vælge SKIP-guarden, her vil man ikke risikere at ændre på rækkefølgen, men man risikere derimod at springe langt frem i tiden.
+Begge muligheder har dog grundliggende den svaghed at oprindeligt ønskede man kun at kommunikere i det indeværende tidsskridt og ikke i hverken et vilkårligt lille tidsrum eller i et tilfældigt tidsrum frem til en efterfølgende begivnhed.
 
-Man kan også vælge at aktiveres processerne i samme tidsskridt, og aktivere de ventende processer når der ikke er flere processer der kan eksekveres i samme tidsskidt.
-Til at aktivere processerne i samme tidsskridt kan vi \fxnote*{illustration}{benytte os af edge-triggering} til at dele hver tidsskridt op i to grupper, wake-first og wake-last.
-I wake-first gruppen foretages eksekveringen af alle processerne der har begivenheder i det givne tidsskridt, mens man wake-last gruppen  aktivere processerne der venter på et timeout.
+En anden løsningsmodel er at vente til lige før tiden tælles op, og der kalde de ventende processers SKIP-guard. 
+For at kunne adskille hvilke processer der har en begivnhed til et tidsskridt og hvilke der venter på kommunikation kan vi \fxnote*{illustration}{benytte os af edge-triggering} til at dele hver tidsskridt op i to grupper, wake-first og wake-last.
+I wake-first gruppen foretages eksekveringen af de processer der har tilknyttet en begivenhed til det givne tidsskridt, mens man i  wake-last gruppen aktiverer SKIP-guarden for de processerne der venter på en timeout.
 
-Med  edge-triggering giver vi dermed mulighed for at eksekvere alle begivnheder som måske resulterer i kommunikation, og først derefter at aktivere de processer der har en timeout til samme tidsskridt.  Ulempen ved denne metode er at vi skal implementere to seperate måde at vente på at tiden tælles op. Dels for begivenheder og dels for timeouts.
-
-
+Edge-triggering er den bedste løsningsmodel af de to beskrevet da man her har mulighed for at eksekvere alle begivnheder som måske resulterer i kommunikation, og først derefter aktivere SKIP-guards, for de processer der har en timeout til samme tidsskridt. Ulempen ved denne metode er at det krævere størrer implementering, da der nu findes to seperate måde at vente for hhv. begivenheder og timeouts.
 
