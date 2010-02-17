@@ -51,55 +51,55 @@ processerne, og til denne koordinering og synkronisering af flere
 processer er  den mest brugte metode at introducere en barriere. Barrierer blev først introduceret i MPI\cite{mpi-barrier}, hvor den bruges til at 
 sikre at alle tråde venter i barrieren før de kan fortsætte. 
 
-I \csp kan man udnytte at begge 
-kanalender skal være klar, før der der kan kommunikeres og at en proces der er 
-indgår i en kommunikation vil vente indtil den anden ende er klar før den 
-fortsætter.  Ved hjælp af kanaler kan man derfor lave en simpel barriere 
-trivielt ved brug af kommunikation over kanaler.  En implementering af en 
-barriere som en selvstændig proces kan eksempelvis implementeres som i 
-\cref{barrier-imp}.
-
-\begin{lstlisting}[float, label=barrier-imp,caption=En barriere i \pycsp]
-@proces
-def Barrier(nprocesses, signalIN, signalOUT):
-	while True:
-		for i in range (nprocesses):
-			signalIN()
-		for i in range (nprocesses):
-			signalOUT(0)
-\end{lstlisting}
-
-Denne implementering af en barriere kræver, i modsætning til de fleste andre 
-implementeringer af barrierer\cites{mpi-barrier, crew}, to kald. Det første 
-sender en variabel til barriereprocessen, mens,
-det andet kald modtager en dummyværdi fra barriereprocessen. Det kræver derved 
-to kanaler at implementere barrieren. På den ene kanal er barrieren den eneste 
-der læser værdierne; en besked sendt på denne kanal vil derfor altid modtages 
-af barrieren. På den anden kanal er barrieren den eneste der skriver, og en 
-modtaget besked må derfor komme fra barrieren.
-
-Vi kan overbevise os om korrektheden af barrieren, da alle processerne først 
-går ind i barrieren ved at sende en værdi til barrieren. Hvis barrieren ikke er 
-klar, sikrer \csp at processerne venter indtil barrieren er klar til at modtage 
-værdierne. Først når barrieren har modtaget en værdi fra alle processerne, 
-begynder barrieren at sende sin værdi, og det er først når en proces modtager 
-denne værdi fra barrieren at den må fortsætte. Når en proces modtager værdien 
-fra barrieren fortsætter den og man kan risikere at den ønsker at gå ind i 
-barrieren inden denne har sendt sin værdi til alle processer for at frigive dem.
-Processer der ønsker adgang til barrieren vil da gå i stå, idet de prøver at 
-sende til barrieren før den er klar til at modtage. Først 
-når barrieren har signaleret til alle processer at de må fortsætte, læser den 
-på kanalen for at accepterer processer der ønsker at tilgå barrieren. Det er 
-denne egenskab fra \csp der giver os garanti for at en proces der netop er 
-frigivet fra barrieren ikke går ind i den igen og derved risikerer at komme 
-foran. 
-
-En ulempe ved denne simple barriere er at antallet af processer skal være 
-konstant gennem hele kørslen.
-Vi vil senere se på et bankeksempel hvor dette problem opstår (\cref{bank-eksempel}). Her ville nogle af 
-processerne kunne slutte tidligt, men må fortsætte med  at kalde barrieren, indtil alle processerne er klar til at slutte.
-Man kunne ændrer barriereprocessen, så man dynamisk kan ændre på antallet af processer der 
-skal synkroniseres. I de fleste implementationer af barrier er dette en mulighed, men til vores simple illustration, har vi valgt ikke at implementere det.
+%I \csp kan man udnytte at begge 
+%kanalender skal være klar, før der der kan kommunikeres og at en proces der er 
+%indgår i en kommunikation vil vente indtil den anden ende er klar før den 
+%fortsætter.  Ved hjælp af kanaler kan man derfor lave en simpel barriere 
+%trivielt ved brug af kommunikation over kanaler.  En implementering af en 
+%barriere som en selvstændig proces kan eksempelvis implementeres som i 
+%\cref{barrier-imp}.
+%
+%\begin{lstlisting}[float, label=barrier-imp,caption=En barriere i \pycsp]
+%@proces
+%def Barrier(nprocesses, signalIN, signalOUT):
+%	while True:
+%		for i in range (nprocesses):
+%			signalIN()
+%		for i in range (nprocesses):
+%			signalOUT(0)
+%\end{lstlisting}
+%
+%Denne implementering af en barriere kræver, i modsætning til de fleste andre 
+%implementeringer af barrierer\cites{mpi-barrier, crew}, to kald. Det første 
+%sender en variabel til barriereprocessen, mens,
+%det andet kald modtager en dummyværdi fra barriereprocessen. Det kræver derved 
+%to kanaler at implementere barrieren. På den ene kanal er barrieren den eneste 
+%der læser værdierne; en besked sendt på denne kanal vil derfor altid modtages 
+%af barrieren. På den anden kanal er barrieren den eneste der skriver, og en 
+%modtaget besked må derfor komme fra barrieren.
+%
+%Vi kan overbevise os om korrektheden af barrieren, da alle processerne først 
+%går ind i barrieren ved at sende en værdi til barrieren. Hvis barrieren ikke er 
+%klar, sikrer \csp at processerne venter indtil barrieren er klar til at modtage 
+%værdierne. Først når barrieren har modtaget en værdi fra alle processerne, 
+%begynder barrieren at sende sin værdi, og det er først når en proces modtager 
+%denne værdi fra barrieren at den må fortsætte. Når en proces modtager værdien 
+%fra barrieren fortsætter den og man kan risikere at den ønsker at gå ind i 
+%barrieren inden denne har sendt sin værdi til alle processer for at frigive dem.
+%Processer der ønsker adgang til barrieren vil da gå i stå, idet de prøver at 
+%sende til barrieren før den er klar til at modtage. Først 
+%når barrieren har signaleret til alle processer at de må fortsætte, læser den 
+%på kanalen for at accepterer processer der ønsker at tilgå barrieren. Det er 
+%denne egenskab fra \csp der giver os garanti for at en proces der netop er 
+%frigivet fra barrieren ikke går ind i den igen og derved risikerer at komme 
+%foran. 
+%
+%En ulempe ved denne simple barriere er at antallet af processer skal være 
+%konstant gennem hele kørslen.
+%Vi vil senere se på et bankeksempel hvor dette problem opstår (\cref{bank-eksempel}). Her ville nogle af 
+%processerne kunne slutte tidligt, men må fortsætte med  at kalde barrieren, indtil alle processerne er klar til at slutte.
+%Man kunne ændrer barriereprocessen, så man dynamisk kan ændre på antallet af processer der 
+%skal synkroniseres. I de fleste implementationer af barrier er dette en mulighed, men til vores simple illustration, har vi valgt ikke at implementere det.
 
 Barrierer er en meget effektiv metode til at synkronisere processer der kører 
 parallelt, og er brugt flittigt i MPI. I \csp er der dog en konflikt i brugen 
