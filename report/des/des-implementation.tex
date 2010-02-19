@@ -85,7 +85,8 @@ Alternation([{Timeout(seconds=0.5):None},
 
 Fra en brugers synsvinkel repræsenteres tiden internt i \pycsp som realtid, men dette er ikke korrekt, hvis vi ser på den eksisterende implementering af tid. Helt generelt kan computere ikke håndtere  realtid, og \code{time}-modulet der er et modul til håndtering af tid i \pycsp, kan derfor ikke give brugeren mulighed for at benytte realtid. 
 
- I stedet tilbydes det vi vil kalde pseudo realtid, der minder mest muligt om realtid, men på en række områder afviger fra realtid. Den største forskel mellem realtid og pseudo realtid, er at i computere kan tiden ikke være kontinuerlig men må nødvendigvis være  diskritiseret, og som oftest i et fast lille tidsskridt. Vi skal med vores diskrete tidsmodel ikke foretage en konvertering fra kontinuerlig  til diskret tid. I stedet skal vi foretage en konvertering fra at tiden stiger med et fast tidsskridt til en diskret tidsmodel hvor tiden stiger med en variable tidsskridt. En anden forskel mellem pseudo realtid og tidsmodellen for \des er at tiden i \des drives af begivenheder, mens den drives af et eksternt modul i pseudo realtid. 
+ I stedet tilbydes det vi vil kalde pseudo realtid, der minder mest muligt om realtid, men på en række områder afviger fra realtid. Den største forskel mellem realtid og pseudo realtid, er at i computere kan tiden ikke være kontinuerlig men må nødvendigvis være  diskritiseret, og som oftest i et fast lille tidsskridt. Vi skal med vores diskrete tidsmodel ikke foretage en konvertering fra kontinuerlig  til diskret tid. I stedet skal vi foretage en konvertering fra at tiden stiger med et fast tidsskridt til en diskret tidsmodel hvor tiden stiger med en variable tidsskridt. Vi skal desuden ændre fremskrivningen af tiden så den  drives af begivenheder og ikke af et eksternt modul i pseudo realtid. 
+ 
  
 \subsubsection{Sammenhæng mellem tidsintervaller i realtid og diskrettid}
 Da man i \code{time}-modulet har et fast tidsskridt og
@@ -100,23 +101,27 @@ begreb ikke, men man  angiver i stedet at når tiden er talt op med 5 tidsskridt
 begivenheden ske. Der findes dog ikke en totalt afkobling mellem tiden i \des og realtiden, for givet et konkret problem der skal modelleres i \des, vil der altid være en sammenhæng mellem tiderne. Men da denne sammenhæng ikke er fast, skal den defineres eksplicit af brugeren, som f.eks at 5 sekunder i problemet defineres som en stigning i tiden med f.eks 5, 0,5 eller 0,05 i simuleringsmodellen.
 
 Når tiden i \des er uafhængig af realtiden er der ingen grund til at bruge en kompleks model af tiden og vi har derfor valgt at repræsentere tiden som et positivt tal der findes internt i \sched en. Ved at have tiden i \sched en findes der kun en version af tiden da  \sched en er en singelton. For processer der ønsker at kende tiden har vi
-introduceret funktionen \code{Now()} der returnerer tiden når funktionen kaldes. 
+introduceret funktionen \code{Now} der returnerer tiden når funktionen kaldes. En anden fordel ved brugen af funktionen Now som en wrapper funktion til at bede om tiden i forhold til, den eksisterende kode, der direkte kalder modulet time, er at vi frigøres fra en konkret implementering af tid. Der er nu kun et sted man skal ændre for at hele systemet bruger en anden implementering tid.
+
+I den eksisterende kode har det ikke været tiltænkt at man ønskede at udskifte implementeringen af tiden, vi skal derfor ændre de steder hvor time modulet er refereret. Heldigvis er det eneste sted time modulet bruges  ved udvælgelse af processer fra timers listen (\cref{fig:green:timer}). 
+Her sammenlignes på linje 204 den første tidsværdi i \code{timers}, med det nuværende tidspunkt givet af time modulet.
+Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra listen.
+For at planlægge begivnheder præcist skal processerne også kunne ekskveres på et specifikt tidsrum, som hverken skal være længere eller kortere end angivet. Dermed har  \sched en i simulations-versionen behov for at kunne  styre aktiveringen af processerne på et finere niveau end hvad der er muligt med \code{greenlets}"-versionen.  
+I \code{simulation}"-verisonen kan vi have fuld kontrol over tiden da  den står stille mens processerne eksekveres.
+Vi kan derfor tilføje den begrænsning at tiden skal være præcist det der er angivet i \code{timers}, før processen skal aktiveres, og ikke kun større, som angivet i \code{greenlets}"-versionen. \CRef{fig:sim:timer} viser udvælgelsen af en proces fra \code{timers} i \code{simulerings}-versionen. 
+
 
 
 \subsubsection{Fremskrivning af tid}
 
-I pseudo realtid drives tiden frem af et eksternt modul for at efterligne realtid. Derfor vil et program der umiddelbart efter hinanden beder om tiden få et stigende  tidspunkt. I pseudo realtid fremskrives tiden derfor uafhængigt af processernes tilstand. I diskret tid skal tiden i modsætning hertil stå stille når processerne er aktive, og kun i forbindelse med at en planlagt begivnehed skal tiden drives frem til tidspunktet for denne begivenhed.
-\inline{her til er jeg nået}
- gentagende gange \des står tiden stille mens processerne eksekveres, og først når alle begivenheder til et tidsskridt er eksekveret, vælger vi at tælle tiden op. Den ekstra tråd til håndtering af tid i et blokeret kald er derfor overflødig i \des, for så længe der findes blokerede processer venter \sched en på dem, uden at tiden tælles op, da de potentielt senere vil kunne  generere nye begivnheder der skal eksekveres i samme tidsskridt.
+I pseudo realtid drives tiden frem af et eksternt modul for at efterligne realtid der kontinuerligt stiger. I pseudo realtid fremskrives tiden derfor uafhængigt af processernes tilstand og derfor vil et program der umiddelbart efter hinanden beder om tiden, vil  få et stigende  tidspunkt. I \des  skal tiden i modsætning til realtid stå stille når processerne er aktive, og kun i forbindelse med at en planlagt begivenhed skal tiden drives frem til tidspunktet for denne begivenhed.
 
+\fxnote*{skriv tegning}{Vi kan demonstrere den kontinuerlige tid i \pycsp med et eksempel}. Proces 1 har startet en ny tråd via \code{io-decoratoren}, og er derfor blokeret. Proces 2 står i en \code{alternation} med en \code{timeout-guard}. Uafhængigt af tiden det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide når dens timeout er indtrådt. Dette er implementeret i \code{greenlets}-versionen i \cref{fig:blocking_sleep} på linjerne 242 til 251. For at køre disse linjer må  der findes processer der er blokeret samt processer der venter på en timeout. Nu startes en separat tråd der signalere \sched en, når næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
 
-\fxwarning{mangler motivation for dette eksempel}
- Dette kan \fxnote*{skriv tegning}{illustreres} med et eksempel; Proces 1 har startet en ny tråd via \code{io-decoratoren}, og er derfor blokeret. Proces 2 står i en \code{alternation} med en \code{timeout-guard}. Uafhængigt af tiden det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide når dens timeout er indtrådt. Dette er implementeret i \code{greenlets}-versionen i \cref{fig:blocking_sleep} på linjerne 242 til 251. For at køre disse linjer må  der findes processer der er blokeret samt processer der venter på en timeout. Nu startes en separat tråd der signalere \sched en, når næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
+Når tiden i \des ikke er drevet af en eksternt modul, er nødvendigheden af et ekstra tråd til  håndtering af tid irrelevant. Først når alle begivenheder til et tidsskridt er eksekveret, skal tiden i \des tælles op. Dette betyder i vores konkrete eksempel at  så længe der  proces 1 er blokeret står tiden stille og  \sched en venter på dem. Vi kan ikke tælle tiden op blot fordi nogle processer er blokeret af \code{io-decoratoren}, ligesom vi ikke kan tælle tiden op blot mens nogle processer eksekvere en anden tilfældig funktion.
 
-
-
-Når alle processer venter i enten \code{timers} listen eller på kommunikation kan der ikke ske flere begivenheder før \sched en tæller tiden op. 
-Vi kan i det tilfælde finde tidspunktet for den begivenhed der ligger tættets på den nuværende tidspunkt  og springe til det. Følgende er implementeret i \cref{fig:sim_sleep}.
+Først når alle processer venter i enten \code{timers} listen eller på kommunikation kan der ikke ske flere begivenheder tiden op. 
+I dette tilfælde  kan \sched en finde tidspunktet for den begivenhed der ligger tættets på den nuværende tidspunkt  og springe til denne begivenhed. Følgende er implementeret i \cref{fig:sim_sleep}.
 \begin{figure}[hbtp]
 \begin{minipage}[c]{\linewidth}
 \begin{lstlisting}[firstnumber=239, label=fig:blocking_sleep, caption=Uddrag af \sched en i \code{Scheduler}]
@@ -165,12 +170,6 @@ self.cond.release()
 \end{minipage}
 \end{figure}
 
-For at konvertere \code{greenlets}-versionen der bruger til \code{time}-moduelt til en \code{simulerings}-version der bruger diskrettid, skal vi ændre de steder hvor time modulet bruges. Det eneste sted time modulet bruges er ved udvælgelse af processer fra timers listen(\cref{fig:green:timer}). 
-Her sammenlignes på linje 204 den første tidsværdi i \code{timers}, med det nuværende tidspunkt givet af time modulet.
-Hvis det nuværende tidspunkt er større end værdien i timers udvælges denne proces til at køre næste gang og fjernes fra listen.
-For at planlægge begivnheder præcist skal processerne også kunne ekskveres på et specifikt tidsrum, som hverken skal være længere eller kortere end angivet. Dermed har  \sched en i simulations-versionen behov for at kunne  styre aktiveringen af processerne på et finere niveau end hvad der er muligt med \code{greenlets}"-versionen.  
-I \code{simulation}"-verisonen kan vi have fuld kontrol over tiden da  den står stille mens processerne eksekveres.
-Vi kan derfor tilføje den begrænsning at tiden skal være præcist det der er angivet i \code{timers}, før processen skal aktiveres, og ikke kun større, som angivet i \code{greenlets}"-versionen. \CRef{fig:sim:timer} viser udvælgelsen af en proces fra \code{timers} i \code{simulerings}-versionen. 
 
 \begin{figure}[hbtp]
 \begin{minipage}[c]{\linewidth}
