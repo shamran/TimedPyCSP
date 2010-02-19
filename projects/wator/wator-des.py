@@ -1,4 +1,5 @@
 from pycsp.simulation import *
+from pycsp.common.trace import *
 import random
 from random import choice as randomchoice 
 from numpy import *
