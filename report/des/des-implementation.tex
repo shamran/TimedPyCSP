@@ -63,30 +63,31 @@ Dette har yderligere den fordel at man tydeligt kan se at alle klasserne i \code
 ikke en \sched \xspace fra \code{greenlets}"-versionen.
 
 \subsection{Tid} \label{sec:tid}
-\fxwarning{Mangler noget indledende motivation}
-\CRef{Timeout} viser et eksempel på en \code{alternation} hvor processen kun er villig
+For at kunne planlægge begivenheder i \des kræves det at alle processer og \sched en har en global forståelse af tid.  Det er derfor en af hjørnestenene i implementeringen af \des hvordan tid introduceres til \pycsp.  
+Begrebet tid er ikke en del af \csp, men er alligevel blevet introduceret i \pycsp, for  at  have
+mulighed for at tilknytte en timeout til en \code{alternation}. Vi ønsker
+at videreudvikle denne struktur til at håndtere tid generelt for alle
+processer, samt så den fungerer med diskret tid, modsat den eksisterende
+løsning hvor der benyttes \code{time}-modulet.
+ 
+\CRef{Timeout} viser et eksempel på brugen af tid i det eksisterende \pycsp, hvor en \code{alternation} er villig
 til at læse fra kanalenden \code{Cin} i $0.5$ sekunder. Hvis ikke der
 er modtaget en besked indenfor 0.5 sekunder, accepteres dens \code{timeout-guard}
 og processen fortsætter sin kørsel uden at have læst fra kanalen.
 
-\begin{lstlisting}[%float=hbtp, 
+\begin{lstlisting}[float=hbtp, 
 label=Timeout,caption=Timeout i Alternation (fra dokumentationen til PyCSP)]
 Alternation([{Timeout(seconds=0.5):None}, 
              {Cin:None}]).select()
 \end{lstlisting}
 
-Tid er dermed blevet introduceret i \pycsp, for i denne specifikke situation at  have
-mulighed for at tilknytte timeout til en \code{alternation}. Vi ønsker
-at videreudvikle denne struktur til at håndtere tid generelt for alle
-processer, samt så den fungerer med diskret tid, modsat den eksisterende
-løsning hvor der benyttes \code{time}-modulet.
+\inline{Dette skal gennemlæses når deadline/interactive  er skrevet for at se om time modulet skal hives op på et højere niveau}
 
-\fxnote{Dette skal gennemlæses når deadline/interactive  er skrevet for at se om time modulet skal hives op på et højere niveau}
-Fra en brugers synsvinkel
-repræsenteres tiden internt som realtid der er kontinuerlig, men dette er ikke korrekt set fra en implementerings synspunkt. I  computere findes realtid ikke, og \code{time}-modulet giver derfor ikke mulighed for at benytte realtid, men giver i stedet brugeren en pseudo realtid, der på en række områder afviger fra realtid. Den største forskel mellem realtid og \code{time}-modulets pseudo realtid, er at tiden er diskretiseret i et fast lille tidsskridt. Vi skal med vores diskrete tidsmodel ikke foretage 
-en konvertering fra realtid til diskret tid. I stedet skal vi foretage en konvertering fra en diskrettid, med et fast tidsskridt til en diskret tidsmodel hvor tiden stiger med en variable tidsskridt.
+Fra en brugers synsvinkel repræsenteres tiden internt i \pycsp som realtid, men dette er ikke korrekt, hvis vi ser på den eksisterende implementering af tid. Helt generelt kan computere ikke håndtere  realtid, og \code{time}-modulet der er et modul til håndtering af tid i \pycsp, kan derfor ikke give brugeren mulighed for at benytte realtid. 
+
+ I stedet tilbydes det vi vil kalde pseudo realtid, der minder mest muligt om realtid, men på en række områder afviger fra realtid. Den største forskel mellem realtid og pseudo realtid, er at i computere kan tiden ikke være kontinuerlig men må nødvendigvis være  diskritiseret, og som oftest i et fast lille tidsskridt. Vi skal med vores diskrete tidsmodel ikke foretage en konvertering fra kontinuerlig  til diskret tid. I stedet skal vi foretage en konvertering fra at tiden stiger med et fast tidsskridt til en diskret tidsmodel hvor tiden stiger med en variable tidsskridt. En anden forskel mellem pseudo realtid og tidsmodellen for \des er at tiden i \des drives af begivenheder, mens den drives af et eksternt modul i pseudo realtid. 
  
-\subsubsection{Sammenhæng mellem tidsintervaller i realtid og diskrettid}\label{label}
+\subsubsection{Sammenhæng mellem tidsintervaller i realtid og diskrettid}
 Da man i \code{time}-modulet har et fast tidsskridt og
 realtiden også er inddelt i faste størrelser
 som eks. sekunder, kan man med \code{time}-modulet måle tidsintervaller der
@@ -103,10 +104,16 @@ introduceret funktionen \code{Now()} der returnerer tiden når funktionen kaldes
 
 
 \subsubsection{Fremskrivning af tid}
-\fxwarning{mangler motivation for dette eksempel}
-I pseudo realtid fremskrives tiden uafhængigt af processernes tilstand. Dette kan \fxnote*{skriv tegning}{illustreres} med et eksempel; Proces 1 har startet en ny tråd via \code{io-decoratoren}, og er derfor blokeret. Proces 2 står i en \code{alternation} med en \code{timeout-guard}. Uafhængigt af tiden det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide når dens timeout er indtrådt. Dette er implementeret i \code{greenlets}-versionen i \cref{fig:blocking_sleep} på linjerne 242 til 251. For at køre disse linjer må  der findes processer der er blokeret samt processer der venter på en timeout. Nu startes en separat tråd der signalere \sched en, når næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
 
-I \des står tiden stille mens processerne eksekveres, og først når alle begivenheder til et tidsskridt er eksekveret, vælger vi at tælle tiden op. Den ekstra tråd til håndtering af tid i et blokeret kald er derfor overflødig i \des, for så længe der findes blokerede processer venter \sched en på dem, uden at tiden tælles op, da de potentielt senere vil kunne  generere nye begivnheder der skal eksekveres i samme tidsskridt.
+I pseudo realtid drives tiden frem af et eksternt modul for at efterligne realtid. Derfor vil et program der umiddelbart efter hinanden beder om tiden få et stigende  tidspunkt. I pseudo realtid fremskrives tiden derfor uafhængigt af processernes tilstand. I diskret tid skal tiden i modsætning hertil stå stille når processerne er aktive, og kun i forbindelse med at en planlagt begivnehed skal tiden drives frem til tidspunktet for denne begivenhed.
+\inline{her til er jeg nået}
+ gentagende gange \des står tiden stille mens processerne eksekveres, og først når alle begivenheder til et tidsskridt er eksekveret, vælger vi at tælle tiden op. Den ekstra tråd til håndtering af tid i et blokeret kald er derfor overflødig i \des, for så længe der findes blokerede processer venter \sched en på dem, uden at tiden tælles op, da de potentielt senere vil kunne  generere nye begivnheder der skal eksekveres i samme tidsskridt.
+
+
+\fxwarning{mangler motivation for dette eksempel}
+ Dette kan \fxnote*{skriv tegning}{illustreres} med et eksempel; Proces 1 har startet en ny tråd via \code{io-decoratoren}, og er derfor blokeret. Proces 2 står i en \code{alternation} med en \code{timeout-guard}. Uafhængigt af tiden det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide når dens timeout er indtrådt. Dette er implementeret i \code{greenlets}-versionen i \cref{fig:blocking_sleep} på linjerne 242 til 251. For at køre disse linjer må  der findes processer der er blokeret samt processer der venter på en timeout. Nu startes en separat tråd der signalere \sched en, når næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
+
+
 
 Når alle processer venter i enten \code{timers} listen eller på kommunikation kan der ikke ske flere begivenheder før \sched en tæller tiden op. 
 Vi kan i det tilfælde finde tidspunktet for den begivenhed der ligger tættets på den nuværende tidspunkt  og springe til det. Følgende er implementeret i \cref{fig:sim_sleep}.

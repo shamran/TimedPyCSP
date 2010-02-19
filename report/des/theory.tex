@@ -2,6 +2,7 @@
 \inline{Beskrivelse af tidsmodellen, teorien omkring den og hvor/hvad den 
     benyttes til. Teori: henvisning til litteratur, bl.a.  matematik/beviser 
     for modellen}
+\inline{Skal vi skrive noget om at introduktionen af tid er det samme som at introducere prioritet}
 
 \begin{shaded}
 \fxnote{Gennemlæses og højst sandlysningt omskrives med henblik på sammenhæng og mangler.}
@@ -48,26 +49,26 @@ I \csp har vi garanti for at de eneste afhængigheder mellem processer vil være
 I \des findes der  en global tid og alle processerne skal derfor have en fælles tid der tæller op 
 samtidigt.  En global viden som tid kræver synkronisering af alle 
 processerne, og til denne koordinering og synkronisering af flere 
-processer er  den mest brugte metode at introducere en barriere. Barrierer blev først introduceret i MPI\cite{mpi-barrier}, hvor den bruges til at 
+processer er  den mest brugte metode at introducere en barriere. Barrierer blev først introduceret i MPI \cite{mpi-barrier}, hvor den bruges til at 
 sikre at alle tråde venter i barrieren før de kan fortsætte. 
 
-%I \csp kan man udnytte at begge 
-%kanalender skal være klar, før der der kan kommunikeres og at en proces der er 
-%indgår i en kommunikation vil vente indtil den anden ende er klar før den 
-%fortsætter.  Ved hjælp af kanaler kan man derfor lave en simpel barriere 
-%trivielt ved brug af kommunikation over kanaler.  En implementering af en 
-%barriere som en selvstændig proces kan eksempelvis implementeres som i 
-%\cref{barrier-imp}.
-%
-%\begin{lstlisting}[float, label=barrier-imp,caption=En barriere i \pycsp]
-%@proces
-%def Barrier(nprocesses, signalIN, signalOUT):
-%	while True:
-%		for i in range (nprocesses):
-%			signalIN()
-%		for i in range (nprocesses):
-%			signalOUT(0)
-%\end{lstlisting}
+I \csp kan man lave sin egen barrierer ved at udnytte at begge 
+kanalender skal være klar, før der der kan kommunikeres og at en proces der er 
+indgår i en kommunikation vil vente indtil den anden ende er klar før den 
+fortsætter.  Ved hjælp af kanaler kan man derfor lave en simpel barriere 
+trivielt ved brug af kommunikation over kanaler.  En implementering af en 
+barriere som en selvstændig proces kan ses i 
+\cref{barrier-imp}.
+
+\begin{lstlisting}[float, label=barrier-imp,caption=En barriere i \pycsp]
+@proces
+def Barrier(nprocesses, signalIN, signalOUT):
+	while True:
+		for i in range (nprocesses):
+			signalIN()
+		for i in range (nprocesses):
+			signalOUT(0)
+\end{lstlisting}
 %
 %Denne implementering af en barriere kræver, i modsætning til de fleste andre 
 %implementeringer af barrierer\cites{mpi-barrier, crew}, to kald. Det første 
@@ -116,7 +117,8 @@ Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp.
 
 Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun  lokalt data. Hvis der er data er delt pga. arkitekturen \csp er implementeret på, bør dette abstraheres væk men udnyttes internt i kanalerne. At introducere hjælpemidler for styre delt data, er derfor at tilskynde til en forkert brug af \csp. Tiden er den anden begrundelse for at benytte barrierer.
 Men barrierer giver kun en  primitiv model for tid, og vi vil vise at med brugen af en \des får man et stærkere værktøj, der blandt meget andet også kan erstatte brugen af barrierer.
-\section{Timeout} 
+
+\subsection{Timeout} 
 I den eksisterende \pycsp findes der som nævnt i \cref{sec:csp} en alternation, hvor brugeren har mulighed for at tilknytte to specielle guards. Den ene er en SKIP-guard der giver mulighed for at kommunikere hvis kanalen er klar og ellers fortsætte uden at kommunikere. Den anden er timeout-guarden der udvider SKIP-guarden så man venter på kommunikation en given periode hvorefter man tager SKIP-guarden. 
 Med \des ændres tiden så timeout opererer på tidsskridt fremfor en tidsperiode. Dette medfører at en proces kan ønske at kommunikere i indeværende tidsskridt, men ikke i det efterfølgende.
 Vi kan dog ikke i tidsskridtet evaluere om kommunikation vil være muligt. Dette skyldes at tiden står stille mens processerne er aktive så selvom kommunikation ikke er muligt på et tidspunkt i tidsskridtet kan en efterfølgende begivenhed i samme tidsskridt muliggøre kommunikation.
