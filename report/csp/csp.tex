@@ -1,7 +1,8 @@
-\chapter{CSP og PyCSP}\label{sec:csp}
+\chapter{CSP og PyCSP}\label{sec:csp}\pdfcomment{Er det passende med en overskrift på ting der ikke er introduceret}
+\inline{}
 \inline{Vi har ikke talt om Timed CSP}
+\pdfcomment{Mangler indledene meta tekts}
 CSP er et sprog til at beskrive uafhængige processer, der udelukkende udveksler information ved at sende og modtage beskeder over eksplicitte kanaler mellem processerne. Det blev introduceret af \citeauthor{hoare-csp} i \citetitle{hoare-csp}\cite{hoare-csp} og ligger til grund for adskillige praktiske implementationer i et udvalg af programmeringssprog, heriblandt Occam, Java, C++ og Python\cite{May1983, jcsp, Brown2007, pycsp}. I Python hedder udviddelsen PyCSP, og er udviklet i et samarbejde mellem mellem Tromsø og Københavns Universitet, med henblik på at kombinere Pythons mulighed for at effektivt og hurtigt at udvikle programmer med CSPs evne til at udtrykke samtidighed\cite{pycsp}. 
-
 
 \section{Kommunikation mellem processer}
 Alt Kommunikationen foregår over kanaler. De nævnte implementationer har forskellige typer kanaler, set med henblik hvordan de forbindes til andre processer. Generelt findes der fire 4 typer af kanaler: one-to-one, any-to-one, one-to-any og any-to-any. Forskellen ligger i hvem og hvor mange der kan læse og skrive til en kanal. Det er klart at any-to-any kanalen er den mest generelle, og har funktionalitet som de andre. Dette er udnyttet i bl.a. PyCSP hvor det er den eneste kanaltype der er til rådighed. Fælles for dem er at processen ikke kender til kanalen og hvilken proces der er i den anden ende af kanalen. Istedet kender processen kun til en  kanalende, som  den enten kan skrive til eller læse fra. Hvis to processer skal kunne både læse fra, og skrive til hinanden, skal der bruges to kanaler, med tilhørende kanalender. 
@@ -19,7 +20,7 @@ Implementationerne adskiller sig ved hvordan CSP processerne er implementeret, o
 
 \code{Greenlets}-versionen går den anden vej, og implementerer CSP processer som user-level tråde i form af greenlet-modulet til Python\cite{greenlet}. Herved kan man have utroligt mange samtidige tråde, der er hurtige at skifte mellem og som er meget lidt ressourcekrævende. Dette gør denne version velegnet til applikationer der ikke har brug for at benytte flere kerner, men som består af mange CSP processer. 
 
-\section{Introduktion af tid i de 3 implementeringer}
+\section{Introduktion af tid i de tre implementeringer}
 Vi vil foretrække en implementation af tid der er ensformig og dækker over alle tre implementeringer. Herved kan vi følge ideen i PyCSP med at benytte samme API på tværs af implementeringerne. Når vi ønsker at introducere tid i PyCSP skal vi kunne styre afviklingen af CSP processer. I  \code{threads}- og \code{processes}-versionerne kan vi ikke styre hvilke af de tråde der ekskvere CSP der er aktive, men kun styre hvad en tråd gør når den bliver aktiveret. For at introducere tid i disse versioner vil det kræve en væsentlig mængde kommunikation mellem trådene til styring af hvad der må afvikles hvornår. \code{Greenlets}-versionen har derimod sin egen \sched , da den er baseret på user-level tråde og vi kan derfor styre afviklingen af CSP processerne direkte. Vi har valgt at begrænse os til kun at lave en implementation af tid i \code{greenlets}-versionen. Som følge heraf vil alle fremtidige referencer til PyCSP være med henblik på \code{greenlets}-versionen med mindre andet er eksplicit nævnt. Ligeledes vil vi henvise til CSP processer blot som processer. 
 
 \section{Afvikling af processer}
