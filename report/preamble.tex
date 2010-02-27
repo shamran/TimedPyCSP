@@ -36,7 +36,13 @@ article
 
 \usepackage[utf8]{inputenc} % eller utf8 eller ansinew eller ...
 \usepackage[english, danish]{babel} %direktiv til at bruge det danske sprog
+\renewcommand\danishhyphenmins{22} % bedre orddeling
+\addto\captionsdanish{
+\renewcommand\contentsname{Indholdsfortegnelse}
+\renewcommand\appendixname{Appendix}
+}
 \selectlanguage{danish}
+
 
 \usepackage{amsmath,amssymb} % bedre matematik og ekstra fonte
 \usepackage{textcomp} % adgagn til tekstsymboler
@@ -78,8 +84,8 @@ article
 \usepackage{hycolor}
 \usepackage[draft,author=Dorte]{pdfcomment}
 \usepackage[draft, danish,layout=margin,innerlayout=inline]{fixme} % til at skrive \fixme kommentarer til sig
-\newcommand{\inline}[1]{\fxwarning[inline, nomargin]{#1}}
-
+\newcommand{\inline}[1]{\fxwarning[inline,nomargin]{#1}}
+\newcommand{\kv}[1]{\fxnote*{Kendt viden?}{#1}}
 %%% We need to redefine \autoref. We should use 
 %%% abbreviations inside the sentence and full names 
 %%% at the beginning of sentences. Additionally,
