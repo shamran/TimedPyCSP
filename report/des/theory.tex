@@ -1,18 +1,23 @@
-\section{Beskrivelse/teori} \label{sec:des-teori}
+\section{Beskrivelse/teori} \label{sec:des-teori}\fxnote{Dårlig overskrift?}
 \inline{Beskrivelse af tidsmodellen, teorien omkring den og hvor/hvad den 
     benyttes til. Teori: henvisning til litteratur, bl.a.  matematik/beviser 
     for modellen}
 \inline{Skal vi skrive noget om at introduktionen af tid er det samme som at introducere prioritet}
 
+\pdfcomment{Jeg synes der mangler en tydelig defintion af sikret tid}
+\inline{Gennemlæses og højst sandsynligvis omskrives med henblik på sammenhæng og mangler.}
+Inden for simulering er \des en meget brugt metode til at modellere systemer. I 
+\des anskues tid som \kv{diskrete tidsskridt}, som er uden kobling til realtid. I disse tidsskridt udføres en eller flere begivenheder, som hver især ændrer på systemets tilstand. Når alle begivenheder for et tidsskridt er udført, kan tiden tælles op, og begivenheder for det nye tidsskridt kan udføres. Der kan være fastlagt et vilkårligt antal begivenheder til et tidsskridt, og hver begivenhed kan variere vilkårligt, ifht., hvor langt tid den tager at udføre i realtid. Dermed er der ikke nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan variere vilkårligt i realtid. Begivenhederne, der skal udføres af systemet, kan enten være givet på forhånd eller blive skemaplanlagt dynamisk under afviklingen af andre begivenheder. 
+Afhængig af hvad der simuleres, kan man udtrække relevant information om systemet f.eks. gennemsnitlig behandlingstid for elementer, længden af køer i systemet og den samlede aktivitetstid for hvert delelement i systemet.
 
-\fxnote{Gennemlæses og højst sandsynligvis omskrives med henblik på sammenhæng og mangler.}
-Indenfor simulering er \des en meget brugt metode til at modellere systemer. I 
-\des anskues tid som diskrete tidsskridt som er uden kobling til realtid. I disse tidsskridt udføres en eller flere begivenheder, som hver især ændrer på systemets tilstand. Når alle begivenheder for et tidsskridt er udført kan tiden tælles op og begivenheder for det nye tidsskridt kan udføres. Der kan være være planlagt et vilkårligt antal begivenheder til et tidsskridt og hver begivenhed kan variere vilkårligt med henlik på hvor langt tid den tager at udføre i realtid. Det er disse betingelser der forårsager at der ikke er nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan derved variere vilkårligt i realtid. Begivenhederne der skal udføres af systemet kan enten være givet på forhånd, eller blive skemaplanlagt dynamisk under afviklingen af andre begivenheder. 
-Afhængig af hvad der simuleres, kan man udtrække relevant information om systemet, f.eks. gennemsnitlig behandlingstid for elementer, længden af køer i systemet, og den samlede aktivitetstid for hvert delelement i systemet.
-
-For at kunne konstruere en \des skal vi have følgende til rådighed; En repræsentation af tid til at styre hvornår vi skifter tidsskridt, en liste over begivenheder der skal udføres i hvert tidsskridt, samt mulighed for at opsamle statistisk data fra simulationen. 
-
-En repræsentation af diskret tid skal kunne udtrykke den aktuelle tid, endelig fremtidig tid og gerne kunne foretage en variabel fremskrivning af tiden. Eksempelvis kan man forestille sig at der til tiden $t_{0}$ planlægges en begivenhed til tiden $t_{3}$. Såfremt der ikke er planlagt andre begivenheder er det her en fordel at kunne springe over $t_{1}$ og $t_{2}$ og fremskrive tiden direkte til $t_{3}$. 
+For at kunne konstruere en \des skal vi have følgende til rådighed: \pdfcomment{Hvorfor er dette ikke først i afsnit 2.1}
+\begin{enumerate}
+\tightlist 
+\item En repræsentation af tid til at styre hvornår vi skifter tidsskridt.
+\item En liste over begivenheder der skal udføres i hvert tidsskridt.
+\item Mulighed for at opsamle statistisk data fra simulationen. 
+\end{enumerate}
+En repræsentation af diskret tid skal kunne udtrykke den aktuelle tid, \ikkef{endelig fremtidig tid} og gerne kunne foretage en variabel fremskrivning af tiden. Eksempelvis kan man forestille sig, at der \ikkef{i tiden $t_{0}$ planlægges en begivenhed til tiden $t_{3}$}. Såfremt der ikke er planlagt andre begivenheder, er det her en fordel at kunne springe over $t_{1}$ og $t_{2}$ og fremskrive tiden direkte til $t_{3}$. \pdfcomment{Dette er om 1, men der står intet skrevet om 2 og 3}
 
 
 
@@ -53,19 +58,18 @@ En simulering løber begivenhederne kronologisk igennem til der enten ikke er fl
 \subsection{Barrierer} \label{sec:barrierer}
 %\inline{Hele afsnittet skal skrives om for at få det generelle samlet i starten, og vores specifikke efterfølgende. Evt. have mindre om vores implementation}
 
-I \des findes der  en global tid og alle processerne skal derfor have en fælles tid der tæller op 
+I \des findes en \fxnote*{skal defineres?}{global tid} og alle processerne skal derfor have en fælles tid, der tæller op 
 samtidigt.  En global viden som tid kræver synkronisering af alle 
 processerne, og til denne koordinering og synkronisering af flere 
 processer er  den mest brugte metode at introducere en barriere. Barrierer blev først introduceret i MPI \cite{mpi-barrier}, hvor den bruges til at 
-sikre at alle tråde venter i barrieren før de kan fortsætte. 
+sikre, at alle tråde venter i barrieren før de kan fortsætte. 
 
-I \csp kan man lave sin egen barrierer ved at udnytte at begge 
-kanalender skal være klar, før der der kan kommunikeres og at en proces der er 
-indgår i en kommunikation vil vente indtil den anden ende er klar før den 
+I \csp kan man lave sin egen barrierer ved at udnytte, at begge 
+kanalender skal være klar, før der kan kommunikeres, og at en proces, der 
+indgår i en kommunikation, derfor vil vente indtil den anden ende er klar, før den 
 fortsætter.  Ved hjælp af kanaler kan man derfor lave en simpel barriere 
-trivielt ved brug af kommunikation over kanaler.  En implementering af en 
-barriere som en selvstændig proces kan ses i 
-\cref{barrier-imp}.
+ ved brug af kommunikation over kanaler.  En implementering af den simple 
+barriere som en selvstændig proces kan ses i \cref{barrier-imp}.
 
 \begin{lstlisting}[float, label=barrier-imp,caption=En barriere i \pycsp]
 @proces
@@ -110,18 +114,13 @@ def Barrier(nprocesses, signalIN, signalOUT):
 %skal synkroniseres. I de fleste implementationer af barrier er dette en mulighed, men til vores simple illustration, har vi valgt ikke at implementere det.
 
 Barrierer er en meget effektiv metode til at synkronisere processer der kører 
-parallelt, og er brugt flittigt i MPI. I \csp er der dog en konflikt i brugen 
-af barrierer da hver proces fungerer i isolation, og den eneste interaktion der 
-skal være mellem processerne er når der kommunikeres via kanalerne. 
+parallelt, og er brugt flittigt i MPI. I \csp findes der en konflikt i brugen 
+af barrierer, selvom det er nemt at implementere. Hver proces bør fungere i isolation, og den eneste interaktion mellem processerne, er via kanalerne. 
 Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp. 
 \citeauthor{crew} beskriver brugen af barrierer som:
-
-\mycite[1]{crew}{
 \begin{otherlanguage}{english}
-[\ldots] where the barriers may be used to maintain global and/or localised models of time and to synchronise safe access to shared data [\ldots]
-\end{otherlanguage}
-}
-
+\mycite[1]{crew}{[\ldots] where the barriers may be used to maintain global and/or localised models of time and to synchronise safe access to shared data[\ldots]}
+\end{otherlanguage}\fxnote{Er det korrekt citeret med brug af \ldots?}
 Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun  lokalt data. Hvis der er data er delt pga. arkitekturen \csp er implementeret på, bør dette abstraheres væk men udnyttes internt i kanalerne. At introducere hjælpemidler for styre delt data, er derfor at tilskynde til en forkert brug af \csp. Tiden er den anden begrundelse for at benytte barrierer.
 Men barrierer giver kun en  primitiv model for tid, og vi vil vise at med brugen af en \des får man et stærkere værktøj, der blandt meget andet også kan erstatte brugen af barrierer.
 
