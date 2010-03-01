@@ -13,8 +13,8 @@ Afhængig af hvad der simuleres, kan man udtrække relevant information om syste
 For at kunne konstruere en \des skal vi have følgende til rådighed: \pdfcomment{Hvorfor er dette ikke først i afsnit 2.1}
 \begin{enumerate}
 \tightlist 
-\item En repræsentation af tid til at styre hvornår vi skifter tidsskridt.
-\item En liste over begivenheder der skal udføres i hvert tidsskridt.
+\item En repræsentation af tid til at styre, hvornår vi skifter tidsskridt.
+\item En liste over begivenheder, der skal udføres i hvert tidsskridt.
 \item Mulighed for at opsamle statistisk data fra simulationen. 
 \end{enumerate}
 En repræsentation af diskret tid skal kunne udtrykke den aktuelle tid, \ikkef{endelig fremtidig tid} og gerne kunne foretage en variabel fremskrivning af tiden. Eksempelvis kan man forestille sig, at der \ikkef{i tiden $t_{0}$ planlægges en begivenhed til tiden $t_{3}$}. Såfremt der ikke er planlagt andre begivenheder, er det her en fordel at kunne springe over $t_{1}$ og $t_{2}$ og fremskrive tiden direkte til $t_{3}$. \pdfcomment{Dette er om 1, men der står intet skrevet om 2 og 3}
@@ -51,7 +51,6 @@ En simulering løber begivenhederne kronologisk igennem til der enten ikke er fl
 	\item Henvis til DE-simulation.ps
   \item Eksempel på problemer som løses med des
   \item model vs. simulering
-  \item 
 \end{itemize}
 
 
@@ -125,18 +124,18 @@ Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunn
 Men barrierer giver kun en  primitiv model for tid, og vi vil vise at med brugen af en \des får man et stærkere værktøj, der blandt meget andet også kan erstatte brugen af barrierer.
 
 \subsection{Timeout} 
-I den eksisterende \pycsp findes der som nævnt i \cref{sec:csp} en alternation, hvor brugeren har mulighed for at tilknytte to specielle guards. Den ene er en SKIP-guard der giver mulighed for at kommunikere hvis kanalen er klar og ellers fortsætte uden at kommunikere. Den anden er timeout-guarden der udvider SKIP-guarden så man venter på kommunikation en given periode hvorefter man tager SKIP-guarden. 
-Med \des ændres tiden så timeout opererer på tidsskridt fremfor en tidsperiode. Dette medfører at en proces kan ønske at kommunikere i indeværende tidsskridt, men ikke i det efterfølgende.
-Vi kan dog ikke i tidsskridtet evaluere om kommunikation vil være muligt. Dette skyldes at tiden står stille mens processerne er aktive så selvom kommunikation ikke er muligt på et tidspunkt i tidsskridtet kan en efterfølgende begivenhed i samme tidsskridt muliggøre kommunikation.
+I den eksisterende \pycsp findes der som nævnt i \autoref{sec:csp} en \code{alternation}, hvor brugeren har mulighed for at tilknytte to specielle guards. Den ene er en SKIP-guard, der giver mulighed for at kommunikere, hvis kanalen er klar og ellers fortsætte uden at kommunikere. Den anden er timeout-guarden, der udvider SKIP-guarden så man venter på kommunikation i en given periode hvorefter man tager SKIP-guarden. 
+Når \des indføres, ændres tiden, \ikkef{så timeout-guarden opererer på tidsskridt fremfor en tidsperiode}. Dette medfører, at en proces kan ønske at kommunikere i indeværende tidsskridt, men ikke i det efterfølgende.
+Vi kan dog ikke i tidsskridtet evaluere om kommunikation er muligt. Dette skyldes, at tiden står stille mens processerne er aktive, så selvom kommunikation ikke er muligt på et tidspunkt i tidsskridtet, så kan en efterfølgende begivenhed i samme tidsskridt muliggøre kommunikation.
 
-En løsningsmodel på denne problemstilling kunne være at lade processer i timeout-guards vente helt frem til næste tidsskridt, og her lade dem tage SKIP-guarden. Dette efterfølgende tidsskridt kan enten være ekstra skridt vi introducerer specifikt for at håndtere disse timeout-guards, eller det kan være det næste tidsskridt hvortil der er planlagt en begivenhed. 
-Såfremt vi introducerer et kunstigt tidsskridt skal dette vælges når en proces når til en timeout-guard. Uanset hvor lille et tidsskridt vi vælger, kan vi ikke garanterer at der ikke efterfølgende, i samme tidsskridt, vil blive planlagt en begivenhed til at indtræffe mellem indeværende tidsskridt, og det kunstige tidsskridt vi valgte i timeout-guarden. Herved er der risiko for at rækkefølgen af begivenheder der skal udføres bliver ændret, hvilket er uacceptabelt. 
-Alternativt kan man vælge at lade tiden springe til den næste begivenhed der er planlagt og der som det første vælge SKIP-guarden. Her vil man ikke risikere at ændre på rækkefølgen, men man risikerer derimod at springe langt frem i tiden. Dette kan være et problem såfrem en proces der tager en SKIP-guard efterfølgende planlægger en begivenhed.
-Begge muligheder har grundliggende den svaghed at oprindeligt ønskede man kun at kommunikere i det indeværende tidsskridt og ikke i hverken et vilkårligt lille tidsrum eller i et tilfældigt tidsrum frem til en efterfølgende begivnhed.
+En løsningsmodel på denne problemstilling kunne være at lade processer i timeout-guards vente helt frem til næste tidsskridt, og her lade dem tage SKIP-guarden. Dette efterfølgende tidsskridt kan enten være et ekstra skridt, vi introducerer specifikt for at håndtere disse timeout-guards, eller det kan være det næste tidsskridt, hvortil der er planlagt en begivenhed. 
+Såfremt vi introducerer et kunstigt tidsskridt skal dette vælges,\ikkef{ når en proces når til en timeout-guard}. Uanset hvor lille et tidsskridt vi vælger, kan vi ikke garanterer, at der ikke efterfølgende, i samme tidsskridt, vil blive planlagt en begivenhed til at indtræffe mellem indeværende tidsskridt og det kunstige tidsskridt, vi valgte i timeout-guarden. Herved er der risiko for, at rækkefølgen af begivenheder, der skal udføres bliver ændret, hvilket er uacceptabelt. 
+Alternativt kan man vælge at lade tiden springe til den næste begivenhed, der er planlagt, og der som det første vælge SKIP-guarden. Her vil man ikke risikere at ændre på rækkefølgen, men derimod at springe for langt frem i tiden. Dette kan være et problem, hvis en proces, der tager en SKIP-guard, efterfølgende planlægger en begivenhed.
+Begge muligheder har grundlæggende den svaghed, at oprindeligt ønskede man kun at kommunikere i det indeværende tidsskridt og ikke i hverken et vilkårligt lille tidsrum eller i et tilfældigt tidsrum frem til en efterfølgende begivnhed.
 
-En sidste løsningsmodel er at vente til lige før tiden tælles op, og der kalde de ventende processers SKIP-guard. 
-For at kunne adskille hvilke processer der har en begivenhed til et tidsskridt og hvilke der venter på kommunikation kan vi \fxnote*{illustration}{benytte os af edge-triggering} til at dele hver tidsskridt op i to grupper, henholdsvis wake-first og wake-last.
-I wake-first gruppen foretages eksekveringen af de processer der har tilknyttet en begivenhed til det givne tidsskridt, mens man i  wake-last gruppen aktiverer SKIP-guarden for de processerne der venter på en timeout.
+En sidste løsningsmodel er at vente til lige før, tiden tælles op, og der kalde de ventende processers SKIP-guards. 
+For at kunne adskille hvilke processer, der har en begivenhed til et tidsskridt, og hvilke, der venter på kommunikation, kan vi \fxnote*{illustration}{benytte os af edge-triggering} til at dele hvert tidsskridt op i to grupper, henholdsvis wake-first og wake-last.
+I wake-first-gruppen udføres de processer, der har tilknyttet en begivenhed til det givne tidsskridt, mens man i  wake-last-gruppen aktiverer SKIP-guarden for de processerne der venter på en timeout.
 
-Edge-triggering er den bedste løsningsmodel af de beskrevne, da man her har mulighed for at eksekvere alle begivnheder som måske resulterer i kommunikation, og først derefter aktivere SKIP-guards, for de processer der har en timeout til samme tidsskridt. Ulempen ved denne metode er at det krævere større implementering, da der nu findes to seperate måde at vente for hhv. begivenheder og timeouts.
+Edge-triggering er den bedste løsningsmodel af de beskrevne, da man her har mulighed for at udføre alle begivenheder, som måske resulterer i kommunikation, og først derefter aktivere SKIP-guards, for de processer der har en timeout til samme tidsskridt. Ulempen ved denne metode er at det krævere større implementering, da der nu findes to seperate måde at vente for hhv. begivenheder og timeouts.
 
