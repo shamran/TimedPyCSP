@@ -1,0 +1,13 @@
+fra artiklen real time scheduling
+
+Har nogle gode figurer til visualisinernaf hard vs soft real time scheduling
+
+Hard real time s. 6 I et hard real time system skal alle event være periodiske, og scheduler skal kunne planlægge skeamet inden start, hvilket gør at man ikke kan sige at CSP er hard real time
+
+Der bliver snakket meget om prioritet, og hvilke processer der har den højeste proritet
+
+For offline eller hard real time skal der gives et upper bound for at cpu tid krævet
+
+s. 11 Earliste deadline er en optimal scheduling, men er "instable" hvilket vil sige at ved overload er det ikke processer med højst prioritet der bliver kørt igennem, men er tilfældigt hvilke processer der fejler
+
+s 14 snakker om CSP
