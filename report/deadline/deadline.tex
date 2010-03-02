@@ -1,8 +1,20 @@
 \chapter{\ds}
 \inline{Måske skal vi ikke snakke om deadline \sched ning men om real time scheduling hvor deadline er en af dem.}
-I den nuværende \csp er alle processer lige, hvilket giver den bedste udnyttelsen af systemet. Det er dog ikke altid hensigtmæssigt kun at maksimere den globale ydelse.\fxnote*{Bedre forumulering}{Eksempelvis vil programmer der skal håndtere GUI, og bruger input ønske  at grænsefladen altid  reagere selv under høj belastning.} Alternativt kan det fejl der opstår i systemet, skulle  håndteres med det samme.   
-Vi ønsker derfor at beskrive  hvordan \sched en kan planlægge processerne så vi sikre processer kan køres baseret på deres prioritet og deadline.
+Vi vil i dette kapitel beskrive \sched ning i realtid og hvordan \sched eren kan planlægge processerne så vi sikre processer kan køres baseret på deres prioritet og deadline.
+I den nuværende \csp er alle processer lige, hvilket giver den bedste udnyttelsen af systemet. Det er dog ikke altid hensigtmæssigt kun at maksimere den globale ydelse.\fxnote*{Bedre forumulering}{Eksempelvis vil programmer der skal håndtere GUI, og bruger input ønske  at grænsefladen altid  reagere selv under høj belastning.} Alternativt kan det fejl der opstår i systemet, skulle  håndteres med det samme. 
+
+En Real-time planlægger(RTP) kan være relevant i multiprogrammering hvis der findes flere processer der ønsker at udføre deres arbejde samtidigt og hvor succes afhænger af timingen af hvilke processer der udføres hvornår. Til at beskrive denne afhængighed af timing er der i de fleste RTP tilknyttet en deadline til processerne.
+
+Indefor RTP findes der flere underkategorier som alle har tilknyttet en deadline men varrierer i hvordan denne deadline skal fortolkes. Man kan illustret de forskellige RTP kategorier med time-value funktioner. Her repræsentererer ``værdien'' det fremskridt den enkelte process bidrager med til det endelige mål for programmet.
+
+I \vref{fig:hard-rt} vises en ```hard RTP''(HRTP). Her tilføres der værdi til programmet hvis processen afsluttes mellem dens start tidspunkt og dens deadline. Hvis processen først er færdig efter den deadline har den ingen værdi. Et ````soft RTP'''(SRTP) vises i \vref{fig_soft-rt}. Her er værdien der tilføjes den samme som i HRTP indtil deadline, mens hvis deadlinen overskrides mindskes værdien en process tilføjer omvendt propotionalt med overskridelsen. Et ``safty critical system''
+
+
+
+RTP er normalt brugt i systemer til indlejerede systemer f.eks i medicinsk udstyr men bruges også i f.eks kontrol af luftrummet,  processkontrol samt på rumstationen ISS\cite{Audsley1990}.
+
   \section{Beskrivelse/teori}
+  
   \section{Eksempel}
   \section{Design og implementation}
   \section{Evaluering}
