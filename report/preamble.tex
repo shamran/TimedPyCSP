@@ -83,7 +83,9 @@ article
 \labelformat{enumi}{\textup{(#1)}}
 \usepackage{hycolor}
 \usepackage[draft,author=Dorte]{pdfcomment}
-\usepackage[draft, danish,layout=margin,innerlayout=inline]{fixme} % til at skrive \fixme kommentarer til sig
+\usepackage[draft, danish]{fixme} % til at skrive \fixme kommentarer til sig
+\fxloadlayouts{pdfcnote}
+
 \newcommand{\inline}[1]{\fxwarning[inline,nomargin]{#1}}
 \newcommand{\kv}[1]{\fxnote*{Kendt viden?}{#1}}
 \newcommand{\ikkef}[1]{\fxnote*{Ikke forstået, gør dataloger?}{#1}}
