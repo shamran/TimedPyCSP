@@ -75,10 +75,14 @@ article
 %% NOTE: This allows us to use \ref instead of \eqref
 \labelformat{equation}{\textup{(#1)}}
 \labelformat{enumi}{\textup{(#1)}}
-
+\usepackage{hycolor}
+\usepackage[draft,author=Dorte]{pdfcomment}
 \usepackage[draft, danish,layout=margin,innerlayout=inline]{fixme} % til at skrive \fixme kommentarer til sig
-\newcommand{\inline}[1]{\fxwarning[inline, nomargin]{#1}}
+\fxloadlayouts{pdfcnote}
 
+\newcommand{\inline}[1]{\fxwarning[inline,nomargin]{#1}}
+\newcommand{\kv}[1]{\fxnote*{Kendt viden?}{#1}}
+\newcommand{\ikkef}[1]{\fxnote*{Ikke forstået, gør dataloger?}{#1}}
 %%% We need to redefine \autoref. We should use 
 %%% abbreviations inside the sentence and full names 
 %%% at the beginning of sentences. Additionally,
