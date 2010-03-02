@@ -4,35 +4,36 @@
   styrke er samspillet mellem flere elementer/modeller.\\
   simulering - dynamisk - tid (time/space).} 
 \pdfcomment{Hvad skal der foregå i dette kapitel? Hvorfor? og evt. hvordan?}
-Simuleringer har længe været et værdifuldt værktøj til at klarlægge hvordan et 
-system fungerer og er specielt brugbart til at repræsentere systemer hvis 
-tilstand ændres over tid, eller såfremt der er interaktion mellem flere systemer.
+Vi vil i dette kapitel gennemgå hvad computersimuleringer kan bruges til, med fokus på discrete event simulation (\des). Indenfor \des vil vi redegøre for hvilke problemstillinger vi skal tage højde for, for at kunne implementere en \des tidsmodel i \pycsp. 
+
+Simuleringer har længe været et værdifuldt værktøj til at klarlægge hvordan et system fungerer og er specielt brugbart til at repræsentere systemer hvis 
+tilstand ændres over tid, eller såfremt der er interaktion mellem flere systemer. 
 
 DES bruges meget i forbindelse med BI hvor erhvervsfolk f.eks ønsker at få klarlagt hvordan produktionen ser ud på en fabrik. Det kan også bruges i forskningsverdenen til komplekse repræsentationer af kemiske eller fysiske processer der ændrer sig over tid. 
 Generelt bruges simuleringer til at forudse hvor hvordan en eventuel ændring af systemet vil påvirke systemet som helhed. Dette vil typisk også kunne opnås med en matematisk model over systemet, men denne vil være væsentlig mere kompleks og sværere at overskue. 
 
 find reference der snakker om matematisk model vs simulering. 
 
-Kopier tabel fra book\_understanding
-
 
 \begin{table}[ht]
-	\begin{tabular}{|p{0.4\textwidth}|p{0.4\textwidth}|}
-	\hline
-	General Situation & Examples \\
-	\hline
-  Real system does not yet exist and building a prototype is cost prohibitive, time-consuming or hazardous. & Aircraft, Production System, Nuclear Reactor \\
+	\begin{tabularx}{\textwidth}{|p{15pt}Xp{15pt}|p{15pt}Xp{15pt}|}
   \hline  
-  System is impossible to build. & National Economy, Biological System \\
+  &&&&&\\
+  \multicolumn{3}{|c|}{\textbf{General Situation}}&\multicolumn{3}{c|}{\textbf{Examples}} \\
+  &&&&&\\  
   \hline
-  Real system exists but experimentation is too expensive, hazardous or disruptive to conduct. & Proposed Changes to a Materials Handling System,Military Unit,Transportation System, Airport Baggage Handling System \\
+  & \vspace{5pt}Real system does not yet exist and building a prototype is cost prohibitive, time-consuming or hazardous. \vspace{5pt}& & & \vspace{5pt}Aircraft, Production System, Nuclear Reactor \vspace{5pt}& \\
+  \hline  
+  & \vspace{5pt}System is impossible to build.\vspace{5pt} & & & \vspace{3pt}National Economy, Biological System\vspace{5pt} &\\
   \hline
-  Forecasting is required to analyze long time periods in a compressed format. & Population Growth, Forest Fire Spread, Urbanization Studies, Pandemic Flu Spread\\
+  & \vspace{5pt}Real system exists but experimentation is too expensive, hazardous or disruptive to conduct.\vspace{5pt} & & & \vspace{5pt}Proposed Changes to a Materials Handling System,Military Unit,Transportation System, Airport Baggage Handling System\vspace{5pt} & \\
   \hline
-  Mathematical modeling has no practical analytical or numeric solution. & Stochastic Problems, Nonlinear Differential Equations \\
+  & \vspace{5pt}Forecasting is required to analyze long time periods in a compressed format.\vspace{5pt} & & & \vspace{5pt}Population Growth, Forest Fire Spread, Urbanization Studies, Pandemic Flu Spread \vspace{5pt}&\\
+  \hline
+  & \vspace{5pt}Mathematical modeling has no practical analytical or numeric solution.\vspace{5pt} & & & \vspace{5pt}Stochastic Problems, Nonlinear Differential Equations\vspace{5pt} & \\
   \hline	
-  \end{tabular}
-	\caption{Tabellen er kopieret fra \cite{Mchaney2009}}
+  \end{tabularx}
+	\caption{Anvendelsesområder for simuleringer. Tabellen er kopieret fra \cite[10]{Mchaney2009}}
 	\label{tab:simulering}
 \end{table}
 
