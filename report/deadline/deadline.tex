@@ -1,20 +1,28 @@
 \chapter{\ds}
 \inline{Måske skal vi ikke snakke om deadline \sched ning men om real time scheduling hvor deadline er en af dem.}
-Vi vil i dette kapitel beskrive \sched ning i realtid og hvordan \sched eren kan planlægge processerne så vi sikre processer kan køres baseret på deres prioritet og deadline.
-I den nuværende \csp er alle processer lige, hvilket giver den bedste udnyttelsen af systemet. Det er dog ikke altid hensigtmæssigt kun at maksimere den globale ydelse.\fxnote*{Bedre forumulering}{Eksempelvis vil programmer der skal håndtere GUI, og bruger input ønske  at grænsefladen altid  reagere selv under høj belastning.} Alternativt kan det fejl der opstår i systemet, skulle  håndteres med det samme. 
+Vi vil i dette kapitel beskrive Real-time systemer, der står for \sched ning i realtid samt  hvordan \sched eren kan planlægge processerne så vi sikre processer kan køre rettidigt baseret på deres prioritet og deadline.
 
-En Real-time planlægger(RTP) kan være relevant i multiprogrammering hvis der findes flere processer der ønsker at udføre deres arbejde samtidigt og hvor succes afhænger af timingen af hvilke processer der udføres hvornår. Til at beskrive denne afhængighed af timing er der i de fleste RTP tilknyttet en deadline til processerne.
+I den nuværende \csp er alle processer lige, hvilket giver den bedste udnyttelsen af systemet. Det er dog ikke altid hensigtmæssigt kun at maksimere den globale ydelse.\fxnote*{Bedre forumulering}{Eksempelvis vil programmer der skal håndtere GUI, og bruger input ønske  at grænsefladen altid  reagere selv under høj belastning.} Alternativt kan fejl der opstår i systemet, skulle håndteres med det samme. 
 
-Indefor RTP findes der flere underkategorier som alle har tilknyttet en deadline men varrierer i hvordan denne deadline skal fortolkes. Man kan illustret de forskellige RTP kategorier med time-value funktioner. Her repræsentererer ``værdien'' det fremskridt den enkelte process bidrager med til det endelige mål for programmet.
+En Real-time planlægger (RTP) kan derfor være relevant og bruges allerede i  indlejerede systemer til f.eks medicinsk udstyr men bruges også i f.eks kontrol af luftrummet,  processkontrol samt på rumstationen ISS\cite{Audsley1990}. Det er  relevant  hvis der findes flere processer der ønsker at udføre deres arbejde samtidigt og hvor programmets succes afhænger af timingen for hvornår processerne udføres. Til at beskrive denne timing er der i de fleste RTP tilknyttet en deadline til processerne.
 
-I \vref{fig:hard-rt} vises en ```hard RTP''(HRTP). Her tilføres der værdi til programmet hvis processen afsluttes mellem dens start tidspunkt og dens deadline. Hvis processen først er færdig efter den deadline har den ingen værdi. Et ````soft RTP'''(SRTP) vises i \vref{fig_soft-rt}. Her er værdien der tilføjes den samme som i HRTP indtil deadline, mens hvis deadlinen overskrides mindskes værdien en process tilføjer omvendt propotionalt med overskridelsen. Et ``safty critical system''
+Indefor RTP findes der flere underkategorier som alle har tilknyttet en deadline, men varrierer i hvordan denne deadline skal fortolkes. Man kan illustret de forskellige kategorier med time-value funktioner. Her repræsentererer ``værdien'' det fremskridt den enkelte proces bidrager med til det endelige mål for programmet.
+
+I \vref{fig:hard-dl} vises en hard deadline for en process. Her tilføres der en positiv værdi til programmet hvis processen afsluttes mellem dens starttidspunkt og dens deadline. Hvis processen først er færdig efter deadline har den ingen værdi. En soft deadline (\vref{fig:soft-dl}) tilføjer den samme værdi som en hard deadline hvis procesessen bliver færdig rettidigt. Hvis deadlinen overskrides mindskes værdien den proces tilføjer, omvendt propotionalt med overskridelsen. Ved en hard deadline er der ikke tilknyttet en egentligt straf hvis en proces ikke overholde sin deadline. Dette er derimod tilfældet i \vref{fig:hard-rtp}, der viser en proces der tilføjer negativ værdi ved overtrædelse af en deadline. Hvis den tilknyttede straf for ikke at overholde en deadline er større end en hvad programmet maksimalt kan opnå ved at overholde alle deadlines kaldes det et ``hard real-time system''\cite{Laprie1989}.
+
+Generelt vil der i et real-time system ikke være alle processer der har den samme type af deadline. Nogle processer har ingen deadline, nogle har en soft deadline, og få har en hard deadline. For RTP skal  kørslen  planlægges så processerne har den maksimale udnyttelse af tilgængelige ressourcer samtidigt med at alle deadlines overholdes.
+
+\section{Beskrivelse/teori}
+De fleste eksisterende real-time systemer arbejder på isolerede systemer, hvor planlæggeren har fuld kontrol over hele computeren. Derfor er hovedparten af forskningen indefor det praktiske område gået til udarbejdelsen af specialisere kerner og totale operativsystemer\cite{damm1989real, jones1979staros, levi1989maruti,ramamritham14scheduling}. Vi ønsker i modsætning hertil ikke at udvikle en specialiseret kerne, men lade \sched en i \pycsp kunne planlægge processer efter bedste evne baseret på informationer den har om processerne.
+
+For real-time systemer kan processerne enten planlægges statisk eller dynamisk\cite{cheng1987scheduling}. I statisk er alle processer er kendt på forhånd. Planlæggeren kan i dette tilfælde allerede inden start udregne om det er muligt at overholde alle deadlines. Alternativt planlægges processerne dynamisk hvis der  løbende kan ankomme nye  processer der skal planlægges. I real time systemer er næsten alle processer cykliske, med enten en regelmæssig eller tilfældigt periode. Periodiske processer kan være målinger der skal være foretaget med regemæssige intervaller, mens aperiodiske processer kan forekomme som reaktion på udefra kommende begivenheder, eller være fejl, der hurtigt skal håndteres inden systemet kan fortsætte.
+Til planlægningen har planlæggeren behov for at vide hvor lang tid det vil tage at udføre en given proces per periode, men da dette tal enten ikke kan kendt eller fast for hver periode bruges der ofte estimater. Dette medfører at en aperiodisk proces kan ankomme på et vilkårligt tidspunkt og da planlæggeren kun har et estimat for tidsforbruget kan man  ikke tilknytte en ``hard deadline'' til aperiodiske processer da der altid findes en kæde af aperiodiske processer der medføre en overskridelse af en deadline. I \pycsp kan der til alle tidspunkter tilføjes nye processer, og derfor vil vi kun beskæftige os med en dynamisk \sched. Desuden har man ikke med \pycsp fuld kontrol over hele operativsystemet. Mængden af processerkraft vi har til rådighed til kørsel af processerne vil derfor varriere uafhængigt af \pycsp, hvorfor vi heller ikke kan lave et pålidelig ``hard real-time system'', men fokusere på et ``soft real-time system''.
+
+\subsection{Forskellige \sched e}
+Vi vil i dette afsnit fokusere på \sched e i et ``soft real time'' system,   hvor processer ankommer dynamisk og diskutere fordele og ulemper ved dem.
+To af de mest kendte \sched e til brug i real-time systemer er ``Rate monotonic algorithm''\cite{lehoczky1989rate,liu1973scheduling} og ``Earliest deadline first''\cite{liu1973scheduling}
 
 
-
-RTP er normalt brugt i systemer til indlejerede systemer f.eks i medicinsk udstyr men bruges også i f.eks kontrol af luftrummet,  processkontrol samt på rumstationen ISS\cite{Audsley1990}.
-
-  \section{Beskrivelse/teori}
-  
   \section{Eksempel}
   \section{Design og implementation}
   \section{Evaluering}

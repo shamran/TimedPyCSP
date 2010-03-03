@@ -27,6 +27,17 @@ article
 \checkandfixthelayout % laver forskellige beregninger og sætter de
 % almindelige længder op
 
+%-------definitions-----
+\newcommand{\Author}{Simon Christiano Bognolo og Rasmus Ebdrup Sørensen} 
+\newcommand{\Title}{Timed PyCSP}
+\newcommand{\Subject}{Introducing discrete event simulation and real time scheduling in PyCSP}
+\newcommand{\Keywords}{Priority, Deadlines, Real-time, Discrete events, Scheduling}
+%-----------------------
+
+
+\title{\Title}
+\author{\Author}
+
 
 \setsecnumdepth{subsection} % Hvor dybt man nu ønsker at vi har
 \maxsecnumdepth{subsection}% overskrifterne nummereret
@@ -59,11 +70,25 @@ article
 %har vi ord der bliver delt forkert kan de indsættes i hyphernation med bindestreg alle steder hvor ordet kan deles
 \hyphenation{tit-len mo-del-len pro-du-ce-rer an-svars-hav-ende om-for-deles for-bind-elses-mulig-heder ska-ber æn-dring-er net-værks-en-hed-er peer backup backup-system fast-track backup-systemer nabo-peers frame-work efter-som Grund-lag-et plads-effek-tivi-teten audits}
 
+
 \usepackage{nameref}
 \usepackage[danish]{varioref} % smarte krydsreferencer via \vref
 \usepackage{color}
 \definecolor{darkblue}{rgb}{0,0.1,0.5}
-\usepackage[colorlinks, linkcolor=darkblue, citecolor=darkblue,urlcolor=darkblue]{hyperref}
+\usepackage[colorlinks%
+           ,linkcolor=darkblue%
+           ,citecolor=darkblue%
+           ,urlcolor=darkblue%
+           ,pdfusetitle%
+           ,pdfstartview=FitBH%fit width of page to the window
+           ]{hyperref}%
+
+\hypersetup{%
+  pdfauthor={\Author},%
+  pdftitle={\Title},%
+  pdfsubject={\Subject},%  
+  pdfkeywords={\Keywords},%  
+}%
 %giver mulighed for at hoppe i pdf'filen via referencerne.
 %hyperref er ustabil med varieof,
 %og skal udkommenteres hvis der opstår problemer.
