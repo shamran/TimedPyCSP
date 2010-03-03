@@ -7,16 +7,11 @@
 Vi vil i dette kapitel gennemgå hvad computersimuleringer kan bruges til, med fokus på discrete event simulation (\des). Indenfor \des vil vi redegøre for hvilke problemstillinger vi skal tage højde for, for at kunne implementere en \des tidsmodel i \pycsp. 
 
 Simuleringer har længe været et værdifuldt værktøj til at klarlægge hvordan et system fungerer og er specielt brugbart til at repræsentere systemer hvis 
-tilstand ændres over tid, eller såfremt der er interaktion mellem flere systemer. Tabel \ref{tab:simulation_examples} viser domæner hvor simulering ofte bruges som løsningsmodel. 
-
-DES bruges meget i forbindelse med BI hvor erhvervsfolk f.eks ønsker at få klarlagt hvordan produktionen ser ud på en fabrik. Det kan også bruges i forskningsverdenen til komplekse repræsentationer af kemiske eller fysiske processer der ændrer sig over tid. 
-Generelt bruges simuleringer til at forudse hvor hvordan en eventuel ændring af systemet vil påvirke systemet som helhed. Dette vil typisk også kunne opnås med en matematisk model over systemet, men denne vil være væsentlig mere kompleks og sværere at overskue. 
-
-find reference der snakker om matematisk model vs simulering. 
-
+tilstand ændres over tid, eller såfremt der er interaktion mellem flere systemer. Typiske områder hvor simulering bruges ofte, fremgår af tabel \ref{tab:simulation_examples}. 
 
 \begin{table}[ht]
-	\begin{tabularx}{\textwidth}{|p{15pt}Xp{15pt}|p{15pt}Xp{15pt}|}
+  \begin{otherlanguage}{english} 	
+  \begin{tabularx}{\textwidth}{|p{15pt}Xp{15pt}|p{15pt}Xp{15pt}|}
   \hline  
   &&&&&\\
   \multicolumn{3}{|c|}{\textbf{General Situation}}&\multicolumn{3}{c|}{\textbf{Examples}} \\
@@ -33,13 +28,35 @@ find reference der snakker om matematisk model vs simulering.
   & \vspace{5pt}Mathematical modeling has no practical analytical or numeric solution.\vspace{5pt} & & & \vspace{5pt}Stochastic Problems, Nonlinear Differential Equations\vspace{5pt} & \\
   \hline	
   \end{tabularx}
-	\caption{Anvendelsesområder for simuleringer. Tabellen er kopieret fra \cite[10]{Mchaney2009}}
+  \end{otherlanguage}	
+  \caption{Anvendelsesområder for simuleringer. Tabellen er kopieret fra \cite[10]{Mchaney2009}}
 	\label{tab:simulation_examples}
 \end{table}
 
 
+Indenfor simulering ønsker vi at fokusere på \des. Det der adskiller \des fra andre simuleringsmodeller, er hvorledes tid opfattes. I \des anskues tid som \kv{diskrete tidsskridt}, som er uden kobling til realtid. I disse tidsskridt udføres en eller flere begivenheder, som hver især ændrer på systemets tilstand. Når alle begivenheder for et tidsskridt er udført, kan tiden tælles op, og begivenheder for det nye tidsskridt kan udføres. Der kan være fastlagt et vilkårligt antal begivenheder til et tidsskridt, og hver begivenhed kan variere vilkårligt, ifht., hvor langt tid den tager at udføre i realtid. Dermed er der ikke nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan variere vilkårligt i realtid. Begivenhederne, der skal udføres af systemet, kan enten være givet på forhånd eller blive skemaplanlagt dynamisk under afviklingen af andre begivenheder. 
+Afhængig af hvad der simuleres, kan man udtrække relevant information om systemet f.eks. gennemsnitlig behandlingstid for elementer, længden af køer i systemet og den samlede aktivitetstid for hvert delelement i systemet.
 
-\input{des/theory}
+For at kunne konstruere en \des skal vi have følgende til rådighed: \pdfcomment{Hvorfor er dette ikke først i afsnit 2.1}
+\begin{enumerate}
+\tightlist 
+\item En repræsentation af tid til at styre, hvornår vi skifter tidsskridt.
+\item En liste over begivenheder, der skal udføres i hvert tidsskridt.
+\item Mulighed for at opsamle statistisk data fra simulationen. 
+\end{enumerate}
+En repræsentation af diskret tid skal kunne udtrykke den aktuelle tid, \ikkef{endelig fremtidig tid} og gerne kunne foretage en variabel fremskrivning af tiden. Eksempelvis kan man forestille sig, at der \ikkef{i tiden $t_{0}$ planlægges en begivenhed til tiden $t_{3}$}. Såfremt der ikke er planlagt andre begivenheder, er det her en fordel at kunne springe over $t_{1}$ og $t_{2}$ og fremskrive tiden direkte til $t_{3}$. \pdfcomment{Dette er om 1, men der står intet skrevet om 2 og 3}
+
+Begivenhederne der skal udføres kan planlægges dynamisk under kørselen, hvilket stiller krav til repræsentationen af listen. Det skal være muligt at indsætte nye begivenheder vilkårlige steder i listen, eller alternativt vælge...
+
+
+
+%DES bruges meget i forbindelse med BI hvor erhvervsfolk f.eks ønsker at få klarlagt hvordan produktionen ser ud på en fabrik. Det kan også bruges i forskningsverdenen til komplekse repræsentationer af kemiske eller fysiske processer der ændrer sig over tid. 
+%Generelt bruges simuleringer til at forudse hvor hvordan en eventuel ændring af systemet vil påvirke systemet som helhed. Dette vil typisk også kunne opnås med en matematisk model over systemet, men denne vil være væsentlig mere kompleks og sværere at overskue. 
+
+%find reference der snakker om matematisk model vs simulering. 
+
+
+%\input{des/theory}
 \input{des/examples}
 \input{des/des-implementation} 
 \input{des/evaluation}
