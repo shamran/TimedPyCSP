@@ -21,13 +21,12 @@
 
 
 
-\begin{shaded}
-I \csp har vi garanti for at de eneste afhængigheder mellem processer vil være kommunikation. I \des har vi ud over kommunikation også en afhængighed af at synkronisere tiden mellem processerne. 
+%I \csp har vi garanti for at de eneste afhængigheder mellem processer vil være kommunikation. I \des har vi ud over kommunikation også en afhængighed af at synkronisere tiden mellem processerne. 
 
-En simulering løber begivenhederne kronologisk igennem til der enten ikke er flere begivenheder eller som det oftere er tilfældet til simuleringen når et forud defineret tidspunkt.
-
+%En simulering løber begivenhederne kronologisk igennem til der enten ikke er flere begivenheder eller som det oftere er tilfældet til simuleringen når et forud defineret tidspunkt.
+\subsubsection{PDES}
 \fxnote*[inline,nomargin]{Brian: ok brug af parallelitet}{Alternativet til  \des  er \pdes hvor tiden i processerne kan løbe uafhængigt af hinanden. Dette introducerer muligheden for større parallitet, men samtidigt risikerer processerne ved kommunikation at modtage beskeder fra fortiden, som der skal tages hånd om, f.eks. ved at rulle tiden tilbage. \pdes har ikke vundet stort indpas i den videnskabelig verden som man kan se af \cref{tab:des}, en grund til dette er at når tiden kan køre parallelt vil de deraf følgende omkostningerne resultere i lavere hastighed end ved at holde tiden synkront på tværs af processerne.}
-\end{shaded}
+
 \begin{table}[ht]
 	\centering
 	\begin{tabular}{lrr}
@@ -43,18 +42,18 @@ En simulering løber begivenhederne kronologisk igennem til der enten ikke er fl
 	\caption{Publisering af artikler if. google scholar ved søgning på hhv. ''\des'' og ''parallel \des''}
 	\label{tab:des}
 \end{table}
-\subsection*{Noter til afsnittet}
-\begin{itemize}
-\tightlist
-	\item stokastisk varians i relation til M/M/1
-	\item Hvad bruges DES til? styrker/svagheder?
-	\item Henvis til DE-simulation.ps
-  \item Eksempel på problemer som løses med des
-  \item model vs. simulering
-\end{itemize}
+%\subsection*{Noter til afsnittet}
+%\begin{itemize}
+%\tightlist
+%	\item stokastisk varians i relation til M/M/1
+%	\item Hvad bruges DES til? styrker/svagheder?
+%	\item Henvis til DE-simulation.ps
+%  \item Eksempel på problemer som løses med des
+%  \item model vs. simulering
+%\end{itemize}
 
 
-\subsection{Barrierer} \label{sec:barrierer}
+\subsubsection{Barrierer} \label{sec:barrierer}
 %\inline{Hele afsnittet skal skrives om for at få det generelle samlet i starten, og vores specifikke efterfølgende. Evt. have mindre om vores implementation}
 
 I \des findes en \fxnote*{skal defineres?}{global tid} og alle processerne skal derfor have en fælles tid, der tæller op 
@@ -123,7 +122,7 @@ Introduktionen af barrierer og kald til disse virker derfor kunstig i \csp.
 Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun  lokalt data. Hvis der er data er delt pga. arkitekturen \csp er implementeret på, bør dette abstraheres væk men udnyttes internt i kanalerne. At introducere hjælpemidler for styre delt data, er derfor at tilskynde til en forkert brug af \csp. Tiden er den anden begrundelse for at benytte barrierer.
 Men barrierer giver kun en  primitiv model for tid, og vi vil vise at med brugen af en \des får man et stærkere værktøj, der blandt meget andet også kan erstatte brugen af barrierer.
 
-\subsection{Timeout} 
+\subsubsection{Timeout} 
 I den eksisterende \pycsp findes der som nævnt i \autoref{sec:csp} en \code{alternation}, hvor brugeren har mulighed for at tilknytte to specielle guards. Den ene er en SKIP-guard, der giver mulighed for at kommunikere, hvis kanalen er klar og ellers fortsætte uden at kommunikere. Den anden er timeout-guarden, der udvider SKIP-guarden så man venter på kommunikation i en given periode hvorefter man tager SKIP-guarden. 
 Når \des indføres, ændres tiden, \ikkef{så timeout-guarden opererer på tidsskridt fremfor en tidsperiode}. Dette medfører, at en proces kan ønske at kommunikere i indeværende tidsskridt, men ikke i det efterfølgende.
 Vi kan dog ikke i tidsskridtet evaluere om kommunikation er muligt. Dette skyldes, at tiden står stille mens processerne er aktive, så selvom kommunikation ikke er muligt på et tidspunkt i tidsskridtet, så kan en efterfølgende begivenhed i samme tidsskridt muliggøre kommunikation.
