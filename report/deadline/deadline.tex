@@ -61,10 +61,14 @@ Som alternativ til den statiske \sched, hvor man ikke kan ændre prioriten af pr
 Udnyttelsen af processorkraft kan i ED komme op på 100\%, da alle processer bliver planlagt løbende i modsætning til RM der foretager et valg om en given proces kan planlægges.  Ulempen ved ED er den ikke er stabil i det vi ikke har kontrol over hvilke processers deadline der bliver overskredet. Dette er specielt et problem hvis man har en en uhomogen samling processer hvor en mindre del er kritiske.
 
 \subsection{Blokkerede processer}
-I den teoretiske tilgang til RTP antages det ofter at processerne er periodiske, har en fast eksekverings tid per periode og er uafhængig af andre processer, og køres i et isoleret miljø. Dette er en højst idealiseret verden og introduktionen af RTP til PyCSP vil processerne ikke overholde et enste af disse antagelser. 
-Vi vil nu beskrive problemerne ved at processerne er afhængige af hinanden samt 
+I den teoretiske tilgang til RTP antages det ofter at processerne er periodiske, har en fast eksekverings tid per periode og er uafhængig af andre processer, og køres i et isoleret miljø. De forskellige tilgange til RTP fokusere på hvordan man kan overvinde de enkelte antagelser ved isoleret og ophæve en af begrænsningerne.
 
+Dette er en højst idealiseret verden og i en introduktion af RTP i PyCSP vil processerne ikke overholde et eneste af disse antagelser. 
+I \pycsp bruges rendezvous til at blokerer kommunikerende  processer.
 
+Vi vil nu beskrive problemerne ved at processerne er afhængige af hinanden, og kan blokere hinanden, således at en proces med høj prioritet venter på processer med lavere prioritet. Forestil dig i \pycsp tre processer ($P_0,P_1,P_2$)med prioriteterne $Pr_0>Pr_1>Pr_2$. Først udvælges $P_0$ da denne har højst prioritet, men stopper da den skal kommunikere med $P_2$. Den næste proces der udvælges vil være $P_1$, og dermed bliver $P_0$ unødigt forsinket mens $P_1$ kører. Dette kaldes priority inversion\cite{sha1990priority}.
+
+Der findes overordnet set to metoder til at løse problemet med priority inversion. Enten kan man ungå at blokerer processer, eller man kan benytte priority inherience\cite{sha1990priority}. Med \pycsp kan man ikke ungå at processer kommunikere, og dermed vil kunne blokere hvorfor priority inherience er den enste farbare vej hvis man skal sikre optimal planlægning.
 
   \section{Eksempel}
   \section{Design og implementation}
