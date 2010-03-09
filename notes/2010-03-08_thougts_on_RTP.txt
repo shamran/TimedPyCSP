@@ -1,0 +1,18 @@
+Hvilke egenskaber skal vi have tilknyttet en process.
+
+
+Baseret på hvilke egenskaber skal en process udvælges.
+
+Hvordan med timeouts og processer i timers listen?
+ = Vi skal have en seperat proces der holder styr på processer i timers listen og når de overskrider deres timeout skal de indgå i den fælles liste af processer, så de ikke uretfærdigt kommer foran i køen.
+
+Hvordan skal hhv new og next processeres?
+
+
+
+
+Kan vi tage alle processer der kan køres og samle i en maxheap sorteret internal priority. 
+Så skal vi have en funktion til at ændre denne.
+
+
+
