@@ -123,6 +123,7 @@ Barrierens berettigelse er derfor for at kunne introducere tid, samt for at kunn
 Men barrierer giver kun en  primitiv model for tid, og vi vil vise at med brugen af en \des får man et stærkere værktøj, der blandt meget andet også kan erstatte brugen af barrierer.
 
 \subsubsection{Timeout} 
+\fxnote{Lave figurer eller eksempler til dette afsnit}
 I den eksisterende \pycsp findes der som nævnt i \autoref{sec:csp} en \code{alternation}, hvor brugeren har mulighed for at tilknytte to specielle guards. Den ene er en SKIP-guard, der giver mulighed for at kommunikere, hvis kanalen er klar og ellers fortsætte uden at kommunikere. Den anden er timeout-guarden, der udvider SKIP-guarden så man venter på kommunikation i en given periode hvorefter man tager SKIP-guarden. 
 Når \des indføres, ændres tiden, \ikkef{så timeout-guarden opererer på tidsskridt fremfor en tidsperiode}. Dette medfører, at en proces kan ønske at kommunikere i indeværende tidsskridt, men ikke i det efterfølgende.
 Vi kan dog ikke i tidsskridtet evaluere om kommunikation er muligt. Dette skyldes, at tiden står stille mens processerne er aktive, så selvom kommunikation ikke er muligt på et tidspunkt i tidsskridtet, så kan en efterfølgende begivenhed i samme tidsskridt muliggøre kommunikation.

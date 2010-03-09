@@ -37,7 +37,7 @@ tilstand ændres over tid, eller såfremt der er interaktion mellem flere system
 Indenfor simulering ønsker vi at fokusere på \des. Det der adskiller \des fra andre simuleringsmodeller, er hvorledes tid opfattes. I \des anskues tid som \kv{diskrete tidsskridt}, som er uden kobling til realtid. I disse tidsskridt udføres en eller flere begivenheder, som hver især ændrer på systemets tilstand. Når alle begivenheder for et tidsskridt er udført, kan tiden tælles op, og begivenheder for det nye tidsskridt kan udføres. Der kan være fastlagt et vilkårligt antal begivenheder til et tidsskridt, og hver begivenhed kan variere vilkårligt, ifht., hvor langt tid den tager at udføre i realtid. Dermed er der ikke nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan variere vilkårligt i realtid. Begivenhederne, der skal udføres af systemet, kan enten være givet på forhånd eller blive skemaplanlagt dynamisk under afviklingen af andre begivenheder. 
 Afhængig af hvad der simuleres, kan man udtrække relevant information om systemet f.eks. gennemsnitlig behandlingstid for elementer, længden af køer i systemet og den samlede aktivitetstid for hvert delelement i systemet.
 
-For at kunne konstruere en \des skal vi have følgende til rådighed: \pdfcomment{Hvorfor er dette ikke først i afsnit 2.1}
+For at kunne konstruere en \des skal vi have følgende til rådighed:
 \begin{enumerate}
 \tightlist 
 \item En repræsentation af tid til at styre, hvornår vi skifter tidsskridt.
