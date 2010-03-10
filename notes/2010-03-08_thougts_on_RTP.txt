@@ -8,11 +8,24 @@ Hvordan med timeouts og processer i timers listen?
 
 Hvordan skal hhv new og next processeres?
 
-
-
-
 Kan vi tage alle processer der kan køres og samle i en maxheap sorteret internal priority. 
 Så skal vi have en funktion til at ændre denne.
+
+
+der fdindes som std. kun min heaps
+
+For RTP vi skal ikke have to forskellige køer da det virker kontraintuitivt. Derfor benyttes kun next.
+
+ next bliver en min-heap.
+
+For Deadline scheduling bliver deadline dens prioritet. såedes at den med mindst deadline kommer først.
+
+
+
+
+
+Kan vi ikke bruge grisseudskæring til et RTP eksempel? 
+
 
 
 
