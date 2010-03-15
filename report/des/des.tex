@@ -1,19 +1,59 @@
 \chapter{Simulering i diskret tid}
-\inline{sammenligning af simulation vs. modellering.\\
-  simulering er en implementation af modellen.\\
-  styrke er samspillet mellem flere elementer/modeller.\\
-  simulering - dynamisk - tid (time/space).} 
+%\inline{sammenligning af simulation vs. modellering.\\
+%  simulering er en implementation af modellen.\\
+%  styrke er samspillet mellem flere elementer/modeller.\\
+%  simulering - dynamisk - tid (time/space).} 
+%\pdfcomment{Hvad skal der foregå i dette kapitel? Hvorfor? og evt. hvordan?}
+Vi vil i dette kapitel gennemgå hvad computersimuleringer kan bruges til, med fokus på discrete event simulation (\des). Indenfor \des vil vi redegøre for hvilke problemstillinger vi skal tage højde for, for at kunne implementere en \des tidsmodel i \pycsp. 
 
-Simuleringer har længe været et værdifuldt værktøj til at klarlægge hvordan et 
-system fungerer og er specielt brugbart til at repræsentere systemer hvis 
-tilstand ændres over tid, eller såfremt der er interaktion mellem flere systemer.
+Simuleringer har længe været et værdifuldt værktøj til at klarlægge hvordan et system fungerer og er specielt brugbart til at repræsentere systemer hvis 
+tilstand ændres over tid, eller såfremt der er interaktion mellem flere systemer. Typiske områder hvor simulering bruges ofte, fremgår af tabel \ref{tab:simulation_examples}. 
 
-DES bruges meget i forbindelse med BI hvor erhvervsfolk f.eks ønsker at få klarlagt hvordan produktionen ser ud på en fabrik. Det kan også bruges i forskningsverdenen til komplekse repræsentationer af kemiske eller fysiske processer der ændrer sig over tid. 
-Generelt bruges simuleringer til at forudse hvor hvordan en eventuel ændring af systemet vil påvirke systemet som helhed. Dette vil typisk også kunne opnås med en matematisk model over systemet, men denne vil være væsentlig mere kompleks og sværere at overskue. 
+\begin{table}[ht]
+  \begin{otherlanguage}{english} 	
+  \begin{tabularx}{\textwidth}{|p{15pt}Xp{15pt}|p{15pt}Xp{15pt}|}
+  \hline  
+  &&&&&\\
+  \multicolumn{3}{|c|}{\textbf{General Situation}}&\multicolumn{3}{c|}{\textbf{Examples}} \\
+  &&&&&\\  
+  \hline
+  & \vspace{5pt}Real system does not yet exist and building a prototype is cost prohibitive, time-consuming or hazardous. \vspace{5pt}& & & \vspace{5pt}Aircraft, Production System, Nuclear Reactor \vspace{5pt}& \\
+  \hline  
+  & \vspace{5pt}System is impossible to build.\vspace{5pt} & & & \vspace{3pt}National Economy, Biological System\vspace{5pt} &\\
+  \hline
+  & \vspace{5pt}Real system exists but experimentation is too expensive, hazardous or disruptive to conduct.\vspace{5pt} & & & \vspace{5pt}Proposed Changes to a Materials Handling System, Military Unit, Transportation System, Airport Baggage Handling System\vspace{5pt} & \\
+  \hline
+  & \vspace{5pt}Forecasting is required to analyze long time periods in a compressed format.\vspace{5pt} & & & \vspace{5pt}Population Growth, Forest Fire Spread, Urbanization Studies, Pandemic Flu Spread \vspace{5pt}&\\
+  \hline
+  & \vspace{5pt}Mathematical modeling has no practical analytical or numeric solution.\vspace{5pt} & & & \vspace{5pt}Stochastic Problems, Nonlinear Differential Equations\vspace{5pt} & \\
+  \hline	
+  \end{tabularx}
+  \end{otherlanguage}	
+  \caption{Anvendelsesområder for simuleringer. Tabellen er kopieret fra \cite[10]{Mchaney2009}}
+	\label{tab:simulation_examples}
+\end{table}
 
-find reference der snakker om matematisk model vs simulering. 
 
-Kopier tabel fra book\_understanding
+Indenfor simulering ønsker vi at fokusere på \des. Det der adskiller \des fra andre simuleringsmodeller, er hvorledes tid opfattes. I \des anskues tid som diskrete tidsskridt, som er uden kobling til realtid. I disse tidsskridt udføres en eller flere begivenheder, som hver især ændrer på systemets tilstand. Når alle begivenheder for et tidsskridt er udført, kan tiden tælles op, og begivenheder for det nye tidsskridt kan udføres. Der kan være fastlagt et vilkårligt antal begivenheder til et tidsskridt, og hver begivenhed kan variere vilkårligt, ifht., hvor langt tid den tager at udføre i realtid. Dermed er der ikke nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan variere vilkårligt i realtid. Begivenhederne, der skal udføres af systemet, kan enten være givet på forhånd eller blive skemaplanlagt dynamisk under afviklingen af andre begivenheder. 
+Afhængig af hvad der simuleres, kan man udtrække relevant information om systemet f.eks. gennemsnitlig behandlingstid for elementer, længden af køer i systemet og den samlede aktivitetstid for hvert delelement i systemet.
+For at kunne konstruere en \des skal vi have følgende til rådighed:
+\begin{enumerate}
+\tightlist 
+\item En repræsentation af tid til at styre, hvornår vi skifter tidsskridt.
+\item En liste over begivenheder, der skal udføres i hvert tidsskridt.
+\item Mulighed for at opsamle statistisk data fra simulationen. 
+\end{enumerate}
+En repræsentation af diskret tid skal kunne udtrykke den aktuelle tid, endelig fremtidig tid og gerne kunne foretage en variabel fremskrivning af tiden. Eksempelvis kan man forestille sig, at der \ikkef{i tiden $t_{0}$ planlægges en begivenhed til tiden $t_{3}$}. Såfremt der ikke er planlagt andre begivenheder, er det her en fordel at kunne springe over $t_{1}$ og $t_{2}$ og fremskrive tiden direkte til $t_{3}$. \\
+Listen over begivenhederne der skal udføres, skal repræsenteres så vi dels kan bestemme den næste begivenhed der skal udføres, dels have mulighed for indsættelse af nye begivenheder i listen. \\
+Hvilke informationer der er interessante at lave statistik over vil være meget afhængig af den enkelte applikation. Opsamlingen bør derfor foretages i den enkelte udviklede simulering, og ikke i vores simuleringssprog. Vi skal muliggøre opsamlingen med nogle værktøjer som udviklere kan benytte. Disse værktøjer skal være generiske således de kan bruges på tværs af simuleringsdomæner. 
+
+
+
+
+%DES bruges meget i forbindelse med BI hvor erhvervsfolk f.eks ønsker at få klarlagt hvordan produktionen ser ud på en fabrik. Det kan også bruges i forskningsverdenen til komplekse repræsentationer af kemiske eller fysiske processer der ændrer sig over tid. 
+%Generelt bruges simuleringer til at forudse hvor hvordan en eventuel ændring af systemet vil påvirke systemet som helhed. Dette vil typisk også kunne opnås med en matematisk model over systemet, men denne vil være væsentlig mere kompleks og sværere at overskue. 
+
+%find reference der snakker om matematisk model vs simulering. 
 
 
 \input{des/theory}
