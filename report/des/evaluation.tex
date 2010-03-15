@@ -139,6 +139,7 @@ def generate(self,number,meanTBA,resource):
 \end{lstlisting}
 
 En sammenligning af generatorfunktionen i \simpy med generatorprocessen i \emph{simulations}"-versionen viser ikke den store forskel. I \simpy aktiverer man kunden direkte, mens man i \emph{simulations}"-versionen sender kunden over en kanal. Der findes derimod en større forskel på de to implementeringer i kundedelen. Dette skyldes at i \emph{simulations}"-versionen findes der en bankproces, som er delt på tværs af alle kunder, mens man i \simpy har en kundefunktion der er unik for hver kunde. Denne forskel medvirker til at bankprocessen skal vedligeholde afgangstiden for samtlige kunder der findes i banken  hvilket kræver mere kode. Dette er implementeret i  \cref{fig:sim:bank} på linjerne 46-53 med en \code{alternation}. Her afventer processen hele tide på enten at modtage en ny kunde, eller på at en kunden ønsker at forlade banken.
+
 \begin{lstlisting}[firstnumber=39,float=hbtp, label=fig:sim:bank, caption= Uddrag af bank processen i simulation]
     while True:
       msg = customerREADER()
