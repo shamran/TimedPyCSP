@@ -9,6 +9,7 @@ Efter i \cref{sec:csp} at have valgt at udvide \emph{greenlets}"-versionen skal 
 Isolationen mellem de to versioner skal opnås via nedarvning, således at det fra en brugers synsvinkel ser ud til at vores version er fuldstændigt sepereret fra \emph{greenlets}"-versionen.
 
 Hvert af de tre versioner har sin egen mappe i \pycsp og i hver af disse findes en tilhørende \code{\_\_init\_\_.py} fil, der fungerer som et manifest for den givne version. Vi opretter vores egen version kaldet \emph{simulation}, og opretter en tilhørende mappe på samme niveau som de andre versioner og med sin egen manifestfil. Manifestfilen kan nu bruges til at udvælge de funktioner der skal tages direkte fra \emph{greenlets}-versionen og hvilke funktioner der skal udvides og som derfor vil ligge i den nye mappe.
+
 \begin{lstlisting}[float=hbtp,label=fig:init,caption=Uddrag af \code{\_\_init\_\_.py} for simulationsversionen.]
 from guard import Timeout, Skip
 from pycsp.greenlets.alternation import choice
