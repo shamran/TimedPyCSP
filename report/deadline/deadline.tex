@@ -7,6 +7,7 @@ RTP benyttes meget i specialiserede indlejrede systemer til f.eks medicinsk udst
 Indenfor RTP er der som udgangspunkt to kategorier af deadlines, henholdsvis soft og hard deadlines. Forskellen ligger i hvordan en deadline fortolkes, specielt med henblik på hvad der sker hvis en deadline overskrides. Hvis en soft deadline overskrides kan en færdiggørelse af begivenheden stadig bidrage med en positiv værdi til systemet, dog mindre end hvis deadlinen var blevet overholdt. Udførelse af begivenheder der har overskredet en hard deadline vil derimod ikke kunne bidrage positivt til systemet. For begge kategorier gælder det at en overskridelse af deadline i yderste konsekvens kan bidrage negativt til systemet. Nedenfor er gennemgået forskellige typer deadlines illustreret med time-value funktioner. Værdien er den enkelte begivenheds bidrag til programmets endelige mål. 
 
 I \cref{fig:hard-dl} vises en hard deadline for en begivenhed. 
+
 \begin{figure}
  \begin{center}
   \includegraphics[scale=0.75]{images/hard-deadline}
@@ -49,7 +50,7 @@ Vi vil i dette afsnit fokusere på skemaplanlægning i et ``soft real time'' sys
 To af de mest kendte \sched e til brug i real-time systemer er ``Rate monotonic algorithm''\cite{lehoczky1989rate,liu1973scheduling} og ``Earliest deadline first''\cite{liu1973scheduling}.
 
 
-Hvor processer isoleret set har behov for at udføre deres opgave inden deres deadline, har \sched en behov for kvantitativt at kunne \fxnote{brugere sortere ?}{organisere} dem indbyrdes således den til hver tid kan vælge hvilken proces der næste gang skal udføres. Kernen i en  \sched ~ er derfor at gå fra en række processer med tilknyttet deadline og eventuelt andre egenskaber til en prioriteret liste 
+Hvor processer isoleret set har behov for at udføre deres opgave inden deres deadline, har \sched en behov for kvantitativt at kunne \fxnote*[inline,nomargin]{brugere sortere ?}{organisere} dem indbyrdes således den til hver tid kan vælge hvilken proces der næste gang skal udføres. Kernen i en  \sched ~ er derfor at gå fra en række processer med tilknyttet deadline og eventuelt andre egenskaber til en prioriteret liste 
 
 De klassiske algoritimer behandler alle processer som værende ligeværdige. Vi har dog tidligere vist at processer kunne reagere forskelligt på en overskridelse af deres deadline. En \sched er stabil hvis man kan definere en mindre mængde processer som kritisk, og som deadline vil bliver overholdt selv hvis alle deadlines ikke kan overholdes.
 \end{shaded}
@@ -57,12 +58,12 @@ De klassiske algoritimer behandler alle processer som værende ligeværdige. Vi 
 \subsubsection{Rate monotonic algorithm (RM)}
 RM er oprindeligt en statisk \sched, der fra start af udregner en prioritede liste på baggrund af frekvensen af processens periode, dermed vil processer der oftet skal have udført deres periode en højere prioritet, end processer med lav frekvens. RM er todelt og i første del udføres før selve simuleringen udregnes  prioriteten for processerne, og udvælger hvilke processer der kan medtages i selve udførslen. Anden del står for udvælgelsen af processer  under simuleringen, og her vælges simpelt den proces med den højeste prioritet. 
 
- Et problem for RM er at ved udvælgelsen af processer der kan medtages har man ikke en optimal udnyttelsen af processorkraf. \Citeauthor{lehoczky1989rate} er kommet frem til at ``worst-case'' er udnyttelsen i gennemsnit 88\%\cite{lehoczky1989rate}. Et større problem i relation til implementering i \pycsp er dog at RM er dog at den er statisk. Til gengæld er algoritmen stabil ved en overskridelse af deadline for en proces. 
+ Et problem for RM er at ved udvælgelsen af processer der kan medtages har man ikke en optimal udnyttelsen af processorkraf. \Citeauthor{lehoczky1989rate} er kommet frem til at ``worst-case'' er udnyttelsen i gennemsnit 88\\cite{lehoczky1989rate}. Et større problem i relation til implementering i \pycsp er dog at RM er dog at den er statisk. Til gengæld er algoritmen stabil ved en overskridelse af deadline for en proces. 
 
 \subsubsection{Earliest deadline first (EDF)}
 Som alternativ til den statiske \sched, hvor man ikke kan ændre prioriten af processen løbende gennem simuleringe, findes de dynamiske \sched er, hvor er EDF er et eksempel. Her evalueres prioriterne af processerne dynamisk igennem simuleringen og evaluere dermed løbende hvilke processer der skal udvælges. I EDF har den proces hvis deadline ligger tættest på højest prioritet og den hvis proces har længst til deadline den laveste prioritet. Aperiodiske processer kan i EDF indgå på lige fod med de periodiske da man til hvert processkift evaluere hvilken der har den nærmeste deadline, som både kan være en periodisk proces som en aperiodisk.
 
-Udnyttelsen af processorkraft kan i EDF komme op på 100\%, da alle processer bliver planlagt løbende i modsætning til RM der foretager et valg om en given proces kan planlægges.  Ulempen ved EDF er den ikke er stabil i det vi ikke har kontrol over hvilke processers deadline der bliver overskredet. Dette er specielt et problem hvis man har en en uhomogen samling processer hvor en mindre del er kritiske.
+Udnyttelsen af processorkraft kan i EDF komme op på 100\, da alle processer bliver planlagt løbende i modsætning til RM der foretager et valg om en given proces kan planlægges.  Ulempen ved EDF er den ikke er stabil i det vi ikke har kontrol over hvilke processers deadline der bliver overskredet. Dette er specielt et problem hvis man har en en uhomogen samling processer hvor en mindre del er kritiske.
 
 \subsubsection{Least Laxity(LL)}
 LL er en modifikation af EDF. LL kigger på hvor lang tid en begivenhed tager at udføre sammenholdt med hvor lang tid der er til deadline for begivenheden. Laxity er defineret som deadline minus tiden det tager for at udføre begivenheden. Laxity bliver altså et udtryk for hvor presserende det er at igangsætte en begivenhed for at den kan nå sin deadline. I LL bruges dette til at prioritere de begivenheder der har mindst laxity højest når begivenhederne planlægges. 
