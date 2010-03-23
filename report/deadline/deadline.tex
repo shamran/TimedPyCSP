@@ -4,26 +4,11 @@ Vi vil i dette kapitel beskrive Real-time planlægning (RTP), samt diskutere hvo
 RTP er baseret på den kendsgerning at nogle begivenheder i programmer kan være vigtigere at få udført end andre indenfor en afgrænset tidsperiode. Dette kan f.eks. være interrupts, input- eller output enheder eller interne processer. Med RTP tilknytter man en deadline for hver begivenhed, som bruges til at planlægge rækkefølgen for afvikling af begivenhederne. Formålet er at optimere antallet af begivenheder der når at blive udført inden deres deadline er overskredet. Normalt anses alle begivenheder for at være lige vigtige, og de planlægges ud fra en optimal udnyttelse af processoren. Denne optimale processorudnyttelse kan man være nødt til at gå på kompromis med hvis man ønsker at bruge RTP og derved prioritere visse begivenheder højere end andre. Man kan forestille sig en situation hvor man ikke starter en begivenhed med lav prioritet selv om den er klar, hvis man ved at en begivenhed med høj prioritet er klar kort tid efter, og venter derfor på at den er klar og igangsætter begivenheden med høj prioritet med det samme. 
 RTP benyttes meget i specialiserede indlejrede systemer til f.eks medicinsk udstyr, kontrol af luftrummet, på rumstationen ISS\cite{Audsley1990} og mange andre steder. Det er dog også anvendeligt i i mere gængse applikationer, typisk i forbindelse med en eller anden form for interaktion med den virkelige verden. 
 
-Indenfor RTP er der som udgangspunkt to kategorier af deadlines, henholdsvis soft og hard deadlines. Forskellen ligger i hvordan en deadline fortolkes, specielt med henblik på hvad der sker hvis en deadline overskrides. Hvis en soft deadline overskrides kan en færdiggørelse af begivenheden stadig bidrage med en positiv værdi til systemet, dog mindre end hvis deadlinen var blevet overholdt. Udførelse af begivenheder der har overskredet en hard deadline vil derimod ikke kunne bidrage positivt til systemet. For begge kategorier gælder det at en overskridelse af deadline i yderste konsekvens kan bidrage negativt til systemet. Nedenfor er gennemgået forskellige typer deadlines illustreret med time-value funktioner. Værdien er den enkelte begivenheds bidrag til programmets endelige mål. 
+I litteraturen omkring RTP bruges begreberne hard- og soft deadlines samt hard- og soft real-time systemer forskelligt, så vi vil i det følgende gennemgå hvordan vi definerer disse begreber. Vi har valgt at illustrere deadlines ved hjælp af time-value funktioner, hvor "værdien" indikerer det bidrag begivenheden bidrager med til systemets overordnede mål. 
 
-I \cref{fig:hard-dl} vises en hard deadline for en begivenhed. 
+\subsubsection{Kritisk deadline}
+En kritisk deadline er en deadline som under alle omstændigheder skal overholdes for at opretholde systemets integritet. Såfremt en kritisk deadline overskrides vil der påføres skader på systemet som kan forårsage at systemets tilstand bliver udefineret. En kritisk deadline er illusteret i \cref{fig:hard-rtp}.
 
-\begin{figure}
- \begin{center}
-  \includegraphics[scale=0.75]{images/hard-deadline}
-	\caption{Begivenhed med hard deadline.}
-	\label{fig:hard-dl}
-\end{center}
-\end{figure}
-Her tilføres der en positiv værdi til programmet hvis begivenheden afsluttes mellem dens starttidspunkt og dens deadline. Hvis begivenheden først er færdig efter deadline har den ingen værdi. En soft deadline (\cref{figure:soft-dl}) tilføjer den samme værdi som en hard deadline hvis begivenheden bliver færdig rettidigt. 
-\begin{figure}
- \begin{center}
-  \includegraphics[scale=0.75]{images/soft-deadline}
-	\caption{Begivenheden med soft deadline.}
-	\label{figure:soft-dl}
-\end{center}
-\end{figure}
-Hvis deadlinen overskrides mindskes værdien den begivenhed tilføjer, omvendt propotionalt med overskridelsen. Ved en hard deadline er der ikke tilknyttet en egentligt straf hvis en begivenhed ikke overholder sin deadline. Dette er derimod tilfældet i \cref{fig:hard-rtp}, der viser en begivenhed der tilføjer negativ værdi ved overtrædelse af en deadline. Hvis den tilknyttede straf for ikke at overholde en deadline er større end en hvad programmet maksimalt kan opnå ved at overholde alle deadlines kaldes det et ``hard real-time system''\cite{Laprie1989}.
 \begin{figure}
  \begin{center}
   \includegraphics[scale=0.75]{images/critical-deadline}
@@ -32,13 +17,49 @@ Hvis deadlinen overskrides mindskes værdien den begivenhed tilføjer, omvendt p
 \end{center}
 \end{figure}
 
-Generelt vil der i et real-time system ikke være alle begivenheder der har den samme type af deadline. Nogle begivenheder har ingen deadline, nogle har en soft deadline, og få har en hard deadline. For RTP skal kørslen planlægges så begivenhederne har den maksimale udnyttelse af tilgængelige ressourcer samtidigt med at så mange deadlines som muligt overholdes, hvor de vigtigte deadlines prioriteres højest. 
+
+\subsubsection{Hard deadline}
+Vi definerer en begivenhed til at have en hard deadline såfremt en færdiggørelse af begivenheden efter deadlinen ikke tilfører systemet nogen positiv værdi. Modsat en kritisk deadline kan en overskridelse af en hard deadline accepteres. I \cref{fig:hard-dl} vises en hard deadline for en begivenhed. 
+
+\begin{figure}
+ \begin{center}
+  \includegraphics[scale=0.75]{images/hard-deadline}
+	\caption{Begivenhed med hard deadline.}
+	\label{fig:hard-dl}
+\end{center}
+\end{figure}
+%Her tilføres der en positiv værdi til programmet hvis begivenheden afsluttes mellem dens starttidspunkt og dens deadline. Hvis begivenheden først er færdig efter deadline har den ingen værdi. En soft deadline (\cref{figure:soft-dl}) tilføjer den samme værdi som en hard deadline hvis begivenheden bliver færdig rettidigt. 
+
+\subsubsection{Soft deadline}
+Færdiggørelse af en begivenhed med en soft deadline til tiden tilføjer samme værdi til systemet som hvis den havde haft en hard deadline. Forskellen ligger i den tilførte værdi såfrem deadlinen overskrides. Hvor en hard deadline ikke tilføjer nogen værdi ved en overskridelse, vil en overskridelse af en soft deadline stadig tilføre en reduceret værdi ved færdiggørelse. Den tilførte værdi vil være omvendt proportional med længden af overskridelsen. \cref{figure:soft-dl} illustrerer en soft deadline. 
+
+\begin{figure}
+ \begin{center}
+  \includegraphics[scale=0.75]{images/soft-deadline}
+	\caption{Begivenheden med soft deadline.}
+	\label{figure:soft-dl}
+\end{center}
+\end{figure}
+
+
+%Hvis deadlinen overskrides mindskes værdien den begivenhed tilføjer, omvendt propotionalt med overskridelsen. Ved en hard deadline er der ikke tilknyttet en egentligt %straf hvis en begivenhed ikke overholder sin deadline. Dette er derimod tilfældet i \cref{fig:hard-rtp}, der viser en begivenhed der tilføjer negativ værdi ved overtrædelse af en deadline. Hvis den tilknyttede straf for ikke at overholde en deadline er større end en hvad programmet maksimalt kan opnå ved at overholde alle deadlines kaldes det et ``hard real-time system''\cite{Laprie1989}.
+
+\subsubsection{Hard real-time system}
+Et hard real-time system er defineret ved et system der har begivenheder med hard deadlines, og kan garantere at disse ikke overskrides. Ydermere skal systemet være derterministisk, så denne garanti kan gives på forhånd. 
+
+\subsubsection{Soft real-time system}
+Et soft real-time system kan indeholde alle typer deadlines men opstiller ikke nogen garantier for at de overholdes. Det vil typisk bruge en algoritme til at op- og nedprioritere hvilke deadlines der skal overholdes.\\
+\\
+
+Generelt vil der i et real-time system ikke være alle begivenheder der har den samme type af deadline. Nogle begivenheder har ingen deadline, nogle har en soft deadline, og få har en hard eller eventuelt en kritisk deadline. 
+%For RTP skal kørslen planlægges så begivenhederne har den maksimale udnyttelse af tilgængelige ressourcer samtidigt med at så mange deadlines som muligt overholdes, hvor de vigtigte deadlines prioriteres højest. 
 
 \section{Planlægning af begivenheder}
 De fleste eksisterende real-time systemer arbejder på isolerede systemer, hvor planlæggeren har fuld kontrol over hele computeren. Derfor er hovedparten af forskningen indefor det praktiske område gået til udarbejdelsen af specialiserede kerner og komplette operativsystemer\cite{damm1989real, jones1979staros, levi1989maruti,ramamritham14scheduling}. Vi ønsker i modsætning hertil ikke at udvikle en specialiseret kerne, men lade \sched en i \pycsp kunne planlægge processer efter bedste evne baseret på informationer den har om processerne.
 
 For real-time systemer kan begivenheder planlægges enten statisk eller dynamisk\cite{cheng1987scheduling}. I statisk RTP er alle begivenheder kendt på forhånd. Planlæggeren kan i dette tilfælde allerede inden start udregne om det er muligt at overholde alle deadlines. Alternativt planlægges begivenhederne dynamisk hvis der løbende kan ankomme nye begivenheder der skal planlægges. I realtidssystemer er næsten alle begivenheder cykliske, med enten en regelmæssig eller tilfældigt periode. Periodiske begivenheder kan være målinger der skal være foretaget med regemæssige intervaller, mens aperiodiske begivenheder kan forekomme som reaktion på udefra kommende begivenheder, eller være fejl, der hurtigt skal håndteres inden systemet kan fortsætte.
-Til planlægningen har planlæggeren behov for at vide hvor lang tid det vil tage at udføre en given begivenhed per periode, men da dette tal enten ikke kan kendt eller fast for hver periode bruges der ofte estimater. Dette medfører at en aperiodisk begivenhed kan ankomme på et vilkårligt tidspunkt og da planlæggeren kun har et estimat for tidsforbruget kan man  ikke tilknytte en ``hard deadline'' til aperiodiske begivenheder, da der altid findes en kæde af aperiodiske begivenheder der medfører en overskridelse af en deadline. 
+
+Til planlægningen har planlæggeren behov for at vide hvor lang tid det vil tage at udføre en given begivenhed per periode, men da dette tal enten ikke er kendt eller fast for hver periode, bruges der ofte estimater. Dette medfører at en aperiodisk begivenhed kan ankomme på et vilkårligt tidspunkt og da planlæggeren kun har et estimat for tidsforbruget kan man  ikke tilknytte en ``hard deadline'' til aperiodiske begivenheder, da der altid findes en kæde af aperiodiske begivenheder der medfører en overskridelse af en deadline. 
 
 \fxnote*{Dette skal måske flyttes eller omformuleres så vi ikke med det samme begrænses til dynamiske \sched}{I \pycsp kan der til alle tidspunkter tilføjes nye processer, og derfor vil vi kun beskæftige os med en dynamisk \sched. Desuden har man ikke med \pycsp fuld kontrol over hele operativsystemet. Mængden af processerkraft vi har til rådighed til kørsel af processerne vil derfor varriere uafhængigt af \pycsp, hvorfor vi heller ikke kan lave et pålidelig ``hard real-time system'', men fokusere på et ``soft real-time system''.}
 
@@ -56,7 +77,7 @@ De klassiske algoritimer behandler alle processer som værende ligeværdige. Vi 
 \end{shaded}
 
 \subsubsection{Rate monotonic algorithm (RM)}
-RM er oprindeligt en statisk \sched, der fra start af udregner en prioritede liste på baggrund af frekvensen af processens periode, dermed vil processer der oftet skal have udført deres periode en højere prioritet, end processer med lav frekvens. RM er todelt og i første del udføres før selve simuleringen udregnes  prioriteten for processerne, og udvælger hvilke processer der kan medtages i selve udførslen. Anden del står for udvælgelsen af processer  under simuleringen, og her vælges simpelt den proces med den højeste prioritet. 
+RM er oprindeligt en statisk \sched, der fra start af udregner en prioriteret liste på baggrund af frekvensen af processens periode, dermed vil processer der oftet skal have udført deres periode en højere prioritet, end processer med lav frekvens. RM er todelt og i første del udføres før selve simuleringen udregnes  prioriteten for processerne, og udvælger hvilke processer der kan medtages i selve udførslen. Anden del står for udvælgelsen af processer  under simuleringen, og her vælges simpelt den proces med den højeste prioritet. 
 
  Et problem for RM er at ved udvælgelsen af processer der kan medtages har man ikke en optimal udnyttelsen af processorkraf. \Citeauthor{lehoczky1989rate} er kommet frem til at ``worst-case'' er udnyttelsen i gennemsnit 88\\cite{lehoczky1989rate}. Et større problem i relation til implementering i \pycsp er dog at RM er dog at den er statisk. Til gengæld er algoritmen stabil ved en overskridelse af deadline for en proces. 
 
