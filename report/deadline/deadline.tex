@@ -99,8 +99,27 @@ En ofte benyttet metode til at undgå priotetsinvertering er priotetsnedarvning.
 \section{Realtime planlægning i \pycsp}
 Da vi ønsker at introducere RTP i \pycsp er der er række forhold som vi skal tage højde for. Vi vil i dette afsnit tage udgangspunkt i de ovenstående opstillede muligheder og sammenholde dem med \pycsp. 
 
-begrænset forhåndsviden -> dynamisk
+begrænset forhåndsviden 
+  dynamisk planlægning
+  ingen viden om udførselstid - heller ikke estimater  
 
+non-preemptive (snakkes der ikke om i foregående afsnit)
+
+nedarvning 
+  any->any kanaler kan potentielt give stor spredning af prioritet
+
+\subsection{Priotetsnedarvning}
+Skelne mellem read og write
+måske skal en kanal arve prioritet?
+hvornår skal prioriteten ændres? 
+
+2 cases:
+udvælgelse i alternation
+propagering af prioritet
+
+med nedarvning kan en proces uden deadline arve en høj prioritet uden at få sat en deadline. 
+
+Skal processer der arver prioritet også arve deadline? Det skal de nok ikke, da de så kommer til at kaste exceptions selv på deadlines som brugeren ikke har sat. De skal nok kastes af den oprindelige proces med information om hvad den ventede på da den fejlede. 
 
 
 \begin{shaded}
@@ -116,18 +135,6 @@ Vi vil nu beskrive problemerne ved at processerne er afhængige af hinanden, og 
 Der findes overordnet set to metoder til at løse problemet med priority inversion. Enten kan man ungå at blokerer processer, eller man kan benytte priority inherience\cite{sha1990priority}. Med \pycsp kan man ikke ungå at processer kommunikere, og dermed vil kunne blokere hvorfor priority inherience er den enste farbare vej hvis man skal sikre optimal planlægning.
 \end{shaded}
 
-\subsection{Priotetsnedarvning}
-Skelne mellem read og write
-måske skal en kanal arve prioritet?
-hvornår skal prioriteten ændres? 
-
-2 cases:
-udvælgelse i alternation
-propagering af prioritet
-
-med nedarvning kan en proces uden deadline arve en høj prioritet uden at få sat en deadline. 
-
-Skal processer der arver prioritet også arve deadline? Det skal de nok ikke, da de så kommer til at kaste exceptions selv på deadlines som brugeren ikke har sat. De skal nok kastes af den oprindelige proces med information om hvad den ventede på da den fejlede. 
 
   \section{Eksempel}
   \section{Design og implementation}
