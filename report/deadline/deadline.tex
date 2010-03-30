@@ -99,6 +99,12 @@ En ofte benyttet metode til at undgå priotetsinvertering er priotetsnedarvning.
 \section{Realtime planlægning i \pycsp}
 Da vi ønsker at introducere RTP i \pycsp er der er række forhold som vi skal tage højde for. Vi vil i dette afsnit tage udgangspunkt i de ovenstående opstillede muligheder og sammenholde dem med \pycsp. 
 
+I \pycsp kan vi anskue processerne som begivenheder, og derved bruge skemaplanlæggeren i greenlets-versionen til at styre hvilken proces og dermed hvilken begivenhed der udføres. Vi har ikke umiddelbart informationer om hvor lang tid en proces er om at blive udført, og det vil kræve en analyse af den enkelte proces at udlede estimater for det. Vi har valgt at fokusere på selve planlægning af processerne og ikke analyse af processerne. Dermed har vi reelt udelukket muligheden for både at benytte RM og LL algoritmerne da de begge benytter information udførselstiden for en proces. Derved har vi EDF tilbage som mulighed, hvilket er den algoritme som vi vil implementere. En udviddelse af \pycsp til at benytte EDF er forholdsvis ligetil. Der skal laves en mulighed for at brugeren kan angive en deadline til en proces, og vi skal ved kontekstskift sikre at vi aktiverer den proces der har den førstkomne deadline. \pycsp har per definition interne afhængigheder mellem processerne i form af kommunikation over kanaler, og vi kan derfor opleve problemer med prioritetsinvertering. Vi skal derfor også implementere prioritetsnedarvning for at sikre os mod prioritetsinvertering.
+Endeligt skal vi håndtere overskredne deadlines. 
+
+
+
+
 begrænset forhåndsviden 
   dynamisk planlægning
   ingen viden om udførselstid - heller ikke estimater  
@@ -108,7 +114,9 @@ non-preemptive (snakkes der ikke om i foregående afsnit)
 nedarvning 
   any->any kanaler kan potentielt give stor spredning af prioritet
 
-\subsection{Priotetsnedarvning}
+\subsection{Prioritetsnedarvning}
+
+
 Skelne mellem read og write
 måske skal en kanal arve prioritet?
 hvornår skal prioriteten ændres? 
@@ -120,6 +128,8 @@ propagering af prioritet
 med nedarvning kan en proces uden deadline arve en høj prioritet uden at få sat en deadline. 
 
 Skal processer der arver prioritet også arve deadline? Det skal de nok ikke, da de så kommer til at kaste exceptions selv på deadlines som brugeren ikke har sat. De skal nok kastes af den oprindelige proces med information om hvad den ventede på da den fejlede. 
+
+\subsection{Overskredne deadlines}
 
 
 \begin{shaded}
@@ -138,6 +148,7 @@ Der findes overordnet set to metoder til at løse problemet med priority inversi
 
   \section{Eksempel}
   \section{Design og implementation}
+    fxwarning{Husk at snakke om kunstige lave prioriteter såfremt en proces arver prioritet fra flere andre processer. }
   \section{Evaluering}
   \section{Fremtidigt arbejde}
   \section{Opsummering}
