@@ -1,0 +1,56 @@
+\section{Realtime planlægning i \pycsp}
+Da vi ønsker at introducere RTP i \pycsp er der er række forhold som vi skal tage højde for. Vi vil i dette afsnit tage udgangspunkt i de ovenstående opstillede muligheder og sammenholde dem med \pycsp. 
+
+I \pycsp kan vi anskue processerne som begivenheder, og derved bruge skemaplanlæggeren i greenlets-versionen til at styre hvilken proces og dermed hvilken begivenhed der udføres. Vi har ikke umiddelbart informationer om hvor lang tid en proces er om at blive udført, og det vil kræve en analyse af den enkelte proces at udlede estimater for det. Vi har valgt at fokusere på selve planlægningen af processerne og ikke analyse af processerne. Dermed har vi ikke mulighed for både at benytte RM og LL algoritmerne da de begge benytter information om udførselstiden for en proces. Derved har vi EDF tilbage som mulighed, hvilket er den algoritme som vi vil implementere. En udviddelse af \pycsp til at benytte EDF er forholdsvis ligetil. Der skal laves en mulighed for at brugeren kan angive en deadline til en proces, og vi skal ved kontekstskift sikre at vi aktiverer den proces der har den førstkomne deadline. \pycsp har per definition interne afhængigheder mellem processerne i form af kommunikation over kanaler, og vi kan derfor opleve problemer med prioritetsinvertering. Vi skal derfor også implementere prioritetsnedarvning for at sikre os mod prioritetsinvertering.
+Endeligt skal vi håndtere overskredne deadlines. 
+
+Vi har valgt at abstrahere en deadline til en prioritet, da vi hermed åbner for senere at kunne lade andre faktorer indgå i prioriteten end blot en proces' deadline. 
+
+
+
+
+begrænset forhåndsviden 
+  dynamisk planlægning
+  ingen viden om udførselstid - heller ikke estimater  
+
+non-preemptive (snakkes der ikke om i foregående afsnit)
+
+nedarvning 
+  any->any kanaler kan potentielt give stor spredning af prioritet
+
+\subsection{Prioritetsnedarvning}
+At introducere priotetsnedarvning i \pycsp virker umiddelbart ligetil idet vi kan se de indbyrdes afhængigheder klart ud fra forbindelserne gennem kanaler. Der kan forekomme andre afhængigheder som er mindre synlige, men vi mener ikke disse vil forekomme i velskrevne CSP applikationer, og vi har derfor valgt at begrænse os til afhængigheder repræsenteret vha. kanaler. På trods af den umiddelbare simplicitet er der dog adskillige overvejelser bl.a. med henblik på hvilke konstruktioner i \pycsp der skal arve prioriteter, hvornår de skal arve dem og hvor længe de skal beholde den modificerede prioritet. 
+
+
+
+
+
+Skelne mellem read og write
+måske skal en kanal arve prioritet?
+hvornår skal prioriteten ændres? 
+
+2 cases:
+udvælgelse i alternation
+propagering af prioritet
+
+med nedarvning kan en proces uden deadline arve en høj prioritet uden at få sat en deadline. 
+
+Skal processer der arver prioritet også arve deadline? Det skal de nok ikke, da de så kommer til at kaste exceptions selv på deadlines som brugeren ikke har sat. De skal nok kastes af den oprindelige proces med information om hvad den ventede på da den fejlede. 
+
+\subsection{Overskredne deadlines}
+
+
+\begin{shaded}
+\subsection{Blokkerede processer}
+I den teoretiske tilgang til RTP antages det ofte at processerne er periodiske, har en fast eksekverings tid per periode og er uafhængig af andre processer, og køres i et isoleret miljø. De forskellige tilgange til RTP fokuserer på hvordan man kan overvinde de enkelte antagelser ved isoleret og ophæve en af begrænsningerne. 
+
+
+Dette er en højst idealiseret verden og i en introduktion af RTP i PyCSP vil processerne ikke overholde et eneste af disse antagelser. 
+I \pycsp bruges rendezvous til at blokere kommunikerende processer.
+
+Vi vil nu beskrive problemerne ved at processerne er afhængige af hinanden, og kan blokere hinanden, således at en proces med høj prioritet venter på processer med lavere prioritet. Forestil dig i \pycsp tre processer ($P_0,P_1,P_2$)med prioriteterne $Pr_0>Pr_1>Pr_2$. Først udvælges $P_0$ da denne har højst prioritet, men stopper da den skal kommunikere med $P_2$. Den næste proces der udvælges vil være $P_1$, og dermed bliver $P_0$ unødigt forsinket mens $P_1$ kører. Dette kaldes priority inversion\cite{sha1990priority}.
+
+Der findes overordnet set to metoder til at løse problemet med priority inversion. Enten kan man ungå at blokerer processer, eller man kan benytte priority inherience\cite{sha1990priority}. Med \pycsp kan man ikke ungå at processer kommunikere, og dermed vil kunne blokere hvorfor priority inherience er den enste farbare vej hvis man skal sikre optimal planlægning.
+\end{shaded}
+
+
