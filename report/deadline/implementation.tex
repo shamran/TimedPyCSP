@@ -1,1 +1,28 @@
 \section{Implementering}
+
+\begin{itemize}
+\item DeadlineException
+\item Now
+\item Release() f.eks i iterationer
+\item to køer kaldet has\_priority og no\_priority, og deres brug i funktionen activate
+\item Process udvidet med: \\self.inherit\_priotity = []     \\
+        self.deadline = None\\
+        self.internal\_priority = float("inf")\\
+        self.has\_priority = False\\
+            if isinstance(arg, pycsp.greenlets.channelend.ChannelEndRead):\\
+                arg.channel.\_addReaderProcess(self)\\
+            if isinstance(arg, pycsp.greenlets.channelend.ChannelEndWrite):\\
+                arg.channel.\_addWriterProcess(self)
+\item def Set\_deadline(value,process=None):
+\item def Remove\_deadline(process=None):
+\item def SetInheritance(process):
+\item def ResetInheritance(process):
+\item Channel:\\
+        self.readerprocesses = []\\
+        self.writerprocesses = []
+
+\item Udviddet _read og _write
+\item Udvidder match
+
+
+\end{itemize}
