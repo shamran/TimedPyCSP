@@ -14,11 +14,21 @@ Hvis en process har tilknyttet  en hard deadline, vil en overskredet deadline  i
 Vi har valgt at der i vores system skal kaldes en exception hvis en deadline overskrides. Dette er er gjort ud fra en betragtning om at systemet ikke kender konsekvensen af en overskredet deadline, og derfor må det være programmørens ansvar at håndtere processen.  Hvis processen stadig kan bidrage med værdi, kan programmøren lade processen fortsætte sin kørsel, og alternativ kan processen lukkes korrekt ned. Ulempen ved at kalde en exception er at processen stopper sin eksekvering i utide. Dette giver problemer f.eks. hvis processen er tilknyttet en kanal og venter på at kommunikere.  Kanalen holder en styr på antallet af processer der vil kommunikere. Hvis processen pludseligt forsvinder vil tilstandsvariablerne ikke være sat korrekt. det er derfor vigtigt at processen manuelt rydder op efter sig selv i forbindelse med en exception, da det ellers kan resultere i et ustabilt system.
 
 I en fremtidig version, vil man kunne udvidde muligheden med et hybrid der både kunne håndtere at markere processerne og kalde en exception. Processen kunne f.eks have  tilknyttet hvilken type deadline det var systemet kunne så reagere passende så soft deadlines blev færdigbehandlet mens hard deadlines resulterede i en exception.
+
+\subsubsection{Preempting}
+
+Da vi ikke har mulighed for PyCSP at have preempting, kan  man risikere at en proces med lav prioritet proces og lang kørselstid kan blokere for en proces med høj prioritet, hvis denne ankommer efter processen med lav prioritet er sat i gang. Vi kan ikke fuldstændigt undgå dette, men programmøren kan derimod minimere problemet ved med mellemrum i processerne at afgive kontrollen og at lade  skemaplanlæggeren evaluere hvilken proces der skal have mulighed for videre at kører. Er der ankommet en proces med høj prioritet kan denne få kørselstid, og ellers kan processen med lav prioritet fortsætte dens kørsel. 
+
+Det er programmørens opgave at processen afgiver kontrol, hvorfor det  derfor være nemt at afgive kontrollen fra processen. til dette har vi lavet funktionen \code{Release()} der kan kaldes fra enhver proces. 
+Implementeringen er meget simpel og er blot en wrapper funktion, da den underliggende funktionalitet allerede eksisterer. Den aktive proces replanlægges ved at blive lagt på køen for planlæggeren, og planlæggeren vælger derefter den optimale proces der skal udføres. Er der ikke kommet ny processer vil det stadigt være den originale proces der planlægges og den kan umiddelbart fortsætte sin kørsel. Hvis der derimod i mellemtiden er ankommet en ny proces der har højere prioritet, vil denne blive udført i stedet.
+
+
+
 \begin{itemize}
 \tightlist
-\item DeadlineException
-\item Now
-\item Release() f.eks i iterationer
+\item DeadlineException - ok
+\item Now ok
+\item Release() f.eks i iterationer -ok
 \item to køer kaldet has\_priority og no\_priority, og deres brug i funktionen activate
 \item Process udvidet med: \\self.inherit\_priotity = []     \\
         self.deadline = None\\
