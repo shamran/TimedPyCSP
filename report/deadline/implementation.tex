@@ -4,8 +4,18 @@
 Som vi beskrev i \des introducerede vi de to globale funktioner Now og Wait der hhv. returnedere tiden og fik en proces til at vente i et givent tidsrum. Vi har ændret den interne implementation af funktionerne, så de bruger realtid, og bruge funktionen Now alle steder hvor tiden skal bruges i stedet  for direkte at bruge pythons funktionalitet til at bestemme time. Dette sikre en ensartet implementering af time på tværs af de tre udviklede versioner af TimedPyCSP.
 
 \subsubsection{Overskrednen deadlines}
-Planlægning i realtime kræver beslutning for hvordan sproget håndterer overskredne deadlines. Man kan vælge enten at se det som en egenskab for processen hvor dens deadline enten kan være overholdt eller ej. Alternativt kan der kan en overskredenent deadline resultere i en exception. Hvilken metode der egner sig bedst til RTP afhænger af hvilken deadline der er tilknyttet processen. Er der tilknyttet en ``soft deadline'' til en proces, vil en lille overskridelse af deadline
+Planlægning i realtime kræver beslutning for hvordan  overskredne deadlines skal håndteres. Man kan vælge enten at se det som en egenskab for processen hvor dens deadline enten kan være overholdt eller ej. Alternativt kan der kan en overskredenent deadline resultere i en exception.
+
+Hvilken metode der egner sig bedst til RTP afhænger af hvilken deadline der er tilknyttet processen. Er der tilknyttet en soft deadline til en proces, vil processen stadig tilføje værdi til systemet, selvom det  overskrider dens deadline. I det tilfælde er det stadig bedst at systemet hurtigst mulig gør processen færdig, således den størst mulige værdi tilføjes systemet. Derfor skal systemet blot markere at dens deadline er overskredet. Senere må programmøren så manuelt håndtere at processens deadline er overskredet. 
+
+
+Hvis en process har tilknyttet  en hard deadline, vil en overskredet deadline  ikke tilføje værdi til systemet og derfor kan det ikke betale sig for systemet at lade processen blive færdig. processen skal derimod stoppes hurtigst muligt, så systemet istedet kan processere processer hvis deadline endnu ikke er overskredet. For et system hvor processerne har hard deadlines vil det derfor være bedst hvis en overskredet deadline resulterede i en exception, der med det samme stopper processen og lader programmøren bestemme hvodan processen skal forholde sig til at deadlinen er overskredet.
+
+Vi har valgt at der i vores system skal kaldes en exception hvis en deadline overskrides. Detter er gjort ud fra en betragtning om at systemet ikke kender konsekvensen af en overskredet deadline, og derfor må det være programmørens ansvar at håndtere processen.  Hvis processen stadig kan bidrage med værdi, kan programmøren lade processen fortsætte sin kørsel, og alternativ kan processen lukkes korrekt ned. Ulempen ved at kalde en exception er at processen stopper sin eksekvering i utide. Dette giver problemer f.eks. hvis processen er tilknyttet en kanal og venter på at kommunikere.  Kanalen holder en styr på antallet af processer der vil kommunikere. Hvis processen pludseligt forsvinder vil tilstandsvariablerne ikke være korrekt.
+
+
 \begin{itemize}
+\tightlist
 \item DeadlineException
 \item Now
 \item Release() f.eks i iterationer
