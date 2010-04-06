@@ -15,6 +15,9 @@ Vi har valgt at der i vores system skal kaldes en exception hvis en deadline ove
 
 I en fremtidig version, vil man kunne udvidde muligheden med et hybrid der både kunne håndtere at markere processerne og kalde en exception. Processen kunne f.eks have  tilknyttet hvilken type deadline det var systemet kunne så reagere passende så soft deadlines blev færdigbehandlet mens hard deadlines resulterede i en exception.
 
+
+
+
 \subsubsection{Preempting}
 
 Da vi ikke har mulighed for PyCSP at have preempting, kan  man risikere at en proces med lav prioritet proces og lang kørselstid kan blokere for en proces med høj prioritet, hvis denne ankommer efter processen med lav prioritet er sat i gang. Vi kan ikke fuldstændigt undgå dette, men programmøren kan derimod minimere problemet ved med mellemrum i processerne at afgive kontrollen og at lade  skemaplanlæggeren evaluere hvilken proces der skal have mulighed for videre at kører. Er der ankommet en proces med høj prioritet kan denne få kørselstid, og ellers kan processen med lav prioritet fortsætte dens kørsel. 
@@ -22,6 +25,17 @@ Da vi ikke har mulighed for PyCSP at have preempting, kan  man risikere at en pr
 Det er programmørens opgave at processen afgiver kontrol, hvorfor det  derfor være nemt at afgive kontrollen fra processen. til dette har vi lavet funktionen \code{Release()} der kan kaldes fra enhver proces. 
 Implementeringen er meget simpel og er blot en wrapper funktion, da den underliggende funktionalitet allerede eksisterer. Den aktive proces replanlægges ved at blive lagt på køen for planlæggeren, og planlæggeren vælger derefter den optimale proces der skal udføres. Er der ikke kommet ny processer vil det stadigt være den originale proces der planlægges og den kan umiddelbart fortsætte sin kørsel. Hvis der derimod i mellemtiden er ankommet en ny proces der har højere prioritet, vil denne blive udført i stedet.
 
+\subsubsection{Ændringer i \sched en}
+I \code{greenlets} versionen af \sched en findes der som nævnt tidligere tre lister af processer: \code{new}, \code{next} og \code{timers}. De tre lister er prioriteret således at der først kigges på processer fra \code{timers}, dernæst fra \code{new}, og til sidst kigges der i \code{Next}.
+
+I RTP er det ikke hensigtsmæssigt at inddele processerne i disse tre  kategorier. Vi skal derimod have et miljø der gnidningsløst tillader både processer med og uden deadlines, samt at de dynamisk kan ændres. \sched en skal i forbindelses med proces skift hurtigt kunne finde den den næste proces der skal udføres.
+
+Vi har derfor valgt at fjerne  de tre lister og erstatte dem  med \code{has\_priority},  \code{no\_priority} og \code{timers}. \code{has\_priority} og  \code{no\_priority}  bruges til at placere  aktive processer der ønsker at blive udført, mens  \code{timers} bruges som i greenletsversionen , men er ændret til en  hob ligesom det er tilfældet i \des versionen. 
+
+Vigtigt at gøre sig bemærket med processer der ligger i timers  listen er at de enten har kaldt en timeout i forbindelse med en \code{alternation}, eller har kaldt funktionen  \code{Wait}. Her kan man forledes til at tro at processen vil vente i præcist det angivede tidsrum, men dette er kun  muligt i \des versionen. I versionen hvor tiden er reel fortolkes de to funktioner som vent  minimum det tidsrum. I greenletsversionen ønsker man at minimere overskridelsen, for på den måde at emulere at processen venter præcist i tidsrummet man har angivet for så at fortsætte. I RTP formodes at der findes en mængde processer der skal gennemføres inden en deadline hvorfor de alle kæmper om CPU-tid. En proces der har ventet i timers listen skal derfor ikke nødvendigvis udføres med det sammen, da det hele tiden er processen med højst prioritet der skal udføres, uafhængigt af processerne i timers hoben. Processerne bliver derfor først lagt i en af de to andre lister, og efterfølgende vælges den optimale proces.
+
+Til at implementere \code{has\_priority} bruger vi også en hob, men da modulet heapq  kun understøtter min hobe kan vi ikke lave en klassisk prioritet hob, da den skal kunne udtrække processen med maksimal prioritet. Vi har dermed to muligheder, enten kan vi lave vores egen implementering af en maks hob eller ændre vores prioriteter internt så en lav værdi angiver en høj prioritet. Med en egenimplementation har vi en  logisk opbygning af prioriteter, men vi får ikke fordelenen ved den underliggende implementation i direkte C som man opnår ved brug af heapqmodulet. Vælger vi at bruge heapqmodulet skal vi invertere prioritetsbegrebet, så det er den laveste prioritet der udvælges først. Dette er dog ikke et problem  i vores tilfælde og vi kan nemt opnå den ønskede effekt ved at bruge en proces deadline som dens prioritet. Her vil en lav deadline betyde at processen snart skal være færdig hvilket skal resultere i en høj prioritet.
+Vi kan derfor blot benytte en proces deadline som dens prioritet og benytte en min hob. Hvis man i en fremtidig version ønsker at processerne kan have en valgfri prioritet, kan man nemt implementere dette ved efterfølgende at mindske den udregnede prioritet, da dette vil resultere i at processen bliver udført tidligere.
 
 
 \begin{itemize}
