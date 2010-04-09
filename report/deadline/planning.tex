@@ -30,9 +30,19 @@ RM er en statisk \sched, der fra start af udregner en prioriteret liste på bagg
 Et problem for RM er at ved udvælgelsen af processer der kan medtages har man ikke en optimal udnyttelsen af processorkraft. \Citeauthor{lehoczky1989rate} er kommet frem til at ``worst-case'' er udnyttelsen i gennemsnit 88\\cite{lehoczky1989rate}. Et større problem i relation til implementering i \pycsp er dog at RM er dog at den er statisk. Til gengæld er algoritmen stabil ved en overskridelse af deadline for en proces. 
 
 \subsubsection{Earliest deadline first (EDF)}
-Som alternativ til den statiske \sched, hvor man ikke kan ændre prioriten af processen løbende gennem simuleringen, findes de dynamiske \sched er, hvor er EDF er et eksempel. Her evalueres prioriterne af processerne dynamisk igennem simuleringen og evaluere dermed løbende hvilke processer der skal udvælges. I EDF har den proces hvis deadline ligger tættest på højest prioritet og den proces hvis deadline ligger længt ude i fremtiden har lavest prioritet. Aperiodiske processer kan i EDF indgå på lige fod med de periodiske da man til hvert processkift evaluere hvilken der har den nærmeste deadline, som både kan være en periodisk proces som en aperiodisk.
+Som alternativ til den statiske \sched, hvor man ikke kan ændre prioriten af processen løbende under udførslen, findes de dynamiske \sched er, hvor er EDF er et eksempel. Her evalueres prioriterne af processerne dynamisk under udførslen og evaluerer dermed løbende hvilke processer der skal udvælges. I EDF har den proces hvis deadline ligger først højest prioritet og den proces hvis deadline ligger længt ude i fremtiden har lavest prioritet. Aperiodiske processer kan i EDF indgå på lige fod med de periodiske da man til hvert processkift evaluere hvilken der har den nærmeste deadline, som både kan være en periodisk proces som en aperiodisk.
 
-Udnyttelsen af processorkraft kan i EDF komme op på 100\%, da alle processer bliver planlagt løbende i modsætning til RM der foretager et valg om en given proces kan planlægges.  Ulempen ved EDF er den ikke er stabil idet vi ikke har kontrol over hvilke processers deadline der bliver overskredet. Dette er specielt et problem hvis man har en en uhomogen samling processer hvor en mindre del er kritiske. Såfremt skemaplanlæggeren ikke kan foretage preemptive skift mellem begivenheder kan EDF EDF ikke give nogen garanti om at alle deadlines overholdes, selv om der findes en rækkefølge af begivenheder der 
+Udnyttelsen af processorkraft kan i EDF komme op på 100\%, da alle processer bliver planlagt løbende i modsætning til RM der foretager et valg om en given proces kan planlægges.  Ulempen ved EDF er den ikke er stabil idet vi ikke har kontrol over hvilke processers deadline der bliver overskredet. Dette er specielt et problem hvis man har en en uhomogen samling processer hvor en mindre del er kritiske. Såfremt skemaplanlæggeren ikke kan foretage preemptive skift mellem begivenheder kan EDF ikke give nogen garanti om at alle deadlines overholdes, selv om der findes en rækkefølge af begivenheder der sikrer dette. Dette er illustreret på \cref{fig:edf-nonpreemptive}.
+
+\begin{figure}
+ \begin{center}
+  \includegraphics[scale=1.00]{images/edf-nonpreemptive}
+  \caption{Overskridelse af deadline med EDF såfremt der ikke kan udføres preemptive kontekstskift. Begivenheden $B_2$ ankommer til tiden $t_1$ og har deadline ved $t_5$. Den kan dog ikke igangsættes før $B_1$ er færdig, hvorved $B_2$ overskrider sin deadline.}
+  \label{fig:edf-nonpreemptive}
+  \end{center}
+\end{figure}
+
+
 
 \subsubsection{Least Laxity(LL)}
 LL er en modifikation af EDF. LL kigger på hvor lang tid en begivenhed tager at udføre sammenholdt med hvor lang tid der er til deadline for begivenheden. Laxity er defineret som deadline minus tiden det tager at udføre begivenheden. Laxity bliver altså et udtryk for hvor presserende det er at igangsætte en begivenhed for at den kan nå sin deadline. I LL bruges dette til at prioritere de begivenheder der har mindst laxity højest når begivenhederne planlægges. \\
