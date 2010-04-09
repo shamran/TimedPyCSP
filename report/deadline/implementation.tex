@@ -38,6 +38,18 @@ Til at implementere \code{has\_priority} bruger vi også en hob, men da modulet 
 Vi kan derfor blot benytte en proces deadline som dens prioritet og benytte en min hob. Hvis man i en fremtidig version ønsker at processerne kan have en valgfri prioritet, kan man nemt implementere dette ved efterfølgende at mindske den udregnede prioritet, da dette vil resultere i at processen bliver udført tidligere.
 
 
+\subsubsection*{Udviddelse af Process}
+
+Hver proces skal have mulighed for at få tilknyttet en deadline, og desuden skal det være muligt i forbindelse med prioritetsnedarvning midlertidigt at kunne ændre dens prioritet.
+
+Når en proces bliver udsat for prioritetsnedarvning, skal systemet planlægge processen ifh. til den kunstigte prioritet. Men det er ikke defineret om den kunstige prioritet medfører at systemet kaster en  \code{deadlineException}  hvis  denne overskrides. Ved at kaste en \code{deadlineException} i processer med kunstigte prioritet, kan programmøren se  afhængighedsforholdet processerne imellem, og måske bedre kan debugge hvorfor den originale proces kaster en \code{deadlineException}. 
+
+En anden begrundelse for at lade kunstige priotetet medfører \code{deadlineException} er hvis processerne findes i et generator/arbejder/forbruger netværk. Her kan forbrugeren øge en arbejdes priotet hvis det er påkrævet af forbugeren modtager det endelige arbejde inden en deadline. Hvis denne deadline ikke nås er dataen som arbejderen bearbejde ikke længere relevant og arbejderen bør derfor stoppe det irrelevante arbejde snarest. 
+
+Der er dog flere problemer ved at lade en kunstig priotet medfører en \code{deadlineException}.  Med hensyn til at visualisere afhægighedsforholdet er det ikke givet at den proces der overskrider en deadline, er den der har brugt tiden. 
+I eksemplet fra før kræver arbejderen data fra generatoren. Hvis data først bliver sendt fra generatoren umiddelbart før en overskridelse af deadline. Her vil det fremgå som at arbejderen er ansvarlig for overskridelsen og ikke generatoren og dermed kan man ikke bruge \code{deadlineException} til debugging. I CSP findes begrebet traces, som kan bruges til at se et programs forløb. På nuværende tidspunkt arbejdes der allerede med at introducere traces til \pycsp og når dette er færdigt, vil det være et langt at foretrække som værktøj til debugging.
+
+Et andet problem ved at kaste en \code{deadlineException} ved kunstigt lave deadlines, er at processer der ikke er designet med hensyn til at mulig deadlines pludseligt skal kunne håndtere mulige \code{deadlineException}, hvis ikke hele processen skal risikere at stoppe. Alle processer vil derfor skulle udviddes med yderligere kode til fejlhåndtering. Men da det ikke er sikkert programmøren kender den underliggende begrundelse for en given deadline vil han ikke kunne reagere optimalt. Eksempelvis  vil arbejderen fra før, der der modtager en kunstig priotet fra forbrugeren, ikke uden  forhåndviden kunne foretage valget om en \code{deadlineException} betyder den skal sende sit arbejde uafhængigt af hvor langt den er kommet. Stoppe arbejdet til den bliver bedt om at fortsætte. eller smide arbejdet ud og starte bearbejdningen af nyt data.
 \begin{itemize}
 \tightlist
 \item DeadlineException - ok
