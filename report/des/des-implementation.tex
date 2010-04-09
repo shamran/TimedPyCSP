@@ -20,6 +20,7 @@ from pycsp.greenlets.channel import ChannelPoisonException, ChannelRetireExcepti
 I \cref{fig:init} kan man se at funktionerne \code{choice}, \code{ChannelPoisonException} og \code{ChannelRetireException} alle bliver hentet fra \emph{greenlets}"-versionen, mens at funktionerne \code{Timeout, Skip} og \code{Alternation} bliver importeret fra samme mappe, og derfor er en modificeret version. For slutbrugeren  vil dette dog være transparent, og hun vil blot se \emph{simulation}"-versionen som en selvstændig version på lige fod med de andre tre versioner.
 
 \subsection{Scheduler-klassen}
+\label{sec:scheduler}
 Med valget af \emph{greenlets}"-versionen som grundversion og med henblik på at hovedparten af vores ændringer vil være i \sched en, vil vi kort gennemgå dele af klassen \code{Scheduler}.
 
 \begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i \emph{greenlets}versionen.]
