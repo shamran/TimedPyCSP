@@ -96,7 +96,7 @@ def match(self):
 
 Funktionen \code{match} vil blive kaldt en gang for hver proces der ønsker at kommunikere, og derfor vil listerne til hvert kald af \code{match} være totalt sorteret minus det sidste element i listen. Desuden vil der altid i den ene liste maksimalt være et element der er aktiv, hvorfor den ene liste højst sandsynlig vil være kort kørselstiden for de to sorteringer vil derfor være lille. Bemærk desuden at listerne er sorteret så værdien af den interne prioritet er stigende, og derfor er det processen med lavest værdi, der først bliver udvalgt til et match, i overensstemmelse med repræsentationen af prioriteter som nævnt i afsnittet ``Ændringer i \sched en''.
 
-
+\subsubsection*{Alternation}
 \begin{itemize}
 \tightlist
 \item Process udvidet med: \\self.inherit\_priotity = []     \\
