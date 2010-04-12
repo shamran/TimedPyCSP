@@ -33,9 +33,10 @@ Vi kan derfor blot benytte en proces deadline som dens prioritet og benytte en m
 Som vi har beskrevet i \cref{sec:rtp-pycsp}, kan  man risikere at en proces med lav prioritet proces og lang kørselstid kan blokere for en proces med høj prioritet. 
 Her konkluderede vi at det er programmørens opgave at processen afgiver kontrol, og derfor skal det være nemt at afgive kontrollen fra processen. til dette har vi lavet funktionen \code{Release()}, der minder om \code{Yield} for \code{co-rutiner}.
 
-Implementeringen er meget simpel og er blot en wrapper funktion, da den underliggende funktionalitet allerede eksisterer. Den aktive proces stopper og bliver lagt planlagt til kørsel af \sched en. Dermed ligges processen på den relevante kø. \Sched en  vælger derefter den bedst proces der skal udføres. Men er  der ikke kommet ny processer vil det stadigt være den originale proces der planlægges og den kan derfor umiddelbart efter fortsætte sin kørsel. Hvis der derimod i mellemtiden er ankommet en ny proces der har højere prioritet, vil det være denne der  bliver udført i stedet.
+Implementeringen er meget simpel og er blot en wrapperfunktion, da den underliggende funktionalitet allerede eksisterer. Den aktive proces stopper og bliver genplanlagt til senere kørsel af \sched en. Dermed ligges processen på den relevante kø og  \sched en  kan blot vælge  den bedst proces der skal udføres. Er  der ikke kommet ny processer vil det stadigt være den originale proces der udføres og kan fortsætte sin kørsel. Hvis der derimod i mellemtiden er ankommet en eller flere nye processer der har højere prioritet, vil disse blive udført i stedet.
 
 Problemet ved denne tvungne procesafgivelse er at det kan tage lang tid at blive lagt korrekt i en min\_hob, som vil være spildt hvis den alligevel med det samme fjernes fra køen. Man vil derfor nok i en senere version kunne optimere hastigheden af \code{Release()}.
+
 
 \subsubsection{Udvidelse af \code{Process}}
 
@@ -45,10 +46,30 @@ Når en proces bliver udsat for prioritetsnedarvning, skal systemet planlægge p
 
 En anden begrundelse for at lade en kunstig prioritet medføre en \code{deadlineException}, er hvis processerne findes i et generator/arbejder/forbruger-netværk, som vist i \cref{fig:producer-worker-consumer}. Her tilføjes forbrugeren og generatoren for den kunstige prioritet. Hvis denne deadline ikke nås er dataen som arbejderen bearbejde ikke længere relevant og arbejderen bør derfor stoppe det irrelevante arbejde snarest. Dette ville medfører at $B_2$ kunne stoppe sit arbejde i til $t = 5$ i modsætning til at fortsætte til $t = 6$.
 
+
+\subsubsection*{Kanaler}
+I \pycsp findes der kun kanaler af type \code{Any-To-Any} og derfor kan der altid  være et vilkårligt antal kanalender i hver enden af kanalen der er klar til at kommunikerere. Vi skal derfor ændre koden, for at implementere at kommunikationen mellem kanalenderne altid foregår mellem de højst prioriterede processer. 
+
+I greenletsversionen foregår udvælgelsen af kanalender til kommunikation ved hjælp af funktionen \code{match}, der udnytter at  hver kanal vedligeholder to lister af processer for hhv. de processer der ønsker at sende og modtage data på kanalen. Når en proces eks. ønsker at modtage data tilføjer den sig selv til listen af processer der ønsker at modtage, og prøver derefter i \code{match} at finde en proces der vil sende data. Er der ingen processer der venter på at sende data, venter processen istedet på en proces melder sig klar til at sende data, og som så vil kalde \code{match}. 
+
+Ideen bag funktionen \code{match} er enkel og  udnytter at greenletsversionen er enkelttrådet så hver proces kan løbe listerne igennem uden andre processer ændre på listernes tilstand.  Vi er kommet frem til at  en simpel sortering af listerne, med hensyn til deres interne prioritet vil resultere i den  ønskede egenskab at det altid er den højst prioritede proces der indgår i kommunikationen. Den ændrede match kan ses i \cref{lst:match}, hvor det kun er linje 119 og 120 der er ændret.
+
+\begin{lstlisting}[firstnumber=117 ,float=hbtp, label=lst:match, caption=funktionen match, der foretager udvælgelsen af hvilke processer der skal indgå i kommunikation over en kanal.]
+def match(self):        
+    if self.readqueue and self.writequeue:
+        self.readqueue.sort(key=lambda channelReq:channelReq.process.internal_priority)
+        self.writequeue.sort(key=lambda channelReq:channelReq.process.internal_priority)
+        for w in self.writequeue:
+            for r in self.readqueue:
+                if w.offer(r):
+                    return       
+\end{lstlisting}
+
+
 \begin{figure}
  \begin{center}
   \includegraphics[scale=1.00]{images/producer-worker-consumer}
-  \caption{Et generator/arbejder/forbruger -netværk. De stiplede pile for proces $B_1$ og $B_2$ viser en kunstig prioritet på baggrund af $B_3$'s deadline. Den tynde pil mellem  $B_1$ og $B_2$ i tiden 2 og mellem $B_2$ og $B_3$ viser kommunikationen.}
+  \caption{Et generator/arbejder/forbruger -netværk. De stiplede pile i proces $B_1$ og $B_2$ til $t=5$ viser en kunstig prioritet på baggrund af $B_3$'s deadline. Den lille stiplede pil mellem  $B_1$ og $B_2$ i $t=2$ og mellem $B_2$ og $B_3$ i $t=6$ viser kommunikation mellem processerne.}
   \label{fig:producer-worker-consumer}
   \end{center}
 \end{figure}
@@ -56,7 +77,7 @@ En anden begrundelse for at lade en kunstig prioritet medføre en \code{deadline
 \begin{figure}
  \begin{center}
   \includegraphics[scale=1.00]{images/producer-worker-consumer2}
-  \caption{Samme netværk som i \autoref{fig:producer-worker-consumer}, men i dette tilfælde venter $B_2$ i på data fra $B_1$ i hovedparten af tiden inden en deadline.}
+  \caption{Samme netværk som i \autoref{fig:producer-worker-consumer}, men i dette tilfælde venter $B_2$  på data fra $B_1$ i hovedparten af tiden inden en deadline.}
   \label{fig:producer-worker-consumer2}
   \end{center}
 \end{figure}
@@ -73,6 +94,7 @@ Vi har valgt at udvide procesmodellen med variablen \code{deadline}, der indehol
 
 Når \sched en placere processen i sin bob bruges blot den mindste prioritet i listen ihh. til vores implementering af \sched en. Dette medfører  at når en proces efterfølgende  får ændret i sin liste af prioriteter skal processen genplanlægges for at sikre den står på den korrekte plads i min-hoben i \sched en. 
 
+
 \begin{itemize}
 \tightlist
 \item Process udvidet med: \\self.inherit\_priotity = []     \\
@@ -80,10 +102,6 @@ Når \sched en placere processen i sin bob bruges blot den mindste prioritet i l
                 arg.channel.\_addReaderProcess(self)\\
             if isinstance(arg, pycsp.greenlets.channelend.ChannelEndWrite):\\
                 arg.channel.\_addWriterProcess(self)
-\item def Set\_deadline(value,process=None):
-\item def Remove\_deadline(process=None):
-\item def SetInheritance(process):
-\item def ResetInheritance(process):
 \item Channel:\\
         self.readerprocesses = []\\
         self.writerprocesses = []
