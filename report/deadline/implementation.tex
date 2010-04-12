@@ -97,6 +97,43 @@ def match(self):
 Funktionen \code{match} vil blive kaldt en gang for hver proces der ønsker at kommunikere, og derfor vil listerne til hvert kald af \code{match} være totalt sorteret minus det sidste element i listen. Desuden vil der altid i den ene liste maksimalt være et element der er aktiv, hvorfor den ene liste højst sandsynlig vil være kort kørselstiden for de to sorteringer vil derfor være lille. Bemærk desuden at listerne er sorteret så værdien af den interne prioritet er stigende, og derfor er det processen med lavest værdi, der først bliver udvalgt til et match, i overensstemmelse med repræsentationen af prioriteter som nævnt i afsnittet ``Ændringer i \sched en''.
 
 \subsubsection*{Alternation}
+
+Som  beskrevet af \citeauthor{Burns1990}, opstår der en konflikt ved brugen af  prioriterede valg. ifh. til prioriteter på processer \cite{Burns1990}. De beskriver en kodestump som angivet i \cref{lst:pri-select}, hvor processernes prioritet er angivet som Pri1 og Pri2, og hvilken proces der udvælges afhænger af processernes indbyrdes forhold som angivet i \cref{tab:prioritizedSelect}.
+
+\begin{lstlisting}[firstnumber=1 ,float=hbtp, label=lst:pri-select, caption= (priority) select]
+(priority) select
+   A1 -- Process P1
+ or
+   A2 -- Process P2
+ end select
+\end{lstlisting}
+
+\begin{longtable}{lccc}
+   	\toprule
+    &Pri1 > Pri2 & Pri1 = Pri2 & Pri1 < Pri2\\
+    \midrule
+    \endfirsthead 
+    \toprule
+    &Pri1 > Pri2 & Pri1 = Pri2 & Pri1 < Pri2\\
+    \midrule
+    \endhead % slut efterfølgende headere
+    \bottomrule
+    \multicolumn{4}{r}{\textit{fortsættes}}
+    \endfoot % slut footer
+    \bottomrule
+	\caption[]{Konflikten ved brug af prioriteret valg og procesprioriteter}\\
+	\label{tab:prioritizedSelect}
+    \endlastfoot % slut sidste footer
+  	select          & A1 & Arbitrary    & A2 \\
+		priority select & A1 & A1           & ? \\    
+\end{longtable}
+
+I \pycsp findes der kun en prioritets valg, og dermed kan vi se bort fra første række af \cref{tab:prioritizedSelect}, og konstatere at vi introducerer  en konflikt med introduktionen af prioriteter. For \citeauthor{Burns1990} er løsningen en ``orthogonal solutions'', der  tager hånd om begge typer af prioriteter. De  vage  i deres løsning, men ønsker overordnet set to typer, Weak og Strong Select. Hvor Weak select sorteres primært ifh. til processernes prioritet og sekundært efter det prioriterede valg. Strong select udvælger modsat udelukkende processer efter det prioriterede valg. De forestiller sig at primært skal weak select bruges, men i hjørnetilfælde skal en programmør have mulighed for at tvinge en prioriteret valg igennem
+
+Vi har valgt en løsning så en alternation i \pycsp  minder om weak select. Først kigges der på om alternation kan vælge en guard umiddelbart. Hvis der er minimum en guard klar foretages der et prioriteret valg baseret på først processernes prioritet og derefter det prioriterede valg, hvis flere processer har samme prioritet. Er ingen guards klar venter alternation, og vælger den første guard der bliver klar, uden at skele til deres prioritet.
+
+
+\inline{Der mangler noget om kanal prioriter , og at det skal være processer med prioriteter}
 \begin{itemize}
 \tightlist
 \item Process udvidet med: \\self.inherit\_priotity = []     \\
