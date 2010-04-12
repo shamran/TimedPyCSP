@@ -1,4 +1,4 @@
-\section{Implementering}
+\section{Implementering}\label{sec:deadline-implementation}
 
 \subsubsection{Now og Wait}
 Som vi beskrev i \des introducerede vi de to globale funktioner Now og Wait der hhv. returnerer tiden og før en proces til at vente i et givent tidsrum. Vi har ændret den interne implementering af funktionerne, så de bruger realtid. Dette sikre en ensartet implementering af tid på tværs af de tre udviklede versioner af TimedPyCSP. Det vil være en fordel hvis greenlet versionen også brugte Now, når den skal bruge tid, i hvilket tilfælde, det kunne fjernes helt i denne version. 
@@ -47,25 +47,6 @@ Når en proces bliver udsat for prioritetsnedarvning, skal systemet planlægge p
 En anden begrundelse for at lade en kunstig prioritet medføre en \code{deadlineException}, er hvis processerne findes i et generator/arbejder/forbruger-netværk, som vist i \cref{fig:producer-worker-consumer}. Her tilføjes forbrugeren og generatoren for den kunstige prioritet. Hvis denne deadline ikke nås er dataen som arbejderen bearbejde ikke længere relevant og arbejderen bør derfor stoppe det irrelevante arbejde snarest. Dette ville medfører at $B_2$ kunne stoppe sit arbejde i til $t = 5$ i modsætning til at fortsætte til $t = 6$.
 
 
-\subsubsection*{Kanaler}
-I \pycsp findes der kun kanaler af type \code{Any-To-Any} og derfor kan der altid  være et vilkårligt antal kanalender i hver enden af kanalen der er klar til at kommunikerere. Vi skal derfor ændre koden, for at implementere at kommunikationen mellem kanalenderne altid foregår mellem de højst prioriterede processer. 
-
-I greenletsversionen foregår udvælgelsen af kanalender til kommunikation ved hjælp af funktionen \code{match}, der udnytter at  hver kanal vedligeholder to lister af processer for hhv. de processer der ønsker at sende og modtage data på kanalen. Når en proces eks. ønsker at modtage data tilføjer den sig selv til listen af processer der ønsker at modtage, og prøver derefter i \code{match} at finde en proces der vil sende data. Er der ingen processer der venter på at sende data, venter processen istedet på en proces melder sig klar til at sende data, og som så vil kalde \code{match}. 
-
-Ideen bag funktionen \code{match} er enkel og  udnytter at greenletsversionen er enkelttrådet så hver proces kan løbe listerne igennem uden andre processer ændre på listernes tilstand.  Vi er kommet frem til at  en simpel sortering af listerne, med hensyn til deres interne prioritet vil resultere i den  ønskede egenskab at det altid er den højst prioritede proces der indgår i kommunikationen. Den ændrede match kan ses i \cref{lst:match}, hvor det kun er linje 119 og 120 der er ændret.
-
-\begin{lstlisting}[firstnumber=117 ,float=hbtp, label=lst:match, caption=funktionen \code{match}]
-def match(self):        
-    if self.readqueue and self.writequeue:
-        self.readqueue.sort(key=lambda channelReq:channelReq.process.internal_priority)
-        self.writequeue.sort(key=lambda channelReq:channelReq.process.internal_priority)
-        for w in self.writequeue:
-            for r in self.readqueue:
-                if w.offer(r):
-                    return       
-\end{lstlisting}
-
-for 
 
 \begin{figure}
  \begin{center}
@@ -94,6 +75,26 @@ Vi har valgt at udvide procesmodellen med variablen \code{deadline}, der indehol
 \code{deadlineException}. Desuden tilføjer vi listen \code{inherit\_priotity}, som indeholder de aktuelle prioriteter for processen. Når andre processer ønsker midlertidigt at ændre en proces prioritet, tilføjes den listen. Ved at bruge en liste i stedet for blot en variable, har processen mulighed for at blive opprioriteret flere gange, og vende tilbage den oprindelige prioritet efterfølgende. Når en proces får en eksplicit deadline, tilføjes denne værdi også til listen, som dens startprioritet. 
 
 Når \sched en placere processen i sin bob bruges blot den mindste prioritet i listen ihh. til vores implementering af \sched en. Dette medfører  at når en proces efterfølgende  får ændret i sin liste af prioriteter skal processen genplanlægges for at sikre den står på den korrekte plads i min-hoben i \sched en. 
+
+\subsubsection*{Kanaler}
+I \pycsp findes der kun kanaler af type \code{Any-To-Any} og derfor kan der altid  være et vilkårligt antal kanalender i hver enden af kanalen, der måske er klar til at kommunikere. Vi skal derfor ændre koden, således at kommunikationen mellem kanalenderne altid foregår mellem de højst prioriterede processer. 
+
+I greenletsversionen foregår udvælgelsen af kanalender til kommunikation ved hjælp af funktionen \code{match}, der udnytter at  hver kanal vedligeholder to lister af processer for hhv. de processer der ønsker at sende og modtage data på kanalen. Når en proces eks. ønsker at modtage data tilføjer den sig selv til listen af processer der ønsker at modtage, og prøver derefter i \code{match} funktionen at finde en proces der vil sende data. Er der ingen processer der venter på at sende data, venter processen selv  på at en proces melder sig klar til at sende data, og som så vil kalde \code{match}. Til hver vellykket kommunikation af data vil \code{match} altid blive kaldt to gange, hvor kun den sidste vil resultere i at kommunikationen lykkedes.
+
+Ideen bag funktionen \code{match} er enkel og  udnytter at greenletsversionen er enkelttrådet så hver proces kan løbe listerne igennem uden andre processer ændre på listernes tilstand.  Vi er kommet frem til at  en simpel sortering af listerne, med hensyn til deres interne prioritet vil resultere i det altid er den højst prioriterede proces der indgår i kommunikationen. Den ændrede match kan ses i \cref{lst:match}, hvor det kun er linje 119 og 120 der er ændret.
+
+\begin{lstlisting}[firstnumber=117 ,float=hbtp, label=lst:match, caption=funktionen \code{match} der sorterer kanalrequests.]
+def match(self):        
+    if self.readqueue and self.writequeue:
+        self.readqueue.sort(key=lambda channelReq:channelReq.process.internal_priority)
+        self.writequeue.sort(key=lambda channelReq:channelReq.process.internal_priority)
+        for w in self.writequeue:
+            for r in self.readqueue:
+                if w.offer(r):
+                    return       
+\end{lstlisting}
+
+Funktionen \code{match} vil blive kaldt en gang for hver proces der ønsker at kommunikere, og derfor vil listerne til hvert kald af \code{match} være totalt sorteret minus det sidste element i listen. Desuden vil der altid i den ene liste maksimalt være et element der er aktiv, hvorfor den ene liste højst sandsynlig vil være kort kørselstiden for de to sorteringer vil derfor være lille. Bemærk desuden at listerne er sorteret så værdien af den interne prioritet er stigende, og derfor er det processen med lavest værdi, der først bliver udvalgt til et match, i overensstemmelse med repræsentationen af prioriteter som nævnt i afsnittet ``Ændringer i \sched en''.
 
 
 \begin{itemize}
