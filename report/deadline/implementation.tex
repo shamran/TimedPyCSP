@@ -54,7 +54,7 @@ I greenletsversionen foregår udvælgelsen af kanalender til kommunikation ved h
 
 Ideen bag funktionen \code{match} er enkel og  udnytter at greenletsversionen er enkelttrådet så hver proces kan løbe listerne igennem uden andre processer ændre på listernes tilstand.  Vi er kommet frem til at  en simpel sortering af listerne, med hensyn til deres interne prioritet vil resultere i den  ønskede egenskab at det altid er den højst prioritede proces der indgår i kommunikationen. Den ændrede match kan ses i \cref{lst:match}, hvor det kun er linje 119 og 120 der er ændret.
 
-\begin{lstlisting}[firstnumber=117 ,float=hbtp, label=lst:match, caption=funktionen match, der foretager udvælgelsen af hvilke processer der skal indgå i kommunikation over en kanal.]
+\begin{lstlisting}[firstnumber=117 ,float=hbtp, label=lst:match, caption=funktionen \code{match}]
 def match(self):        
     if self.readqueue and self.writequeue:
         self.readqueue.sort(key=lambda channelReq:channelReq.process.internal_priority)
@@ -65,6 +65,7 @@ def match(self):
                     return       
 \end{lstlisting}
 
+for 
 
 \begin{figure}
  \begin{center}
