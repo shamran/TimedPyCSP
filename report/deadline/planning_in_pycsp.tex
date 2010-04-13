@@ -1,26 +1,11 @@
 \section{Realtime planlægning i \pycsp}
 \label{sec:rtp-pycsp}
-\fxwarning{Skriv afsnit om udvælgelse af kanal efter prioritet}
 
 Da vi ønsker at introducere RTP i \pycsp er der er række forhold som vi skal tage højde for. Vi vil i dette afsnit tage udgangspunkt i de ovenstående opstillede muligheder og sammenholde dem med \pycsp. 
 
 I \pycsp kan vi anskue processerne som begivenheder, og derved bruge skemaplanlæggeren i greenlets-versionen til at styre hvilken proces og dermed hvilken begivenhed der udføres. Vi har ikke umiddelbart informationer om hvor lang tid en proces er om at blive udført, og det vil kræve en analyse af den enkelte proces at udlede estimater for det. Vi har valgt at fokusere på selve planlægningen af processerne og ikke analyse af processerne. Dermed har vi ikke mulighed for både at benytte RM og LL algoritmerne da de begge benytter information om udførselstiden for en proces. Derved har vi EDF tilbage som mulighed, hvilket er den algoritme som vi vil implementere. En udviddelse af \pycsp til at benytte EDF er forholdsvis ligetil. Der skal laves en mulighed for at brugeren kan angive en deadline til en proces, og vi skal ved kontekstskift sikre at vi aktiverer den proces der har den førstkomne deadline. \pycsp har per definition interne afhængigheder mellem processerne i form af kommunikation over kanaler, og vi kan derfor opleve problemer med prioritetsinvertering. Vi skal derfor også implementere prioritetsnedarvning for at sikre os mod prioritetsinvertering. Endeligt skal vi håndtere overskredne deadlines.\fxwarning{Bedre argumentation for valget af prioritetsnedarvning}
 
 Da vi benytter os af greenlets-versionen af \pycsp arbejder vi med en skemaplanlægger der ikke kan foretage preemptive kontekstskift. Dette kan lede til problemstillinger som det illustreret på \cref{fig:edf-nonpreemptive}. En metode til at mindske denne type probqlemer er at lade de enkelte processer afgive kontrollen med jævne melemrum. Herved vil der blive foretaget en ny evaluering om hvilken proces der skal aktiveres, og hvis der processer der har en nærmere deadline som er blevet klar, aktiveres en af disse. Dette beror helt og holdent på hver at hver enkelt proces frivilligt afgiver kontrollen og gør det med jævne mellemrum når den er aktiv. Dette betyder at det er overladt til udvikleren at indsætte det på relevante steder i processens kode. 
-
-
-
-% Nedenstående beskrives i implementationen
-%Vi har valgt at abstrahere en deadline til en prioritet, da vi hermed åbner for senere at kunne lade andre faktorer indgå i prioriteten end blot en proces' deadline. 
-
-begrænset forhåndsviden 
-  dynamisk planlægning
-  ingen viden om udførselstid - heller ikke estimater  
-
-non-preemptive (snakkes der ikke om i foregående afsnit)
-
-nedarvning
-  any->any kanaler kan potentielt give stor spredning af prioritet
 
 \subsection{Prioritetsnedarvning}
 At introducere prioritetsnedarvning i \pycsp virker umiddelbart ligetil idet vi kan se de indbyrdes afhængigheder klart ud fra forbindelserne gennem kanaler. Der kan forekomme andre afhængigheder som er mindre synlige, men vi mener ikke disse vil forekomme i velskrevne CSP applikationer, og vi har derfor valgt at begrænse os til afhængigheder repræsenteret vha. kanaler. På trods af den umiddelbare simplicitet er der dog adskillige overvejelser bl.a. med henblik på hvilke konstruktioner i \pycsp der skal arve prioriteter, hvornår de skal arve dem og hvor længe de skal beholde den modificerede prioritet. \\
@@ -84,11 +69,9 @@ I \pycsp findes kun et prioriteret valg, og dermed kan vi se bort fra første r�
 
 Vi ønsker at foretage udvælgelse i \code{alternations} udføres som weak select. Dvs at først skal der kigges der på om alternation kan vælge en guard umiddelbart. Hvis der er minimum en guard klar foretages der et prioriteret valg baseret på først processernes prioritet, og hvis flere processer har samme prioritet  foretages det prioriterede valg. Er ingen guards klar bør processen vente i dens alternation, og vælge den første guard der bliver klar, uden at skele til dens prioritet.
 
-I artiklen fra \citeauthor{Burns1990} udvælger man en proces blandt flere mulige, mens en \code{alternation} udvælger en kanal der i \pycsp er af typen any-to-any. Dette medfører at man ikke  foretager et valg mellem processer, men foretager et valg mellem kanaler, som processen kommunikerer med. For at foretage en weak selection i vores \code{alternation}, skal man derfor kunne finde prioriteten for kanalerne. Dette skaber derfor et behov for at kunne tilknytte en prioritet til hver kanal, baseret på hvilke processer der er tilknyttet kanalen. \label{misc:kanal-prioritet}
-
-
-
-
+I artiklen fra \citeauthor{Burns1990} udvælger man en proces blandt flere mulige, mens en \code{alternation} udvælger en kanal der i \pycsp er af typen any-to-any. Dette medfører at man ikke  foretager et valg mellem processer, men foretager et valg mellem kanaler, som processen kommunikerer med. For at foretage en weak selection i vores \code{alternation}, skal man derfor kunne finde prioriteten for kanalerne. Dette skaber derfor et behov for at kunne tilknytte en prioritet til hver kanal, baseret på hvilke processer der er tilknyttet kanalen. 
+\phantomsection
+\label{misc:kanal-prioritet}
 
 
 \begin{shaded}
