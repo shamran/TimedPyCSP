@@ -49,6 +49,46 @@ Skal processer der arver prioritet også arve deadline? Det skal de nok ikke, da
 Som udgangspunkt skal vi kunne håndtere at en proces kan have forskellige typer deadlines. Umiddelbart giver det mening at der for hver proces tilknyttes en deadline samt hvilken type det er. Dette giver mulighed for at vi kan differentiere i måden hvorpå vi håndterer en overskreden deadline. F.eks. kan vi stoppe systemet helt i tilfælde af overskridelse af en kritisk deadline, kaste en exception ved en hard deadline og blot registrere overskridelser af soft deadlines. Uanset hvilken handling vi vælger at tilknytte til de respektive overskridelser, vil der være situationer hvor den valgte handling ikke er optimal. Vi har derfor valgt en anden løsning hvor en proces blot kaster en exception hvis den overskrider en deadline. Dette overflødiggør at der tilknyttes en specifik type deadline til en proces, da håndteringen af den kastede exception overgives til udvikleren. Det er herved op til den nekelte udvikler at definere hvad der skal ske i i hver enkelt proces såfremt den oplever en overskreden deadline. Dette giver den største frihed til at tilpasse håndteringen til den enkelte proces og applikation. 
 
 \subsection{Udvælgelse i \code{alternations}}
+Som  beskrevet af \citeauthor{Burns1990}, opstår der en konflikt ved brugen af  prioriterede valg. ifh. til prioriteter på processer \cite{Burns1990}. De beskriver en kodestump som angivet i \cref{lst:pri-select}, hvor processernes prioritet er angivet som Pri1 og Pri2, og hvilken proces der udvælges afhænger af processernes indbyrdes forhold som angivet i \cref{tab:prioritizedSelect}.
+
+
+\begin{lstlisting}[firstnumber=1 ,float=hbtp, label=lst:pri-select, caption={ (priority) select. Eksemplet er kopieret fra \cite[160]{Burns1990}}]
+(priority) select
+   A1 -- Process P1
+ or
+   A2 -- Process P2
+ end select
+\end{lstlisting}
+
+\begin{longtable}{lccc}
+   	\toprule
+    &Pri1 > Pri2 & Pri1 = Pri2 & Pri1 < Pri2\\
+    \midrule
+    \endfirsthead 
+    \toprule
+    &Pri1 > Pri2 & Pri1 = Pri2 & Pri1 < Pri2\\
+    \midrule
+    \endhead % slut efterfølgende headere
+    \bottomrule
+    \multicolumn{4}{r}{\textit{fortsættes}}
+    \endfoot % slut footer
+    \bottomrule
+	\caption[]{Konflikten ved brug af prioriteret valg og procesprioriteter. Eksemplet er kopieret fra \cite[160]{Burns1990}}\\
+	\label{tab:prioritizedSelect}
+    \endlastfoot % slut sidste footer
+      	select          & A1 & Arbitrary    & A2 \\
+		priority select & A1 & A1           & ? \\    
+\end{longtable}
+
+I \pycsp findes kun et prioriteret valg, og dermed kan vi se bort fra første række af \cref{tab:prioritizedSelect}, og konstatere at vi introducerer  en konflikt med introduktionen af prioriteter. For \citeauthor{Burns1990} er løsningen ``orthogonal solutions'', der  tager hånd om begge typer af prioriteter. De ønsker overordnet set to typer udvælgelsesmetoder, Weak- og Strong Select. Weak select sorterer primært ifh. til processernes prioritet og sekundært efter det prioriterede valg. Strong select udvælger udelukkende processer efter det prioriterede valg. De forestiller sig at weak select skal bruges som den primære metode, men i hjørnetilfælde skal en programmør have mulighed for at tvinge et prioriteret valg igennem.
+
+Vi ønsker at foretage udvælgelse i \code{alternations} udføres som weak select. Dvs at først skal der kigges der på om alternation kan vælge en guard umiddelbart. Hvis der er minimum en guard klar foretages der et prioriteret valg baseret på først processernes prioritet, og hvis flere processer har samme prioritet  foretages det prioriterede valg. Er ingen guards klar bør processen vente i dens alternation, og vælge den første guard der bliver klar, uden at skele til dens prioritet.
+
+I artiklen fra \citeauthor{Burns1990} udvælger man en proces blandt flere mulige, mens en \code{alternation} udvælger en kanal der i \pycsp er af typen any-to-any. Dette medfører at man ikke  foretager et valg mellem processer, men foretager et valg mellem kanaler, som processen kommunikerer med. For at foretage en weak selection i vores \code{alternation}, skal man derfor kunne finde prioriteten for kanalerne. Dette skaber derfor et behov for at kunne tilknytte en prioritet til hver kanal, baseret på hvilke processer der er tilknyttet kanalen. \label{misc:kanal-prioritet}
+
+
+
+
 
 
 \begin{shaded}

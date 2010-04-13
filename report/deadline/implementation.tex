@@ -3,7 +3,7 @@
 \subsubsection{Now og Wait}
 Som vi beskrev i \des introducerede vi de to globale funktioner Now og Wait der hhv. returnerer tiden og før en proces til at vente i et givent tidsrum. Vi har ændret den interne implementering af funktionerne, så de bruger realtid. Dette sikre en ensartet implementering af tid på tværs af de tre udviklede versioner af TimedPyCSP. Det vil være en fordel hvis greenlet versionen også brugte Now, når den skal bruge tid, i hvilket tilfælde, det kunne fjernes helt i denne version. 
 
-\subsubsection{Overskreden deadlines}
+\subsubsection{Overskredene deadlines}
 Planlægning i realtime kræver man tager stilling til  hvordan  overskredne deadlines skal håndteres. Man kan vælge enten at se det som en egenskab for processen hvor dens deadline enten kan være overholdt eller ej. Alternativt kan der kan en overskreden deadline resultere i en exception.
 
 Hvilken metode der egner sig bedst til RTP afhænger af hvilken deadline der er tilknyttet processen. Er der tilknyttet en soft deadline til en proces, vil processen stadig tilføje værdi til systemet, selvom det  overskrider dens deadline. Hvorfor  det stadig er bedst for systemet at udføre processen færdig. I dette tilfælde  skal systemet blot markere at dens deadline er overskredet, og senere må programmøren så manuelt håndtere at processens deadline er overskredet. 
@@ -97,44 +97,10 @@ def match(self):
 Funktionen \code{match} vil blive kaldt en gang for hver proces der ønsker at kommunikere, og derfor vil listerne til hvert kald af \code{match} være totalt sorteret minus det sidste element i listen. Desuden vil der altid i den ene liste maksimalt være et element der er aktiv, hvorfor den ene liste højst sandsynlig vil være kort kørselstiden for de to sorteringer vil derfor være lille. Bemærk desuden at listerne er sorteret så værdien af den interne prioritet er stigende, og derfor er det processen med lavest værdi, der først bliver udvalgt til et match, i overensstemmelse med repræsentationen af prioriteter som nævnt i afsnittet ``Ændringer i \sched en''.
 
 \subsubsection*{Alternation}
-
-Som  beskrevet af \citeauthor{Burns1990}, opstår der en konflikt ved brugen af  prioriterede valg. ifh. til prioriteter på processer \cite{Burns1990}. De beskriver en kodestump som angivet i \cref{lst:pri-select}, hvor processernes prioritet er angivet som Pri1 og Pri2, og hvilken proces der udvælges afhænger af processernes indbyrdes forhold som angivet i \cref{tab:prioritizedSelect}.
-
-
-\begin{lstlisting}[firstnumber=1 ,float=hbtp, label=lst:pri-select, caption={ (priority) select. Eksemplet er kopieret fra \cite[160]{Burns1990}}]
-(priority) select
-   A1 -- Process P1
- or
-   A2 -- Process P2
- end select
-\end{lstlisting}
-
-\begin{longtable}{lccc}
-   	\toprule
-    &Pri1 > Pri2 & Pri1 = Pri2 & Pri1 < Pri2\\
-    \midrule
-    \endfirsthead 
-    \toprule
-    &Pri1 > Pri2 & Pri1 = Pri2 & Pri1 < Pri2\\
-    \midrule
-    \endhead % slut efterfølgende headere
-    \bottomrule
-    \multicolumn{4}{r}{\textit{fortsættes}}
-    \endfoot % slut footer
-    \bottomrule
-	\caption[]{Konflikten ved brug af prioriteret valg og procesprioriteter. Eksemplet er kopieret fra \cite[160]{Burns1990}}\\
-	\label{tab:prioritizedSelect}
-    \endlastfoot % slut sidste footer
-      	select          & A1 & Arbitrary    & A2 \\
-		priority select & A1 & A1           & ? \\    
-\end{longtable}
-
-I \pycsp findes der kun en prioritets valg, og dermed kan vi se bort fra første række af \cref{tab:prioritizedSelect}, og konstatere at vi introducerer  en konflikt med introduktionen af prioriteter. For \citeauthor{Burns1990} er løsningen en ``orthogonal solutions'', der  tager hånd om begge typer af prioriteter. De  vage  i deres løsning, men ønsker overordnet set to typer, Weak og Strong Select. Hvor Weak select sorteres primært ifh. til processernes prioritet og sekundært efter det prioriterede valg. Strong select udvælger modsat udelukkende processer efter det prioriterede valg. De forestiller sig at primært skal weak select bruges, men i hjørnetilfælde skal en programmør have mulighed for at tvinge en prioriteret valg igennem
-
-Vi ønsker en løsning så en alternation i \pycsp  minder om weak select. Dvs at først skal der kigges der på om alternation kan vælge en guard umiddelbart. Hvis der er minimum en guard klar foretages der et prioriteret valg baseret på først processernes prioritet, og hvis flere processer har samme prioritet  foretages det prioriterede valg. Er ingen guards klar bør processen vente i dens alternation, og vælge den første guard der bliver klar, uden at skele til dens prioritet.
-
-I artiklen fra \citeauthor{Burns1990}  udvælger man en proces blandt flere mulige, mens en \code{alternation} udvælger en kanal der i \pycsp er af typen any-to-any. Dette medfører at man ikke  foretager et valg mellem processer, men foretager et valg mellem kanaler, som processen kommunikerer med. For at foretage en weak selection i vores \code{alternation}, skal man derfor kunne finde prioriteten for kanalerne. Dette findes ikke, men vi kan emulere at en kanal har  prioritet, ved at finde den højst prioriterede proces i hver kanal der er interesseret i kommunikation.  Vi har derfor lavet to hjælpefunktioner der finder de højst prioriterede processer der er villig til hhv. at sende og modtage data. Med disse hjælpefunktioner kan vi til hver kanal se på om det er en input- eller output-guard, der knytter sig til kanalen og finde den tilhørende prioritet for kanalen. \inline{Skal det begrundes hvorfor vi har to hjælpefunktioner}
+Som nævnt i \cref{misc:kanal-prioritet} har vi behov for at kunne tilknytte en prioritet til en kanal for at kunne håndtere udvælgelse i \code{alternations} prioritetet. I stedet for direkte at tilknytte en prioritet har vi valgt at emulere en prioritet, ved at finde den højst prioriterede proces i hver kanal der er klar til at kommunikere.  Vi har derfor lavet to hjælpefunktioner der finder de højst prioriterede processer der er villig til hhv. at sende og modtage data. Med disse hjælpefunktioner kan vi til hver kanal se på om det er en input- eller output-guard, der knytter sig til kanalen og finde den tilhørende prioritet for kanalen. Derved kan vi finde en prioritet som er gældende for kanalen, hvilket opfylder det stillede krav. \inline{Skal det begrundes hvorfor vi har to hjælpefunktioner}
 \fxnote{skal det afsluttes bedre?}
+
+
 
 \subsubsection*{Prioritetsnedarvning}
 Prioritet i et RTP system skal ses i forhold til samlede antal prioriteter. En proces kan derfor ikke i sig selv have en absolut høj prioritet, men kun have høj prioritet ifh. til andre processers prioritet. 
