@@ -105,8 +105,30 @@ Som nævnt i \cref{misc:kanal-prioritet} har vi behov for at kunne tilknytte en 
 \subsubsection*{Prioritetsnedarvning}
 Prioritet i et RTP system skal ses i forhold til samlede antal prioriteter. En proces kan derfor ikke i sig selv have en absolut høj prioritet, men kun have høj prioritet ifh. til andre processers prioritet. Ved at give højere prioritet til andre processer, vil vi dermed også indirekte sænke den oprindelige proces prioritets, et fænomen vi vil kalde prioritetsdevaluering.
 
-For at minimere prioritetsdevaluering i forbindelse med prioritetsnedarvning  ønsker vi, at minimere tiden en proces har en kunstigt høj prioritet. Desuden ønsker vi det er færrest mulige processer hvis prioritet øges. I \pycsp findes der kun any-to-any kanaler, og derfor kan der findes et vilkårligt antal processer i hver kanalenden, og man risikere en stor prioritetsdevaluering, i modsætning til  one-to-one kanaler, hvor man er sikret at kun èn proces prioritet bliver højnet. I \pycsp må man højne alle de processer der har en kanalende 
+For at minimere prioritetsdevaluering i forbindelse med prioritetsnedarvning  ønsker vi, at minimere tiden en proces har en kunstigt høj prioritet. Desuden ønsker vi  færrest mulige processer  prioritet øges. I \pycsp findes der kun any-to-any kanaler, og derfor kan der findes et vilkårligt antal processer i hver kanalenden, og man risikere en stor prioritetsdevaluering, i modsætning til  one-to-one kanaler, hvor man er sikret at kun én proces prioritet bliver højnet. Forskellen kan illustreres af \autoref{fig:one-to-one-inheritance} og \cref{fig:any-to-any-inheritance}\fxwarning{tjek sidenr. er korrekt for de to figurer inden aflevering}. I \autoref{fig:one-to-one-inheritance}, bliver  en proces prioritet hævet, mens afsenderen er blokeret mens den venter på kommunikation. Den totale prioritet er derfor bevaret, da der altid kun er én aktiv proces med prioritet ti. I \autoref{fig:any-to-any-inheritance} bliver tre processers prioritet hævet til ti og det totale antal processer der har en prioritet på ti, øges derfor fra en til tre. \fxnote{skriv mere og afslut}
 
+
+I \pycsp skal en proces nedarve prioritet, hvis der ikke finder nogle processer der umiddelbart er klar til at kommunikere. 
+Vi kan umiddelbart evaluere om der er processer klar til kommunikation på en kanal, da disse findes i listerne \code{readqueue} og \code{writequeue}. Men vi har ikke umiddelbart mulighed for vide hvilke processer der kan indgå i kommunikation med processen. Vi må derfor udvide kanalerne i RTP versionen, med to lister der af processer der potentielt kan kommunikere over kanalen.  
+
+For at foretage prioritetsnedarvning har vi valgt at vi skal udvidde de to funktioner til kommunikation \code{\_read} og \code{\_write}
+vi kan finde en metode til midlertidigt at øge prioriterne for de processer, der har mulighedfindes der ikke i greenletsversionen to listermå man højne alle de processer der har en kanalende. 
+
+\begin{figure}
+ \begin{center}
+  \includegraphics[scale=1.00]{images/one-to-one-inheritance}
+\caption{Procesnetværk med en afsender og en modtager. Afsenderen har prioritet 10, mens modtageren har en initiel prioritet på fem. Modtageren  får via prioritetsnedarvning hævet sin prioritet til ti. (Højere er bedre)}
+  \label{fig:one-to-one-inheritance}
+  \end{center}
+\end{figure}
+
+\begin{figure}
+ \begin{center}
+  \includegraphics[scale=1.00]{images/any-to-any-inheritance}
+  \caption{I dette eksempel findes der tre modtagere, som alle får hævet deres prioritet til ti.}
+  \label{fig:any-to-any-inheritance}
+  \end{center}
+\end{figure}
 
 \begin{itemize}
 \tightlist
