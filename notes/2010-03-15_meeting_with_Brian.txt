@@ -1,0 +1,16 @@
+Kan vi få nogle præsise definitioner af interaktiv tid. Meget gerne litteratur.
+- Det må tidligst ske til tid t. 
+
+
+Kan vi ikke bruge grisseudskæring til et RTP eksempel? Hvem står for dette.
+- 
+
+Hvad skal vi gøre hvis deadline og interaktive viser sig at være det samme.
+-
+
+
+Kan vi ændre så vi får mere kritik af det vi skriver ifh. til møderne?
+
+- Deadline i aften .
+- Møde onsdag kl 12.30! ho Brian 
+

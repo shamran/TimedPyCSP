@@ -1,0 +1,25 @@
+TimedPyCSP
+ - To nye versioner baseret på greenlets
+ - Nedarvning fra greenlets.
+ - Integration test and TDD
+RTP
+ - Deadline
+ - Prioritet
+ - Grisseeksempel
+ - Nedarvning
+    - problematisk med any to any kanaler
+
+DES
+ - Det er en simulering
+ - Tiden står stille
+ - Planlægning af begivnhed / Processer kan vente
+ - Omskrivning af scheduler 
+    - brug af heap i timer
+    - ingen timer tråd.
+ - Grisseeksempel
+
+
+---------------------------------------------------------
+
+
+
