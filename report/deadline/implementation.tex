@@ -136,7 +136,14 @@ Vi ønsker en løsning så en alternation i \pycsp  minder om weak select. Dvs a
 I artiklen fra \citeauthor{Burns1990}  udvælger man en proces blandt flere mulige, mens en \code{alternation} udvælger en kanal der i \pycsp er af typen any-to-any. Dette medfører at man ikke  foretager et valg mellem processer, men foretager et valg mellem kanaler, som processen kommunikerer med. For at foretage en weak selection i vores \code{alternation}, skal man derfor kunne finde prioriteten for kanalerne. Dette findes ikke, men vi kan emulere at en kanal har  prioritet, ved at finde den højst prioriterede proces i hver kanal der er interesseret i kommunikation.  Vi har derfor lavet to hjælpefunktioner der finder de højst prioriterede processer der er villig til hhv. at sende og modtage data. Med disse hjælpefunktioner kan vi til hver kanal se på om det er en input- eller output-guard, der knytter sig til kanalen og finde den tilhørende prioritet for kanalen. \inline{Skal det begrundes hvorfor vi har to hjælpefunktioner}
 \fxnote{skal det afsluttes bedre?}
 
+\subsubsection*{Prioritetsnedarvning}
+Prioritet i et RTP system skal ses i forhold til samlede antal prioriteter. En proces kan derfor ikke i sig selv have en absolut høj prioritet, men kun have høj prioritet ifh. til andre processers prioritet. 
 
+Ved at give højere prioritet til andre processer, vil vi dermed også indirekte sænke den oprindelige processens prioritets devaluering
+
+Derfor ønsker vi, kun i kortets mulig tid, at højne prioriteten for andre processer. Desuden ønsker vi det er færrest mulige processer hvis prioritet øges. 
+
+I \pycsp findes der kun any-to-any kanaler, og derfor kan der findes et vilkårligt antal processer i hver enden af kanalenden. 
 
 
 \begin{itemize}
@@ -149,10 +156,4 @@ I artiklen fra \citeauthor{Burns1990}  udvælger man en proces blandt flere muli
 \item Channel:\\
         self.readerprocesses = []\\
         self.writerprocesses = []
-
-\item Udviddet \_read og \_write
-\item Udvidder match
-\item     def choose(self) i alternation
-
-
 \end{itemize}
