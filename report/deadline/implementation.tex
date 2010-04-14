@@ -105,24 +105,7 @@ Som nævnt i \cref{misc:kanal-prioritet} har vi behov for at kunne tilknytte en 
 \subsubsection*{Prioritetsnedarvning}
 Prioritet i et RTP system skal ses i forhold til samlede antal prioriteter. En proces kan derfor ikke i sig selv have en absolut høj prioritet, men kun have høj prioritet ifh. til andre processers prioritet. Ved at give højere prioritet til andre processer, vil vi dermed også indirekte sænke den oprindelige proces prioritets, et fænomen vi vil kalde prioritetsdevaluering.
 
-For at minimere prioritetsdevaluering i forbindelse med prioritetsnedarvning  ønsker vi, at minimere tiden en proces har en kunstigt høj prioritet. Desuden ønsker vi  færrest mulige processer  prioritet øges. I \pycsp findes der kun any-to-any kanaler, og derfor kan der findes et vilkårligt antal processer i hver kanalenden, og man risikere en stor prioritetsdevaluering, i modsætning til  one-to-one kanaler, hvor man er sikret at kun én proces prioritet bliver højnet. Forskellen kan illustreres af \autoref{fig:one-to-one-inheritance} og \cref{fig:any-to-any-inheritance}\fxwarning{tjek sidenr. er korrekt for de to figurer inden aflevering}. I \autoref{fig:one-to-one-inheritance}, bliver  en proces prioritet hævet, mens afsenderen er blokeret mens den venter på kommunikation. Den totale prioritet er derfor bevaret, da der altid kun er én aktiv proces med prioritet ti. I \autoref{fig:any-to-any-inheritance} bliver tre processers prioritet hævet til ti og det totale antal processer der har en prioritet på ti, øges derfor fra en til tre. Prioritetsnedarvning i et miljø med med any-to-any kanaler har dermed en latent risiko for at medfører prioritetsdevaluering. Man kan forstille sig forskellige metoder til at eliminere eller minimere problemet ved at begrænse antallet processer der kan modtage en prioritetsnedarvning, men hvilken proces der er tættets på at indgå i kommunikation beror på den enkelte applikation og dens processers aktuelle tilstand.  En begrænsning på  hvilke processers prioritet der skal forhøjes vil derfor kræve analyse af applikationens kode på kørselstidspunktet, og brug af heuristik. Vi ønske ikke at begynde på at analysere brugerens kode hvorfor vi nødvendigvis må sende prioritetsnedarvningen til alle processerne på kanalen, men vil i stedet fokusere på at minimere antallet af processer der starter prioritetsnedarvningen, og den tid processerne har nedarvet en prioritet.
-
-\begin{figure}
- \begin{center}
-  \includegraphics[scale=1.00]{images/one-to-one-inheritance}
-\caption{Procesnetværk med en afsender og en modtager. Afsenderen har prioritet 10, mens modtageren har en initiel prioritet på fem. Modtageren  får via prioritetsnedarvning hævet sin prioritet til ti. (Højere er bedre)}
-  \label{fig:one-to-one-inheritance}
-  \end{center}
-\end{figure}
-
-\begin{figure}
- \begin{center}
-  \includegraphics[scale=1.00]{images/any-to-any-inheritance}
-  \caption{I dette eksempel findes der tre modtagere, som alle får hævet deres prioritet til ti.}
-  \label{fig:any-to-any-inheritance}
-  \end{center}
-\end{figure}
-
+For at minimere prioritetsdevaluering i forbindelse med prioritetsnedarvning  ønsker vi, at minimere tiden en proces har en kunstigt høj prioritet. Desuden ønsker vi  færrest mulige processer  prioritet øges. 
 
 I \pycsp skal en proces nedarve prioritet, hvis der ikke finder nogle processer der umiddelbart er klar til at kommunikere.  Vi kan umiddelbart evaluere om der er processer klar til at kommunikere over en given kanal, da processer der er klar findes i listerne \code{readqueue} og \code{writequeue}. I de tilfælde hvor der ikke er nogle processer klar, har vi derimod ikke umiddelbart mulighed for vide hvilke processer der skal have øget deres prioritet, så de kan indgå i kommunikation med processen. Vi må derfor udvide kanalerne i RTP versionen, med to lister der består af de processer der potentielt kan sende og modtage over kanalen og har derfor tilføjet listerne  \code{readerprocesses} og \code{writerprocesses} til kanalerne.  
 Det indebærer dog en udfordring at udfulde listerne med de korrekte processer, da kanalerne er dynamiske, og antallet af processer tilknyttet en given kanal varierer over dens levetid.
