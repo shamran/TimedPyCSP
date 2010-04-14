@@ -7,7 +7,7 @@ RTP benyttes meget i specialiserede indlejrede systemer til f.eks medicinsk udst
 I litteraturen omkring RTP bruges begreberne hard- og soft deadlines samt hard- og soft real-time systemer forskelligt, så vi vil i det følgende gennemgå hvordan vi definerer disse begreber. Vi har valgt at illustrere deadlines ved hjælp af time-value funktioner, hvor "værdien" indikerer det bidrag begivenheden bidrager med til systemets overordnede mål. 
 
 \subsubsection{Kritisk deadline}
-En kritisk deadline er en deadline som under alle omstændigheder skal overholdes for at opretholde systemets integritet. Såfremt en kritisk deadline overskrides vil der påføres skader på systemet som kan forårsage at systemets tilstand bliver udefineret. En kritisk deadline er illusteret i \cref{fig:hard-rtp}.
+En kritisk deadline er en deadline som under alle omstændigheder skal overholdes for at opretholde systemets integritet. Såfremt en kritisk deadline overskrides vil der påføres skader på systemet som kan forårsage at systemets tilstand bliver udefineret. En kritisk deadline er illusteret på \cref{fig:hard-rtp}.
 
 \begin{figure}
  \begin{center}
@@ -19,7 +19,7 @@ En kritisk deadline er en deadline som under alle omstændigheder skal overholde
 
 
 \subsubsection{Hard deadline}
-Vi definerer en begivenhed til at have en hard deadline såfremt en færdiggørelse af begivenheden efter deadlinen ikke tilfører systemet nogen positiv værdi. Modsat en kritisk deadline kan en overskridelse af en hard deadline accepteres. I \cref{fig:hard-dl} vises en hard deadline for en begivenhed. 
+Vi definerer en begivenhed til at have en hard deadline såfremt en færdiggørelse af begivenheden efter deadlinen ikke tilfører systemet nogen positiv værdi. Modsat en kritisk deadline kan en overskridelse af en hard deadline accepteres. På \cref{fig:hard-dl} vises en hard deadline for en begivenhed. 
 
 \begin{figure}
  \begin{center}
@@ -55,9 +55,10 @@ Generelt vil der i et real-time system ikke være alle begivenheder der har den 
 %For RTP skal kørslen planlægges så begivenhederne har den maksimale udnyttelse af tilgængelige ressourcer samtidigt med at så mange deadlines som muligt overholdes, hvor de vigtigte deadlines prioriteres højest. 
 
 \input{deadline/planning}
-\input{deadline/examples}
+%\input{deadline/examples}
 \input{deadline/planning_in_pycsp}
-\input{deadline/implementation}
-\section{Evaluering}
-\section{Fremtidigt arbejde}
-\section{Opsummering}
+%\input{deadline/implementation}
+%\fxwarning[inline,nomargin]{Husk at snakke om kunstige lave prioriteter såfremt en proces arver prioritet fra flere andre processer. }
+%\section{Evaluering}
+%\section{Fremtidigt arbejde}
+%\section{Opsummering}
