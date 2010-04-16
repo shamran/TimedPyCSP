@@ -17,10 +17,21 @@ Til at understøtte udvælgelsen af model må vi først se arbejdsgangen der er 
 	\item Robotten udskærer grisen.
 \end{enumerate}
 
-Man kan se at arbejdsgangen indeholder en  række klart afgrænsede arbejdsområder, som med fordel kan modelleres som selvstændige processer i \pycsp. Der findes do ikke kun en måde at opbygge procesnetværket på, men vi har valgt at have følgende processer: Røntgenskanner, Billedekonvertering, 3D-analyse og en udvælgelse og udskæringsproces. 
+Man kan se at arbejdsgangen indeholder en  række klart afgrænsede arbejdsområder, som med fordel kan modelleres som selvstændige processer i \pycsp. Der findes do ikke kun en måde at opbygge procesnetværket på, men vi har valgt at have følgende processer: Røntgenskanner, Billedekonvertering, 3D-analyse og en udvælgelse og udskæringsproces, hvilket leder til et procesnetværk som vist i \cref{fig:pig-network}
 
+\begin{figure}
+ \begin{center}
+  \includegraphics[scale=1]{images/pig-network}
+	\caption{Procesnetværk til udskæring af grise på et slagteri.}
+	\label{fig:pig-network}
+\end{center}
+\end{figure}
 
-Dette har yderligere den fordel at RTP systemet, nem kan udviddes hvis man indsætter ekstra hardware
+Den simple model, viser dog ikke den store fordel, ved RTP systemet i \pycsp, som er at netværket nemt kan udvide antallet af processer til at passe det endelige opstilling. Som programmør har man mulighed for at teste forskellige indstillinger i netværket, som hvor mange processer der samtidigt skal konverterer billederne og hvor mange analyser skal kunne foregå samtidigt. Endeligt kan systemet også nemt udvides hvis det overordnede design på slagteriet ændre sig. Viser det sig f.eks at røntgenskanneren holder netværket tilbage kan man blot udvide procesnetværket med endnu en røngtenproces.
+
+\subsubsection*{Implementering uden RTP}
+Selve implementeringen af slagteriet uden brug af RTP skal indeholde: 
+
 
 
 \subsection{Eksempel 2 - Sensornetværk med høj/lav -prioritet}
