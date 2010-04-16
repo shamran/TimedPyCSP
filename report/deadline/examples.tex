@@ -1,11 +1,27 @@
 \section{Eksempler}
+\subsection{Slagteri}
+\inline{eks1: grise på bånd, foto af flere grise, ingen deadline på kniven. Billeder lægges i kø til kniven som bruger dem hvis de er klar.}
+
+Det første eksempel på en applikation der kan bruge et RTP systemer, er en beslutningsmodel til udskæring af grise med.
+
+Vi forestiller os at der findes slagteri hvor  hver gris skal skæres ud i et forud defineret antal portioner. Til dette bruges en udskæringsrobot og en udskæringsmodel. Udskæringsmodellen er lavet for at minimere mængden af kød der går til spilde.  Det har dog vist sig at udskæringsmodellen ikke altid resultere i en  optimal udskæring af grisen, da  ca. 10\% af alle grise har et ekstra sæt ribben. Til at løse dette problem har slagteriet udviklet en ny udskæringsmodel for grise med et ekstra sæt ribben, samt  investeret i en røngentskanner der skal skanne alle grisene. 
+Slagteriet har placeret røngtenskanneren i starten af et transportbåndet mens udskæringsrobotten findes i den anden enden. Der kan være flere grise på transportbåndet på samme tid, og det fremføre grisene i et fast tempo. Dette giver et fast tidsrum fra grisen passere røntgenskanneren til den passere udskæringsrobotten. Vi har hermed et RTP system, hvor robotten skal foretage et valg af udskæringsmodel under en hard deadline, da det ikke er en mulighed ikke at foretage en udskæring.
+
+Til at understøtte udvælgelsen af model må vi først se arbejdsgangen der er involveret i valget af udskæringsmodel. 
+\begin{enumerate}
+\tightlist
+	\item Et billede bliver taget af grisen mens den passere røntgenskanneren.
+	\item Billedet konverteres til en 3D-model af grisen.
+	\item 3D-modellen analyseres.
+	\item Udskæringmodel udvælges på baggrund af analysen.
+	\item Robotten udskærer grisen.
+\end{enumerate}
+
+Man kan se at arbejdsgangen indeholder en  række klart afgrænsede arbejdsområder, som med fordel kan modelleres som selvstændige processer i \pycsp. Der findes do ikke kun en måde at opbygge procesnetværket på, men vi har valgt at have følgende processer: Røntgenskanner, Billedekonvertering, 3D-analyse og en udvælgelse og udskæringsproces. 
 
 
-eks1: grise på bånd, foto af flere grise, ingen deadline på kniven. Billeder lægges i kø til kniven som bruger dem hvis de er klar. 
+Dette har yderligere den fordel at RTP systemet, nem kan udviddes hvis man indsætter ekstra hardware
 
 
-
-
-
-
-eks2: skal vise alternation, kan være en sensor som modtager måledata med lav prioritet og som skal sende måledata på opdordring med høj prioritet. 
+\subsection{Eksempel 2 - Sensornetværk med høj/lav -prioritet}
+\inline{eks2: skal vise alternation, kan være en sensor som modtager måledata med lav prioritet og som skal sende måledata på opdordring med høj prioritet.}
