@@ -103,13 +103,14 @@ Som nævnt i \cref{misc:kanal-prioritet} har vi behov for at kunne tilknytte en 
 
 
 \subsubsection*{Prioritetsnedarvning}
-Prioritet i et RTP system skal ses i forhold til samlede antal prioriteter. En proces kan derfor ikke i sig selv have en absolut høj prioritet, men kun have høj prioritet ifh. til andre processers prioritet. Ved at give højere prioritet til andre processer, vil vi dermed også indirekte sænke den oprindelige proces prioritets, et fænomen vi vil kalde prioritetsdevaluering.
+Prioritet i et RTP system skal ses i forhold til alle processers prioritet. En proces kan derfor ikke i sig selv have en absolut høj prioritet, men kun have høj prioritet ifh. til de andre processers prioritet. Ved at give en høj prioritet til  en proces, vil dette dermed  indirekte sænke de andre processers prioritet, et fænomen vi vil kalde prioritetsdevaluering.
 
-For at minimere prioritetsdevaluering i forbindelse med prioritetsnedarvning  ønsker vi, at minimere tiden en proces har en kunstigt høj prioritet. Desuden ønsker vi  færrest mulige processer  prioritet øges. 
+For at minimere prioritetsdevaluering i forbindelse med prioritetsnedarvning  ønsker vi, at minimere tiden en proces har en kunstigt høj prioritet og minimere antallet af processers, hvis prioritet øges. 
 
-I \pycsp skal en proces nedarve prioritet, hvis der ikke finder nogle processer der umiddelbart er klar til at kommunikere.  Vi kan umiddelbart evaluere om der er processer klar til at kommunikere over en given kanal, da processer der er klar findes i listerne \code{readqueue} og \code{writequeue}. I de tilfælde hvor der ikke er nogle processer klar, har vi derimod ikke umiddelbart mulighed for vide hvilke processer der skal have øget deres prioritet, så de kan indgå i kommunikation med processen. Vi må derfor udvide kanalerne i RTP versionen, med to lister der består af de processer der potentielt kan sende og modtage over kanalen og har derfor tilføjet listerne  \code{readerprocesses} og \code{writerprocesses} til kanalerne.  
-Det indebærer dog en udfordring at udfulde listerne med de korrekte processer, da kanalerne er dynamiske, og antallet af processer tilknyttet en given kanal varierer over dens levetid.
-Dette kan vi løse ved at hver proces ved opstart tilføjer sig til de kanaler den har mulighed for at kommunikere over. Et oplagt sted at implementere denne funktionalitet er i processens  \code{\_\_init\_\_}  funktion. Her findes listen af argumenter som en proces starter med, inklusivt alle de kanalender den kender til. Ved at gennemløbe argumenterne, og finde kanalenderne kan processen tilføje sig til de relevante kanaler som det ses af  \cref{lst:process-init}
+Som vi er kommet frem til i \cref{sec:rtp-pycsp-nedarvning}, skal  der foregå  prioritetsnedarvning i forbindelse med kommunikation, hvis der ikke finder nogle processer der umiddelbart er klar til at kommunikere.  I \pycsp kan man umiddelbart evaluere om der er processer klar til at kommunikere over en given kanal. Det skyldes at processer der ønsker kommunikation befinder sig i listerne \code{readqueue} og \code{writequeue}. Hvis ingen proces ønsker at kommunikere, kan man dog ikke finde de processer som potentielt kan indgå i kommunikation.
+Vi må derfor udvide kanalerne i RTP versionen, med to lister, \code{readerprocesses} og \code{writerprocesses}, der består af de processer der potentielt kan sende og modtage data over kanalen. 
+Det er dog ikke ummidelbart hvordan kanalerne skal udfylde de to lister, da processerne dynamiske starter og stopper, og antallet af processer tilknyttet en given kanal varierer over dens levetid.
+Dette kan løser vi ved at hver proces ved opstart tilføjer sig selv til de kanaler den har mulighed for at kommunikere over. Et oplagt sted at implementere denne funktionalitet er i processens  \code{\_\_init\_\_}  funktion. Til det skyldes at alle kanalender som denne proces potentielt kan kommunikere over, findes som argument til  \code{\_\_init\_\_} funktion. \Cref{lst:process-init} viser udvidelsen af funktionen, hvor argumenterne gennemløbes mens der ledes efter kanaler som processen skal registreres i.
 
 \begin{lstlisting}[firstnumber=29 ,float=hbtp, label=lst:process-init, caption=Uddrag af \code{Process}' \code{\_\_init\_\_}funktion]
 for arg in args:
@@ -119,14 +120,14 @@ for arg in args:
         arg.channel._addWriterProcess(self)  
 \end{lstlisting}
 
-Kanaler kender nu  både de processer der på et specifikt tidspunkt ønsker at kommunikere via listerne \code{readqueue} og \code{writequeue}, samt de processer der potentielt vil kunne kommunikere med listerne \code{readerprocesses} og \code{writerprocesses}. En proces der ønsker at kommunikere over en kanal, kan nu  både evaluere om den umiddelbart kan kommunikere, og hvis ikke hvilke processer den kan øge prioriteten på for at komme til at kommunikere.
+Kanaler kender nu  både de processer der på et specifikt tidspunkt ønsker at kommunikere via listerne \code{readqueue} og \code{writequeue}, samt de processer der potentielt vil kunne kommunikere med listerne \code{readerprocesses} og \code{writerprocesses}. En proces der ønsker at kommunikere over en kanal, kan nu  både evaluere om den umiddelbart kan kommunikere, og hvis ikke hvilke processers  prioritet den kan øge for at komme til at kommunikere.
 
-Selve prioritetsnedarvning har vi valgt skal inkorporeres i de to interne kommunikationfunktioner kaldet \code{\_read} og \code{\_write}. Vi har udvidet funktionerne med følgende liste af begivenheder.
+Implemtenteringen af prioritetsnedarvning, skal implementeres i de to interne kommunikationfunktioner  \code{\_read} og \code{\_write}. Fordelen ved at placere prioritetsnedarvning i disse to funktioner er at de bruges både i forbindelse med normal blokerende kommunikation, af processerne, samt i forbindelse med kommunikation i \code{alternation}. Vi har udvidet funktionerne med følgende liste af begivenheder:
 \begin{itemize}
 \tightlist
 	\item Undersøg om processen opfylder kriterierne for at starte en prioritetsnedarvning.
 	\item Forhøj prioriteterne for de potentielle processer i enten \code{readerprocesses} eller \code{writer\-processes}.
-	\item Nedprioriter de processer, man midlertidigt har øget prioriteterne på.
+	\item Umiddelbart efter kommunikationen nedprioriteres de processer, man midlertidigt har øget prioriteterne på.
 \end{itemize}
 
 som beskrevet er det vigtigt vi igennem hele designet forsøger at begrænse mængden af prioritetsnedarvningen, og derfor har vi tilføjet en række egenskaber  der skal være indfriet før prioritetsnedarvningen forsøges. Disse er: processen skal have en prioritet, enten direkte eller efter en nedarvning; kanalen må ikke være klar til kommunikation, hvilket vil sige at ønsker processen at skrive må der ikke findes en proces der er klar til at modtage data; endelige skal processen ikke have overskredet sin egen deadline, da denne tilslut blot vil genererer en exception, og hele prioritetsnedarvningen vil være irrelevant.
