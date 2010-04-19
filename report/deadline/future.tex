@@ -1,0 +1,21 @@
+\section{Fremtidigt arbejde}
+Vi har i dette kapitel opstillet en basal model for en RTP-implementering i \pycsp. Implementeringen er foretaget med henblik på blot at vise muligheden for en sådan model, og der er flere udviddelser som vi mener vil kunne forbedre modellen såfremt de kan implementeres. Vi vil i dette afsnit gennemgå nogle forbedringer som vi mener er interessante, men som ikke er inddraget i den basale implementering. 
+
+\subsubsection{Evaluering af effektivitet}
+Vi har med eksempler og test vist, at den implementerede løsning fungerer teoretisk korrekt. Vi har ingen test af om vi reelt når flere deadlines med vores RTP-løsning end vi ville uden. For at belyse dette ville det være interessant med en analyse af hvor meget ekstra tid vi bruger på at evaluere hvilken proces der skal aktiveres, samt opretholde de metadata der skal til for at foretage denne vurdering.  
+
+\subsubsection{Estimater for udførselstid}
+Den primære begrænsning i vores løsning er manglen på at kunne evaluere hvor lang tid en proces eller dele af en proces tager at udføre. Hvis vi kunne udvikle en løsning der kunne foretage estimater af processers udførselstid ville vi kunne vælge en anden udvælgelsesalgoritme, som f.eks LL frem for EDF. Derved ville udvælgelsen af hvilken proces der skal aktiveres blive mere præcis. Ligeledes vil muligheden for at vurdere hvor langt en proces er nået i sin udførsel også være meget brugbart i forbindelse med prioritetsnedarvning. I vores implementering nedarver vi prioritet til alle processer som har mulighed for at opfylde en afhængighed. Såfremt vi kan vurdere hvilken proces der er tættest på at kunne opfylde afhængigheden, kan vi nøjes med at nedarve prioriteten til denne proces. Dette vil afhjælpe problemet med prioritetsdevaluering som nævnt i \fxwarning{find reference}.
+
+\subsubsection{Implementering i threads-version}
+
+
+
+Test af effektivitet
+
+Estimater for kørselstid for processer
+
+Evaluering af hvor langt en proces er fra at være færdig
+
+Implemementering i process-version
+
