@@ -1,10 +1,10 @@
 \section{Slagterieksempel}
 
-På Danish Crown slagteriet i Horsens udskæres grisene af en robot.
+I det første eksempel på en applikation der kan bruge et RTP systemer, skal vi udvikle er en beslutningsmodel, der kan beslutte hvilken model robotten skal bruge til at  udskære den enkelte gris med. På Danish Crown slagteriet i Horsens udskæres grisene af en robot som beskrevet på deres hjemmeside:
 
 \begin{quote}\textit{``Grisen [\ldots] skal nu skæres i mindre, håndterbare stykker. Det sker i en meget avanceret maskine -- en såkaldt tredeler -- hvor hver halvdel af grisen deles i tre stykker: bov, mellemstykke og skinke. \\ 
 \\
-Robotten starter med at fotografere hver halvdel. Dataene fra billedet kombineres med ordren og kundens ønsker, hvorefter stykket deles i tre - nøjagtigt afpasset kundens ønsker.''}{ Danish Crowns hjemmeside\footnote{http://www.danishcrown.dk/custom/horsens/3772.asp}}\end{quote}
+Robotten starter med at fotografere hver halvdel. Dataene fra billedet kombineres med ordren og kundens ønsker, hvorefter stykket deles i tre - nøjagtigt afpasset kundens ønsker.''}{ Danish Crowns hjemmeside\footnote{\url{http://www.danishcrown.dk/custom/horsens/3772.asp}}}\end{quote}
 
 Et billede af den automatiske tredeler er vist  på \cref{fig:pig}. Vi forestiller os at selve udskæring også laves på baggrund af en model af hvordan grisen er udformet. Det har dog vist sig at modellen ikke altid resulterer i en  optimal udskæring, da  ca. 10\% af alle grise har et ekstra sæt ribben, som modellen ikke tager højde for. Til at løse dette problem har slagteriet udviklet en ny model for grise med et ekstra sæt ribben.
 
@@ -16,7 +16,6 @@ Et billede af den automatiske tredeler er vist  på \cref{fig:pig}. Vi forestill
 \end{center}
 \end{figure}
 
-I det første eksempel på en applikation der kan bruge et RTP systemer, skal vi udvikle er en beslutningsmodel, der kan beslutte hvilken model robotten skal bruge til at  udskære den enkelte gris med. 
 
 Slagteriet har placeret kameraet i starten af et transportbåndet mens udskæringsrobotten findes i den anden enden. Der kan være flere svin på transportbåndet på samme tid, og det fremføre svinene i et fast tempo. Dette giver et fast tidsrum fra svinet passere kameraet til det passere robotten. Vi har hermed et klassisk RTP system, hvor robotten skal foretage et valg af model under en hard deadline, da det ikke er en mulighed ikke at foretage en udskæring.
 
@@ -40,7 +39,7 @@ Man kan se at arbejdsgangen indeholder en  række klart afgrænsede arbejdsområ
 \end{center}
 \end{figure}
 
-Den simple model, viser dog ikke den store fordel, ved RTP systemet i \pycsp, som er at netværket nemt kan udvide antallet af processer til at passe det endelige opstilling. Som programmør har man mulighed for at teste forskellige indstillinger i netværket, som hvor mange processer der samtidigt skal konverterer billederne og hvor mange analyser skal kunne foregå samtidigt. Endeligt kan systemet også nemt udvides hvis det overordnede design på slagteriet ændre sig. Viser det sig f.eks at røntgenskanneren holder netværket tilbage kan man blot udvide procesnetværket med endnu en røngtenproces.
+
 
 \subsubsection*{Implementering i Greenletsversionen}
 Til at implementere eksemplet uden brug af af RTP-udvidelsen i \pycsp, kan vi oprette hvert svin som et objekt og tilknytte en deadline. Nu kan hver proces evaluere om svinet har overskredet sin deadline, i det tilfælde fjerne svinet, og stoppe den videre behandling. Det er ikke angivet hvordan hele processen startes, men vi antager der findes en form for detektor foran røngtenkameraet, der opfanger når et svin passere og som dermed  starter processen. 
@@ -54,7 +53,7 @@ Når detektoren starter hele processen, opretter den svineobjektet som den sende
 \end{center}
 \end{figure}
 
-Et problem ved at implementere hele slagterieksemplet i \pycsp er  grænsefladen mellem verden hvor svinene kører på transportbåndet, og den elektroniske verden, der bygger på greenletsversionen, og hvor  kun en proces kan være aktiv af gangen. For hele tiden at arbejde kører konvertering og analyse processen, mens  udskæringsprocessen venter på at svinene kommer inden for rækkevidde. Men konvertering og analysen processen  skal frivilligt afgive kontrollen, mens svinet er indenfor robottens rækkevidden og hvis de ikke gør, bliver svinet ikke udskåret. Dette er dybt uhensigstmæssigt 
+Et problem ved at implementere hele slagterieksemplet i \pycsp er  grænsefladen mellem verden hvor grisene kører på transportbåndet, og  greenletsversionen,  hvor  kun en proces kan være aktiv af gangen. Konvertering og analyse processen arbejder, mens  udskæringsprocessen venter på at svinene kommer inden for rækkevidde. Konvertering- og analysenprocessen  skal dog frivilligt afgive kontrollen, mens svinet er indenfor robottens rækkevidden og hvis de ikke gør, bliver svinet ikke udskåret. I stedet for at det samme system både skal foretage analysen som  styrer robotten, kan vi antage at processerne er mere autonome i deres opbygning. Dette giver at computeren der styrer robotten fungere uafhængigt af de computere der foretager konvertering og analysen. de to computere kan udveksle data igennem f.eks en database, harddisk eller anden delt datastruktur. Hvis analysen bliver færdig gemmes den, i den delte datastruktur, og robotten kan udnytte analysen, Hvis ikke den er klar bruges standard modellen.    
 
 
 
