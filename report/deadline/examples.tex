@@ -1,20 +1,33 @@
 \section{Slagterieksempel}
 
-\inline{eks1: grise på bånd, foto af flere grise, ingen deadline på kniven. Billeder lægges i kø til kniven som bruger dem hvis de er klar.}
+På Danish Crown slagteriet i Horsens udskæres grisene af en robot.
 
-Det første eksempel på en applikation der kan bruge et RTP systemer, er en beslutningsmodel til udskæring af svin.
+\begin{quote}\textit{``Grisen [\ldots] skal nu skæres i mindre, håndterbare stykker. Det sker i en meget avanceret maskine -- en såkaldt tredeler -- hvor hver halvdel af grisen deles i tre stykker: bov, mellemstykke og skinke. \\ 
+\\
+Robotten starter med at fotografere hver halvdel. Dataene fra billedet kombineres med ordren og kundens ønsker, hvorefter stykket deles i tre - nøjagtigt afpasset kundens ønsker.''}{ Danish Crowns hjemmeside\footnote{http://www.danishcrown.dk/custom/horsens/3772.asp}}\end{quote}
 
-Vi forestiller os at der findes slagteri hvor  hvert svin skal skæres ud i et forud defineret antal portioner. Til dette bruges en udskæringsrobot og en udskæringsmodel. Udskæringsmodellen er lavet for at minimere mængden af kød der går til spilde.  Det har dog vist sig at udskæringsmodellen ikke altid resultere i en  optimal udskæring af svinet, da  ca. 10\% af alle svin har et ekstra sæt ribben, som modellen ikke tager højde for. Til at løse dette problem har slagteriet udviklet en ny udskæringsmodel for svin med et ekstra sæt ribben, samt  investeret i en røngentskanner der skal skanne alle svin. 
-Slagteriet har placeret røngtenskanneren i starten af et transportbåndet mens udskæringsrobotten findes i den anden enden. Der kan være flere svin på transportbåndet på samme tid, og det fremføre svinene i et fast tempo. Dette giver et fast tidsrum fra svinet passere røntgenskanneren til det passere udskæringsrobotten. Vi har hermed et klassisk RTP system, hvor robotten skal foretage et valg af udskæringsmodel under en hard deadline, da det ikke er en mulighed ikke at foretage en udskæring.
+Et billede af den automatiske tredeler er vist  på \cref{fig:pig}. Vi forestiller os at selve udskæring også laves på baggrund af en model af hvordan grisen er udformet. Det har dog vist sig at modellen ikke altid resulterer i en  optimal udskæring, da  ca. 10\% af alle grise har et ekstra sæt ribben, som modellen ikke tager højde for. Til at løse dette problem har slagteriet udviklet en ny model for grise med et ekstra sæt ribben.
 
-Til at understøtte udvælgelsen af model må vi først se arbejdsgangen der er involveret i valget af udskæringsmodel. 
+\begin{figure}
+ \begin{center}
+  \includegraphics[scale=0.5]{images/209690-1}
+	\caption{Billedet viser i forgrunden  et foto taget af tredeleren til brug for analyse. I baggrunden ses transportbåndet, hvor de halve  grise venter på på at blive udskåret af den automatisk tredeler.}
+	\label{fig:pig}
+\end{center}
+\end{figure}
+
+I det første eksempel på en applikation der kan bruge et RTP systemer, skal vi udvikle er en beslutningsmodel, der kan beslutte hvilken model robotten skal bruge til at  udskære den enkelte gris med. 
+
+Slagteriet har placeret kameraet i starten af et transportbåndet mens udskæringsrobotten findes i den anden enden. Der kan være flere svin på transportbåndet på samme tid, og det fremføre svinene i et fast tempo. Dette giver et fast tidsrum fra svinet passere kameraet til det passere robotten. Vi har hermed et klassisk RTP system, hvor robotten skal foretage et valg af model under en hard deadline, da det ikke er en mulighed ikke at foretage en udskæring.
+
+Vi må først se på arbejdsgangen der er involveret i valget af model. 
 \begin{enumerate}
 \tightlist
-	\item Et billede bliver taget af svinet mens den passere røntgenskanneren.
+	\item Et billede bliver taget af svinet mens den passere kameraet.
 	\item Billedet konverteres til en 3D-model af svinet.
 	\item 3D-modellen analyseres.
-	\item Udskæringmodel udvælges på baggrund af analysen.
-	\item Robotten udskærer svinet.
+	\item Modellen udvælges på baggrund af analysen, ordren og kundens ønske.
+	\item Robotten udskærer grisen.
 \end{enumerate}
 
 Man kan se at arbejdsgangen indeholder en  række klart afgrænsede arbejdsområder, som med fordel kan modelleres som selvstændige processer i \pycsp. Der findes do ikke kun en måde at opbygge procesnetværket på, men vi har valgt at have følgende processer: Røntgenskanner, Billedekonvertering, 3D-analyse og en udvælgelse og udskæringsproces, hvilket leder til et procesnetværk som vist i \cref{fig:pig-network}.
@@ -41,7 +54,7 @@ Når detektoren starter hele processen, opretter den svineobjektet som den sende
 \end{center}
 \end{figure}
 
-Et problem ved at implementere hele slagterieksemplet i en version bygget på greenletsversionen, er at kun en proces kan være aktiv af gangen. Mens udskæringsprocessen venter på at svinet kommer tæt nok på arbejder konvertering og analyse processen. De skal frivilligt afgive kontrollen, mens svinet er indenfor rækkevidden af robotten, og hvis de ikke gør er udskæringsrobotten låst og  foretager  ikke udskæringen.
+Et problem ved at implementere hele slagterieksemplet i \pycsp er  grænsefladen mellem verden hvor svinene kører på transportbåndet, og den elektroniske verden, der bygger på greenletsversionen, og hvor  kun en proces kan være aktiv af gangen. For hele tiden at arbejde kører konvertering og analyse processen, mens  udskæringsprocessen venter på at svinene kommer inden for rækkevidde. Men konvertering og analysen processen  skal frivilligt afgive kontrollen, mens svinet er indenfor robottens rækkevidden og hvis de ikke gør, bliver svinet ikke udskåret. Dette er dybt uhensigstmæssigt 
 
 
 

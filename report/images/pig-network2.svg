@@ -11,11 +11,11 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="370.97009"
-   height="54.424938"
+   height="139.18048"
    id="svg2"
    version="1.1"
    inkscape:version="0.47pre4 r22446"
-   sodipodi:docname="pig-network.svg">
+   sodipodi:docname="pig-network2.svg">
   <defs
      id="defs4">
     <inkscape:path-effect
@@ -169,6 +169,16 @@
        y1="86.222382"
        x2="260.33792"
        y2="179.08699" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4111-3"
+       id="linearGradient3984"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.76278026,0,0,0.58559942,-258.17364,-283.1664)"
+       x1="186.52563"
+       y1="86.222382"
+       x2="260.33792"
+       y2="179.08699" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -179,7 +189,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="2.6471138"
      inkscape:cx="185.48504"
-     inkscape:cy="27.212468"
+     inkscape:cy="69.590238"
      inkscape:document-units="px"
      inkscape:current-layer="g3271-7"
      showgrid="true"
@@ -324,5 +334,36 @@
        style="fill:none;stroke:#000000;stroke-width:1.05089867px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
        d="m 324.01758,146.78712 c 49.69746,0 49.69746,0 49.69746,0"
        id="path4051" />
+    <g
+       transform="translate(-1.1569652,22.937073)"
+       id="g3976">
+      <rect
+         style="fill:url(#linearGradient3984);fill-opacity:1;stroke:#000000;stroke-width:0.66834396;stroke-opacity:1"
+         id="rect3978"
+         width="55.488621"
+         height="53.756592"
+         x="-115.48862"
+         y="-232.36218"
+         transform="scale(-1,-1)" />
+      <text
+         xml:space="preserve"
+         style="font-size:10px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         x="86.09375"
+         y="208.60559"
+         id="text3980"><tspan
+           sodipodi:role="line"
+           x="86.09375"
+           y="208.60559"
+           id="tspan5156">Detektor</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.98319209px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
+       d="m 85.508859,200.87789 0,-25.29629 0,-3.70371"
+       id="path3986"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.98149544px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
+       d="m 114.50886,230.87789 289,0 0,-59"
+       id="path4966" />
   </g>
 </svg>
