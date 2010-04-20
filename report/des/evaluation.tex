@@ -43,7 +43,7 @@
 \subsection{Eksempler}
 For at evaluere fordele og ulemper af \emph{simulerings}"-versionen af \pycsp, har vi genimplementeret eksemplerne fra \cref{sec:des-examples}, men denne gang med  brug af vores udviklede kode. vi kan nu sammenholde de to versioner, og se på fordele og ulemper ved \emph{simulerings}"-versionen.
  
-\subsection{Hajer og fisk på Wator}
+\subsubsection{Hajer og fisk på Wa-Tor}
 Implementeringen af dette problem  i et simulationssprog har ikke medført den store omskrivning. Dette skyldes at eksemplet er en kontinuerlig simulation, og alle fisk og hajer ønsker at interagere med omverdenen i hvert tidsskridt. I processen \code{visualize} ser man tydeligst forskellen mellem standard \pycsp og dens brug af barrierer og \emph{simulerings}"-versionen og dens brug af tid vha. funktionen \code{Wait}. Hvor standard \pycsp må kalde en barrier tre gange for hver iteration (\cref{fig:green:visualize}),vers kan man i \emph{simulerings}"-versionen blot angive at visualiseringen ønsker at vente tre tidsskridt (\cref{fig:sim:visualize}). 
 
 \begin{lstlisting}[firstnumber=157 ,float=hbtp, label=fig:green:visualize, caption=\code{Greenlets}"-versionen af visualize]
@@ -85,10 +85,10 @@ for i in xrange(iterations):
 
 I arbejderprocessen (\cref{fig:sim:worker}) kan man også se hvordan brugen af tid  sikrer adgang til en delt ressource. I  \emph{greenlets}"-versionen skulle barrieren  kaldes flere gange i træk for at sikre at en delt datastruktur ikke blev brugt af processen. Med \emph{simulering}"-versionen kan man, som det ses af \cref{fig:sim:worker} linje 140, nøjes med at kalde \code{Wait} og vente i to tidsskridt. Dermed har denne proces ikke har adgang til den delte data, da processen  ligger og venter i kø på \code{timers} listen. Skal flere forskellige processer have eksklusive rettigheder kan man blot øge antallet af tidsskridt processen venter. Hvis dette skulle opnås med barrierer skulle man lave en løkke der et antal gange lod processen gå igennem barrieren.
 
-\subsection{Kunder i bank}
+\subsubsection{Kunder i bank}
 De to bankeksempler har krævet en betydelig omskrivning for at udnytte den nyudviklede \emph{simulerings}"-version. I Generatorprocessen ses tydeligst forskellen på de to versioner. \emph{Greenlets}"-versionen bruger 20 linjer kode hvor \emph{simulerings}"-versionen kun bruger 6 linjer. Den store forskel på de to funktioner er muligheden for i simulationen  at hoppe fra et tidspunkt til det næste. Dermed skal funktionen ikke være aktiv i hvert tidsskridt, men kun i de tidsskridt hvor der skal produceres en kunde. Når processen kun er aktiv i de korrekte tidsskridt kan vi undgå hjælpevariablerne \code{t\_event, time} og \code{numberInserted}. 
 
-\emph{Simulerings}"-versionen er desuden fri for den kunstige begrænsning, der findes i \emph{greenlets}"-versionen, der kræver at en tiden skal være delelig med et givent tidsskridt. I \cref{fig:green:generator} er linjerne 35 til 41 krævet da barrieren behøves det samme antal processer igennem hele kørslen (se \cref{sec:barrierer}). 
+\emph{Simulerings}"-versionen er desuden fri for den kunstige begrænsning, der findes i \emph{greenlets}"-versionen, der kræver at en tiden skal være delelig med et givent tidsskridt. I \cref{fig:green:generator} er linjerne 35 til 41 krævet da barrieren behøver det samme antal processer igennem hele kørslen (se afsnit \cref{sec:barrierer}). 
 
 \begin{lstlisting}[firstnumber=21, label=fig:green:generator, caption=Generatorprocessen for Greenlets versionen]
 @process

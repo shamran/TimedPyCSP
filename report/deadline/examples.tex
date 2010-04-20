@@ -1,12 +1,12 @@
 \section{Slagterieksempel}
-\fxnote{mere intro}
-I det første eksempel på en applikation der kan bruge et RTP systemer, skal vi udvikle er en beslutningsmodel, der kan beslutte hvilken model robotten skal bruge til at  udskære den enkelte gris med. På Danish Crown slagteriet i Horsens udskæres grisene af en robot som beskrevet på deres hjemmeside:
+\fxnote{mere intro -  Rasmus hjælp}
+Til at illustrere brugen af RTP har vi fundet et problem fra Danish Crown slagteriet, der skal  udvikle er en beslutningsmodel, for hvilken model robotten skal bruge til at udskære hver gris med. På Danish Crown slagteriet i Horsens udskæres grisene af en robot som beskrevet på deres hjemmeside:
 
 \begin{quote}\textit{``Grisen [\ldots] skal nu skæres i mindre, håndterbare stykker. Det sker i en meget avanceret maskine -- en såkaldt tredeler -- hvor hver halvdel af grisen deles i tre stykker: bov, mellemstykke og skinke. \\ 
 \\
 Robotten starter med at fotografere hver halvdel. Dataene fra billedet kombineres med ordren og kundens ønsker, hvorefter stykket deles i tre - nøjagtigt afpasset kundens ønsker.''}{ Danish Crowns hjemmeside\footnote{\url{http://www.danishcrown.dk/custom/horsens/3772.asp}}}\end{quote}
 
-Et billede af den automatiske tredeler er vist  på \cref{fig:pig}. Vi forestiller os at selve udskæring også laves på baggrund af en model af hvordan grisen er udformet. Det har dog vist sig at modellen ikke altid resulterer i en  optimal udskæring, da  ca. 10\% af alle grise har et ekstra sæt ribben som modellen ikke tager højde for. Til at løse dette problem har slagteriet udviklet en ny model for grise med et ekstra sæt ribben.
+Et billede af den automatiske tredeler er vist  på \cref{fig:pig}.  Det har dog vist sig at modellen ikke altid resulterer i en  optimal udskæring, da  ca. 10\% af alle grise har et ekstra sæt ribben som modellen ikke tager højde for. Til at løse dette problem har slagteriet udviklet en ny model for grise med et ekstra sæt ribben.
 
 \begin{figure}
  \begin{center}
@@ -19,7 +19,7 @@ Et billede af den automatiske tredeler er vist  på \cref{fig:pig}. Vi forestill
 
 Slagteriet har placeret kameraet i starten af et transportbåndet mens udskæringsrobotten findes i den anden enden. Der kan være flere svin på transportbåndet på samme tid, og det fremføre svinene i et fast tempo. Dette giver et fast tidsrum fra svinet passere kameraet til det passere robotten. Vi har hermed et klassisk RTP system, hvor robotten skal foretage et valg af model under en hard deadline, da det ikke er en mulighed ikke at foretage en udskæring.
 
-Vi må først se på arbejdsgangen der er involveret i valget af model. 
+Vi må først se på arbejdsgangen der er involveret i valget af model:
 \begin{enumerate}
 \tightlist
 	\item Et billede bliver taget af svinet mens den passere kameraet.
@@ -29,7 +29,7 @@ Vi må først se på arbejdsgangen der er involveret i valget af model.
 	\item Robotten udskærer grisen.
 \end{enumerate}
 
-Man kan se at arbejdsgangen indeholder en  række klart afgrænsede arbejdsområder, som med fordel kan modelleres som selvstændige processer i \pycsp. Der findes do ikke kun en måde at opbygge procesnetværket på, men vi har valgt at have følgende processer: Røntgenskanner, Billedekonvertering, 3D-analyse og en udvælgelse og udskæringsproces, hvilket leder til et procesnetværk som vist i \cref{fig:pig-network}.
+Man kan se at arbejdsgangen indeholder en  række klart afgrænsede arbejdsområder, som med fordel kan modelleres som selvstændige processer i \pycsp. Der findes  ikke kun en måde at opbygge procesnetværket på, men vi har valgt at have følgende processer: Kamera, Billedekonvertering, 3D-analyse og en udvælgelse og udskæringsproces, hvilket leder til et procesnetværk som vist i \cref{fig:pig-network}.
 
 \begin{figure}
  \begin{center}
@@ -39,21 +39,20 @@ Man kan se at arbejdsgangen indeholder en  række klart afgrænsede arbejdsområ
 \end{center}
 \end{figure}
 
+\subsubsection*{Implementering i \code{greenlets}-versionen}
+Til at implementere eksemplet \code{greenlets}-versionen, kan vi oprette hvert svin som et objekt og tilknytte en deadline. Nu kan hver proces evaluere om svinet har overskredet sin deadline, i det tilfælde fjerne svinet, og stoppe den videre behandling. Det er ikke angivet hvordan hele processen startes, men vi antager der findes en form for detektor foran kameraet, der opfanger når et svin passerer og som dermed starter processen. 
 
-
-\subsubsection*{Implementering i Greenletsversionen}
-Til at implementere eksemplet uden brug af af RTP-udvidelsen i \pycsp, kan vi oprette hvert svin som et objekt og tilknytte en deadline. Nu kan hver proces evaluere om svinet har overskredet sin deadline, i det tilfælde fjerne svinet, og stoppe den videre behandling. Det er ikke angivet hvordan hele processen startes, men vi antager der findes en form for detektor foran røngtenkameraet, der opfanger når et svin passere og som dermed  starter processen. 
-Når detektoren starter hele processen, opretter den svineobjektet som den sender til Røngtenprocessen, samt sender en kopi direkte til udvælgelse og udskæringsprocessen. dermed ved processen at der ankommer et svin som den skal udskære, og hvis den inden deadline får en analyse af svinet, kan den træffe et begrundet valg om hvilken model der skal bruges,  men hvis ikke denne analyse findes, bruges blot standardmodellen. \CRef{fig:pig-network2} viser det endelige  netværk, hvor detektoren er introduceret, og som sender data til hhv. Røntgenprocessen og til Udvælgelse og udskæringsprocessen. 
+Når detektoren starter hele processen, opretter den svineobjektet som den sender til kameraprocessen, samt sender en kopi direkte til udvælgelse og udskæringsprocessen. Dermed ved processen at der ankommer et svin som den skal udskære, og hvis den inden deadline får en analyse af svinet, kan den træffe et begrundet valg om hvilken model der skal bruges,  men hvis ikke denne analyse findes, bruges blot standardmodellen. \CRef{fig:pig-network2} viser det endelige  netværk, hvor detektoren er introduceret, og som sender data til hhv. kameraprocessen og til udvælgelse og udskæringsprocessen. 
 
 \begin{figure}
  \begin{center}
   \includegraphics[scale=1]{images/pig-network2}
-	\caption{Procesnetværk med detektor til initiering af hvert svin.}
+	\caption{Procesnetværk med detektor til initiering af hver gris.}
 	\label{fig:pig-network2}
 \end{center}
 \end{figure}
 
-Et problem ved at implementere hele slagterieksemplet i \pycsp er  grænsefladen mellem verden hvor grisene kører på transportbåndet, og  greenletsversionen,  hvor  kun en proces kan være aktiv af gangen. Konvertering og analyse processen arbejder, mens  udskæringsprocessen venter på at svinene kommer inden for rækkevidde. Konvertering- og analysenprocessen  skal dog frivilligt afgive kontrollen, mens svinet er indenfor robottens rækkevidden og hvis de ikke gør, bliver svinet ikke udskåret. I stedet for at det samme system både skal foretage analysen som  styrer robotten, kan vi antage at processerne er mere autonome i deres opbygning. Dette giver at computeren der styrer robotten fungere uafhængigt af de computere der foretager konvertering og analysen. de to computere kan udveksle data igennem f.eks en database, harddisk eller anden delt datastruktur. Hvis analysen bliver færdig gemmes den, i den delte datastruktur, og robotten kan udnytte analysen, Hvis ikke den er klar bruges standard modellen.    
+Et problem ved at implementere  slagterieksemplet i \pycsp er  grænsefladen mellem verden hvor grisene kører på transportbåndet, og  \code{greenlets}-versionen,  hvor  kun en proces kan være aktiv af gangen. Derfor arbejder konvertering og analyse processen, mens  udskæringsprocessen venter på at svinene kommer inden for rækkevidde. Konvertering- og analysenprocessen  skal dog frivilligt afgive kontrollen, mens svinet er indenfor robottens rækkevidden og hvis de ikke gør, bliver svinet ikke udskåret. Da dette er uacceptabelt ændre vi systemet så det ikke er samme applikation det  både skal foretage konvertering analysen som  styrer robotten. De to applikationer skal dog kunne kommunikere, og til dette kan de f.eks udveksle data igennem en database, harddisk eller anden delt datastruktur. Hvis analysen bliver færdig gemmes den, i den delte datastruktur, og robotten kan udnytte analysen, Hvis ikke den er klar bruges standard modellen.    
 
 
 

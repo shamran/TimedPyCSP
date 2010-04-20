@@ -1,6 +1,6 @@
 \section{Evaluering}
 \subsection{Test af Korrekthed}
-Vi har som i \des løbende skrevet test før vi implementerede hver ny funktion i RTP.  Tabellen herunder viser testresultaterne for de test der er lavet specifikt for RTP-versionen.
+Vi har som i \des løbende skrevet test før vi implementerede hver ny funktion i \code{RTP}-versionen.  Tabellen herunder viser testresultaterne for de test der er lavet specifikt for \code{RTP}-versionen.
 \begin{longtable}{lr}
    	\toprule
     \mc{Test} & \mc{Resultat} \\
@@ -43,7 +43,7 @@ test\_xreset\_inheritance\_from\_two\_step  & FAIL\\
 \end{longtable}
 
 
- Alle test med en undtagelse fungere korrekt. Testen der fejler  hedder test\_xreset\_inheritance\_from\_two\_step, og viser en situation hvor den samme proces får løftets sin prioritet to gange i træk, føst med en høj prioritet, og efterfølgende med en mellemprioritet. Efterfølgende skal processen sænke sin prioritet, først til den midterste prioritet og tilslut til sin originale prioritet. Her viser det sig vi har lavet en fejl i implementeringen, således at prioriteten ikke bliver nedsat til mellemprioriteten, før også mellemprioriteten bliver nedsat. \CRef{fig:priority-inheritance} viser prioriteten mens processen bliver op og nedprioriteret. Tiden har ikke tilladt os at løse problemet, men  kan løses ved at kræve at der ved en opprioritering gemmes hvilken proces der står bag, så når en proces ønsker at fjerne sin oppriotering fra andre processer er det kun sin egen  prioritet den fjerner.  
+ Alle test med en undtagelse fungerer korrekt. Testen der fejler  hedder test\_xreset\_inheritance\_from\_two\_step, og viser en situation hvor den samme proces får løftets sin prioritet to gange i træk, først med en høj prioritet, og efterfølgende med en mellemprioritet. Efterfølgende skal processen sænke sin prioritet, først til  mellemprioriteten og tilslut til sin originale prioritet. Her viser det sig vi har lavet en fejl i implementeringen, således at prioriteten ikke bliver nedsat til mellemprioriteten. \CRef{fig:priority-inheritance} viser prioriteten mens processen bliver op og nedprioriteret. Tiden har ikke tilladt os at løse problemet, men  kan løses ved at kræve at, når en proces opprioriteres gemmes hvilken proces der står bag, så når en proces ønsker at fjerne sin opprioritering fra andre processer er det kun sin egen  prioritet den fjerner.  
  
   
 \begin{figure}
@@ -56,11 +56,13 @@ test\_xreset\_inheritance\_from\_two\_step  & FAIL\\
   
 
 \subsection{Slagterieksempel}
-Den simple model, som blev konstrueret til implementering af greenletsversionen, Kan kun bearbejde en gris i konvertering samt en gris i analysen. Dette sikre at det altid er grisen tættest på robotten der får foretaget analysen, men samtidigt betyder det at kun to grise kan konverteres og analyseres samtidigt. Hvis man omvendt tilføjer flere konverterings og analyseprocesser vil der kunne foretages samtidige beregninger, men de enkelte processer vil kæmpe mod hinanden for processesortid uden hensyn til hvilken gris der er nærmest robotten.
 
-Med introduktionen af RTP kan netværket udvides hvis de fysiske rammer for slagteriet ændre sig. Viser det sig f.eks at kameraet holder den samlede produktivitet af netværket tilbage kan, slagteriet tilføjet endnu et kamera, og nemt udvide procesnetværket med endnu en kameraproces, som kan arbejde samtidigt med det første kamera. 
-Som programmør kan man også fintune sit netværk og nemt udvide med flere konvertering og analyse processer. Dermed kan programmøren nemt udnytte den underliggende platform. Med RTP sikres at hver gang en proces modtager en gris, bliver det grisen med højst prioritet den modtager, og dette sikre at grisen nærmest robotten først bliver bearbejdet. 
-\CRef{fig:pig-network3} viser hvordan netværket kan se ud med flere konverterings og analyse processer. 
+Ved at basere koden på \pycsp kan netværket nemt udvides hvis de fysiske rammer for slagteriet ændre sig. Viser det sig f.eks at kameraet holder den samlede produktivitet af netværket tilbage kan, slagteriet tilføjet endnu et kamera, og nemt udvide procesnetværket med endnu en kameraproces, som kan arbejde samtidigt med det første kamera. 
+
+Den simple model, som blev konstrueret til implementering af \code{greenlets}-versionen, Kan kun bearbejde en gris i konvertering samt en gris i analysen. Dette sikre at det altid er grisen nærmest robotten der arbejdes på, men samtidigt betyder det maksimalt er  to grise der kan arbejdes på samtidigt. Hvis man 
+ tilføjer flere konverterings og analyseprocesser vil der kunne foretages samtidige beregninger af flere grise, men grisene vil kæmpe mod hinanden for at komme igennem netværket uden hensyn til hvilken gris der er nærmest robotten.
+
+Selvom CSP kan udnytte et vilkårligt antal processorer i en computer, så længe der er flere processer end processorer, vil man se ændring i ydelsen hvis man variere  antallet af processer. Med \code{RTP}-versionen kan man nemt ændrer på antallet af konvertering og analyse processer for at fintune applikationen og  udnytte den underliggende platform. \code{RTP}-versionen sikrer at netværket hele tiden har fokus på først at videresende grisen nærmest robotten. \CRef{fig:pig-network3} viser hvordan netværket kan se ud med flere konverterings og analyse processer. 
 
 \begin{figure}
  \begin{center}
@@ -70,6 +72,9 @@ Som programmør kan man også fintune sit netværk og nemt udvide med flere konv
 \end{center}
 \end{figure}
 
+Ved implementering af slagterieksemplet i \code{RTP}-versionen, slipper de enkelte processer for at holde styr på tiden, og om den enkelte gris deadline er overskredet. Når de modtager en gris bruger de dens deadline med \code{Set\_deadline}. og kan blot gå i gang med modtage en ny gris. Hver proces skal til gengæld kunne håndtere  \code{DeadlineException}, som de blot kan bruge til at smide grisen væk og starte på den næste.
 
-I eksemplet kom vi også ind på at processerne frivilligt skal afgive kontrollen, før robotten kan foretage udskæringen. Med introduktionen af \code{Release} har alle processerne  mulighed for med jævne mellemrum at afgive kontrollen så robotten rettidigt kan foretage selve udskæringen. Hermed skal vi ikke  introducere en delt datastruktur, med de problemer som den har og som vi snakkede om i Barriererafsnittet på side \pageref{sec:barrierer}.
+I \code{greenlets}-versionen kom vi ind på at processerne frivilligt skal afgive kontrollen, før robotten kan foretage udskæringen, men at der ikke bar en metode til midlertidigt at afgive kontrollen. Med \code{RTP}-versionen og funktionen \code{Release} har alle processer mulighed for med jævne mellemrum at afgive kontrollen så robotten rettidigt kan foretage selve udskæringen. Hermed skal vi ikke  introducere en delt datastruktur, med de problemer som den har og som vi snakkede om i afsnittet Barrierer på side \pageref{sec:barrierer}.
+  
+Ved at basere os på \code{greenlets}-versionen har vi adgang til en \sched, hvor kun en proces  kan være aktiv på samme tid. Dermed kan vi kun udnytte en processor, men dette passer dårligt sammen med denne applikation, hvor man vil forvente at det endelige program vil kører på en supercomputer, med flere processorer for at kunne processere grisene inden de skal udskæres.  Den eneste metode til at samtidig behandling af flere funktioner i \pycsp-versioner, der baserer sig på \code{greenlets}-versionen er at anvende \code{IO}-dekorering. Denne placerer en funktion i en separat tråd, så flere funktioner kan køre samtidigt. Men ved at køre flere funktioner samtidigt er det operativsystemets \sched, der står for planlægningen og  udførselen af funktionen, uden at kende noget til vores planlægning. En brug af \code{IO}-dekorering til at sikre samtidighed skal derfor bruges med varsomhed og kun efter en analyse af den enkelte applikation, da samtidige processer på den samme processor vil kæmpe mod hinanden om CPU tid.
  
