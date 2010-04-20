@@ -1,5 +1,60 @@
 \section{Evaluering}
 \subsection{Test af Korrekthed}
+Vi har som i \des løbende skrevet test før vi implementerede hver ny funktion i RTP.  Tabellen herunder viser testresultaterne for de test der er lavet specifikt for RTP-versionen.
+\begin{longtable}{lr}
+   	\toprule
+    \mc{Test} & \mc{Resultat} \\
+    \midrule
+    \endfirsthead 
+    \toprule
+    \mc{Test} & \mc{Resultat} \\
+    \midrule
+    \endhead % slut efterfølgende headere
+    \bottomrule
+    \multicolumn{2}{r}{\textit{fortsættes}}
+    \endfoot % slut footer
+    \bottomrule
+    \endlastfoot % slut sidste footer
+test\_Alternation  & ok\\
+test\_AlternationChoiseReader  & ok \\
+test\_AlternationChoiseWriter  & ok \\
+test\_AlternationExecuteReadDeadline  & ok\\
+test\_AlternationExecuteSkipDeadline  & ok\\
+test\_AlternationExecuteTimeoutDeadline  & ok \\
+test\_AlternationExecuteWriteDeadline  & ok \\
+test\_Alternationchoise1Deadline  & ok \\
+test\_Alternationchoise2Deadline  & ok \\
+test\_ChoisemultipleReader  & ok \\
+test\_ChoisemultipleReader2  & ok \\
+test\_ChoisemultipleWriter  & ok\\
+test\_PoisonAndDeadline1  & ok\\
+test\_PoisonAndDeadline2  & ok\\
+test\_Reader\_Inheritance  & ok\\
+test\_RetireAndDeadline  & ok\\
+test\_Writer\_Inheritance  & ok\\
+test\_channelpriority\_from\_low\_deadline  & ok\\
+test\_channelpriority\_from\_low\_deadline2  & ok\\
+test\_channelpriority\_from\_no\_deadline  & ok\\
+test\_channelpriority\_from\_no\_deadline2  & ok\\
+test\_readDeadline  &ok\\
+test\_writeDeadline  & ok\\
+test\_xreset\_inheritance  & ok\\
+test\_xreset\_inheritance\_from\_two\_step  & FAIL\\
+\end{longtable}
+
+
+ Alle test med en undtagelse fungere korrekt. Testen der fejler  hedder test\_xreset\_inheritance\_from\_two\_step, og viser en situation hvor den samme proces får løftets sin prioritet to gange i træk, føst med en høj prioritet, og efterfølgende med en mellemprioritet. Efterfølgende skal processen sænke sin prioritet, først til den midterste prioritet og tilslut til sin originale prioritet. Her viser det sig vi har lavet en fejl i implementeringen, således at prioriteten ikke bliver nedsat til mellemprioriteten, før også mellemprioriteten bliver nedsat. \CRef{fig:priority-inheritance} viser prioriteten mens processen bliver op og nedprioriteret. Tiden har ikke tilladt os at løse problemet, men  kan løses ved at kræve at der ved en opprioritering gemmes hvilken proces der står bag, så når en proces ønsker at fjerne sin oppriotering fra andre processer er det kun sin egen  prioritet den fjerner.  
+ 
+  
+\begin{figure}
+ \begin{center}
+  \includegraphics[scale=1]{images/priority-inheritance}
+	\caption{Figuren viser hhv. forventet og faktisk prioritetsarvning. Der hvor den faktiske og forventede opførsel adskiller sig er forventet den fuldt optrukne streg, mens den stiplede streg er den faktiske opførsel.}
+	\label{fig:priority-inheritance}
+\end{center}
+\end{figure}
+  
+
 \subsection{Slagterieksempel}
 Den simple model, som blev konstrueret til implementering af greenletsversionen, Kan kun bearbejde en gris i konvertering samt en gris i analysen. Dette sikre at det altid er grisen tættest på robotten der får foretaget analysen, men samtidigt betyder det at kun to grise kan konverteres og analyseres samtidigt. Hvis man omvendt tilføjer flere konverterings og analyseprocesser vil der kunne foretages samtidige beregninger, men de enkelte processer vil kæmpe mod hinanden for processesortid uden hensyn til hvilken gris der er nærmest robotten.
 
