@@ -227,9 +227,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.4948837"
-     inkscape:cx="196.80276"
-     inkscape:cy="69.590238"
+     inkscape:zoom="10.982546"
+     inkscape:cx="258.88149"
+     inkscape:cy="107.86729"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -257,7 +257,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -288,10 +288,6 @@
            sodipodi:role="line"
            id="tspan3319">Kamera</tspan></text>
     </g>
-    <path
-       style="fill:none;stroke:#000000;stroke-width:1.05089867px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
-       d="m 114.14557,145.49587 c 49.69746,0 49.69746,0 49.69746,0"
-       id="path3047" />
     <rect
        transform="scale(-1,-1)"
        y="-170.54372"
@@ -390,18 +386,6 @@
          x="201.21423"
          y="162.28712"
          id="tspan4041">tering</tspan></text>
-    <path
-       style="fill:none;stroke:#000000;stroke-width:1.01213431px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
-       d="m 133.50886,155.90617 35,0.11166"
-       id="path4441" />
-    <rect
-       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-opacity:1"
-       id="rect4631"
-       width="3"
-       height="3"
-       x="196.0202"
-       y="7.0401073"
-       transform="matrix(0.7074879,0.70672545,-0.70672545,0.7074879,0,0)" />
     <rect
        transform="scale(-1,-1)"
        y="-170.54372"
@@ -438,44 +422,81 @@
          sodipodi:role="line">Analyse</tspan></text>
     <rect
        transform="matrix(0.7074879,0.70672545,-0.70672545,0.7074879,0,0)"
-       y="-66.958626"
-       x="284.24838"
+       y="-72.618538"
+       x="278.59457"
        height="3"
        width="3"
        id="rect4671"
        style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-opacity:1" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 170,49.180481 20,0 0,-20 -20,0"
-       id="path5593"
-       transform="translate(58.508859,116.45295)" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.98319209px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow2Lstart);marker-end:url(#Arrow2Lend)"
-       d="m 288.47763,145.63343 -19.33333,0 0,10 0,10 29,0"
-       id="path5597" />
     <rect
        style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-opacity:1"
        id="rect6351"
        width="3"
        height="3"
-       x="298.84775"
-       y="-81.542229"
+       x="293.19394"
+       y="-87.202141"
        transform="matrix(0.7074879,0.70672545,-0.70672545,0.7074879,0,0)" />
+    <g
+       id="g3153"
+       transform="translate(0,-8)">
+      <rect
+         transform="matrix(0.7074879,0.70672545,-0.70672545,0.7074879,0,0)"
+         y="7.0401073"
+         x="196.0202"
+         height="3"
+         width="3"
+         id="rect4631"
+         style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-opacity:1" />
+      <g
+         id="g3147">
+        <g
+           id="g3142">
+          <path
+             id="path3047"
+             d="m 114.14557,145.49587 c 49.69746,0 49.69746,0 49.69746,0"
+             style="fill:none;stroke:#000000;stroke-width:1.05089867px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)" />
+          <path
+             id="path4441"
+             d="m 133.50886,155.90617 35,0.11166"
+             style="fill:none;stroke:#000000;stroke-width:1.01213431px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)" />
+          <path
+             id="path6353"
+             d="m 133.72359,145.35242 -0.0615,20.28555 38.75555,0"
+             style="fill:none;stroke:#000000;stroke-width:0.98459435px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)" />
+        </g>
+      </g>
+    </g>
     <path
-       style="fill:none;stroke:#000000;stroke-width:0.98459435px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
-       d="m 133.72359,145.35242 -0.0615,20.28555 38.75555,0"
-       id="path6353" />
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 228.50886,157.63343 20,0 0,-20 -20,0"
+       id="path5593" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.98319209px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow2Lstart);marker-end:url(#Arrow2Lend)"
+       d="m 288.47763,137.63343 -19.33333,0 0,10 0,10 29,0"
+       id="path5597" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.98652834px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
-       d="m 228.50212,155.63346 63.87815,0"
+       d="m 228.50212,147.63346 63.87815,0"
        id="path6543" />
-    <path
-       id="path6733"
-       d="m 354.50886,165.63343 20,0 0,-20 -20,0"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.99113721px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
-       d="m 354.21348,155.82614 41.22404,-0.34856"
-       id="path6739" />
+    <g
+       id="g3138"
+       transform="translate(0,-7.9958985)">
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 354.50886,165.63343 20,0 0,-20 -20,0"
+         id="path6733" />
+      <path
+         id="path6739"
+         d="m 354.21348,155.82614 41.22404,-0.34856"
+         style="fill:none;stroke:#000000;stroke-width:0.99113721px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)" />
+    </g>
+    <rect
+       transform="matrix(0.7074879,0.70672545,-0.70672545,0.7074879,0,0)"
+       y="-161.6647"
+       x="367.73682"
+       height="3"
+       width="3"
+       id="rect3164"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-opacity:1" />
   </g>
 </svg>
