@@ -81,6 +81,10 @@ article
 %har vi ord der bliver delt forkert kan de indsættes i hyphernation med bindestreg alle steder hvor ordet kan deles
 \hyphenation{tit-len mo-del-len pro-du-ce-rer an-svars-hav-ende om-for-deles for-bind-elses-mulig-heder ska-ber æn-dring-er net-værks-en-hed-er peer backup backup-system fast-track backup-systemer nabo-peers frame-work efter-som Grund-lag-et plads-effek-tivi-teten audits}
 
+\makeatletter
+    \declare@shorthand{danish}{"/}{\nobreak\discretionary{/}{}{/}\bbl@allowhyphens}%Tillader orddeling på tværs af / ved at skrive "/
+    \declare@shorthand{danish}{"_}{\nobreak\discretionary{\_}{}{\_}\bbl@allowhyphens}%Tillader orddeling på tværs af _ ved at skrive "_
+\makeatother
 
 \usepackage{nameref}
 \usepackage[danish]{varioref} % smarte krydsreferencer via \vref
