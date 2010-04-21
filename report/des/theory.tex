@@ -135,5 +135,5 @@ En sidste løsningsmodel er at vente til lige før, tiden tælles op, og der kal
 For at kunne adskille hvilke processer, der har en begivenhed til et tidsskridt, og hvilke, der venter på kommunikation, kan vi \fxnote*{illustration}{benytte os af edge-triggering} til at dele hvert tidsskridt op i to grupper, henholdsvis wake-first og wake-last.
 I wake-first-gruppen udføres de processer, der har tilknyttet en begivenhed til det givne tidsskridt, mens man i  wake-last-gruppen aktiverer SKIP-guarden for de processerne der venter på en timeout.
 
-Edge-triggering er den bedste løsningsmodel af de beskrevne, da man her har mulighed for at udføre alle begivenheder, som måske resulterer i kommunikation, og først derefter aktivere SKIP-guards, for de processer der har en timeout til samme tidsskridt. Ulempen ved denne metode er at det krævere større implementering, da der nu findes to seperate måde at vente for hhv. begivenheder og timeouts.
+Edge-triggering er den bedste løsningsmodel af de beskrevne, da man her har mulighed for at udføre alle begivenheder, som måske resulterer i kommunikation, og først derefter aktivere SKIP-guards, for de processer der har en timeout til samme tidsskridt. Ulempen ved denne metode er at det krævere en mere kompleks implementering, da der nu findes to seperate måde at vente for hhv. begivenheder og timeouts.
 
