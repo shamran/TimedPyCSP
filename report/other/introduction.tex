@@ -1,4 +1,17 @@
 \chapter{Introduktion}
+I denne opgave vil vi undersøge om det er muligt at introducere tre tidsmodeller i \pycsp. Vi vil identificere de problemstillinger der er forbundet med at skulle foretage denne introduktion og komme med løsningsforslag til hvodan de fundne problemer kan imødekommes. Vi vil fokusere på de praktiske aspekter af problemerne og vil lave en  hel eller delvis implementering, baseret på de givne løsningsforslag, der skal fungere som en udviddelse af \pycsp som det ser ud i dag. For at vise brugen af og fordelene ved vores udviddelse, vil vi lave nogle eksempelprogrammer lavet i \pycsp henholdsvis med og uden vores udviddelser. Dette gøres for at give en klart indblik i hvordan udviddelserne benyttes samt hvilke fordele en introduktion af de givne tidsmodeller direkte i pycsp vil give. 
+
+De tre tidsmodeller som vi vil undersøge er diskretiseret tid, realtid og interaktiv tid. Disse modeller repræsenterer forskellige anvendelser af tid og dækker tilsammen bredt over tid som helhed. Diskretiseret tid anvendes i stor udstrækning i simuleringer specifikt i discrete event sumulation. \\
+Realtid benyttes i tidskritiske systemer hvor der er stringente krav om at en given begivenhed er blevet udført inden for en tidsramme. Endeligt bruges interaktiv tid til at specificere at en given begivenhed skal finde sted på et specifikt tidspunkt, eller alternativt inden for en givet tidsrum. 
+
+Så vidt der er muligt ønsker vi at sammenligne vores arbejde med hvad andre har lavet af lignende implementeringer. Dette er ikke første gang der arbejdes med at introducere tid i CSP. Timed CSP er en omfattende teoretisk gennemgang af hvordan tid kan introduceres på det rent teoretiske plan, men det har aldrig vundet indpas i i praktiske implementationer af CSP. Vi vil derfor fokusere på de praktiske aspekter og problemstillinger og dermed ikke tage udgangspunkt i Timed CSP. 
+
+\subsubsection{Rapportens opbygning}
+Rapporten vil være strukteret som følger. I \cref{sec:csp} vil vi gennemgå CSP og \pycsp med fokus på de dele der er relevante i forhold til at introducere tidsmodeller. \cref{chap:des,chap:rtp,chap:is} vil være en gennemgang af de tre tidsmodeller, hver med en gennemgang af tidsmodellens anvendelsesområder, eksempler, identificerede problemstillinger, løsninger samt en afsluttende evaluering. Afslutningsvis vil vi foretage en samlet i evaluering og konklusion i \cref{chap:konklusion}
+
+
+
+
   \section{Problem}	 
   \section{Kontekst - Baggrund og motivation}
 Over de sidste par år er multi-kerne cpu'er blevet hyldevarer, og findes i 
