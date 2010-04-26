@@ -151,17 +151,18 @@ article
          \orgautoref}
 %
 %% \Autorefs is plural for the beginning of the sentence
-%\providecommand{\Autorefs}
-%        {\def\equationautorefname{Equations}%
-%         \def\figureautorefname{Figures}%
-%         \def\subfigureautorefname{Figures}%
-%         \def\sectionautorefname{Sections}%
-%         \def\subsectionautorefname{Sections}%
-%         \def\subsubsectionautorefname{Sections}%
-%         \def\Itemautorefname{Items}%
-%         \def\tableautorefname{Tables}%
-%         \orgautoref}
 %
+\providecommand{\Autorefs}
+        {\def\equationautorefname{Ligningerne}%
+         \def\figureautorefname{Figurerne}%
+         \def\subfigureautorefname{}%
+         \def\sectionautorefname{Afsnittene}%
+         \def\subsectionautorefname{Afsnittene}%
+         \def\subsubsectionautorefname{Afsnittene}%
+         \def\Itemautorefname{Items}%
+         \def\tableautorefname{Tabellerne}%
+         \def\chapterautorefname{Kapitlerne}% 
+         \orgautoref}
 
 
 %% \autoref is used inside a sentence 
@@ -179,18 +180,22 @@ article
          \def\tableautorefname{tabel}%
          \def\lstlistingname{kodestump}%
          \orgautoref}
-%
+%figurerne
 %% \autorefs is plural for inside a sentence
-%\providecommand{\autorefs}
-%        {\def\equationautorefname{Eqs.}%
-%         \def\figureautorefname{Figs.}%
-%         \def\subfigureautorefname{Figs.}%
-%         \def\sectionautorefname{Sects.}%
-%         \def\subsectionautorefname{Sects.}%
-%         \def\subsubsectionautorefname{Sects.}%
-%         \def\Itemautorefname{items}%
-%         \def\tableautorefname{Tables}%
-%         \orgautoref}
+\providecommand{\autorefs}
+        {\def\equationautorefname{ligningerne}%
+         \def\figureautorefname{figurerne}%
+         \def\subfigureautorefname{}%
+         \def\sectionautorefname{afsnittene}%
+         \def\subsectionautorefname{afsnittene}%
+         \def\subsubsectionautorefname{afsnittene}%
+         \def\Itemautorefname{items}%
+         \def\tableautorefname{tabellerne}%
+         \def\chapterautorefname{kapitlerne}% 
+         \orgautoref}
+
+
+
 
 
 \fxfatal[layout=index,target=cite]{Brian: Hvad er din holdning til litteraturhenvisninger.}

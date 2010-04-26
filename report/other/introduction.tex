@@ -1,73 +1,25 @@
 \chapter{Introduktion}
-I denne opgave vil vi undersøge om det er muligt at introducere tre tidsmodeller i \pycsp. Vi vil identificere de problemstillinger der er forbundet med at skulle foretage denne introduktion og komme med løsningsforslag til hvodan de fundne problemer kan imødekommes. Vi vil fokusere på de praktiske aspekter af problemerne og vil lave en  hel eller delvis implementering, baseret på de givne løsningsforslag, der skal fungere som en udviddelse af \pycsp som det ser ud i dag. For at vise brugen af og fordelene ved vores udviddelse, vil vi lave nogle eksempelprogrammer lavet i \pycsp henholdsvis med og uden vores udviddelser. Dette gøres for at give en klart indblik i hvordan udviddelserne benyttes samt hvilke fordele en introduktion af de givne tidsmodeller direkte i pycsp vil give. 
+Vi vil indledningsvis præsentere konteksten og baggrunden for dette speciale. Herefter vil vi klarlægge hvilke problemer vi ønsker at adressere samt hvordan vores tilgangsvinkel vil være. Afslutningsvis giver vi et overblik over specialets struktur. 
 
-De tre tidsmodeller som vi vil undersøge er diskretiseret tid, realtid og interaktiv tid. Disse modeller repræsenterer forskellige anvendelser af tid og dækker tilsammen bredt over tid som helhed. Diskretiseret tid anvendes i stor udstrækning i simuleringer specifikt i discrete event sumulation. \\
-Realtid benyttes i tidskritiske systemer hvor der er stringente krav om at en given begivenhed er blevet udført inden for en tidsramme. Endeligt bruges interaktiv tid til at specificere at en given begivenhed skal finde sted på et specifikt tidspunkt, eller alternativt inden for en givet tidsrum. 
+\subsubsection{Baggrund}
+Over de sidste par år er multi-kerne cpu'er blevet hyldevarer, hvilket har afledt et stigende behov for at udvikle programmer der kan udnytte flere kerner samtidigt. Dette behov har gjort CSP til et populært sprog, da det gør det let at repræsentere samtidighed samtidig med at det kræver eksplicit udveksling af data, frem for at benytte delte datastrukturer som kræver låsemekanismer eller anden form for kontrol over hvem og der tilgår og hvordan det delte data tilgås. CSP's stigende popularitet har affødt at det er blevet blevet implementeret i flere andre programmeringssprog, og senest har Google lavet sproget Go, der er baseret på CSP. Med den stigende popularitet stiger behovet også for udviddet funktionalitet indenfor niche-områder, heriblandt håndtering af tidsspecifikke problemer. Der er tidligere blevet arbejdet meget med at introducere tid i CSP, men det er primært på det teoretiske plan og har aldrig vundet indpas i de gængse implementationer. 
 
-Så vidt der er muligt ønsker vi at sammenligne vores arbejde med hvad andre har lavet af lignende implementeringer. Dette er ikke første gang der arbejdes med at introducere tid i CSP. Timed CSP er en omfattende teoretisk gennemgang af hvordan tid kan introduceres på det rent teoretiske plan, men det har aldrig vundet indpas i i praktiske implementationer af CSP. Vi vil derfor fokusere på de praktiske aspekter og problemstillinger og dermed ikke tage udgangspunkt i Timed CSP. 
+\subsubsection{Problemformulering}
+Set i lyset af den nuværende mangel på en praktisk anvendelig implementation af tid i CSP, vil vi undersøge om det er muligt at lave en sådan, som kan bruges af udviklere til at løse problemer der har en naturlig dimension af tid.
 
-\subsubsection{Rapportens opbygning}
-Rapporten vil være strukteret som følger. I \cref{sec:csp} vil vi gennemgå CSP og \pycsp med fokus på de dele der er relevante i forhold til at introducere tidsmodeller. \cref{chap:des,chap:rtp,chap:is} vil være en gennemgang af de tre tidsmodeller, hver med en gennemgang af tidsmodellens anvendelsesområder, eksempler, identificerede problemstillinger, løsninger samt en afsluttende evaluering. Afslutningsvis vil vi foretage en samlet i evaluering og konklusion i \cref{chap:konklusion}
+For at opnå dette vil vi forsøge at introducere tre tidsmodeller i \pycsp. De tre tidsmodeller som vi vil undersøge er diskretiseret tid, realtid og interaktiv tid. Disse modeller repræsenterer forskellige anvendelser af tid og dækker tilsammen bredt over tid som helhed. Diskretiseret tid anvendes i stor udstrækning i simuleringer specifikt i discrete event simulation. Realtid benyttes i tidskritiske systemer hvor der er stringente krav om at en given begivenhed er blevet udført inden for en tidsramme. Endeligt bruges interaktiv tid til at specificere at en given begivenhed skal finde sted på et specifikt tidspunkt, eller alternativt inden for en givet tidsrum. 
 
+Vi vil identificere kravene for hver model og komme med løsningsforslag som tager udgangspunkt i den praktiske anvendelighed. Disse løsningsforslag vil blive implementeret som en udviddelse af \pycsp. Med fokus på den praktiske anvendelighed vil vi konstruere eksempler til hver tidsmodel der viser hvordan et tidsspecifikt problem kan løses henholdsvis med og uden vores udviddelse. Vi vil definere eksemplerne så de bedst muligt illustrerer de problemstillinger vi har identificeret ved hver enkelt tidsmodel. Eksemplernes formål er derfor at vise problemstillingerne samt give et klart indblik i hvordan udviddelserne benyttes og hvilke fordele en introduktion af de givne tidsmodeller i \pycsp vil give. 
 
-
-
-
-
-
-  \section{Problem}	 
-  \section{Kontekst - Baggrund og motivation}
-Over de sidste par år er multi-kerne cpu'er blevet hyldevarer, og findes i 
-stort set alle solgte computere. For at udnytte den ekstra 
-ydelse, der er til rådighed med flere kerner, er softwareudviklere nødt til at 
-ændre på tankegangen og metoderne, der hidtil har været brugt til at udvikle 
-programmer. Hvor man tidligere har kunne udvikle programmer ud fra en meget 
-sekventiel tankegang, er man nu nødt til at muliggøre samtidig afvikling af 
-opgaver, så de kan udnytte flere kerner samtidigt. Dette stiller både krav 
-til udviklerne og de værktøjer og sprog, de benytter til udvikling. CSP er en metode 
-til at repræsentere den krævede samtidighed\cite{hoare-csp}. 
-\fxnote{omskriv}\begin{shaded}
-I CSP opdeles et program i selvstændige processer, der 
-kan afvikles samtidigt på hver sin kerne. Der bør som udgangspunkt ike være 
-delt data mellem processer, og al kommunikation mellem processer sker eksplicit 
-via kanaler. Dette gør det let at overskue og meget egnet til multi-kerne 
-arkitekturer. Ydermere lægger det op til at komplekse systemer opbygges af 
-mindre individuelle enheder, og kobles sammen med kanaler for så til sammen at 
-udgøre systemet som helhed.
-Opdelingen af et program i processer skaber nye problemstillinger, som ikke er 
-til stede i sekventielle programmer. Specifikt introduceres der et behov for 
-synkronisering af processerne idet de ofte vil have en indbyrdes afhængighed af 
-større eller mindre grad. Denne synkronisering kan ske implicit eller eksplicit 
-i programmet, afhængig af strukturen i det givne program. Ved eksplicit 
-synkronisering forstås at der er i programmet findes elementer hvis primære 
-formål er at håndtere synkronisering. Ved implicit synkronisering sker 
-synkroniseringen ud fra programmets normale kommunikation mellem processerne, 
-og ingen ekstra elementer til håndtering af synkronisering er nødvendige.  
-\end{shaded}
-\fxnote[inline,nomargin]{Mere her, bl.a. om tidsmodeller}
-\subsection{usammenhængende råtekst}
-Der er, så vidt vi ved, ikke nogen tilgængelige implementationer af CSP der 
-tager... 
-
-Af de implementationer af CSP der findes på nuværende tidspunkt, er der, så 
-vidt vi ved, ingen der har en reel repræsentation af tid indbygget. Det gør at 
-tidsspecifikke programmer, som f.eks. realtids-simuleringer, kræver brug af 
-andre konstruktioner i sproget.
-Vi ønsker at undersøge muligheden for at introducere tid som en indbygget del 
-af PyCSP for derved at kunne lette implementationen af programmer der i større 
-eller mindre grad er bundet op omkring et tidselement. 
+\subsubsection{Specialets opbygning}
+Rapporten vil være strukteret som følger. I \autoref{sec:csp} vil vi gennemgå CSP og \pycsp med fokus på de dele der er relevante i forhold til at introducere tidsmodeller. 
+\Autorefs{chap:des}, \ref{chap:rtp} og \ref{chap:is} vil være en gennemgang af de tre tidsmodeller, hver med en gennemgang af tidsmodellens anvendelsesområder, eksempler, identificerede problemstillinger, løsninger samt en afsluttende evaluering. Afslutningsvis vil vi foretage en samlet i evaluering og konklusion i \autoref{chap:konklusion}.
 
 
-I sin nuværende form kræver styring af tid i PyCSP brug af 
-barrierer. Dette skaber et 
-behov for flere kanaler mellem de enkelte processer og de fornødne barrierer, 
-samt kald til en barriere når en proces skal vente på at fortsætte.  Dette 
-resulterer som helhed i mindre overskuelig kode, hvilket vi mener kan gøres 
-mere elegant med indbygget funktionalitet til håndtering af tid. Målet er at 
-give mulighed for at integrere relationen til tid direkte i det udviklede 
-program, i stedet for at benytte 
+%Mål: At lave en praktisk anvendelig udviddelse af pycsp, som kan bruges af udviklere til at løse problemer, der har en naturlig dimension af tid.
 
-\section{Fremgangsmåde}
+%Mål: At undersøge om det er muligt at lave en praktisk anvendelig udviddelse af pycsp, som kan bruges af udviklere til at løse problemer, der har en naturlig dimension af tid.
+
 \section{Vores bidrag}
 \section{Termer}
 
