@@ -7,18 +7,20 @@ avg_arrival_interval = 0.1
 avg_convert_processing = 0.1
 avg_camera_processing = 0.1
 avg_analysis_processing = 0.1
-time_to_deadline = 1
+time_to_deadline = 0.4
 
 class Pig:
   def __init__(self,_id, arrivaltime,deadline = time_to_deadline):
     self.arrivaltime = arrivaltime
     self.deadline = arrivaltime+deadline
-    self.id = _id
+    self.id = _id,
+    self.donetime = arrivaltime
+    self.done = False
     if uniform(0,9)<1: self.normal = False 
     else : self.normal = True 
     self.wait = []
   def __repr__(self):
-    return "pig arrived with delay of %f. has normal ribs: %s\n pig: [%s]\n total processtime is %0.3f"%(time.time()-self.arrivaltime,self.normal,self.wait, sum(self.wait))
+    return "%s\tHas normal ribs: %s, total processtime = %0.3f, totaltime = %0.3f\t%s\n"%(self.done,self.normal,sum(self.wait),self.donetime-self.arrivaltime,self.wait)
 
 @process
 def feederFunc(feeder,robot , data = avg_arrival_interval):
@@ -82,49 +84,59 @@ def analysisFunc(in0,out0 , data = avg_analysis_processing):
  
 @process        
 def robotFunc(feeder,robot, data = time_to_deadline):
-    next_deadline = []
+    next_deadline = {}
     try:
-        def cancel(p):
-            for i in xrange(len(next_deadline)):
-                if next_deadline[i][1] == p:
-                    next_deadline.pop(i)
-                    break
-            heapq.heapify(next_deadline)
-        
-    
-        @choice
-        def analysis_arived(channel_input):
-            proctime = time.time()-channel_input.arrivaltime
-            if proctime<=data : 
-                print "ok process time was: %f %s"%(proctime,channel_input.__repr__())
-            else : print "fail process time was: %f %s"%(proctime,channel_input.__repr__())
-            cancel(channel_input.id)                     
+        #        def cancel(p):
+        #            for i in xrange(len(next_deadline)):
+        #                if next_deadline[i][1] == p:
+        #                    next_deadline.pop(i)
+        #                    break
+        #            heapq.heapify(next_deadline)
+        #        
+        #    
+        #        @choice
+        #        def analysis_arived(channel_input):
+        #            proctime = time.time()-channel_input.arrivaltime
+        #            if proctime<=data : 
+        #                print "ok process time was: %f %s"%(proctime,channel_input.__repr__())
+        #            else : print "fail process time was: %f %s"%(proctime,channel_input.__repr__())
+        #            cancel(channel_input.id)                     
+
+        #        @choice
+        #        def start_timer(channel_input):
+        #            heapq.heappush(next_deadline,(channel_input.deadline,channel_input))
+        #            
+        #        @choice
+        #        def deadline_crossed(channel_input):
+        #            print "deadline crossed: %s"%next_deadline.pop(0)[1]
+        #        print "max time is ",data
 
         @choice
-        def start_timer(channel_input):
-            heapq.heappush(next_deadline,(channel_input.deadline,channel_input))
+        def process_pig(channel_input):
+            next_deadline[channel_input.id] = channel_input
+
+        @choice
+        def process_pig2(channel_input):
+            channel_input.done = True
+            channel_input.donetime = time.time()
+            next_deadline[channel_input.id] = channel_input
             
-        @choice
-        def deadline_crossed(channel_input):
-            print "deadline crossed: %s"%next_deadline.pop(0)[1]
-        print "max time is ",data
-
-       
         while True:
-            while not next_deadline:
+            #while not next_deadline:
                 alt = Alternation([
-                    {feeder:analysis_arived()},
-                    {robot :start_timer()}            
+                    {feeder:process_pig2()},
+                    {robot :process_pig()}            
                 ]).execute()
-            if next_deadline :
-                Alternation([
-                    {feeder:analysis_arived()},
-                    {robot :start_timer()},
-                    {Timeout(next_deadline[0][0]-time.time()):deadline_crossed()}            
-                ]).execute()
+#            if next_deadline :
+#                Alternation([
+#                    {feeder:analysis_arived()},
+#                    {robot :start_timer()},
+#                    {Timeout(next_deadline[0][0]-time.time()):deadline_crossed()}            
+#                ]).execute()
     except ChannelPoisonException:
         poison(feeder)
         poison(robot)       
+        print next_deadline
 
 robot = Channel()       
 feeder = Channel()

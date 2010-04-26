@@ -77,15 +77,16 @@ def analysisFunc(in0,out0 , data = avg_analysis_processing):
     try:
         print "analysis time %f"%data
         while True:
-            val0 = in0()
-            Set_deadline(val0.deadline-Now())
-            waittime = None
-            if val0.normal : waittime = expovariate(1/data)
-            else :   waittime = expovariate(1/(2*data))
-            val0.wait.append(waittime)
-            Wait(waittime)
-            out0(val0)
-            Remove_deadline()
+            try:
+                val0 = in0()
+                Set_deadline(val0.deadline-Now())
+                waittime = None
+                if val0.normal : waittime = expovariate(1/data)
+                else :   waittime = expovariate(1/(2*data))
+                val0.wait.append(waittime)
+                Wait(waittime)
+                out0(val0)
+                Remove_deadline()
             except DeadlineException:
                 Remove_deadline()
     except ChannelPoisonException:
