@@ -10,10 +10,10 @@ avg_analysis_processing = 0.1
 time_to_deadline = 1
 
 class Pig:
-  def __init__(self,arrivaltime,deadline = time_to_deadline):
+  def __init__(self,_id,arrivaltime,deadline = time_to_deadline):
     self.arrivaltime = arrivaltime
     self.deadline = arrivaltime+deadline
-    self.id = uniform(0,999999999999999999999999999999999999999999)
+    self.id = _id
     if uniform(0,9)<1: self.normal = False 
     else : self.normal = True 
     self.wait = []
@@ -26,7 +26,7 @@ def feederFunc(feeder,robot , data = avg_arrival_interval):
     #Insert work here
     for x in xrange(10):
         Wait(expovariate(1/data))
-        pig = Pig(Now())
+        pig = Pig(x,Now())
         Alternation([
             {(feeder,pig):"robot(pig)"},
             {(robot,pig) :"feeder(pig)"}
@@ -118,9 +118,7 @@ def robotFunc(feeder,robot, data = time_to_deadline):
             
         @choice
         def deadline_crossed(channel_input):
-            print "deadline crossed: %s"%next_deadline.pop(0)[1]
-        print "max time is ",data
-
+            print "deadline crossed, cutting pig: %s"%next_deadline.pop(0)[1]
        
         while True:
             while not next_deadline:
@@ -129,6 +127,7 @@ def robotFunc(feeder,robot, data = time_to_deadline):
                     {robot :start_timer()}            
                 ]).execute()
             if next_deadline :
+                Set_deadline(next_deadline[0][0]-Now())
                 Alternation([
                     {feeder:analysis_arived()},
                     {robot :start_timer()},

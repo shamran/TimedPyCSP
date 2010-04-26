@@ -8,7 +8,7 @@ avg_convert_processing = 0.1
 avg_camera_processing = 0.1
 avg_analysis_processing = 0.1
 time_to_deadline = 0.4
-
+pigs_to_simulate = 10
 class Pig:
   def __init__(self,_id, arrivaltime,deadline = time_to_deadline):
     self.arrivaltime = arrivaltime
@@ -26,7 +26,7 @@ class Pig:
 def feederFunc(feeder,robot , data = avg_arrival_interval):
     print "feeder data = %f"%data
     #Insert work here
-    for x in xrange(10):
+    for x in xrange(pigs_to_simulate):
         time.sleep(expovariate(1/data))
         pig = Pig(x,time.time())
         Alternation([
@@ -86,31 +86,6 @@ def analysisFunc(in0,out0 , data = avg_analysis_processing):
 def robotFunc(feeder,robot, data = time_to_deadline):
     next_deadline = {}
     try:
-        #        def cancel(p):
-        #            for i in xrange(len(next_deadline)):
-        #                if next_deadline[i][1] == p:
-        #                    next_deadline.pop(i)
-        #                    break
-        #            heapq.heapify(next_deadline)
-        #        
-        #    
-        #        @choice
-        #        def analysis_arived(channel_input):
-        #            proctime = time.time()-channel_input.arrivaltime
-        #            if proctime<=data : 
-        #                print "ok process time was: %f %s"%(proctime,channel_input.__repr__())
-        #            else : print "fail process time was: %f %s"%(proctime,channel_input.__repr__())
-        #            cancel(channel_input.id)                     
-
-        #        @choice
-        #        def start_timer(channel_input):
-        #            heapq.heappush(next_deadline,(channel_input.deadline,channel_input))
-        #            
-        #        @choice
-        #        def deadline_crossed(channel_input):
-        #            print "deadline crossed: %s"%next_deadline.pop(0)[1]
-        #        print "max time is ",data
-
         @choice
         def process_pig(channel_input):
             next_deadline[channel_input.id] = channel_input
@@ -122,17 +97,10 @@ def robotFunc(feeder,robot, data = time_to_deadline):
             next_deadline[channel_input.id] = channel_input
             
         while True:
-            #while not next_deadline:
                 alt = Alternation([
                     {feeder:process_pig2()},
                     {robot :process_pig()}            
                 ]).execute()
-#            if next_deadline :
-#                Alternation([
-#                    {feeder:analysis_arived()},
-#                    {robot :start_timer()},
-#                    {Timeout(next_deadline[0][0]-time.time()):deadline_crossed()}            
-#                ]).execute()
     except ChannelPoisonException:
         poison(feeder)
         poison(robot)       
