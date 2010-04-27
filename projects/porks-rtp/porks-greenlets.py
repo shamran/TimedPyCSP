@@ -1,14 +1,16 @@
 """ Configurable. Run once then poison channels. """
-from pycsp.greenlets import *
+from pycsp.processes import *
+#from pycsp.greenlets import *
 from random import expovariate, uniform
-import heapq, time
+import heapq, time, math
 
-avg_arrival_interval = 0.1
-avg_convert_processing = 0.1
-avg_camera_processing = 0.1
-avg_analysis_processing = 0.1
-time_to_deadline = 0.4
-pigs_to_simulate = 10
+avg_arrival_interval = 0.05
+avg_convert_processing = 0.05
+avg_camera_processing = 0.05
+avg_analysis_processing = 0.05
+time_to_deadline = 0.25
+pigs_to_simulate = 100
+
 class Pig:
   def __init__(self,_id, arrivaltime,deadline = time_to_deadline):
     self.arrivaltime = arrivaltime
@@ -22,11 +24,20 @@ class Pig:
   def __repr__(self):
     return "%s\tHas normal ribs: %s, total processtime = %0.3f, totaltime = %0.3f\t%s\n"%(self.done,self.normal,sum(self.wait),self.donetime-self.arrivaltime,self.wait)
 
+def dummywork(stop_time):
+    #Estimating Pi.
+    k = 0
+    temp = 0
+    while time.time() < stop_time:
+         temp += (math.pow(-1,k)*4) / (2.0*k+1.0)
+         k +=1
+
 @process
 def feederFunc(feeder,robot , data = avg_arrival_interval):
     print "feeder data = %f"%data
     #Insert work here
     for x in xrange(pigs_to_simulate):
+        if x % 20 == 0 : print "doing ",x
         time.sleep(expovariate(1/data))
         pig = Pig(x,time.time())
         Alternation([
@@ -44,7 +55,7 @@ def cameraFunc(in0,out0 , data = avg_camera_processing):
             if val0.deadline>time.time():
                 waittime = expovariate(1/data)
                 val0.wait.append(waittime)
-                time.sleep(waittime)
+                dummywork(waittime+time.time())
                 out0(val0)
     except ChannelPoisonException:
         poison(in0,out0)
@@ -60,7 +71,7 @@ def convertFunc(in0,out0 , data = avg_convert_processing):
                 if val0.normal : waittime = expovariate(1/data)
                 else :   waittime = expovariate(1/(2*data))
                 val0.wait.append(waittime)
-                time.sleep(waittime)
+                dummywork(waittime+time.time())
                 out0(val0)
     except ChannelPoisonException:
         poison(in0,out0)
@@ -76,7 +87,7 @@ def analysisFunc(in0,out0 , data = avg_analysis_processing):
                 if val0.normal : waittime = expovariate(1/data)
                 else :   waittime = expovariate(1/(2*data))
                 val0.wait.append(waittime)
-                time.sleep(waittime)
+                dummywork(waittime+time.time())
                 out0(val0)
     except ChannelPoisonException:
         poison(in0,out0)
@@ -103,16 +114,20 @@ def robotFunc(feeder,robot, data = time_to_deadline):
                 ]).execute()
     except ChannelPoisonException:
         poison(feeder)
-        poison(robot)       
-        print next_deadline
-
+        poison(robot)
+        good = 0
+        bad = 0
+        for key, pig in  next_deadline.items():
+            if pig.done : good +=1
+            else : bad +=1
+        print "good = ",good,"bad =",bad, " = ",float(good)/(good+bad)*100,"%"
 robot = Channel()       
 feeder = Channel()
 camera = Channel()
 convert = Channel()
 analysis = Channel()
 
-
+start = time.time()
 Parallel(
     feederFunc(-feeder,-robot),
     cameraFunc(+feeder,-camera),
@@ -120,3 +135,4 @@ Parallel(
     analysisFunc(+convert,-analysis),
     robotFunc(+analysis,+robot)
 )        
+print "time to process: ", time.time()-start,"sec"

@@ -57,7 +57,36 @@ test\_xreset\_inheritance\_from\_two\_step  & FAIL\\
 
 \subsection{Slagterieksempel}
 
+
+
+
+Først vil vi sammenligne de to udviklede versioner, for at se på deres fordele og ulemper, og til slut vi dette afsnit sammenholde de to versioner, med et  eksempel der er implementeret i RTP-versionen.
+
+Forskellen i kode mellem greenlets og processes versionen består af en linje, som indikere hvilken version pycsp skal bruge. Resten af koden er identisk mellem de to versioner. En kørsel mellem de to versioner, som vist i \cref{fig:fnhdk} viser dog at det har betydning for andelen af grise der kan nå at blive bearbejdet.
+
+\begin{longtable}{lcr}
+   	\toprule
+    \mc{Version} & \mc{succesrate (\%)} & \mc{tidsforbrug (s)} \\
+    \midrule
+    \endfirsthead 
+    \toprule
+    \mc{Version} & \mc{succesrate (\%)} & \mc{tidsforbrug (s)} \\
+    \midrule
+    \endhead % slut efterfølgende headere
+    \bottomrule
+    \multicolumn{3}{r}{\textit{fortsættes}}
+    \endfoot % slut footer
+    \bottomrule
+    \endlastfoot % slut sidste footer
+    Greenlets & 42 & 16,5\\
+    Processes & 71 & 10.3\\
+\end{longtable}
+
+
 Ved at basere koden på \pycsp kan netværket nemt udvides hvis de fysiske rammer for slagteriet ændre sig. Viser det sig f.eks at kameraet holder den samlede produktivitet af netværket tilbage kan, slagteriet tilføjet endnu et kamera, og nemt udvide procesnetværket med endnu en kameraproces, som kan arbejde samtidigt med det første kamera. 
+
+
+RTP udvidelsen bygger på \code{greenlets}-versionen, og derfor vil en genimplementation med RTP versionen lide under de samme begrænsninger som diskuteret i implementeringen i afsnit \cref{sec:deadline-exampel-implementation}.
 
 
 Selvom \pycsp kan udnytte et vilkårligt antal processorer i en computer, så længe der er flere processer end processorer, vil man se ændring i ydelsen hvis man variere  antallet af processer. Med \code{RTP}-versionen kan man nemt ændrer på antallet af konvertering- og analyse-processer for at fintune applikationen og  udnytte den underliggende platform. \code{RTP}-versionen sikrer i modsætning til \code{greenlets}-versionen at netværket hele tiden har fokus på først at videresende grisene nærmest robotten. \CRef{fig:pig-network3} viser hvordan netværket kan se ud med flere konverterings og analyse processer. 
