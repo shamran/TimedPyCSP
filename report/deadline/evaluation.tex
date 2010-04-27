@@ -59,8 +59,6 @@ test\_xreset\_inheritance\_from\_two\_step  & FAIL\\
 
 Ved at basere koden på \pycsp kan netværket nemt udvides hvis de fysiske rammer for slagteriet ændre sig. Viser det sig f.eks at kameraet holder den samlede produktivitet af netværket tilbage kan, slagteriet tilføjet endnu et kamera, og nemt udvide procesnetværket med endnu en kameraproces, som kan arbejde samtidigt med det første kamera. 
 
-Den simple model, som blev konstrueret til implementering af \code{greenlets}-versionen, Kan kun bearbejde en gris i konvertering samt en gris i analysen. Dette sikre at det altid er grisen nærmest robotten der arbejdes på, men samtidigt betyder det maksimalt er  to grise der kan arbejdes på samtidigt. Hvis man 
- tilføjer flere konverterings og analyseprocesser vil der kunne foretages samtidige beregninger af flere grise, men grisene vil kæmpe mod hinanden for at komme igennem netværket uden hensyn til hvilken gris der er nærmest robotten.
 
 Selvom \pycsp kan udnytte et vilkårligt antal processorer i en computer, så længe der er flere processer end processorer, vil man se ændring i ydelsen hvis man variere  antallet af processer. Med \code{RTP}-versionen kan man nemt ændrer på antallet af konvertering- og analyse-processer for at fintune applikationen og  udnytte den underliggende platform. \code{RTP}-versionen sikrer i modsætning til \code{greenlets}-versionen at netværket hele tiden har fokus på først at videresende grisene nærmest robotten. \CRef{fig:pig-network3} viser hvordan netværket kan se ud med flere konverterings og analyse processer. 
 
