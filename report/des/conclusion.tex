@@ -1,0 +1,14 @@
+\section{Konklusion}
+Vi har nu gennemgået tidsmodellen \des og redegjort for dens anvendelsesområder. Vi er kommet frem til at en \des grundlæggende skal have tre ting til rådighed; en repræsentation af tid, en liste over begivenheder og muligheden for at opsamle statistisk data. \\
+Repræsentationen af tid og listen over begivenheder varetages i \code{scheduler}-klassen hvor vi har foretaget de primære ændringer for at implementere \des. Da vi ændrer betydeligt på brugen af \code{timers}-listen har vi ændret den til en min-hob, som egner sig bedre til vores formål. Vi kan nu have alle begivenheder
+
+Snak her om hvilke problemer vi har fundet og hvordan vi har løst dem. 
+
+Omskriv nedenstående så der giver mening
+\begin{shaded}
+Vi har vist hvordan dette implementeres henholdsvis med og uden en implementering af \des i \pycsp. Ud fra implementeringen uden \des har vi klarlagt at det er nødvendigt at benytte barrierer til at repræsentere tid, og at denne metode bryder med det grundlæggende princip i CSP om ikke at have delte datastrukturer. Yderligere viser vi at vores implementering imødekommer dette problem og tilbyder en repræsentation af tid så udvikleren ikke har brug for delte datastrukturer. 
+
+Vi har lavet to eksempler som viser brugen af vores \des implementering. Disse eksemplerer illustrerer at der bruges væsentligt mindre kode på at håndtere tiden når det er implementeret direkte i \pycsp, hvilket generelt resulterer i mere overskuelig kode, da den derved primært udtrykker det konkrete problem der skal løses. De to eksempler er af grundlæggende forskellig karakter, og vi kan se at fordelene ved vores \des implementering er væsentlig større i bankeksemplet end i Wa-Tor-eksemplet. Grunden til dette er, at en simulering af en bank generelt egner sig godt til at illustrere \des, hvor Wa-Tor er en kontinuerlig simulering og kan derfor ikke drage fuld nytte af egenskaberne ved \des. 
+\end{shaded}
+
+Opsummér her hvad vi har opnået - now og wait, fungerende og anvendelig, let at bruge
