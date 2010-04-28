@@ -14,17 +14,17 @@ article
 %\setlrmarginsandblock{3.5cm}{3.5cm}{*}
 
 
-\setlrmarginsandblock{1cm}{3.5cm}{*}
+\setlrmarginsandblock{1.5cm}{3.5cm}{*}
 
 
 
 %her kan margenen sættes manuelt, hvis man har lyst
-%\setulmarginsandblock{2cm}{2cm}{*}
+\setulmarginsandblock{3cm}{4cm}{*}
 % % mere utraditionelt, men hurtigt smartere
 % % vi sætter tekstblokken og placerer den
 % % værdierne som er angivet svarer ca. til dem anvende i LaTeXbogen
 % % 400pt bred og en højde svarende til at forholdet er det gyldne snit
-%\settypeblocksize{*}{371pt}{1.618}
+%%\settypeblocksize{*}{371pt}{1.618}
 % % placer tekstblokken på papriet, kun en værdi skal angives, her sider
 % % vi bare hvad forholder mellem marginerne skal være
 % \setlrmargins{*}{*}{1.6}
@@ -90,6 +90,8 @@ article
 \usepackage[danish]{varioref} % smarte krydsreferencer via \vref
 \usepackage{color}
 \definecolor{darkblue}{rgb}{0,0.1,0.5}
+\usepackage{hycolor}
+\usepackage[draft, danish,layout=margin,innerlayout=inline]{fixme} % til at skrive \fixme kommentarer til sig
 \usepackage[colorlinks%
            ,linkcolor=darkblue%
            ,citecolor=darkblue%
@@ -110,16 +112,13 @@ article
 %og skal udkommenteres hvis der opstår problemer.
 %specielt skal udkommenteres når man kompilere i final til print
 
-
 %% Make sure \autoref puts parentheses around 
 %% equations and enumeration items (similar to \eqref)
 %% NOTE: This allows us to use \ref instead of \eqref
 \labelformat{equation}{\textup{(#1)}}
 \labelformat{enumi}{\textup{(#1)}}
-\usepackage{hycolor}
-\usepackage[draft,author=Dorte]{pdfcomment}
-\usepackage[draft, danish,layout=margin,innerlayout=inline]{fixme} % til at skrive \fixme kommentarer til sig
-\fxloadlayouts{pdfmargin}
+%\usepackage[draft,author=Dorte]{pdfcomment}
+
 
 \newcommand{\inline}[1]{\fxwarning[inline,nomargin]{#1}}
 \newcommand{\kv}[1]{\fxnote*{Kendt viden?}{#1}}
@@ -193,8 +192,6 @@ article
          \def\tableautorefname{tabellerne}%
          \def\chapterautorefname{kapitlerne}% 
          \orgautoref}
-
-
 
 
 
