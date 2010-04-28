@@ -92,9 +92,7 @@ selvom det var nødvændigt at basere RTP på  \code{greenlets}-versionen, medf�
 
 Et problem ved at køre flere funktioner samtidigt og overlade kørslen til operativsystemets \sched, er at den ikke kender noget til vores interne planlægning. En brug af \code{IO}-dekorering og eksterne moduler til at sikre samtidighed skal derfor bruges med varsomhed og kun efter en analyse af den enkelte applikation, da samtidige processer på den samme processor lige som i \code{processes}-versionen vil kæmpe mod hinanden om processorresurser. 
  
-En benyttet metode til at sikre optimal arbejdsfordeling variere  antallet af processer. Med \code{RTP}-versionen kan man nemt ændrer på antallet af konvertering- og analyse-processer for at fintune applikationen og  udnytte den underliggende platform. \code{RTP}-versionen sikrer i modsætning til \code{processes}-versionen at netværket hele tiden har fokus på først at videresende grisene nærmest robotten. \CRef{fig:pig-network3} viser hvordan netværket kan se ud med flere konverterings og analyse processer. 
-
-ændring i ydelsen hvis man
+for at sikre optimal arbejdsfordeling kan man udføre en række test, hvor man variere  antallet af processer. Med \code{RTP}-versionen kan man nemt ændrer på antallet af konvertering- og analyse-processer for at fintune applikationen og  udnytte den underliggende platform. \code{RTP}-versionen sikrer i modsætning til \code{processes}-versionen at netværket hele tiden har fokus på først at videresende grisene nærmest robotten. \CRef{fig:pig-network3} viser hvordan netværket kan se ud med flere konverterings og analyse processer. 
 
 \begin{figure}
  \begin{center}
@@ -103,7 +101,3 @@ En benyttet metode til at sikre optimal arbejdsfordeling variere  antallet af pr
 	\label{fig:pig-network3}
 \end{center}
 \end{figure}
-
- 
- 
- 
