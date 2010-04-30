@@ -3,11 +3,17 @@
 
 \is er den sidste model for at belyse hvordan man kan implementere i \pycsp. Det har dog vidst sig at emnet er yderst begrænset dækket af litteraturen, og at de få definitioner af interactive tid vi har fundet ikke er en selvstændig tidsmodel men en definition af RTP med hard deadline, uden at være et kritisk system. \cite{?}. Dette Vi vil derfor istedet på baggrund af en række praktiske eksempler indkredse hvad vi forventer et \is skal kunne bruges til og på  baggrund af eksemplerne finde en definition af \is. Som hvis det er muligt implementere. Dette kapitel adskiller sig dermed væsentligt fra de foregående to kapitler i og med de ikke baserer sig på en fast definition givet af litteraturen. 
 
-  \section{Eksempel}
-Oprindeligt forestillede vi os at \is var defineret af computerspilindustrien som en metode til at planlægge forskellige handlinger/begivenheder der skal foregå på et senere tidspunkt i spillet. Der findes dog ingen akademiske værker omhandlende \is i spil, men vi forestiller os et eksempel hvor man i et spil har et tidsforløb hvor en række elementer vil komme og gå. Konkret ønsker man med mellemrum en fugl skal flyve over skærmen Det første eksempel tager udgangspunkt i grafik
+\section{Eksempel}
+Oprindeligt forstillede vi os at \is var defineret af computerspilindustrien som en metode til at planlægge hvordan spillet skal forløbe. Der findes dog ingen akademiske værker der fokusere på \is i spil, så vi vil i stedet opstille et hypotetisk eksempel. 
+
+Vi forstiller os at der til et computerspil er tilknyttet en drejebog, indeholdende et tidsforløb hvor alle elementer og begivenheder er koordineret og planlagt. 
+
+Spillet er bygget på \pycsp og hvert element i spillet er en selvstændig proces. Når en frame skal tegnes; udregner hver proces hvor deres deres element er i den givne frame og hvad der skal vises. Når alle processerne har tilføjet deres element til den givne frame, kan den sendes videre til rendering, få tilknyttet lyd og tilslut visualisering. 
+
+Konkret forstiller vi os et spil hvor udviklerne ønsker at en fugl med mellemrum skal flyve over skærmen. Fuglen skal starte på et givet tidspunkt og med en fast hastighed bevæge sig på tværs af skærmen.
 
   \section{Beskrivelse/teori}
-  \section{Design og implementation}
+  \section{Design og implementering}
   \section{Evaluering}
   \section{Fremtidigt arbejde}
   \section{Opsummering}
