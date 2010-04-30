@@ -1,0 +1,16 @@
+Indledning:
+Stemmer indledningen godt over ens med problemformuleringen? 
+Har vi defineret 'praktisk anvendeligt' tilstrækkeligt?
+Kan det bruges til at konkludere noget ud fra?
+
+større perspektiv, hvorfor er tid vigtigere end så meget andet?
+
+Forsvar - dato
+
+styring af processer (vores løsning) vs. styring af kommunikation(kan gøres i processes)
+
+processer egner sig bedst til cpu-tung anvendelse, hvor styring af kommunikation kræver regelmæssig kommunikation
+
+snak om interaktiv tid - eksempler
+
+

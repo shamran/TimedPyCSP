@@ -54,7 +54,7 @@ Når detektoren starter hele processen, opretter den et griseobjektet som den se
 
 Vi har holdt os tæt op af den virkelige verden, i designet af implementeringen, men da dette er et delvist tænkt eksempel har vi i  sagens natur ikke  adgang til slagteriet og deres maskiner, eller præcis data om grisene. Derfor må vi nødvendigvis simulere store dele af eksemplet. 
 
-De enkelte processer foretager derfor ikke et konkret stykke arbejde, men har  tilknyttet et tal der repræsenteret det tidsrum, som vi forventer arbejdet i processen vil tage. Hver proces simulere i stedet arbejdet, i et  normalfordelt tidsrum omkring det tilknyttede tidsrum.
+De enkelte processer foretager derfor ikke et konkret stykke arbejde, men har  tilknyttet et tal der repræsenterer det tidsrum, som vi forventer arbejdet i processen vil tage. Hver proces simulerer i stedet arbejdet, i et normalfordelt tidsrum omkring det tilknyttede tidsrum.
 
 Detektoren starter processeringen af hver gris. Derfor står detektoren for oprettelsen af griseobjektet, hvori vi også  definerer om den har et ekstra sæt ribben. Denne oplysning bruges af de enkelte processer til at justere tidsrummet bearbejdningen af grisen tager. 
 
@@ -71,6 +71,8 @@ Med tanke på de ovenstående fordele og ulemper der findes ved hhv.  \code{gree
 I \code{greenlets}-versionen er ``Udvælgelse og udskæringsprocessen'' reduceret til en IO-proces der modtager grisene og gemmer dem så en anden applikation kan tilgå dem. Til dette har vi valgt at bruge en \code{dictonary} datastruktur til at gemme  hver gris under deres unikke id. Første gang processen modtager en gris gemmes den i datastrukturen, så i tilfælde af at analysen ikke bliver færdig vil den anden applikation som minimum vide der kommer en gris. Anden gang den samme gris modtages er det fra analyseprocessen, med det færdige resultat hvorfor  den gamle gris overskrives. Den anden applikation, kender derfor til alle grisene, uanset om analysen er blevet rettidigt færdig.
 
 \code{Process}-versionen, er magen til \code{greenlets}-versionen, men den praktiske forskel at processerne kører som selvstændige python-processer og derfor har muligheden for parallel kørsel. 
+
+\fxwarning{konsekvent brug af process- vs processes-versionen}
 
 %\subsection{Eksempel 2 - Sensornetværk med høj/lav -prioritet}
 %\inline{eks2: skal vise alternation, kan være en sensor som modtager måledata med lav prioritet og som skal sende måledata på opdordring med høj prioritet.}
