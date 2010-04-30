@@ -17,7 +17,7 @@ Et billede af den automatiske tredeler er vist  på \cref{fig:pig}.  Det har dog
 \end{figure}
 
 
-Slagteriet har placeret kameraet i starten af et transportbåndet mens udskæringsrobotten findes i den anden enden. Der kan være flere grise på transportbåndet på samme tid, og det fremfører grisene i et fast tempo. Dette giver et fast tidsrum fra grisen passerer kameraet til det passerer robotten. Vi har hermed et klassisk RTP system, hvor robotten skal foretage et valg under en hard deadline, da der skal foretages en udskæring.\fxwarning{konsistent brug af gris/svin}
+Slagteriet har placeret kameraet i starten af et transportbåndet mens udskæringsrobotten findes i den anden ende. Der kan være flere grise på transportbåndet på samme tid, og det fremfører grisene i et fast tempo. Dette giver et fast tidsrum fra grisen passerer kameraet til det passerer robotten. Vi har hermed et klassisk RTP system, hvor robotten skal foretage et valg under en hard deadline, da der skal foretages en udskæring.
 
 Vi må først se på arbejdsgangen der er involveret i valget af model:
 \begin{enumerate}
@@ -34,13 +34,13 @@ Man kan se at arbejdsgangen indeholder en  række klart afgrænsede arbejdsområ
 \begin{figure}
  \begin{center}
   \includegraphics[scale=1]{images/pig-network}
-	\caption{Procesnetværk til udskæring af svin på et slagteri.}
+	\caption{Procesnetværk til udskæring af grise på et slagteri.}
 	\label{fig:pig-network}
 \end{center}
 \end{figure}
 
 \subsubsection*{Implementering}\label{sec:deadline-exampel-implementation}
-Til at implementere eksemplet i \pycsp, kan vi oprette hvert gris som et objekt og tilknytte et tidspunkt dertil som vi kan bruge som en deadline. Med denne kan hver proces evaluere om grisen har overskredet sin deadline, og i det tilfælde fjerne griseobjektet, og stoppe den videre behandling af det. Da det er ikke angivet hvordan hele processen startes,  antager vi der findes en form for detektor foran kameraet, der opfanger når et svin passerer og som dermed starter processen. 
+Til at implementere eksemplet i \pycsp, kan vi oprette hvert gris som et objekt og tilknytte et tidspunkt dertil som vi kan bruge som en deadline. Med denne kan hver proces evaluere om grisen har overskredet sin deadline, og i det tilfælde fjerne griseobjektet, og stoppe den videre behandling af det. Da det er ikke angivet hvordan hele processen startes,  antager vi der findes en form for detektor foran kameraet, der opfanger når en gris passerer og som dermed starter processen. 
 
 Når detektoren starter hele processen, opretter den et griseobjektet som den sender til kameraprocessen, samt sender en kopi direkte til udvælgelse og udskæringsprocessen. Dermed ved processen at der ankommer en gris som den skal udskære, og hvis den, inden deadline, får en analyse af grisen, kan den træffe et begrundet valg om hvordan udskæringen skal foretages. Hvis ikke denne analyse findes, bruges blot standardmodellen til at udskære grisen. \CRef{fig:pig-network2} viser det endelige  netværk, hvor detektoren er introduceret, og som sender data til hhv. kameraprocessen og til udvælgelse og udskæringsprocessen. 
 
@@ -71,7 +71,7 @@ I stedet for at vælge \code{greenlets}-versionen kunne man i stedet vælge \cod
 
 Med tanke på de ovenstående fordele og ulemper der findes ved hhv.  \code{greenlets}-versionen og \code{process}-versionen,  har vi valgt at implementere begge versioner for i evalueringen at sammenligne dem med RTP-versionen. Fra et praktisk synspunkt vil \code{greenlets}-versionen ikke være relevant, da denne har nogle flere ulemper end \code{process}-versionen. Men til at danne grundlaget for en sammenligning med RTP-versionen har den sin berettigelse.
 
-I \code{greenlets}-versionen er ``Udvælgelse og udskæringsprocessen'' er reduceret til en IO-proces der modtager grisene og gemmer dem så en anden applikation kan tilgå dem. Til dette har vi valgt at bruge en \code{dictonary} datastruktur til at gemme  hver gris under deres unikke id. Første gang processen modtager en gris gemmes den datastrukturen, så i tilfælde af at analysen ikke bliver færdig vil den anden applikation som minimum vide der kommer en gris. Anden gang den samme gris modtages er det fra analyseprocessen, med det færdige resultat hvorfor  den gamle gris overskrives. Den anden applikation, kender derfor til alle grisene, uanset om analysen er blevet rettidigt færdig.
+I \code{greenlets}-versionen er ``Udvælgelse og udskæringsprocessen'' er reduceret til en IO-proces der modtager grisene og gemmer dem så en anden applikation kan tilgå dem. Til dette har vi valgt at bruge en \code{dictonary} datastruktur til at gemme  hver gris under deres unikke id. Første gang processen modtager en gris gemmes den i datastrukturen, så i tilfælde af at analysen ikke bliver færdig vil den anden applikation som minimum vide der kommer en gris. Anden gang den samme gris modtages er det fra analyseprocessen, med det færdige resultat hvorfor  den gamle gris overskrives. Den anden applikation, kender derfor til alle grisene, uanset om analysen er blevet rettidigt færdig.
 
 \code{Process}-versionen, er magen til \code{greenlets}-versionen, men den praktiske forskel at processerner kørere som selvstændige pythonprocesser og derfor har muligheden for parallel kørsel. 
 
