@@ -7,10 +7,19 @@ større perspektiv, hvorfor er tid vigtigere end så meget andet?
 
 Forsvar - dato
 
+INTERACTIVE:
 styring af processer (vores løsning) vs. styring af kommunikation(kan gøres i processes)
 
 processer egner sig bedst til cpu-tung anvendelse, hvor styring af kommunikation kræver regelmæssig kommunikation
 
-snak om interaktiv tid - eksempler
+\subsection*{Spil}
+Fuglen flyver over skærmen mellem t = 5 og t=10. Des flere gange den bliver kaldt, des mere præcist kan fuglens flugt beskrives.
+
+\subsubsection{WSN}
+en radio skal være aktiv hele et givet tidsrum. f.eks fra t= 5 til t = 10. og hverken mere eller mindre.
+
+\subsubsection*{Udskæring af gris}
+Grisen ankommer til til t=5 og skal være færdig til t =10 , men det er frit hvornår inden for dette tidsrum det gøres.
+
 
 
