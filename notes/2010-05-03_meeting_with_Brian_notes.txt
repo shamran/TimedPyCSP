@@ -5,7 +5,27 @@ Kan det bruges til at konkludere noget ud fra?
 
 større perspektiv, hvorfor er tid vigtigere end så meget andet?
 
+readability - python er godt
+flere tidsmodeller samlet - ikke prøvet før
+correctness vs tid
+
+hvorfor er csp den rigtige løsning for alle modeller - dette er humlen
+
+interessante ved tid er 3 modeller, generelt anvendt.
+"noget der har har irriteret os altid"
+
+Dadio, snakket med Kenni: Der findes ikke noget teori
+
+
+
+
 Forsvar - dato
+
+1,22,29
+
+evt. 28
+
+
 
 INTERACTIVE:
 styring af processer (vores løsning) vs. styring af kommunikation(kan gøres i processes)
@@ -21,5 +41,5 @@ en radio skal være aktiv hele et givet tidsrum. f.eks fra t= 5 til t = 10. og h
 \subsubsection*{Udskæring af gris}
 Grisen ankommer til til t=5 og skal være færdig til t =10 , men det er frit hvornår inden for dette tidsrum det gøres.
 
-
+vise et ur
 
