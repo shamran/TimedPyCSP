@@ -1,27 +1,33 @@
 \chapter{\is}
 \label{chap:is}
 
-\is er den sidste model for at belyse hvordan man kan implementere i \pycsp. Det har dog vidst sig at emnet er yderst begrænset dækket af litteraturen, og at de få definitioner af interactive tid vi har fundet ikke er en selvstændig tidsmodel men en definition af RTP med hard deadline, uden at være et kritisk system. \cite{?}. Dette Vi vil derfor istedet på baggrund af en række praktiske eksempler indkredse hvad vi forventer et \is skal kunne bruges til og på  baggrund af eksemplerne finde en definition af \is. Som hvis det er muligt implementere. Dette kapitel adskiller sig dermed væsentligt fra de foregående to kapitler i og med de ikke baserer sig på en fast definition givet af litteraturen. 
+\is er den sidste model for at belyse hvordan man kan implementere ti i \pycsp. Det har dog vidst sig at emnet er yderst begrænset dækket af litteraturen, og at de få definitioner af interactive tid vi har fundet ikke er en selvstændig tidsmodel men en definition af RTP med hard deadline, uden at være et kritisk system. \cite{?}. Vores udgangspunkt for denne model var istedet til brug i computerspil, men efter at have rådført os Med Kenny Erleben, underviser på  Det Danske Akademi for Digital Interaktiv Underholdning (DADIU), er vi kommet frem til der ikke findes en udbredt definition af tid i computerspil. Han fortæller desuden at  det ikke er i computerspilfirmaerne interesse at  oplyse om deres tidsmodel da de  betragte den som en  virksomhedshemmelighed. 
+
+Vi vil derfor istedet på baggrund af en række praktiske eksempler indkredse hvad vi forventer et \is skal kunne bruges til og på  baggrund af eksemplerne finde en definition af \is. Som hvis det er muligt implementere. Dette kapitel adskiller sig dermed væsentligt fra de foregående to kapitler i og med tidsmodellen  ikke baserer sig på en fast definition givet af litteraturen og vi ikke kan udbygge på kendt viden.
 
 \section{Eksempel}
 Oprindeligt forstillede vi os at \is var defineret af computerspilindustrien som en metode til at planlægge hvordan spillet skal forløbe. Der findes dog ingen akademiske værker der fokusere på \is i spil, så vi vil i stedet opstille et hypotetisk eksempel. 
 
-Vi forstiller os at der til et computerspil er tilknyttet en drejebog, indeholdende et tidsforløb hvor alle elementer og begivenheder er koordineret og planlagt. 
+\subsection*{Computerspil}
+Vi forestiller os et computerspillet der er bygget på \pycsp og hvor hvert element i spillet er en selvstændig proces. I dette computerspil ønsker man en fugl der flyver på tværs af skærmen. Fuglen skal starte på et givet tidspunkt og med en fast hastighed bevæge sig over skærmen. Fuglens flugt over skærmen udregnes af to typer processer, efter en model der minder om videokomprimering. Den første type, består af én højprioritets proces der står for udregne positionen af fuglen med sjældne mellemrum. Den anden type kan bestå af mange lavprioritetsprocesser. Hver lavprioritetsproces står for en egenskab, som  f.eks. at justere fuglen i forhold til dens position, optimere animationen af fuglen, tilknyttet fuglekvidre og andre ikke essentielle egenskaber.  Den højtprioriterede proces udføres sjældent men skal udføres, mens lavprioritetsprocesserne blot skal udføres hvis der er mulighed for det og ellers skal droppes.
 
-Spillet er bygget på \pycsp og hvert element i spillet er en selvstændig proces. Når en frame skal tegnes; udregner hver proces hvor deres deres element er i den givne frame og hvad der skal vises. Når alle processerne har tilføjet deres element til den givne frame, kan den sendes videre til rendering, få tilknyttet lyd og tilslut visualisering. 
-
-Konkret forstiller vi os et spil hvor udviklerne ønsker at en fugl med mellemrum skal flyve over skærmen. Fuglen skal starte på et givet tidspunkt og med en fast hastighed bevæge sig på tværs af skærmen.
-
+Uden tab af generelitet vil vi i dette eksempel begrænse os til at fokusere på en høj og en lavprioritets proces. Højprioritetsprocessen står for at beregne positionen mens lavprioritetsprocessen står for at flytte fuglen i forhold denne position.
 
 
 
-\subsection*{Spil}
-Fuglen flyver over skærmen mellem t = 5 og t=10. Des flere gange den bliver kaldt, des mere præcist kan fuglens flugt beskrives.
+
+\subsection{Animeret ur}
+
+Vi ønsker at animere et digitalur. Uret består af 4 cifre, og en gang i minuttet skal minuttallet tælles op. Denne begivnehed kan være længe undervejs, men det skal sikres at uret 
+
 \subsubsection{WSN}
 en radio skal være aktiv hele et givet tidsrum. f.eks fra t= 5 til t = 10. og hverken mere eller mindre.
 
 \subsubsection*{Udskæring af gris}
 Grisen ankommer til til t=5 og skal være færdig til t =10 , men det er frit hvornår inden for dette tidsrum det gøres.
+Dårligt.
+
+vise e ur. Hvert minut skal et tal skifte. 
 
   \section{Beskrivelse/teori}
   \section{Design og implementering}
