@@ -7,12 +7,20 @@ Over de sidste par år er multi-kerne cpu'er blevet hyldevarer, hvilket har afle
 \subsubsection{Specialets problemformulering og struktur}
 Set i lyset af den nuværende mangel på en praktisk anvendelig implementering af tid i CSP, vil vi undersøge om det er muligt at lave en sådan - dvs. en implementering, som kan bruges af udviklere til at løse problemer, hvori tid indgår.\fxwarning{Brian: Har vi defineret "praktisk anvendelig implementering" tilstrækkeligt?}
 
-For at opnå dette vil vi undersøge, hvad der skal til for at introducere følgende tre tidsmodeller i \pycsp: Diskret tid, realtid og interaktiv tid. Disse modeller repræsenterer forskellige anvendelser af tid og dækker tilsammen bredt over tid som helhed. Diskret tid anvendes i stor udstrækning i simuleringer specifikt i discrete event simulation. Realtid benyttes i tidskritiske systemer hvor der er stringente krav om at en given begivenhed er blevet udført inden for en tidsramme. Endeligt bruges interaktiv tid til at specificere at en given begivenhed skal finde sted på et specifikt tidspunkt, eller alternativt inden for en givet tidsrum. 
+For at opnå dette vil vi undersøge, hvad der skal til for at introducere følgende tre tidsmodeller i \pycsp: Diskret tid, realtid og interaktiv tid. Disse modeller repræsenterer forskellige anvendelser af tid og dækker tilsammen bredt over tid som helhed. Diskret tid anvendes i stor udstrækning i simuleringer specifikt i discrete event simulation. Realtid benyttes i tidskritiske systemer hvor der er stringente krav om at en given begivenhed er blevet udført inden for en tidsramme. Endeligt bruges interaktiv tid til at specificere at en given begivenhed skal finde sted på et specifikt tidspunkt, eller alternativt inden for en givet tidsrum. På \cref{fig:intro} viser vi hvordan vi forventer at kombinere tidsmodellerne med \pycsp for derved at komme frem til vores Timed \pycsp. 
 
-For hver model vil vi dentificere problemerne ved introduktionen af denne og derpå definere en række eksempler, der illustrerer disse problemstillinger. Eksemplerne skal sikre den praktiske anvendelighed og senere bruges til at vise, hvordan et tidsspecifikt problem kan løses henholdsvis med og uden vores udvidelse. Eksemplernes formål er altså, ud over at vise problemstillingerne, at give et klart indblik i de krav, der stilles til en udvidelse af \pycsp, og hvilke fordele en introduktion af de givne tidsmodeller i \pycsp vil give. På denne baggrund vil vi komme med løsningsforslag som tager udgangspunkt i den praktiske anvendelighed. Disse løsningsforslag vil såfremt det er muligt, blive implementeret som en udviddelse af \pycsp.
+For hver model vil vi identificere problemerne ved introduktionen af denne og derpå definere en række eksempler, der illustrerer disse problemstillinger. Eksemplerne skal sikre den praktiske anvendelighed og senere bruges til at vise, hvordan et tidsspecifikt problem kan løses henholdsvis med og uden vores udvidelse. Eksemplernes formål er altså, ud over at vise problemstillingerne, at give et klart indblik i de krav, der stilles til en udvidelse af \pycsp, og hvilke fordele en introduktion af de givne tidsmodeller i \pycsp vil give. På denne baggrund vil vi komme med løsningsforslag som tager udgangspunkt i den praktiske anvendelighed. Disse løsningsforslag vil såfremt det er muligt, blive implementeret som en udviddelse af \pycsp.
 \fxwarning{En ting er at det lyder flot. En anden ting er om vi kan konkludere på det til slut}
 
 Specialet vil derfor være struktureret som følger. I \autoref{chap:csp} vil vi gennemgå CSP og \pycsp med fokus på de dele der er relevante i forhold til at introducere tidsmodeller. I \autorefs{chap:des}, \ref{chap:rtp} og \ref{chap:is} vil vi gennemgå de tre tidsmodeller som beskrevet ovenfor. Afslutningsvis vil vi foretage en samlet i evaluering og konklusion i \autoref{chap:konklusion} på baggrund af delkonklusionerne i \autorefs{chap:des}, \ref{chap:rtp} og \ref{chap:is}.
+
+\begin{figure}
+ \begin{center}
+  \includegraphics[scale=0.8]{images/intro}
+	\caption{Samspil mellem CSP, Python og de tre tidsmodeller samlet i Timed \pycsp .}
+	\label{fig:intro}
+\end{center}
+\end{figure}
 
 %Mål: At lave en praktisk anvendelig udviddelse af pycsp, som kan bruges af udviklere til at løse problemer, der har en naturlig dimension af tid.
 
