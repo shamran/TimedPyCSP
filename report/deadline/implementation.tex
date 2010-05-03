@@ -1,8 +1,5 @@
 \section{Implementering}\label{sec:deadline-implementation}
 
-\subsubsection{Now og Wait}
-Som vi beskrev i \des introducerede vi de to globale funktioner Now og Wait der hhv. returnerer tiden og før en proces til at vente i et givent tidsrum. Vi har ændret den interne implementering af funktionerne, så de bruger realtid. Dette sikre en ensartet implementering af tid på tværs af de tre udviklede versioner af TimedPyCSP. Det vil være en fordel hvis greenlet versionen også brugte Now, når den skal bruge tid, i hvilket tilfælde, det kunne fjernes helt i denne version. 
-
 \subsubsection{Overskredene deadlines}
 Planlægning i realtime kræver man tager stilling til  hvordan  overskredne deadlines skal håndteres. Man kan vælge enten at se det som en egenskab for processen hvor dens deadline enten kan være overholdt eller ej. Alternativt kan der kan en overskreden deadline resultere i en exception.
 
