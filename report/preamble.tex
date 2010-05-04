@@ -59,6 +59,10 @@ article
 }
 \selectlanguage{danish}
 
+%har vi ord der bliver delt forkert kan de indsættes i hyphernation med bindestreg alle steder hvor ordet kan deles
+\hyphenation{tit-len mo-del-len pro-du-ce-rer an-svars-hav-ende om-for-deles for-bind-elses-mulig-heder ska-ber æn-dring-er net-værks-en-hed-er peer backup backup-system fast-track backup-systemer nabo-peers frame-work efter-som Grund-lag-et plads-effek-tivi-teten audits }
+
+
 
 \usepackage{amsmath,amssymb} % bedre matematik og ekstra fonte
 \usepackage{textcomp} % adgagn til tekstsymboler
@@ -78,9 +82,6 @@ article
 \usepackage{longtable} %allow for tables that span more than one page 
 \usepackage[section]{placeins}%pakke til at stoppe float fra at drifte for længere end til \FloatBarrier. Med en section i option ændrers alle sections til at sætte en barriere.
  
-%har vi ord der bliver delt forkert kan de indsættes i hyphernation med bindestreg alle steder hvor ordet kan deles
-\hyphenation{tit-len mo-del-len pro-du-ce-rer an-svars-hav-ende om-for-deles for-bind-elses-mulig-heder ska-ber æn-dring-er net-værks-en-hed-er peer backup backup-system fast-track backup-systemer nabo-peers frame-work efter-som Grund-lag-et plads-effek-tivi-teten audits}
-
 \makeatletter
     \declare@shorthand{danish}{"/}{\nobreak\discretionary{/}{}{/}\bbl@allowhyphens}%Tillader orddeling på tværs af / ved at skrive "/
     \declare@shorthand{danish}{"_}{\nobreak\discretionary{\_}{}{\_}\bbl@allowhyphens}%Tillader orddeling på tværs af _ ved at skrive "_
