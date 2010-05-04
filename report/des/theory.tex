@@ -57,8 +57,7 @@ Et alternativ til \des  er parallel discrete event simulation(\pdes) hvor tiden 
 \subsubsection{Barrierer} \label{sec:barrierer}
 %\inline{Hele afsnittet skal skrives om for at få det generelle samlet i starten, og vores specifikke efterfølgende. Evt. have mindre om vores implementation}
 
-I \des findes en \fxnote*{skal defineres?}{global tid}, og alle processerne skal derfor have en fælles tid, der tæller op 
-samtidigt.  En global viden som tid kræver synkronisering af alle 
+I \des er tiden den samme for alle processer, og de skal derfor have en fælles tid, der samtidigt for alle processerne tælles op. En global viden som tid kræver derfor synkronisering af alle 
 processerne, og til denne koordinering og synkronisering af flere 
 processer er  den mest brugte metode at introducere en barriere. Barrierer blev først introduceret i MPI \cite{mpi-barrier}, hvor den bruges til at 
 sikre, at alle tråde venter i barrieren før de  fortsætter. 
