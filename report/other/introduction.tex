@@ -9,10 +9,6 @@ Set i lyset af den nuværende mangel på en praktisk anvendelig implementering a
 
 For at opnå dette vil vi undersøge, hvad der skal til for at introducere følgende tre anvendelsesområder i \pycsp: Diskret simulering, realtids planlægning og interaktiv planlægning. Disse anvendelsesområder repræsenterer områder hvor tid indgår  og dækker tilsammen bredt over tid som helhed. Diskret simulering anvendes i stor udstrækning i discrete event simulation. Realtids planlægning benyttes i tidskritiske systemer hvor der er stringente krav om at en given begivenhed er blevet udført inden for en tidsramme. Endeligt bruges interaktiv planlægning i spilindustrien til at udregne scenen i et computerspil. På \cref{fig:intro} viser vi hvordan vi forventer at kombinere anvendelsområderne med \pycsp for derved at komme frem til vores Timed \pycsp. 
 
-For hver model vil vi definere en række eksempler, der illustrerer disse anvendelsesområderne. Eksemplerne skal sikre den praktiske anvendelighed og senere bruges til at vise, hvordan et tidsspecifikt problem kan løses henholdsvis med og uden vores udvidelse. Eksemplernes formål er altså, at give et klart indblik i de krav, der stilles til en udvidelse af \pycsp, og hvilke fordele en introduktion af de givne anvendelsesområderne i \pycsp vil give. På denne baggrund vil vi komme med løsningsforslag som tager udgangspunkt i den praktiske anvendelighed. Disse løsningsforslag vil såfremt det er muligt, blive implementeret som en udvidelse af \pycsp.
-
-Specialet vil derfor være struktureret som følger. I \autoref{chap:csp} vil vi gennemgå CSP og \pycsp med fokus på de dele der er relevante i forhold til at introducere tid. I \autorefs{chap:des}, \ref{chap:rtp} og \ref{chap:is} vil vi gennemgå de tre anvendelsesområder som beskrevet ovenfor. Afslutningsvis vil vi foretage en samlet i evaluering og konklusion i \autoref{chap:konklusion} på baggrund af delkonklusionerne i \autorefs{chap:des}, \ref{chap:rtp} og \ref{chap:is}.
-
 \begin{figure}[htp]
  \begin{center}
   \includegraphics[scale=0.8]{images/intro}
@@ -20,6 +16,10 @@ Specialet vil derfor være struktureret som følger. I \autoref{chap:csp} vil vi
 	\label{fig:intro}
 \end{center}
 \end{figure}
+
+For hver model vil vi definere en række eksempler, der illustrerer disse anvendelsesområderne. Eksemplerne skal sikre den praktiske anvendelighed og senere bruges til at vise, hvordan et tidsspecifikt problem kan løses henholdsvis med og uden vores udvidelse. Eksemplernes formål er altså, at give et klart indblik i de krav, der stilles til en udvidelse af \pycsp, og hvilke fordele en introduktion af de givne anvendelsesområderne i \pycsp vil give. På denne baggrund vil vi komme med løsningsforslag som tager udgangspunkt i den praktiske anvendelighed. Disse løsningsforslag vil såfremt det er muligt, blive implementeret som en udvidelse af \pycsp.
+
+Specialet vil derfor være struktureret som følger. I \autoref{chap:csp} vil vi gennemgå CSP og \pycsp med fokus på de dele der er relevante i forhold til at introducere tid. I \autorefs{chap:des}, \ref{chap:rtp} og \ref{chap:is} vil vi gennemgå de tre anvendelsesområder som beskrevet ovenfor. Afslutningsvis vil vi foretage en samlet i evaluering og konklusion i \autoref{chap:konklusion} på baggrund af delkonklusionerne i \autorefs{chap:des}, \ref{chap:rtp} og \ref{chap:is}.
 
 %Mål: At lave en praktisk anvendelig udviddelse af pycsp, som kan bruges af udviklere til at løse problemer, der har en naturlig dimension af tid.
 
@@ -39,12 +39,12 @@ Specialet vil derfor være struktureret som følger. I \autoref{chap:csp} vil vi
 
 \begin{list}{}{}
 \item \textbf{\Sched} dækker over det engelske ord Scheduler. En \sched~ er det software der står for at planlægge i hvilken rækkefølge processerne skal udføres på computeren.
-\item \textbf{Tidsdomænet} Tidsdomænet er den overordnede .... \fxwarning{Hvad fanden skal der stå her}
+%\item \textbf{Tidsdomænet} Tidsdomænet er den overordnede .... \fxwarning{Hvad fanden skal der stå her}
 \item \textbf{Realtid} er en tidsmodel, der i litteraturen også er defineret som absolut tid, eller Newtonisk tid. Tiden ses som en fundamental struktur i universet, der 
 fremskrives kontinuerligt og uafhængigt af nogle eksterne kræfter.
-\item \textbf{Diskret tid} er en anden tidsmodel. Her samples værdier fra den kontinuerlige tid, således at tiden fremskrives i ryk. Den enkelte samples er normal taget med et konstant tidsinterval, men kan også være taget med et variable tidsinterval. I diskret tid kan tiden enten drives frem af tiden selv som i realtid, eller at den manuelt  skal fremskrives.
-\item \textbf{Anvendelsesområde} er en område hvor hvor der 
-\item \textbf{\code{skrivemaskine-font}} markerer i dette speciale de  variabelnavne, funktioner,  klasser og moduler  der er  der er specifikt for Python.
+\item \textbf{Diskret tid} er en anden tidsmodel. Her samples værdier fra den kontinuerlige tid, således at tiden fremskrives i ryk. Den enkelte samples er normal taget med et konstant tidsinterval, men kan også være taget med et variable tidsinterval. I diskret tid kan tiden enten drives frem af tiden selv som i realtid, eller at den manuelt  skal fremskrives. I dette speciale defineres diskret tid til at have variable tidsinterval, og skal fremskrives mauelt.
+\item \textbf{Anvendelsesområde} er en konkredt implementation af en tidsmodel.
+\item \textbf{\code{Skrivemaskine-font}} markerer i dette speciale de  variabelnavne, funktioner,  klasser og moduler  der er  der er specifikt for Python.
 \end{list}
 
 
