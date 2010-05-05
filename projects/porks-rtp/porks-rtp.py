@@ -1,31 +1,49 @@
 """ Configurable. Run once then poison channels. """
 from pycsp.deadline import *
-from random import expovariate, uniform
+#from random import expovariate, uniform, seed
+import random 
 import heapq
 
-avg_arrival_interval = 0.1
-avg_convert_processing = 0.1
-avg_camera_processing = 0.1
-avg_analysis_processing = 0.1
-time_to_deadline = 1
+avg_arrival_interval = 0.05
+avg_camera_processing = 0.05
+avg_convert_processing = 0.05
+avg_analysis_processing = 0.05
+time_to_deadline = 0.25
+pigs_to_simulate = 20
 
 class Pig:
-  def __init__(self,_id,arrivaltime,deadline = time_to_deadline):
+  def __init__(self,_id, arrivaltime,deadline = time_to_deadline):
     self.arrivaltime = arrivaltime
     self.deadline = arrivaltime+deadline
-    self.id = _id
-    if uniform(0,9)<1: self.normal = False 
+    self.id = _id,
+    self.donetime = arrivaltime
+    self.done = False
+    if ran.uniform(0,9)<1: self.normal = False 
     else : self.normal = True 
     self.wait = []
   def __repr__(self):
-    return "pig arrived at %f and process time is %s: [%s] total processtime is %0.3f"%(self.arrivaltime,self.normal,self.wait, sum(self.wait))
+    return "%s\tHas normal ribs: %s, total processtime = %0.3f, totaltime = %0.3f\t%s\n"%(self.done,self.normal,sum(self.wait),self.donetime-self.arrivaltime,self.wait)
+
+def dummywork(stop_time):
+    #Estimating Pi.
+    k = 0
+    temp = 0
+    while Now() < stop_time:
+         temp += (math.pow(-1,k)*4) / (2.0*k+1.0)
+         k +=1
+
+@io
+def sleep(n):
+    import time
+    time.sleep(n)
 
 @process
 def feederFunc(feeder,robot , data = avg_arrival_interval):
     print "feeder data = %f"%data
     #Insert work here
-    for x in xrange(10):
-        Wait(expovariate(1/data))
+    for x in xrange(pigs_to_simulate):
+        if x % 20 == 0 : print "doing ",x
+        sleep(ran.expovariate(1/data))
         pig = Pig(x,Now())
         Alternation([
             {(feeder,pig):"robot(pig)"},
@@ -40,12 +58,14 @@ def cameraFunc(in0,out0 , data = avg_camera_processing):
         while True:
             try:
                 val0 = in0()
-                Set_deadline(val0.deadline-Now())
-                waittime = expovariate(1/data)
-                val0.wait.append(waittime)
-                Wait(waittime)
-                out0(val0)
-                Remove_deadline()
+                if val0.deadline>Now():
+                    Set_deadline(val0.deadline-Now())
+                    waittime = ran.expovariate(1/data)
+                    #print waittime
+                    val0.wait.append(waittime)
+                    dummywork(waittime+Now())
+                    out0(val0)
+                    Remove_deadline()
             except DeadlineException:
                 Remove_deadline()
     except ChannelPoisonException:
@@ -59,14 +79,15 @@ def convertFunc(in0,out0 , data = avg_convert_processing):
         while True:
             try:
                 val0 = in0() 
-                Set_deadline(val0.deadline-Now())   
-                waittime = None
-                if val0.normal : waittime = expovariate(1/data)
-                else :   waittime = expovariate(1/(2*data))
-                val0.wait.append(waittime)
-                Wait(waittime)
-                out0(val0)
-                Remove_deadline()
+                if val0.deadline>Now():    
+                    Set_deadline(val0.deadline-Now())   
+                    waittime = None
+                    if val0.normal : waittime = ran.expovariate(1/data)
+                    else :   waittime = ran.expovariate(1/(2*data))
+                    val0.wait.append(waittime)
+                    dummywork(waittime+Now())
+                    out0(val0)
+                    Remove_deadline()
             except DeadlineException:
                 Remove_deadline()
     except ChannelPoisonException:
@@ -79,63 +100,55 @@ def analysisFunc(in0,out0 , data = avg_analysis_processing):
         while True:
             try:
                 val0 = in0()
-                Set_deadline(val0.deadline-Now())
-                waittime = None
-                if val0.normal : waittime = expovariate(1/data)
-                else :   waittime = expovariate(1/(2*data))
-                val0.wait.append(waittime)
-                Wait(waittime)
-                out0(val0)
-                Remove_deadline()
+                if val0.deadline>Now():
+                    Set_deadline(val0.deadline-Now())
+                    waittime = None
+                    if val0.normal : waittime = ran.expovariate(1/data)
+                    else :   waittime = ran.expovariate(1/(2*data))
+                    val0.wait.append(waittime)
+                    dummywork(waittime+Now())
+                    out0(val0)
+                    Remove_deadline()
             except DeadlineException:
                 Remove_deadline()
     except ChannelPoisonException:
         poison(in0,out0)
 
- 
 @process        
 def robotFunc(feeder,robot, data = time_to_deadline):
-    next_deadline = []
+    next_deadline = {}
     try:
-        def cancel(p):
-            for i in xrange(len(next_deadline)):
-                if next_deadline[i][1] == p:
-                    next_deadline.pop(i)
-                    break
-            heapq.heapify(next_deadline)
-           
         @choice
-        def analysis_arived(channel_input):
-            proctime = Now()-channel_input.arrivaltime
-            if proctime<=data : 
-                print "ok process time was: %f %s"%(proctime,channel_input.__repr__())
-            else : print "fail process time was: %f %s"%(proctime,channel_input.__repr__())
-            cancel(channel_input.id)                     
+        def process_pig(channel_input):
+            next_deadline[channel_input.id] = channel_input
 
         @choice
-        def start_timer(channel_input):
-            heapq.heappush(next_deadline,(channel_input.deadline,channel_input))
+        def process_pig2(channel_input):
+            if channel_input.deadline>Now():
+                channel_input.done = True
+            #print channel_input.deadline , Now()
+            channel_input.donetime = Now()
+            next_deadline[channel_input.id] = channel_input
             
-        @choice
-        def deadline_crossed(channel_input):
-            print "deadline crossed, cutting pig: %s"%next_deadline.pop(0)[1]
-       
         while True:
-            while not next_deadline:
                 alt = Alternation([
-                    {feeder:analysis_arived()},
-                    {robot :start_timer()}            
+                    {feeder:process_pig2()},
+                    {robot :process_pig()}            
                 ]).execute()
-            if next_deadline :
-                Set_deadline(next_deadline[0][0]-Now())
-                Alternation([
-                    {feeder:analysis_arived()},
-                    {robot :start_timer()},
-                    {Timeout(next_deadline[0][0]-Now()):deadline_crossed()}            
-                ]).execute()
+                
     except ChannelPoisonException:
         poison(feeder)
-        poison(robot)       
+        poison(robot)
+        good = 0
+        bad = 0
+        for key, pig in  next_deadline.items():
+            if pig.done : good +=1
+            else : bad +=1
+            #print pig
+        print "good = ",good,"bad =",bad, " = ",float(good)/(good+bad)*100,"%"
+
+
+ran = random.Random(12)
 
 robot = Channel()       
 feeder = Channel()
@@ -144,6 +157,7 @@ convert = Channel()
 analysis = Channel()
 
 
+start = Now()
 Parallel(
     feederFunc(-feeder,-robot),
     cameraFunc(+feeder,-camera),
@@ -151,3 +165,4 @@ Parallel(
     analysisFunc(+convert,-analysis),
     robotFunc(+analysis,+robot)
 )        
+print "time to process: ", Now()-start,"sec"
