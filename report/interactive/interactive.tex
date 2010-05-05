@@ -7,33 +7,44 @@ Vi vil derfor i stedet på baggrund af en række praktiske eksempler indkredse h
 
 \section{Eksempel}
 
+\subsection{Animeret ur}
+Det første eksempel på \is er en  simulering af et animeret digitalur. Uret består af 4 cifre, og en gang i minuttet skal minuttallet tælles op. Simuleringen foregår på en computer der kan have begrændeset ressourcer, hvorfor det ikke er sikkert at begivenhed foregår på det tidspunkt den er planlagt til.  Det s skal i eksemplet sikres at når uret tæller minuttallet op, sker det så tiden på uret svare til hvad klokken er.  Der er til  hvert minut tilknyttet en begivenhed, der består i at sætte minut cifret til det nu korrekte tal. Begivenheden er planlagt så den først skal ske når tiden har krydset nul sekundet. Desuden skal begivenhed eksekveres i indestående minut, således man ikke risikere at man skifter til et tal der er forkert. Hvis begivenheden ikke når at blive eksekveret inden for sin deadline falder den bort, og uret må vente på den efterfølgende begivenhed før det bliver opdateret.
+
+Uret er repræsentativt for \is da det planlægges en række begivenheder der skal foregå i fremtiden, og hvor hver begivenhed også har tilknyttet en deadline.
+
 \subsection{Computerspil}
-Oprindeligt forstillede vi os at \is var defineret af computerspilindustrien som en metode til at planlægge hvordan spillet skal forløbe. Uden deres definition af \is vil vi i stedet opstille et hypotetisk eksempel. 
+Et andet eksempel vi mener repræsenterer  \is, er mere realistisk og bunder i vores oprindelige forventning om at \is  var defineret af computerspilindustrien som en metode til at planlægge hvordan spillet skal forløbe. Uden deres definition af \is vil vi i stedet opstille et hypotetisk eksempel. 
 
 Vi forstiller os et computerspil, der er skrevet i \pycsp og hvor hvert element i spillet er en selvstændig proces. I dette computerspil ønsker man en fugl der med et mellemrum flyver på tværs af skærmen. Fuglen skal starte på et givet tidspunkt og med en fast hastighed bevæge sig over skærmen. Fuglens flugt over skærmen udregnes af to typer processer, baseret på en model der minder om videokomprimering. Den første procestype, er en højprioritets proces der står for udregne positionen af fuglen med  mellemrum. Den anden procestype kan bestå af mange lavprioritetsprocesser. Hver lavprioritetsproces står for en egenskab ved fuglen, som  f.eks. at justere fuglen i forhold til dens position, optimere animationen af fuglen, tilknyttet fuglekvidre og andre ikke essentielle egenskaber.  Den højtprioriterede proces udføres sjældent men skal udføres, mens lavprioritetsprocesserne blot skal udføres hvis der er mulighed for det og ellers skal droppes.
 
 Uden tab af generelitet vil vi i dette eksempel begrænse os til at fokusere på en høj og en lavprioritets proces. Højprioritetsprocessen står for at beregne positionen mens lavprioritetsprocessen står for at flytte fuglen i forhold denne position.
 
-
-\subsection{Animeret ur}
-Et andet eksempel vi mener repræsenterer \is er en  simulering af et animeret digitalur. Uret består af 4 cifre, og en gang i minuttet skal minuttallet tælles op. Denne begivenhed kan være længe undervejs, men det skal sikres at når uret tæller minuttallet op, sker det så tiden på uret svare til hvad klokken er.  Der er til  hvert minut tilknyttet en begivenhed, der består i at sætte minut cifret til det nu korrekte tal. Begivenheden er planlagt så den først skal ske når tiden har krydset nul sekundet. Desuden skal begivenhed eksekveres i indestående minut, således man ikke risikere at man skifter til et tal der er forkert. Hvis begivenheden ikke når at blive eksekveret inden for sin deadline falder den bort, og uret må vente på den efterfølgende begivenhed før det bliver opdateret.
-
-Uret er repræsentativt for \is da det planlægges en række begivenheder der skal foregå på ude i fremtiden, og hvor hver begivenhed også har tilknyttet en deadline.
-
 \section{Beskrivelse/teori}
 
-\is arbejder ligesom RTP i reel tid. Den driven kraft bag tiden er derfor tiden selv, som kontinuerligt fremskrives. \is og RTP minder også om hinanden da man i begge modeller arbejder med begivenheder, der har tilknyttet deadlines. Desuden viser computerspilseksemplet at en  udvikleren skal kunne tilknyttes prioriteter, der sættes uafhængigt af deres deadline i \is. Dette nævnte vi i RTP kapitlet i \cref{sec:deadlineFuture}, som en naturlig udvidelse til RTP.
-\is og \des overlapper også om hinanden da man i begge modeller skal kunne planlægge en begivenhed til at kunne foregå ud i fremtiden. Men hvor \des kan garantere at begivenheden sker på præcist det angivne tidspunkt kan vi i \is kun garantere at det sker efter et givent tidspunkt.
+\is arbejder ligesom RTP i realtid. Desuden minder de også om hinanden da man i begge modeller arbejder med begivenheder, der har tilknyttet deadlines. For det tredje viser computerspilseksemplet at en udvikleren skal kunne tilknyttes prioriteter til begivenheder, der skal sættes uafhængigt af deres deadline i \is. Dette nævnte vi som en mulig udvidelse til RTP i \cref{sec:deadlineFuture}.
+
+\is og \des minder også om hinanden da man i begge modeller skal kunne planlægge en begivenhed til at foregå ud i fremtiden. Men hvor \des kan garantere at begivenheden sker på præcist det angivne tidspunkt kan vi i \is kun garantere at det sker efter et givent tidspunkt.
+
 
 \section{Design og implementering}
 I \des kom vi frem til at planlægningen af begivenheder ud i fremtiden også kan tolkes som en venten. Dermed kan man se på \is som en udvidelse til RTP, hvor man udover at have mulighed for at sætte en deadline skal have mulighed for at vente. For at kunne bruge RTP til \is vil det desuden være hensigtsmæssigt at  udvide RTP så det er muligt for udvikleren at tilknytte en prioritet til begivenheden.
 
-\subsubsection{Now og Wait}
-Som vi beskrev i \des introducerede vi de to globale funktioner Now og Wait der hhv. returnerer den aktuelle tid. og lader en proces vente i et givent tidsrum. Vi har ændret den interne implementering af funktionerne, så de bruger realtid. Dette sikre en ensartet implementering af tid på tværs af TimedPyCSP, og man kan i vores øjne med fordel tilføje dem til alle \pycsp versionerne, for på den måde at ensrette de forskellige implementeringer. Hvis \code{Now} og \code{Wait} blev inkluderet i \code{greenlets}-versionen kunne de fjernes helt i denne version, de deres implementeringer vil være helt ens. 
+\subsubsection{\code{Now} og \code{Wait}}
+Som vi beskrev i \des introducerede vi de to globale funktioner \code{Now} og \code{Wait} der hhv. returnerer den aktuelle tid. og lader en proces vente i et givent tidsrum. Vi har ændret den interne implementering af funktionerne, så de bruger realtid. Ved at genbruge de samme funktioner, sikres en ensartet implementering af tid på tværs af TimedPyCSP, og man kan i vores øjne med fordel tilføje dem til alle \pycsp versionerne, for på den måde at ensrette de forskellige implementeringer. Hvis \code{Now} og \code{Wait} blev inkluderet i \code{greenlets}-versionen kunne de fjernes helt i \is, da de to baserer sig på den samme tidsmodel
 
-For at benytte reel tid i forhold til diskret tid. i denne implementering ændrer vi blot Bruger ændrede vi blot 
+ 
+For at benytte realtid i forhold til diskret tid bruger vi pythons \code{time} modul. Genimplementering består derfor kun i at ændre funktionen \code{Now} til at bede \code{time}-modulet om tiden i stedet for \sched en.
+
+\subsubsection{Prioriteter}
+
+I computerspilseksemplet, har processerne forskellige prioritet dikteret af udvikleren. Derfor skal vi finde en metode, til at udvide RTP således at det kan håndtere processer hvor udvikleren også kan tilknytte en prioritet. Denne udvikler-prioritet er ikke det samme som den prioritet der allerede findes i RTP eksemplet, da denne prioritet er beregnet af \sched en.
+
+I RTP versionen er \sched en baseret på EDF, som kun tager hensyn til processernes deadline når der beregnes prioriteter. Vi skal dermed bruge en anden skemaplanlægningsalgoritme, for også at kunne håndtere at udvikleren skal kunne definere prioriteter.
+
+ dikterede valget af \sched at priorite
+
 
     
-  \section{Evaluering}
-  \section{Fremtidigt arbejde}
-  \section{Opsummering}
+\section{Evaluering}
+\section{Fremtidigt arbejde}
+\section{Opsummering}

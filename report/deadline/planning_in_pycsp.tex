@@ -50,19 +50,6 @@ Vi har som nævnt en klar kæde af afhængigheder i \pycsp men vi skal være opm
 \end{figure}
 
 
-\subsubsection{noter}
-Skelne mellem read og write
-måske skal en kanal arve prioritet?
-hvornår skal prioriteten ændres? 
-
-2 cases:
-udvælgelse i alternation
-propagering af prioritet
-
-med nedarvning kan en proces uden deadline arve en høj prioritet uden at få sat en deadline. 
-
-Skal processer der arver prioritet også arve deadline? Det skal de nok ikke, da de så kommer til at kaste exceptions selv på deadlines som brugeren ikke har sat. De skal nok kastes af den oprindelige proces med information om hvad den ventede på da den fejlede. 
-
 \subsection{Tilknytning og overskridelse af deadlines}
 Som udgangspunkt skal vi kunne håndtere at en proces kan have forskellige typer deadlines. Umiddelbart giver det mening at der for hver proces tilknyttes en deadline samt hvilken type det er. Dette giver mulighed for at vi kan differentiere i måden hvorpå vi håndterer en overskreden deadline. F.eks. kan vi stoppe systemet helt i tilfælde af overskridelse af en kritisk deadline, kaste en exception ved en hard deadline og blot registrere overskridelser af soft deadlines. Uanset hvilken handling vi vælger at tilknytte til de respektive overskridelser, vil der være situationer hvor den valgte handling ikke er optimal. Vi har derfor valgt en anden løsning hvor en proces blot kaster en exception hvis den overskrider en deadline. Dette overflødiggør at der tilknyttes en specifik type deadline til en proces, da håndteringen af den kastede exception overgives til udvikleren. Det er herved op til den nekelte udvikler at definere hvad der skal ske i i hver enkelt proces såfremt den oplever en overskreden deadline. Dette giver den største frihed til at tilpasse håndteringen til den enkelte proces og applikation. 
 
@@ -100,18 +87,5 @@ I artiklen fra \citeauthor{Burns1990} udvælger man en proces blandt flere mulig
 \phantomsection
 \label{misc:kanal-prioritet}
 
-
-\begin{shaded}
-\subsection{Blokkerede processer}
-I den teoretiske tilgang til RTP antages det ofte at processerne er periodiske, har en fast eksekverings tid per periode og er uafhængig af andre processer, og køres i et isoleret miljø. De forskellige tilgange til RTP fokuserer på hvordan man kan overvinde de enkelte antagelser ved isoleret og ophæve en af begrænsningerne. 
-
-
-Dette er en højst idealiseret verden og i en introduktion af RTP i PyCSP vil processerne ikke overholde et eneste af disse antagelser. 
-I \pycsp bruges rendezvous til at blokere kommunikerende processer.
-
-Vi vil nu beskrive problemerne ved at processerne er afhængige af hinanden, og kan blokere hinanden, således at en proces med høj prioritet venter på processer med lavere prioritet. Forestil dig i \pycsp tre processer ($P_0,P_1,P_2$)med prioriteterne $Pr_0>Pr_1>Pr_2$. Først udvælges $P_0$ da denne har højst prioritet, men stopper da den skal kommunikere med $P_2$. Den næste proces der udvælges vil være $P_1$, og dermed bliver $P_0$ unødigt forsinket mens $P_1$ kører. Dette kaldes priority inversion\cite{sha1990priority}.
-
-Der findes overordnet set to metoder til at løse problemet med priority inversion. Enten kan man ungå at blokere processer, eller man kan benytte priority inherience\cite{sha1990priority}. Med \pycsp kan man ikke ungå at processer kommunikere, og dermed vil kunne blokere hvorfor priority inherience er den enste farbare vej hvis man skal sikre optimal planlægning.
-\end{shaded}
 
 
