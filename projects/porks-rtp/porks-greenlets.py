@@ -9,7 +9,8 @@ avg_arrival_interval = 0.05
 avg_convert_processing = 0.05
 avg_camera_processing = 0.05
 avg_analysis_processing = 0.05
-time_to_deadline = 0.25
+dummy_work = 0.05
+time_to_deadline = 0.35
 pigs_to_simulate =  20
 
 class Pig:
@@ -32,23 +33,36 @@ def dummywork(stop_time):
     while time.time() < stop_time:
          temp += (math.pow(-1,k)*4) / (2.0*k+1.0)
          k +=1
-@io
-def sleep(n):
-    time.sleep(n)
 
 @process
-def feederFunc(feeder,robot , data = avg_arrival_interval):
+def background_dummywork(dummy_in,work = dummy_work):
+    try:
+        while True:
+            Alternation([{Timeout(seconds=0.005):None}, {dummy_in:None}]).select()    
+            dummywork(time.time()+work)
+    except ChannelPoisonException:
+        exit
+
+@io
+def sleep(n):
+    if n>0: time.sleep(n)
+
+@process
+def feederFunc(feeder,robot,dummy, data = avg_arrival_interval):
     print "feeder data = %f"%data
     #Insert work here
+    Lastpig = time.time()
     for x in xrange(pigs_to_simulate):
         if x % 20 == 0 : print "doing ",x
-        sleep(ran.expovariate(1/data))
+        deltapig = time.time()-Lastpig
+        sleep(ran.expovariate(1/data)-deltapig)
+        Lastpig = time.time()
         pig = Pig(x,time.time())
         Alternation([
-            {(feeder,pig):"robot(pig)"},
-            {(robot,pig) :"feeder(pig)"}
+            {(robot,pig) :"feeder(pig)"},
+            {(feeder,pig):"robot(pig)"}
             ]).execute()        
-    poison(feeder)
+    poison(feeder,dummy)
     
 @process    
 def cameraFunc(in0,out0 , data = avg_camera_processing):
@@ -99,12 +113,13 @@ def analysisFunc(in0,out0 , data = avg_analysis_processing):
 
  
 @process        
-def robotFunc(feeder,robot, data = time_to_deadline):
+def robotFunc(done,start, data = time_to_deadline):
     next_deadline = {}
     try:
         @choice
         def process_pig(channel_input):
-            next_deadline[channel_input.id] = channel_input
+            #print "\n\nr got start pig"
+            if channel_input.id not in next_deadline : next_deadline[channel_input.id] = channel_input
 
         @choice
         def process_pig2(channel_input):
@@ -115,8 +130,8 @@ def robotFunc(feeder,robot, data = time_to_deadline):
             
         while True:
                 alt = Alternation([
-                    {feeder:process_pig2()},
-                    {robot :process_pig()}            
+                {start :process_pig()},
+                {done:process_pig2()}
                 ]).execute()
     except ChannelPoisonException:
         poison(feeder)
@@ -128,22 +143,24 @@ def robotFunc(feeder,robot, data = time_to_deadline):
             else : bad +=1
         print "good = ",good,"bad =",bad, " = ",float(good)/(good+bad)*100,"%"
 
-#seed(12)
+
 ran = random.Random(12)
 
-robot = Channel()       
-feeder = Channel()
-camera = Channel()
-convert = Channel()
-analysis = Channel()
+robot = Channel("robot")       
+feeder = Channel("feeder")
+camera = Channel("camera")
+convert = Channel("convert")
+analysis = Channel("analysis")
+dummy = Channel("dummy")
 
 start = time.time()
 Parallel(
-    feederFunc(-feeder,-robot),
+    feederFunc(-feeder,-robot, -dummy),
     cameraFunc(+feeder,-camera),
     convertFunc(+camera,-convert),
     analysisFunc(+convert,-analysis),
-    robotFunc(+analysis,+robot)
+    robotFunc(+analysis,+robot),
+    background_dummywork(+dummy)
 )        
  
 print "time to process: ", time.time()-start,"sec"
