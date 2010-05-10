@@ -3,16 +3,18 @@
 from pycsp.greenlets import *
 #from random import expovariate, uniform, seed
 import random
-import heapq, time, math
+import heapq, time,math
 
-avg_arrival_interval = 0.05
-avg_convert_processing = 0.05
-avg_camera_processing = 0.05
-avg_analysis_processing = 0.05
+avg_arrival_interval = 1.1
+avg_convert_processing = 0.5
+avg_camera_processing = 0.5
+avg_analysis_processing = 0.1
 dummy_work = 0.05
-time_to_deadline = 0.35
-pigs_to_simulate =  20
-
+std = 0.1
+time_to_deadline = 2.5
+time_to_camera_deadline = 0.1
+pigs_to_simulate =  100
+number_of_simulations = 10
 class Pig:
   def __init__(self,_id, arrivaltime,deadline = time_to_deadline):
     self.arrivaltime = arrivaltime
@@ -49,30 +51,29 @@ def sleep(n):
 
 @process
 def feederFunc(feeder,robot,dummy, data = avg_arrival_interval):
-    print "feeder data = %f"%data
     #Insert work here
-    Lastpig = time.time()
+    NextpigArrival = time.time()+ran.gauss(data, data*std)
+    ThispigArrival = time.time()
     for x in xrange(pigs_to_simulate):
-        if x % 20 == 0 : print "doing ",x
-        deltapig = time.time()-Lastpig
-        sleep(ran.expovariate(1/data)-deltapig)
-        Lastpig = time.time()
-        pig = Pig(x,time.time())
+        #if x % 20 == 0 : print "doing ",x
+        pig = Pig(x,ThispigArrival)
         Alternation([
             {(robot,pig) :"feeder(pig)"},
-            {(feeder,pig):"robot(pig)"}
+            {(feeder,pig):"robot(pig)"},
+            {Timeout(NextpigArrival-time.time()):None}
             ]).execute()        
+        ThispigArrival = NextpigArrival
+        NextpigArrival = NextpigArrival+ran.gauss(data, data*std)
+        if ThispigArrival>time.time() : sleep(ThispigArrival-time.time())
     poison(feeder,dummy)
     
 @process    
 def cameraFunc(in0,out0 , data = avg_camera_processing):
-    print "camera time is %f"%data
     try: 
         while True:
             val0 = in0()
-            if val0.deadline>time.time():
-                waittime = ran.expovariate(1/data)
-                #print waittime
+            if time.time() - val0.arrivaltime   < time_to_camera_deadline :
+                waittime = ran.gauss(data,data*std)
                 val0.wait.append(waittime)
                 dummywork(waittime+time.time())
                 out0(val0)
@@ -82,13 +83,13 @@ def cameraFunc(in0,out0 , data = avg_camera_processing):
 @process
 def convertFunc(in0,out0 , data = avg_convert_processing):
     try:
-        print "convert time %f"%data
+        #print "convert time %f"%data
         while True:
             val0 = in0()
             if val0.deadline>time.time():    
                 waittime = None
-                if val0.normal : waittime = ran.expovariate(1/data)
-                else :   waittime = ran.expovariate(1/(2*data))
+                if val0.normal : waittime = ran.gauss(data,std*data)
+                else :   waittime = ran.gauss(2*data,std*data)
                 val0.wait.append(waittime)
                 dummywork(waittime+time.time())
                 out0(val0)
@@ -98,13 +99,13 @@ def convertFunc(in0,out0 , data = avg_convert_processing):
 @process
 def analysisFunc(in0,out0 , data = avg_analysis_processing):
     try:
-        print "analysis time %f"%data
+        #print "analysis time %f"%data
         while True:
             val0 = in0()
             if val0.deadline>time.time():
                 waittime = None
-                if val0.normal : waittime = ran.expovariate(1/data)
-                else :   waittime = ran.expovariate(1/(2*data))
+                if val0.normal : waittime = ran.gauss(data,std*data)
+                else :   waittime = ran.gauss(2*data,data*std)
                 val0.wait.append(waittime)
                 dummywork(waittime+time.time())
                 out0(val0)
@@ -138,29 +139,32 @@ def robotFunc(done,start, data = time_to_deadline):
         poison(robot)
         good = 0
         bad = 0
+        normal = 0
         for key, pig in  next_deadline.items():
             if pig.done : good +=1
             else : bad +=1
-        print "good = ",good,"bad =",bad, " = ",float(good)/(good+bad)*100,"%"
+            if pig.normal : normal +=1
+        print "good = ",good,"bad =",bad, " = ",float(good)/(pigs_to_simulate)*100,"% (",normal,"/",pigs_to_simulate,") normal"
 
-
-ran = random.Random(12)
-
-robot = Channel("robot")       
-feeder = Channel("feeder")
-camera = Channel("camera")
-convert = Channel("convert")
-analysis = Channel("analysis")
-dummy = Channel("dummy")
 
 start = time.time()
-Parallel(
-    feederFunc(-feeder,-robot, -dummy),
-    cameraFunc(+feeder,-camera),
-    convertFunc(+camera,-convert),
-    analysisFunc(+convert,-analysis),
-    robotFunc(+analysis,+robot),
-    background_dummywork(+dummy)
-)        
- 
-print "time to process: ", time.time()-start,"sec"
+for x in range(number_of_simulations):
+    ran = random.Random(x)
+    
+    robot = Channel("robot")       
+    feeder = Channel("feeder")
+    camera = Channel("camera")
+    convert = Channel("convert")
+    analysis = Channel("analysis")
+    dummy = Channel("dummy")
+
+
+    Parallel(
+        feederFunc(-feeder,-robot, -dummy),
+        cameraFunc(+feeder,-camera),
+        convertFunc(+camera,-convert),
+        analysisFunc(+convert,-analysis),
+        robotFunc(+analysis,+robot),
+        5*background_dummywork(+dummy)
+    )        
+#print "time to process: ", time.time()-start," sec"
