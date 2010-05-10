@@ -1,19 +1,23 @@
 """ Configurable. Run once then poison channels. """
 from pycsp.deadline import *
 #from random import expovariate, uniform, seed
-import random 
+import random, sys
 import heapq
 
-avg_arrival_interval = 1.1
-avg_convert_processing = 0.5
-avg_camera_processing = 0.5
-avg_analysis_processing = 0.1
-dummy_work = 0.05
-std = 0.1
-time_to_deadline = 2.5
+avg_arrival_interval = 0.9
+
+avg_convert_processing = 0.8
+avg_camera_processing = 0.07
+avg_analysis_processing = 0.8
+std = 0.05
+
 time_to_camera_deadline = 0.1
-pigs_to_simulate =  10
-number_of_simulations = 1
+time_to_deadline = avg_camera_processing+avg_convert_processing+avg_analysis_processing-0.2
+dummy_work = 0.05
+
+
+pigs_to_simulate =  20
+number_of_simulations = 3
 
 class Pig:
   def __init__(self,_id, arrivaltime,deadline = time_to_deadline):
@@ -45,10 +49,11 @@ def background_dummywork(dummy_in,work = dummy_work):
             time_spent +=work
             Alternation([{Timeout(seconds=0.005):None}, {dummy_in:None}]).select()    
             n+=1
-            print "will do dummy_work : ",n
+            #print "will do dummy_work : ",n
+            #yt=input()
             dummywork(Now()+work)
     except ChannelPoisonException:
-        print time_spent
+        print "time spent in dummy is ", time_spent
 
 @io
 def sleep(n):
@@ -56,9 +61,8 @@ def sleep(n):
     if n>0: time.sleep(n)
 
 @process
-def feederFunc(feeder,robot,dummy, data = avg_arrival_interval):
-    
-    #Insert work here
+def feederFunc(robot, analysis, dummy, data = avg_arrival_interval):
+       #Insert work here
     NextpigArrival = Now()+ran.gauss(data, data*std)
     ThispigArrival = Now()
     Set_deadline(NextpigArrival-Now())
@@ -66,9 +70,16 @@ def feederFunc(feeder,robot,dummy, data = avg_arrival_interval):
         try:
             #if x % 20 == 0 : print "doing ",x
             pig = Pig(x,ThispigArrival)
+            camchannel = Channel()
+            conChannel = Channel()
+            feederChannel = Channel()
+            cam = cameraFunc(+feederChannel,-camchannel)
+            conv = convertFunc(+camchannel,-conChannel)
+            ana =  analysisFunc(+conChannel,analysis)
+            Spawn(cam,conv,ana)
             Alternation([
-                {(robot,pig) :"feeder(pig)"},
-                {(feeder,pig):"robot(pig)"}
+                {(robot,pig) :"OUT(feederChannel)(pig)"},
+                {(OUT(feederChannel),pig):"robot(pig)"}
                 ]).execute()
             Remove_deadline()
             ThispigArrival = NextpigArrival
@@ -78,13 +89,10 @@ def feederFunc(feeder,robot,dummy, data = avg_arrival_interval):
         except DeadlineException:
             Remove_deadline()
             NextpigArrival = NextpigArrival+ran.gauss(data, data*std)
-
-    poison(feeder,dummy)
+    poison(robot, dummy)
     
 @process    
 def cameraFunc(in0,out0 , data = avg_camera_processing):
-    try: 
-        while True:
             try:
                 val0 = in0()                
                 if Now() - val0.arrivaltime   < time_to_camera_deadline :
@@ -96,13 +104,11 @@ def cameraFunc(in0,out0 , data = avg_camera_processing):
                     Remove_deadline()
             except DeadlineException:
                 Remove_deadline()
-    except ChannelPoisonException:
-        poison(in0,out0)        
+                poison(in0,out0)
         
 @process
 def convertFunc(in0,out0 , data = avg_convert_processing):
     try:
-        while True:
             try:
                 val0 = in0() 
                 if val0.deadline>Now():    
@@ -116,13 +122,13 @@ def convertFunc(in0,out0 , data = avg_convert_processing):
                     Remove_deadline()
             except DeadlineException:
                 Remove_deadline()
+                poison(in0,out0)
     except ChannelPoisonException:
         poison(in0,out0)
              
 @process
 def analysisFunc(in0,out0 , data = avg_analysis_processing):
     try:
-        while True:
             try:
                 val0 = in0()
                 if val0.deadline>Now():
@@ -137,7 +143,7 @@ def analysisFunc(in0,out0 , data = avg_analysis_processing):
             except DeadlineException:
                 Remove_deadline()
     except ChannelPoisonException:
-        poison(in0,out0)
+        exit
 
 @process        
 def robotFunc(done,start, data = time_to_deadline):
@@ -159,9 +165,7 @@ def robotFunc(done,start, data = time_to_deadline):
                 {start :process_pig()},
                 {done:process_pig2()}
             ]).execute()
-    except ChannelPoisonException:
-        poison(feeder)
-        poison(robot)
+    except ChannelPoisonException:       
         good = 0
         bad = 0
         normal = 0
@@ -176,20 +180,22 @@ start = Now()
 for x in range(number_of_simulations):
     ran = random.Random(x)
 
-    robot = Channel("robot")       
-    feeder = Channel("feeder")
-    camera = Channel("camera")
-    convert = Channel("convert")
-    analysis = Channel("analysis")
-    dummy = Channel("dummy")
+    robotC = Channel("robot")       
+    #feeder = Channel("feeder")
+    #camera = Channel("camera")
+    #convert = Channel("convert")
+    analysisC = Channel("analysis")
+    dummyC = Channel("dummy")
 
+    
+    rob = robotFunc(+robotC,+analysisC)
+
+    #Set_priority(10,cam)
+    #Set_priority(10,rob)
 
     Parallel(
-        feederFunc(-feeder,-robot, -dummy),
-        cameraFunc(+feeder,-camera),
-        convertFunc(+camera,-convert),
-        analysisFunc(+convert,-analysis),
-        robotFunc(+analysis,+robot),
-        1*background_dummywork(+dummy)
+        feederFunc(-robotC,-analysisC, -dummyC),
+        rob,
+        1*background_dummywork(+dummyC)
     )        
-#print "time to process: ", Now()-start,"sec"
+print "time to process: ", Now()-start,"sec"
