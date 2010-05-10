@@ -159,7 +159,7 @@ def robotFunc(done,start, data = time_to_deadline):
         for key, pig in  next_deadline.items():
             if pig.done : good +=1
             else : bad +=1
-            #print pig
+            print pig
         print "good = ",good,"bad =",bad, " = ",float(good)/(good+bad)*100,"%"
 
 
