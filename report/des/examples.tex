@@ -8,13 +8,13 @@ har beskrevet i artiklen \citetitle{wator}\cite{wator}. Artiklen beskriver den
 fiktive planet Wa-Tor, der har form som en torus og er fuldstændig
 dækket af vand. Verdenen er inddelt i felter, som kan være tomme, indeholde en
 fisk eller en haj\cite[20]{wator}. Følgende karakteristika beskriver fisk og hajers
-opførsel.
+opførsel:
 
 \begin{itemize}
 \item[\textbf{Fisk}]
 Lever af plankton, en ressource som er uendelig. Hvis der er ét ledigt 
 tilstødende felt, bevæger den sig til dette felt. Hvis der er flere ledige 
-felter vælges et tilfældigt. Såfremt en fisk overlever 3 tidsskridt forplanter 
+felter vælges et tilfældigt. Såfremt en fisk overlever 3 tidsskridt, forplanter 
 den sig.
 \item[\textbf{Hajer}]
 Såfremt der er fisk i et eller flere tilstødende felter, vil hajen bevæge sig 
@@ -24,41 +24,41 @@ ikke spiser i 3 tidsskridt dør den. Overlever den i 10 tidsskridt forplanter
 den sig.
 \end{itemize}
 
-For hvert tidsskridt vil alle fisk og hajer udføre en handling ud fra
+For hvert tidsskridt udfører alle fisk og hajer en handling ud fra
 ovenstående opførsel.
-Til at initiere systemet skal der defineres en størrelse af verdenen,
-samt hvor mange fisk og hajer der er til stede fra start. Disse fisk og
+Til at initiere systemet skal der defineres en størrelse af verdenen
+samt hvor mange fisk og hajer, der er til stede fra start. Disse fisk og
 hajer placeres tilfældigt i verdenen.
 Såfremt de initielle parametre for antal fisk og hajer understøtter en 
-bæredygtig bestand forventer vi at se bestanden af henholdsvis fisk og hajer 
-oscillerer afhængigt af hinanden.
+bæredygtig bestand, forventer vi at se bestanden af henholdsvis fisk og hajer 
+oscillere afhængigt af hinanden.
 
-Vi har valgt dette eksempel, da det er et klassisk simuleringsproblem der er enkelt og let forståeligt, men samtidig 
-introducerer problemstillinger omkring synkronisering når det paralleliseres.  
-Disse problemstillinger optræder fordi en opdatering af hvert felt er afhængigt 
-af de omkringliggende felter, og vil derfor være afhængig af felter fra andre 
+Vi har valgt dette eksempel, da det er et klassisk simuleringsproblem, der er enkelt og let forståeligt, men samtidig 
+introducerer problemstillinger omkring synkronisering, når det paralleliseres.  
+Disse problemstillinger optræder, fordi en opdatering af hvert felt er afhængigt 
+af de omkringliggende felter, og derfor også er afhængig af felter fra andre 
 processer i grænsetilfælde. Ud over at være afhængig af information fra andre 
-processer, kan en opdatering også påvirke data hos andre processer. Eksemplet er repræsentativt for de problemer der ligger i kategorien af continuous simulation, og viser at hvis vi kan bruge vores implementation af \des til simulering af dette eksempel vil man helt generelt kunne bruge det til continuous simulations.
+processer, kan en opdatering også påvirke data hos andre processer. Eksemplet er repræsentativt for de problemer, der ligger i kategorien af continuous simulation, og viser, at hvis vi kan bruge vores implementation af \des til simulering af dette eksempel vil man helt generelt kunne bruge det til continuous simulations.
 
 \subsubsection{Før introduktion af et tidsbegreb i \pycsp}
-For at simulere Wa-Tor verdenen i \pycsp hvori tidsbegrebet ikke er introduceret, er vi nødt 
+For at simulere Wa-Tor verdenen i \pycsp, hvori tidsbegrebet ikke er introduceret, er vi nødt 
 til at udføre en synkronisering af de enkelte processers arbejde. Denne 
 synkronisering kan ske ved brug af barrierer, hvor alle processer udfører en 
-handling og mødes i barrieren før de fortsætter.
+handling og mødes i barrieren, før de fortsætter.
 
 Vi har valgt at basere vores model på \citetitle{crew}\cite{crew}, hvor verdenen repræsenteres 
 som en delt datastruktur og adgangen til denne styres med barrierer. I vores 
-model er hver proces derved ansvarlig for en del af verdenen og tilgangen til 
+model er hver proces derved ansvarlig for en del af verdenen, og tilgangen til 
 den delte datastruktur sker ud fra CREW-princippet (Concurrent Read, Exclusive 
 Write)\cite[5]{crew}, der styres vha. barrierer.  
 
 I en mere ren \csp-model ville man foretage en direkte udveksling af data mellem 
-processerne, og undgå den delte datastruktur vi har i vores model.  Vi har 
+processerne og undgå den delte datastruktur, vi har i vores model.  Vi har 
 valgt denne model frem for den mere rene \csp model, da den klarlægger brugen af 
-barrierer bedre.  Det bliver meget eksplicit i koden hvornår hvilke dele 
+barrierer bedre.  Det bliver meget eksplicit i koden, hvornår hvilke dele 
 opdateres, og hvornår processerne venter i en barriere.
 
-Vi deler verdenen lodret, hvor hver proces styrer en verdensdel. Hver proces 
+Vi deler verdenen lodret, og hver proces styrer en verdensdel. Hver proces 
 gennemgår sin verdensdel og udfører en mulig handling for hver fisk og haj, dog 
 vil fisk og hajer i de sidste to kolonner i hver verdensdel ikke bliver 
 opdateret på nuværende tidspunkt. Dette skyldes at der kan opstå en race 
