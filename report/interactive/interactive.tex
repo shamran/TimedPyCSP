@@ -6,6 +6,7 @@ Interaktiv planlægning (\is) er det sidste anvendelsesområde vi vil belyse med
 Vi vil derfor i stedet på baggrund af en række praktiske eksempler indkredse hvad vi forventer \is skal kunne bruges til, og på baggrund af eksemplerne se på muligheden for at implementere en model, så eksemplerne kan implementeres i \pycsp. Dette kapitel adskiller sig dermed væsentligt fra de foregående to kapitler, i og med tidsmodellen ikke baserer sig på en fast definition givet af litteraturen og vi ikke bygger på kendt viden.
 
 \section{Eksempler}
+Vi har valgt to scenarier som vi forventer med fordel kan benytte \is. Det første er en repræsentation af et ur, hvilket vi mener er det simpleste eksempel der kan gøre brug af \is. Det andet eksempel er en del af et computerspil, som er vores forventede primære anvendelsesområde for \is. 
 
 \subsection{Et ur}
 Det første eksempel på \is er en repræsentation af et digitalur. Uret består af fire cifre, og en gang i minuttet skal minuttallet tælles op. Det er et  krav at en opdatering af uret skal sætte uret til at vise det korrekte tidspunkt. Vi forestiller os at uret er en del af et større system hvor der er andre ressourcekrævende begivenheder der er vigtigere at få udført end opdateringen af uret. Opdatering af uret foregår ved at planlægge en begivenhed til hvert minut, der specificerer hvad uret skal vise. Da det har en lav prioritet, er der ikke er nogen garanti for at denne begivenhed indtræffer i det minut den er planlagt til. Derfor skal begivenheden  bortkastes såfremt den overskrider sin deadline. Deadlinen vil være det sidste sekund inden et nyt minut begynder, for at sikre den krævede korrekthed. 
@@ -33,13 +34,11 @@ Vi kan dermed se \is som en blanding af RTP og \des, med tidsmodellen og deadlin
 I \des kom vi frem til at planlægningen af begivenheder ud i fremtiden også kan tolkes som en venten. Dermed kan man se på \is som en udvidelse til RTP, hvor man udover at have mulighed for at sætte en deadline skal have mulighed for at vente. For at kunne bruge RTP til \is vil det desuden være hensigtsmæssigt at  udvide RTP så det er muligt for udvikleren at tilknytte en prioritet til begivenheden.
 
 \subsubsection{\code{Now} og \code{Wait }}
-Som vi beskrev i \des introducerede vi de to globale funktioner \code{Now} og \code{Wait} der hhv. returnerer den aktuelle tid og lader en proces vente i et givent tidsrum. Vi har ændret den interne implementering af funktionerne, så de bruger realtid. Ved at genbruge de samme funktioner, sikres en ensartet implementering af tid på tværs af TimedPyCSP, og man kan i vores øjne med fordel tilføje dem til alle \pycsp versionerne, for på den måde at ensrette de forskellige implementeringer. Hvis \code{Now} og \code{Wait} blev inkluderet i \code{greenlets}-versionen kunne de fjernes helt i \is, da de to baserer sig på den samme tidsmodel
+Som vi beskrev i \des introducerede vi de to globale funktioner \code{Now} og \code{Wait} der hhv. returnerer den aktuelle tid og lader en proces vente i et givent tidsrum. Vi har ændret den interne implementering af funktionerne, så de bruger realtid. Ved at genbruge de samme funktioner, sikres en ensartet implementering af tid på tværs af TimedPyCSP, og man kan i vores øjne med fordel tilføje dem til alle \pycsp versionerne, for på den måde at ensrette de forskellige implementeringer. Hvis \code{Now} og \code{Wait} blev inkluderet i \code{greenlets}-versionen kunne de fjernes helt i \is, da de to baserer sig på den samme tidsmodel.
 
- 
 For at benytte realtid i forhold til diskret tid bruger vi pythons \code{time} modul. Genimplementering består derfor kun i at ændre funktionen \code{Now} til at bede \code{time}-modulet om tiden i stedet for \sched en.
 
 \subsubsection{Prioriteter}
-
 I computerspilseksemplet, har processerne forskellige prioritet dikteret af udvikleren. Derfor skal vi finde en metode, til at udvide RTP således at det kan håndtere processer hvor udvikleren også kan tilknytte en prioritet. Denne udvikler-prioritet er ikke det samme som den prioritet der allerede findes i RTP eksemplet, da denne prioritet er beregnet af \sched en.
 
 I RTP versionen er \sched en baseret på EDF, som kun tager hensyn til processernes deadline når der beregnes prioriteter. Vi skal dermed bruge en anden skemaplanlægningsalgoritme, for også at kunne håndtere at udvikleren skal kunne definere prioriteter.
