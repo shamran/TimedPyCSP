@@ -31,7 +31,11 @@ Vi kan dermed se \is som en blanding af RTP og \des, med tidsmodellen og deadlin
 
 
 \section{Design og implementering} 
-I \des kom vi frem til at planlægningen af begivenheder ud i fremtiden også kan tolkes som en venten. Dermed kan man se på \is som en udvidelse til RTP, hvor man udover at have mulighed for at sætte en deadline skal have mulighed for at vente. For at kunne bruge RTP til \is vil det desuden være hensigtsmæssigt at  udvide RTP så det er muligt for udvikleren at tilknytte en prioritet til begivenheden.
+Vi argumenterer i kapitel \ref{chap:des} for at planlægning af begivenheder til et givet tidspunkt, kan tolkes som venten indtil tidspunktet. Vi kan derfor se \is som RTP med den yderligere mulighed at kunne vente. Som nævnt ovenfor vil det også være et krav at vi kan sætte en prioritet på en proces uafhængigt at processens deadline. 
+
+Da kravene til \is rent teoretisk ligger meget tæt op ad de løsninger vi tidligere har beskrevet, vil vi også tage udgangspunkt i de allerede udviklede implementeringer. 
+
+%I \des kom vi frem til at planlægningen af begivenheder ud i fremtiden også kan tolkes som en venten. Dermed kan man se på \is som en udvidelse til RTP, hvor man udover at have mulighed for at sætte en deadline skal have mulighed for at vente. For at kunne bruge RTP til \is vil det desuden være hensigtsmæssigt at  udvide RTP så det er muligt for udvikleren at tilknytte en prioritet til begivenheden.
 
 \subsubsection{\code{Now} og \code{Wait }}
 Som vi beskrev i \des introducerede vi de to globale funktioner \code{Now} og \code{Wait} der hhv. returnerer den aktuelle tid og lader en proces vente i et givent tidsrum. Vi har ændret den interne implementering af funktionerne, så de bruger realtid. Ved at genbruge de samme funktioner, sikres en ensartet implementering af tid på tværs af TimedPyCSP, og man kan i vores øjne med fordel tilføje dem til alle \pycsp versionerne, for på den måde at ensrette de forskellige implementeringer. Hvis \code{Now} og \code{Wait} blev inkluderet i \code{greenlets}-versionen kunne de fjernes helt i \is, da de to baserer sig på den samme tidsmodel.
