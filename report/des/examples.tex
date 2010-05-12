@@ -61,32 +61,33 @@ opdateres, og hvornår processerne venter i en barriere.
 Vi deler verdenen lodret, og hver proces styrer en verdensdel. Hver proces 
 gennemgår sin verdensdel og udfører en mulig handling for hver fisk og haj, dog 
 vil fisk og hajer i de sidste to kolonner i hver verdensdel ikke bliver 
-opdateret på nuværende tidspunkt. Dette skyldes at der kan opstå en race 
-condition hvis disse to kolonner opdateres samtidig med de andre. Årsagen til 
-dette er at både processen der er ansvarlig for kolonnerne, og processen 
+opdateret samtidigt med de resterende kolonner. Dette skyldes, at der kan opstå en race 
+condition, hvis disse to kolonner opdateres samtidig med de andre. Årsagen til 
+dette er, at både processen, der er ansvarlig for kolonnerne, og processen 
 umiddelbart til højre for den skal have mulighed for at flytte fisk og hajer fra og til dette område. 
 Når denne 
-opdatering er fuldført mødes processerne i en barriere, hvorefter hver proces 
+opdatering er fuldført, mødes processerne i en barriere, hvorefter hver proces 
 opdaterer de to sidste kolonner. Herefter mødes processerne igen i barrieren, 
-og når alle kolonner er opdateret kan der foretages en visualisering af de 
-udførte opdateringer. Til slut mødes alle i en barriere igen før processerne 
+og når alle kolonner er opdateret, kan der foretages en visualisering af de 
+udførte opdateringer. Til slut mødes alle i en barriere igen, før processerne 
 kan begynde en ny iteration.
+\fxnote{Dorte: dvs de mødes i en barriere 3 gange?}
 
 En repræsentation af opdelingen ses på \cref{fig:wator}. Her er verdenen 
 opdelt mellem to processer, og de to kolonner mellem hver del opdateres i et 
 separat tidsskridt.  
 
-\begin{figure}
+\begin{figure} 
  \begin{center}
   \includegraphics[scale=0.75]{images/wator}
   \caption{Opdeling af verdenen mellem to processer. Der er for hver verdensdel 
-  to kolonner som opdateres i et separat tidsskridt.}
+  to kolonner, som opdateres i et separat tidsskridt.}
   \label{fig:wator}
   \end{center}
 \end{figure}
 
 
-\begin{figure}[hbtp]
+\begin{figure}[hbtp] 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[label=code:wator-worldpart,caption=Uddrag af processen 
   \code{worldpart} i Wator]
@@ -125,20 +126,19 @@ separat tidsskridt.
 \end{lstlisting}
 
 \end{minipage}
-\caption[test]{\code{barW(1)} og \code{barR()} er henholdsvis skrivning og læsning til og 
-fra en barriere som defineret i \cref{sec:barrierer}.}
+\caption[test]{\code{barW(1)} og \code{barR()} er henholdsvis skrivning til og læsning fra en barriere, som defineret i \cref{sec:barrierer}.}
 \end{figure}
-Afviklingen af programmet sker ved at et antal worldpart-, en 
+Afviklingen af programmet sker ved, at et antal worldpart-, en 
 visualize- og en barrier-proces køres parallelt. Af 
-\autoref{code:wator-worldpart} og \cref{code:wator-visualize}, ses det 
+\autoref{code:wator-worldpart} og \cref{code:wator-visualize} ses det 
 overordnede design af henholdsvis worldpart- og 
 vizualize-processen.  
-\subsubsection{Konklusion}
+\subsubsection{Konklusion} 
 %\inline{konklusion hvordan var det at implementere og hvor stor parallelitet kan man opnå. }
-Det var ikke svært at implementere et predator/prey simulering i \pycsp, men da store dele af koden bruges på at simulere  de forskellige fisk, og ikke på synkronisering, forventer vi ikke at introduktionen af tid i \pycsp vil medføre de store ændringer. 
+Det var ikke svært at implementere et predator/prey simulering i \pycsp, men da store dele af koden bruges på at simulere  de forskellige fisk og ikke på synkronisering, forventer vi ikke, at introduktionen af tid i \pycsp vil medføre de store ændringer. 
 
 Værd at bemærke er det store antal barrierekald i 
-visualize-processen. Dette er til for at man kan benytte den samme barriere som 
+visualize-processen. Dette er til for, at man kan benytte den samme barriere som 
 worldpart-processerne. Alternativt kunne man have to barriere-processer; en til 
 synkronisering af worldpart med vizualize, samt en som 
 worldpart-processerne bruger til synkroniseringen af de to sidste kolonner. 
