@@ -144,13 +144,13 @@ synkronisering af worldpart med vizualize, samt en som
 worldpart-processerne bruger til synkroniseringen af de to sidste kolonner. 
 
 \subsection{Kunder i en bank}\label{bank-eksempel}
-Et klassisk eksempel inden for \des er at simulere  en række kunder der alle 
+Et klassisk eksempel inden for \des er at simulere  en række kunder, der alle 
 ankommer til en butik, hvor de skal serviceres. Dette simple problem kan 
-udvides til at modellere mange forskellige problemstillinger, der berører 
-hvordan flowet ændrer sig hvis man varier en eller flere parametre
-i systemet. Programmeringssproget \simpy\footnote{\url{http://simpy.sourceforge.net/}}har, som et af deres 
-eksempler, en simulering af kunder i en bank. \simpy bruger dette som et 
-gennemgående eksempel, hvor de løbende udvider modellen, for at vise 
+udvides til at modellere mange forskellige problemstillinger, der berører, 
+hvordan flowet ændrer sig hvis man varierer en eller flere parametre
+i systemet. Programmeringssproget \simpy\footnote{\url{http://simpy.sourceforge.net/}}har som et af deres 
+eksempler en simulering af kunder i en bank. \simpy bruger dette som et 
+gennemgående eksempel, hvor de løbende udvider modellen for at vise 
 forskellige egenskaber ved \simpy. For at kunne sammenligne \simpy  med vores 
 version, vil vi implementere to af eksemplerne med kunder 
 i en bank i \pycsp.
@@ -158,53 +158,53 @@ i en bank i \pycsp.
 I det simple tilfælde af eksemplet ankommer kunderne til banken på 
 tilfældige tidspunkter.  De opholder sig i banken i et tilfældigt 
 tidsrum, hvorefter de igen forlader banken. I dette eksempel kan der ikke 
-uddrages meget information, men det viser hvordan en simpel model er opbygget i 
+uddrages meget information, men det viser, hvordan en simpel model er opbygget i 
 hhv.  \simpy og \pycsp for at håndtere tid.
 
-I det andet eksempel er modellen udvidet med en servicedisk, hvilket giver at eksemplet bliver en M/M/1 kømodel\fxnote{Brian - er det relevant at snakke om kømodeller?}. Her skal alle 
-kunderne betjenes af en servicemedarbejder, som kun kan ekspederes en kunde ad 
+I det andet eksempel er modellen udvidet med en servicedisk, dermed bliver eksemplet en M/M/1 kømodel\fxnote{Brian - er det relevant at snakke om kømodeller?}. Her skal alle 
+kunderne betjenes af en servicemedarbejder, som kun kan ekspedere en kunde ad 
 gangen. Alle kunder ankommer til banken på tilfældige tidspunkter  og stiller sig i 
-kø for at blive serviceret. Det er igen et tilfældigt tidsrum som kunden bruger på at blive 
+kø for at blive serviceret. Det er igen et tilfældigt tidsrum, som kunden bruger på at blive 
 serviceret.  Dette er stadigt en meget simpel model, men med introduktionen af 
 en begrænset ressource kan man uddrage information om den tilhørende kø, f.eks. 
-kan der måles hvor lang det tager for hver kunde at blive betjent af 
+kan der måles, hvor lang det tager for hver kunde at blive betjent af 
 servicemedarbejdere, samt hvordan køen opfører sig over tid. 
 
 \subsubsection{Før introduktion af et tidsbegreb i \pycsp}
 
 I \simpy opretter generatorfunktionen dynamisk en kundeprocess og  kører den parallelt med sig selv. Det vil  være nærliggende ligeledes at 
-modellere eksemplet i \pycsp med kunder som en proces. I \pycsp er processerne mere statiske, gerne med en generator- og 
+modellere eksemplet i \pycsp med kunder som en proces. I \pycsp er processerne dog mere statiske end i \simpy, gerne med en generatorproces og 
 arbejderproces, hvor  arbejdet flyttes 
-mellem processerne igennem kanaler. Vi har derfor ændret modellen så   
-generatorprocessen i \pycsp er som i \simpy, men vi introducerer en bankproces i stedet for en kundeproces, og lader kunderne være arbejdet der flyttes mellem dem. 
-I \pycsp findes muligheden for at oprette processer dynamisk med funktionen \code{spawn}, og man kunne derfor god lade generatoprocessen oprette kundeprocesser dynamisk, men vi ønsker ikke kun at kopiere eksemplet fra \simpy til \pycsp, men også konvertere eksemplet så der overholder stilen for et program skrevet til \csp. 
+mellem processerne igennem kanaler. Vi har derfor ændret modellen, så   
+generatorprocessen i \pycsp er som i \simpy, men vi introducerer en bankproces i stedet for en kundeproces og lader kunderne være arbejdet, der flyttes mellem dem. 
+I \pycsp findes muligheden for at oprette processer dynamisk med funktionen \code{spawn}, og man kunne derfor god lade generatoprocessen oprette kundeprocesser dynamisk, men vi ønsker ikke kun at kopiere eksemplet fra \simpy til \pycsp, men også konvertere eksemplet, så det overholder stilen for et program skrevet til \csp. 
 
 Mens \simpy kalder kundeprocessen fra generatoren og lader denne stå for håndteringen af kunden 
-og den tid hun befinder sig i banken, kender bankprocessen i \pycsp ikke tid som 
-sådan. Bankprocessen skal derfor selv vedligeholde en liste med kunderne, der findes inden i banken og til hver 
-tidskridt vide hvilke kunder der skal forlade den. 
+og den tid, hun befinder sig i banken, kender bankprocessen i \pycsp ikke tid som 
+sådan. Bankprocessen skal derfor selv vedligeholde en liste med de kunder, der findes i banken og til hvert 
+tidskridt vide hvilke kunder, der skal forlade den. 
 
 Tiden er igen modelleret ved brug af barrierer. I 
-stedet for at have de to kald til barrieren som den kræver, lige efter hinanden, lader 
+stedet for at have de to kald til barrieren, som den kræver, lige efter hinanden, lader 
 vi bankprocessen gå ind i barrieren i starten af tidsskridtet, og så modtage 
-kunder, indtil bankeprocessen modtager det andet kald fra barrieren (se\cref{bank-alternation-imp}). Dette er nødvendigt for at lade banken have 
+kunder, indtil den modtager det andet kald fra barrieren (se \cref{bank-alternation-imp}). Dette er nødvendigt for at lade banken have 
 mulighed for at modtage et vilkårligt antal kunder i samme tidsskridt, samt 
-vide hvornår der ikke vil komme flere kunder.  Vi kan ræsonnere os frem til at 
-barrieren stadig virker efter hensigten ved  simpel indsigt.
+vide hvornår der ikke vil komme flere kunder.  Vi kan, ved simpel indsigt, ræsonnere os frem til, at 
+barrieren stadig virker efter hensigten.
 For at generatorprocessen kan komme foran med et tidsskridt og sende en kunde i et forkert tidsskridt,
 skal den have fuldført begge begge kald til barrieren, mens bankprocessen ikke 
-har modtaget et kald fra barrieren. Barrieren vil dog ikke modtage kald fra 
+har modtaget et kald fra barrieren. \fxnote{Dorte: sætning ikke forstået}Barrieren vil dog ikke modtage kald fra 
 nogle, før den har  kaldt bankprocessen. Derfor må generatorprocessen vente i 
 sit første kald til barrieren, indtil banken har modtaget sit kald fra 
 barrieren, før den kan sende en ny kunde.
 Når bankprocessen har modtaget et kald fra barrieren er den ikke længere villig 
-til at modtage kunder, før i det efterfølgende tidsskridt. Vi kan bruge samme 
+til at modtage kunder før i det efterfølgende tidsskridt. Vi kan bruge samme 
 ræsonnement for at bankprocessen heller ikke kan komme et 
 tidsskridt foran generatorfunktionen, og derfor virker barrieren stadigt som 
 forventet. 
 
 \begin{lstlisting}[float=hbtp,label=bank-alternation-imp,caption=Modtage en 
-  kunde eller barrierekald i Bankprocessen]
+  kunde eller et barrierekald i bankprocessen]
 while True:
 		(g,msg) = Alternation([{
 		barrierREADER:None,
@@ -217,42 +217,42 @@ while True:
 \end{lstlisting}
 
 
-I det mere avancerede eksempel hvor kunderne skal tilgå den samme begrænsede 
-ressource dannes en kø. Denne kan i \pycsp modeleres på flere måder, afhængigt 
-at hvilken proces der skal have ansvaret for at vedligeholde køen. En metode er 
-internt i en proces at have en liste af kunder der venter, og lade det være 
+I det mere avancerede eksempel, hvor kunderne skal tilgå den samme begrænsede 
+ressource, dannes en kø. Denne kan i \pycsp modeleres på flere måder afhængigt 
+af hvilken proces, der skal have ansvaret for at vedligeholde køen. En metode er 
+internt i en proces at have en liste af kunder, der venter, og lade det være 
 processens ansvar at håndtere denne liste som en kø. Processen med ansvaret for køen kan 
-så enten være den begrænsede ressource, eller en separat proces hvis eneste 
-formål er at vedligeholde køen. For nyligt\footnote{d. 22. december 2009} er 
+så enten være den begrænsede ressource eller en separat proces, hvis eneste 
+formål er at vedligeholde køen. For nyligt\footnote{d. 22. december 2009.} er 
 der i \pycsp blevet introduceret bufferkanaler\cite{pycsp-r147}, og 
 disse kan også bruges som en kø. Dermed kan man modellere sin proces uden 
-hensyntagen til håndtering af køen, og blot lade processen læse fra kanalen når den er klar. Vi har i dette eksempel valgt 
+hensyntagen til håndtering af køen, og blot lade processen læse fra kanalen, når den er klar. Vi har i dette eksempel valgt 
 at lade køen være repræsenteret ved en bufferkanal, da denne  kræver 
 færrest linjer kode, men den kunne lige så godt være repræsenteret som en liste 
-i servicedisk processen.
+i servicedisk-processen.
 
 
 \subsubsection{Konklusion}
-Ved at se på implementeringen af de to eksempler af kunder i en bank sammenholdt med implementeringen i \simpy, kan man se at \des  egner sig godt til 
-simulering disse problemer, og fra eksemplet kan man se at der findes meget kode til 
+Ved at sammenligne implementeringen af de to eksempler af kunder i en bank med implementeringen i \simpy, kan man se, at \des  egner sig godt til 
+simulering af disse problemer, og fra eksemplet kan man se, at der findes meget kode til 
 vedligeholdelse af de interne tidsvariabler, som \simpy ikke har behov for. Det drejer sig 
-om kode der sørger for at hver proces kender tiden, samt at den er 
-synkroniseret på tværs af processerne. Vi forventer derfor at koden skal kunne 
+om kode, der sørger for, at hver proces kender tiden, samt at den er 
+synkroniseret på tværs af processerne. Vi forventer derfor at koden kan 
 simplificeres i \pycsp med tid, så det bliver lige så simpelt at implementere som i 
 \simpy. 
 
-I \simpy findes begrebet ressource direkte i sproget, som en type og servicedisken er blot et objekt af denne type. 
-En ressource i \simpy bruges til modellering af en begrænset ressource. Ved oprettelsen af ressourcen angives hvor mange der samtidigt kan tilgå den begrænsede ressource, og ressourcen står selv for at adgang til ressourcen samt den tilhørende kø, der eventuelt måtte opstå. 
+I \simpy findes begrebet ressource direkte i sproget som en type, og servicedisken er blot et objekt af denne type. 
+En ressource i \simpy bruges til modellering af en begrænset ressource. Ved oprettelsen af ressourcen angives hvor mange, der samtidigt kan tilgå den begrænsede ressource, og ressourcen står selv for adgang til den samt den tilhørende kø, der eventuelt måtte opstå. 
 I \pycsp modelleres servicedisken som en separat proces, og 
 bankprocessen er derfor reduceret til blot at sende kunden videre til 
 servicedisken og lade kanalen håndtere køen. 
 
-En ulempe ved brugen af bufferkanaler som en kø er, at kanalen har en fast størrelse på sin buffer, som 
-angives når kanalen oprettes. Man kan dermed risikere en deadlock ved brug af bufferkanaler sammen med barrierer. Dette opstår hvis ikke processen i samme 
+En ulempe ved brugen af bufferkanaler som kø er, at kanalen har en fast størrelse på sin buffer, som 
+angives, når kanalen oprettes. Man kan dermed risikere en deadlock ved brug af bufferkanaler sammen med barrierer. Dette opstår, hvis ikke processen i samme 
 tidsskridt kan foretage transmissionen og kalde barrieren.
 Det kan løses med en \code{alternation} og \code{skip guard}, men så 
 skal bankprocessen håndtere fejlede forsendelser og må nødvendigvis introducere en 
-sekundær kø hvilket gør brugen af en bufferkanal overflødig. For undgå dette har vi i vores tilfælde valgt blot at 
+sekundær kø, hvilket gør brugen af en bufferkanal overflødig. For undgå dette har vi i vores tilfælde valgt blot at 
 angive en maksimal størrelse på bufferen som er større end det totale antal 
-kunder banken modtager. \fxnote*{RS: Afhænger af den forrige fixme om M/M/1}{Dette medfører at det ikke længere er en teoretisk korrekt M/M/1 kømodel, da denne specifikt angiver at køen skal have mulighed for at have uendelig længde. I praksis er det ikke et problem da vi blot kan ræsonnere os frem til at køen ikke bliver fuld.}
+kunder banken modtager. \fxnote*{RS: Afhænger af den forrige fixme om M/M/1}{Dette medfører, at det ikke længere er en teoretisk korrekt M/M/1 kømodel, da denne specifikt angiver, at køen skal have mulighed for at have uendelig længde. I praksis er det ikke et problem, da vi blot kan ræsonnere os frem til, at køen ikke bliver fuld.}
 
