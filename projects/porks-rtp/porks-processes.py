@@ -1,6 +1,6 @@
 """ Configurable. Run once then poison channels. """
 #from pycsp.processes import *
-from pycsp.greenlets import *
+from pycsp.threads import *
 #from random import expovariate, uniform, seed
 import random, sys, time , heapq, math, scipy
 
@@ -107,7 +107,7 @@ def cameraFunc(in0,out0,ran , data = avg_camera_processing):
                 val0.accum.append(time.time()-val0.arrivaltime)
                 val0.wait.append(waits)
                 dummywork(waittime+time.time())
-                out0(val0)
+                out0(val0)                
         
 @process
 def convertFunc(in0,out0,ran , data = avg_convert_processing):
@@ -156,7 +156,7 @@ def robotFunc(feeder,analysis,ran, statC, data = time_to_deadline):
             next_deadline[channel_input.id] = channel_input
             
         while True:
-                alt = Alternation([
+            alt = Alternation([
                 {feeder :process_pig()},
                 {analysis:process_pig2()}
                 ]).execute()
@@ -234,4 +234,4 @@ Parallel(
 )
 print "cam deadline:\t%3f\ndeadline:\t%3f"%(time_to_camera_deadline,time_to_deadline)
 print "avg procsessing time: ",avg_camera_processing+avg_convert_processing+avg_analysis_processing
-print "Greenlets version"
+print "Processes version"
