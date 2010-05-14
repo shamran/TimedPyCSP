@@ -13,11 +13,11 @@ conv_iter = 1000000
 ana_iter =   700000
 dummy_iter = 100000
 std = 0.04
+concurrent = 2
+avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*(0.99/concurrent)
 
-avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*0.99
-
-time_to_camera_deadline = avg_camera_processing+max(avg_convert_processing,avg_analysis_processing)*1
-time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*1.22
+time_to_camera_deadline = avg_camera_processing*1.6
+time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*(1.22*concurrent)
 
 
 pigs_to_simulate =  100
@@ -46,7 +46,7 @@ def dummywork(iterations):
     #Estimating Pi.
     temp = 0
     import time    
-    for k in xrange(iterations):
+    for k in xrange(int(iterations)):
          temp += (math.pow(-1,k)*4) / (2.0*k+1.0)
          k +=1
 
@@ -56,10 +56,11 @@ def background_dummywork(dummy_in, time_out,work = dummy_iter):
         time_spent=0
         n = 0
         while True:
-            time_spent +=work
             Alternation([{Timeout(seconds=0.005):None}, {dummy_in:None}]).select()    
             n+=1
+            time_spent -= time.time()
             dummywork(work)
+            time_spent += time.time()
     except ChannelPoisonException:
         time_out(time_spent)   
 
@@ -89,11 +90,11 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
                 {((-feederChannel),pig):None},
                 {Timeout(NextpigArrival-time.time()):None}
                 ]).execute()       
-        else: print "no slack !!"
+        #else: print "no slack !!"
         ThispigArrival = NextpigArrival
         NextpigArrival = ThispigArrival+ran.gauss(data, data*std)
         if ThispigArrival>time.time() : sleep(ThispigArrival-time.time())
-    sleep(time_to_camera_deadline*1.2)       
+    #sleep(time_to_camera_deadline*1.2)       
     poison(robot)
     poison(dummy)
     
@@ -105,7 +106,7 @@ def cameraFunc(in0,out0,ran , data = avg_camera_processing):
                 #waits = "cam: ",waittime
                 val0.accum.append(time.time()-val0.arrivaltime)
                 #val0.wait.append(waits)
-                dummywork(cam_iter)
+                dummywork(ran.gauss(cam_iter,cam_iter*std))
                 out0(val0)
         
 @process
@@ -118,7 +119,7 @@ def convertFunc(in0,out0,ran , data = avg_convert_processing):
                 #waits = "con: ",waittime
                 #val0.wait.append(waits)
                 val0.accum.append(time.time()-val0.arrivaltime)
-                dummywork(conv_iter)
+                dummywork(ran.gauss(conv_iter,conv_iter*std))
                 out0(val0)
     except ChannelPoisonException:
         poison(in0,out0)
@@ -132,7 +133,7 @@ def analysisFunc(in0,out0,ran , data = avg_analysis_processing):
                 #waits = "ana: ",waittime
                 val0.accum.append(time.time()-val0.arrivaltime)
                 #val0.wait.append(waits)
-                dummywork(ana_iter)                
+                dummywork(ran.gauss(ana_iter,ana_iter*std))                
                 out0(val0)
     except ChannelPoisonException:
         exit
@@ -188,8 +189,8 @@ def Work(statC,timeC):
 
         Parallel(
             feed,
-            rob#,
-            #1*background_dummywork(+dummyC,timeC)
+            rob,
+            1*background_dummywork(+dummyC,timeC)
         )          
     poison(statC, timeC)
 

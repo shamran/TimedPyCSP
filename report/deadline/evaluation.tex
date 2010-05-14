@@ -57,11 +57,13 @@
 
 \subsection{Slagterieksempel}
 
-Vi vil nu sammenligne de tre eksisterende versioner af \PyCSP mod hinanden og mod RTP-versionen. Ud fra denne sammenligning vil vi  se på deres fordele og ulemper ved de forskellige versioner.
+Vi vil nu sammenligne de tre eksisterende versioner af \pycsp mod hinanden og mod \code{RTP}-versionen. Ud fra denne sammenligning vil vi  se på deres fordele og ulemper ved de forskellige versioner.
 
 Ved at benytte \pycsp til slagterieksemplet opnår man et modulært design, der nemt kan udvides hvis de fysiske rammer for slagteriet ændrer sig. Viser det sig f.eks at kameraet holder den samlede produktivitet af netværket tilbage, kan slagteriet, nemt tilføje endnu et kamera og udvide procesnetværket med endnu en kameraproces, som kan arbejde samtidigt med det første kamera. 
 
-En kørsel af de tre eksisternede versioner giver et meget forskelligt resultat, som vist i \cref{tab:deadline-runs}. I denne tabel har vi foretaget en simulation af 100 grise. Denne simulation er kørt 10 gange, og tabellen viser gennemmsnittet og standardvariationen. Dermed har valget af version betydning, både for andelen af griseobjekter, der kan nå at blive bearbejdet, og hvor lang tid det tager at køre testen. Dette skyldes, at testen køres på en multikerne CPU, hvor \code{proces}-versionen dermed har mulighed for at køre parallelt. \code{Greenelts}-versionen derimod er begrænset til kørsel af en proces, hvorfor der er flere grise der ikke når at blive bearbejdet inden for sin deadline.
+En kørsel af de tre eksisterende versioner giver et meget forskelligt resultat, som vist i \cref{tab:deadline-runs}. I denne tabel har vi foretaget en simulation af 100 grise. Denne simulation er kørt 10 gange, og tabellen viser gennemsnittet og standardvariationen. Af tabellen kan man se at versionen som forventet har betydning for antallet af grise der rettidigt kan nå at blive bearbejdet. 
+
+\code{Proces}-versionen er ikke som forventet bedre en de andre versioner til at bearbejde griseobjekterne rettidigt. Dette skyldes at testen er gennemført på en maskine, med kun en kerne.  Dermed kan \code{process}-versionen ikke drage nytte  af flere kerner, men er begrænset til kun at kunne køre en proces af gangen. I \code{process}-versionen, skal konktekstskiftene foregår i operativsystemets \sched~ der er væsentligt langsommere end i \code{greenlets} og \code{RTP}-versionen hvor konktekstskiftene sker i vores \sched. 
 
 \begin{table}[htbp]
 	\centering
@@ -69,41 +71,65 @@ En kørsel af de tre eksisternede versioner giver et meget forskelligt resultat,
        	\toprule
         \mc{Version}  &\mc{Succesrate (\%)}&\mc{Standard Afvigelse (SA)}\\
         \midrule
-        Processes(1 kerne) &100 & 0 \\
-        Threads & 70 & 11\\
-        Greenlets & 54.6& 11.3 \\        
-        RTP u. prioritet &41.1  &7.5 \\
-        RTP m. prioritet & 40 & 7,6\\
+        Processes&1 & 1 \\
+        Threads & 14 & 7\\
+        Greenlets & 18& 9 \\        
+        RTP u. prioritet &22  &8 \\
+        RTP m. prioritet & 17 & 8\\
         \bottomrule
     \end{tabular}
-	\caption[]{20 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }\\
+	\caption[]{10 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }\\
 	\label{tab:deadline-runs}
 \end{table}
-\fxerror{Process versionen FEJLER!!!}
-I \code{processes}-versionen findes der fire processer og dermed kan der bearbejdes fire griseobjekter samtidigt. Dette sikrer at det er de fire  griseobjekter nærmest robotten der arbejdes på, men samtidigt betyder det at man maksimalt kan arbejde på fire grise samtidigt. Ved at øge antallet af griseobjekter man kan arbejde på, vil man få mere tid per grisseobjekt til at foretage de nødvendige beregninger. Man kan derfor vælge at tilføje flere konverterings- og analyseprocesser, da disse ikke er bundet op på specialiseret hardware, og på den måde øge antallet af processer der kan arbejde samtidigt. Dette vil dog øge antallet af processer der må kæmper mod hinanden for CPU-tid, og griseobjekterne vil desuden skulle kæmpe mod hinanden for at komme igennem netværket uden hensyn til hvilken gris der er nærmest robotten. Man risikerer dermed en starvation situation hvor griseobjekter, svarende til grise længere tilbage på transportbåndet, overhaler griseobjekter længere fremme på transportbåndet.
 
-\code{RTP}-udvidelsen bygger på \code{greenlets}-versionen, og vil derfor have de samme begrænsninger som denne, som diskuteret i implementeringen i afsnit \cref{sec:deadline-exampel-implementation}. Der er dog også en række fordele som vi vil komme ind på her.
+\begin{table}[htbp]
+	\centering
+	\begin{tabular}{lccc}
+       	\toprule
+        \mc{Version}  &\mc{Samtidige grise}&\mc{Succesrate (\%)}&\mc{Standard Afvigelse (SA)}\\
+        \midrule
+        Greenlets & 1 & 18& 9 \\
+        Greenlets & 2 & 49& 0 \\
+        Greenlets & 3 & 32& 0\\
+        Greenlets & 5 & 20& 0 \\
+        \midrule
+        RTP u. prioritet &1&22  &8 \\
+        RTP u. prioritet &2&45  &2 \\
+        RTP u. prioritet &3&29  &0 \\
+        RTP u. prioritet &5&17  &0 \\
+        \midrule
+        RTP m. prioritet &1& 17 & 8\\
+        \bottomrule
+    \end{tabular}
+	\caption[]{10 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }\\
+	\label{tab:deadline-runs2}
+\end{table}
 
-Ved implementering af slagterieksemplet i \code{RTP}-versionen, slipper de enkelte processer for at holde styr på tiden, og vurdere om den enkelte grisseobjekts deadline er overskredet. Når de modtager et grisseobjekt sætter de deres egen deadline til grisens via funktionen \code{Set\_deadline}. Hver proces skal i modsætning til \code{greenlets}-versionen, kunne håndtere at modtage en \code{DeadlineException}, som de i dette eksempel blot kan håndtere ved at smide det nuværende griseobjekt væk. Det kan de gøre, da robotten på dette tidspunkt tager en beslutning uden specialviden om grisen, og griseobjektet er derfor ikke længere er relevant. I stedet kan processen  gå i gang med modtage et nyt griseobjekt.
+Hvis antallet af grise der skal bearbejdes samtidigt stiger, øges antallet af processer der må kæmper mod hinanden for CPU-tid. Dette er ens for de tre eksisterende versionerne af \pycsp.  I \code{Proces}-versionen medfører det  muligheden  for at griseobjekterne kan blive  bearbejdet parallelt, hvis computeren har denne mulighed.  Ofte vil der være flere griseobjekterne end processorer, hvorfor griseobjekterne stadig vil  skulle kæmpe mod hinanden for at komme igennem netværket.
 
-I \code{greenlets}-versionen kom vi ind på at processerne frivilligt skal afgive kontrollen, før robotten kan foretage udskæringen, men at der ikke findes en metode til midlertidigt at afgive kontrollen. Med \code{RTP}-versionen og funktionen \code{Release} har alle processer mulighed for at afgive kontrollen så robotten rettidigt kan foretage selve udskæringen. Hermed skal vi ikke introducere en delt datastruktur.
+Når griseobjekterne skal kæmpe for at komme igennem netværket, sker det uden hensyn til hvilken gris der er nærmest robotten. Man risikerer dermed en starvation situation hvor griseobjekterne kan overhale hinanden, så det ikke er grisene nærmest robotten der først bliver bearbejdet.
+
+\code{RTP}-udvidelsen bygger på \code{greenlets}-versionen, og vil derfor have de samme begrænsninger som denne, som diskuteret i implementeringen i afsnit \cref{sec:deadline-exampel-implementation}. Starvation er ikke på samme måde et problem i \code{RTP}-versionen, da hver proces har tilknyttet griseobjektets deadline. Dermed sikres at det altid er griseobjektet tættets på sin deadline der sendes igennem netværket først.
+
+I \code{RTP}-versionen, slipper de enkelte processer desuden for at holde styr på tiden, og vurdere om den enkelte griseobjekts deadline er overskredet. Når de starter har de en deadline svarende til når robotten senest skal have griseobjektet. Denne sættes  via funktionen \code{Set\_deadline}. \code{Set\_deadline} kan resultere i en exception, og derfor skal hver proces, kunne håndtere en \code{DeadlineException}, som de i dette eksempel blot kan håndtere ved at smide griseobjektet væk. Det kan de gøre, da robotten på dette tidspunkt tager sin beslutning, og derfor vælger at udskære grisen uden specialviden. Griseobjektet er dermed ikke længere relevant og kan smides væk, så processen kan gå i gang med modtage et nyt griseobjekt.
+
+I \code{greenlets}-versionen kom vi ind på at processerne frivilligt skal afgive kontrollen, før robotten kan foretage udskæringen, men at der ikke findes en metode til midlertidigt at afgive kontrollen. Med \code{RTP}-versionen og funktionen \code{Release} har alle processer mulighed for at afgive kontrollen så robotten rettidigt kan foretage selve udskæringen. Hermed skal vi ikke introducere en delt datastruktur, men kan lade det være op til robotprocessen at igangsætte robotten.
   
-selvom det var nødvendigt at basere RTP på  \code{greenlets}-versionen medfører det, at kun en proces kan være aktiv på samme tid. Dermed kan vi kun udnytte en processor, som  passer dårligt sammen med denne applikation, som det ses af \cref{tab:deadline-runs}.  Vi kan dog til dels afhjælpe dette problem ved at udnytte at der i \code{greenlets}-versionen, findes en \code{IO}-dekorering. Denne dekorering placerer en funktion i en separat tråd, så flere funktioner kan køre samtidigt. Man skal her dog være opmærksom på at GIL'en stadig forhindre parallel udførsel. Eventuel parallel udførsel vil derfor kræve at koden i IO dekoreringen, kalder eksterne moduler som diskuteret i \cref{chap:csp}. Denne mulighed for parallel bearbejdning af flere processer vil dog  som i \code{processes}-versionen resultere i at processerne vil kæmpe mod hinanden om CPU-resurser. \code{RTP}-versionen har dog den store fordel at vi, i modsætning til \code{proces}-versionen, ikke risikerer at griseobjekterne overhaler hinanden, men at netværket hele tiden har fokus på først at videresende griseobjektet nærmest robotten. \CRef{fig:pig-network3} viser hvordan netværket kan se ud med flere konverterings- og analyseprocesser.
+%selvom det var nødvendigt at basere \code{RTP} på  \code{greenlets}-versionen medfører det, at kun en proces kan være aktiv af gangen. Dermed kan vi kun udnytte en processor, som  passer dårligt sammen med denne applikation, som det ses af \cref{tab:deadline-runs}.  Vi kan dog til dels afhjælpe dette problem ved at udnytte at der i \code{greenlets}-versionen, findes en \code{IO}-dekorering. Denne dekorering placerer en funktion i en separat tråd, så flere funktioner kan køre samtidigt. Man skal her dog være opmærksom på at GIL'en stadig forhindre parallel udførsel. Eventuel parallel udførsel vil derfor kræve at koden i IO dekoreringen, kalder eksterne moduler som diskuteret i \cref{chap:csp}. Denne mulighed for parallel bearbejdning af flere processer vil dog  som i \code{processes}-versionen resultere i at processerne vil kæmpe mod hinanden om CPU-resurser. \code{RTP}-versionen har dog den store fordel at vi, i modsætning til \code{proces}-versionen, ikke risikerer at griseobjekterne overhaler hinanden, men at netværket hele tiden har fokus på først at videresende griseobjektet nærmest robotten. \CRef{fig:pig-network3} viser hvordan netværket kan se ud med flere konverterings- og analyseprocesser.
 
-\begin{figure}
- \begin{center}
-  \includegraphics[scale=1]{images/pig-network3}
-	\caption{Procesnetværk med flere konverteringsprocesser, og analyseprocesser}
-	\label{fig:pig-network3}
-\end{center}
-\end{figure}
-
-
-Vi har efter at have implementeret RTP, og implementeret vores eksempel i \code{RTP}-versionen, erkendt at det ikke er det bedste eksempel vi har valgt. Det skyldes dels at alle processer har den samme deadline i forhold til hvornår de ankommer, hvorfor de alle har den samme begrænsning. At udvælge et grisseobjekt frem for en anden, har ikke indflydelse på  hvor mange grisseobjekter vi i alt når inden grisen når robotten, Vi udvælger blot hvilke grisseobejkter der bliver bearbejdet rettidigt. Det ekstra arbejde vi foretager gavner derfor ikke helheden af slagterieksemplet, men tværtimod begrænse tiden hvert grisseobjekt har til at blive bearbejdet.
+%\begin{figure}
+% \begin{center}
+%  \includegraphics[scale=1]{images/pig-network3}
+%	\caption{Procesnetværk med flere konverteringsprocesser, og analyseprocesser}
+%	\label{fig:pig-network3}
+%\end{center}
+%\end{figure}
 
 
-Med udgangspunkt i at eksemplet ikke er optimalt til at visualisere vores løsning, ønsker vi at ændre eksemplet, for at se hvordan RTP bruges hvis ikke alle processerne har en deadline.
-Vi har derfor udviddet slagterieksemplet med en ekstra proces. Denne dummyproces har ingen deadline, og kører i en fast løkke, der estimerer $\pi$. Formålet med processen er at simulere et arbejde der også ønskes udført, men som ikke er tidskritisk. Når \code{greenlets}-versionen udvælger hvilke processer der skal køres, gøres det tilfældigt, hvorfor processen uden deadline kan risikere at blokere for at de tidskritiske processer. 
+Efter at have implementeret \code{RTP}-versionen, og implementeret vores eksempel i denne version, kan vi se at vores løsning ikke er mærkbart bedre en \code{greenlets}-versionen, og vi mener det skyldes at det valgte eksempel er for simpelt og derfor ikke lader \code{RTP}-versionen komme til sin ret. Dette mener vi skyldes  at alle processer har den samme deadline i forhold til hvornår de ankommer, hvorfor de alle er lige begrænset. At udvælge et griseobjekt frem for et andet, har ikke indflydelse på  hvor mange griseobjekter vi i alt kan nå, men ændre blot hvilke af griseobjekterne der bliver bearbejdet rettidigt. Det ekstra arbejde vi foretager i \sched en gavner ikke slagterieksemplet, men tværtimod begrænser \code{RTP}-versionen tiden processerne har til at bearbejde hvert griseobjekt.
+
+Med udgangspunkt i at eksemplet ikke er optimalt til at vise vores løsning, ønsker vi at ændre eksemplet, for at se hvordan \code{RTP}-versionen bruges, hvis ikke alle processerne har en deadline. Vi har udvidet slagterieksemplet med en ekstra proces. Denne dummyproces har ingen deadline, og kører i en fast løkke, der estimerer $\pi$. Formålet med processen er at simulere et arbejde der også ønskes udført, men som ikke er tidskritisk. Når \code{greenlets}-versionen udvælger hvilke processer der skal køres, gøres det tilfældigt, hvorfor processen uden deadline kan risikere at blokere for at de tidskritiske processer. I \code{RTP}-versionen bør tiden vi spendere i  dummyproces til gengæld begrænses, når der er tidskritiske processer der skal bearbejdes.
+
 \begin{table}[htbp]
 	\centering
 	\begin{tabular}{lllll}
@@ -116,11 +142,11 @@ Vi har derfor udviddet slagterieksemplet med en ekstra proces. Denne dummyproces
         RTP med Prioritet &1.46&0.276&34.1&7.2\\
         \bottomrule
     \end{tabular}
-	\caption[]{20 * 100 grise køres igennem procesnetværket. Desuden er der tilknyttet en dummyproces, uden en deadline, der hele tiden ønsker at arbejde. For hver kørsel udregnes hvor meget kørselstid dummyprocessen har kørt, samt antallet af grise der bliver rettidigt processeret.}\\
+	\caption[]{20 * 100 grise køres igennem procesnetværket. Desuden er der tilknyttet en dummyproces, uden en deadline, der hele tiden ønsker at arbejde. For hver kørsel udregnes hvor meget kørselstid dummyprocessen har kørt, samt antallet af grise der bliver rettidigt bearbejdet.}\\
 	\label{tab:dummy-run}
 \end{table}
 
-Tabellen \cref{tab:dummy-run} viser den gennemsnitlige tid hver version har brugt i dummyprocessen, samt hvor mange grise der er blevet processeret rettidigt. 
-Som det ses bruges der væsentligt mindre tid i dummyfunktionen i \code{RTP}-versionen end i \code{Greenlets}-verisionen. Dette medfører at antal grise der rettidigt bliver processeret er højere i \code{RTP}-versionen. Denne test viser dermed at \code{RTP}-versionen formår at udvælge de tidskritiske processer på bekostning af processer uden deadline, og at denne udvælgelse medfører en øget succesrate på trods af den øgede kompleksitet i \code{RTP}-versionen.
+\CRef{tab:dummy-run} viser den gennemsnitlige tid hver version har brugt i dummyprocessen, samt hvor mange grise der er blevet bearbejdet rettidigt. 
+Som det ses bruges der væsentligt mindre tid i dummyfunktionen i \code{RTP}-versionen end i \code{Greenlets}-versionen. Dette medfører at antal grise der rettidigt bliver bearbejdet er højere i \code{RTP}-versionen. Denne test viser dermed at \code{RTP}-versionen formår at udvælge de tidskritiske processer på bekostning af processer uden deadline, og at denne udvælgelse medfører en øget succesrate på trods af den øgede kompleksitet i \code{RTP}-versionen.
 
 \fxerror{Jeg har slet ikke snakket om prioritet!}

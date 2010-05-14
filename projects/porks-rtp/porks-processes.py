@@ -1,6 +1,6 @@
 """ Configurable. Run once then poison channels. """
 from pycsp.processes import *
-#from pycsp.threads import *
+#   from pycsp.threads import *
 #from random import expovariate, uniform, seed
 import random, sys, time , heapq, math, scipy
 
@@ -15,14 +15,14 @@ ana_iter =   700000
 dummy_iter = 100000
 std = 0.04
 
-avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*0.99
+avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*0.5
 
 time_to_camera_deadline = avg_camera_processing+max(avg_convert_processing,avg_analysis_processing)*1
-time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*1.22
+time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*2.22
 
 
-pigs_to_simulate =  100
-number_of_simulations = 10
+pigs_to_simulate =  5
+number_of_simulations = 2
 
 class Pig:
   def __init__(self,_id, arrivaltime,ran,deadline = time_to_deadline):
@@ -75,7 +75,7 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
     NextpigArrival = time.time()+ran.gauss(data, data*std)
     ThispigArrival = time.time()
     for x in xrange(pigs_to_simulate):
-        if x % 10 == 0 : print "\t\t",x
+        if x % 1 == 0 : print "\t\t",x
         pig = Pig(x,ThispigArrival,ran)
         robot(pig)
         if pig.arrivaltime+time_to_camera_deadline-time.time()>0:
@@ -94,7 +94,8 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
         ThispigArrival = NextpigArrival
         NextpigArrival = ThispigArrival+ran.gauss(data, data*std)
         if ThispigArrival>time.time() : sleep(ThispigArrival-time.time())       
-    sleep(time_to_camera_deadline*1.2)
+    sleep(time_to_deadline*2)
+    print "poison robot"
     poison(robot)
     poison(dummy)
     
@@ -161,6 +162,7 @@ def robotFunc(feeder,analysis,ran, statC, data = time_to_deadline):
                 {analysis:process_pig2()}
                 ]).execute()
     except ChannelPoisonException:
+        print "rob got poison"
         good = 0
         bad = 0
         normal = 0
@@ -191,7 +193,8 @@ def Work(statC,timeC):
             feed,
             rob#,
             #1*background_dummywork(+dummyC,timeC)
-        )        
+        )
+        print "ended work"     
     poison(statC, timeC)
 
 @process
