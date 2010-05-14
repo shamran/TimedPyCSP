@@ -1,67 +1,67 @@
 \section{Evaluering}
-\subsection{Test af Korrekthed}
-Vi har som i \des løbende skrevet test før vi implementerede hver ny funktion i \code{RTP}-versionen.  Tabellen herunder viser testresultaterne for de test der er lavet specifikt for \code{RTP}-versionen.
-\begin{longtable}{lr}
-   	\toprule
-    \mc{Test} & \mc{Resultat} \\
-    \midrule
-    \endfirsthead 
-    \toprule
-    \mc{Test} & \mc{Resultat} \\
-    \midrule
-    \endhead % slut efterfølgende headere
-    \bottomrule
-    \multicolumn{2}{r}{\textit{fortsættes}}
-    \endfoot % slut footer
-    \bottomrule
-    \endlastfoot % slut sidste footer
-test\_Alternation  & ok\\
-test\_AlternationChoiseReader  & ok \\
-test\_AlternationChoiseWriter  & ok \\
-test\_AlternationExecuteReadDeadline  & ok\\
-test\_AlternationExecuteSkipDeadline  & ok\\
-test\_AlternationExecuteTimeoutDeadline  & ok \\
-test\_AlternationExecuteWriteDeadline  & ok \\
-test\_Alternationchoise1Deadline  & ok \\
-test\_Alternationchoise2Deadline  & ok \\
-test\_ChoisemultipleReader  & ok \\
-test\_ChoisemultipleReader2  & ok \\
-test\_ChoisemultipleWriter  & ok\\
-test\_PoisonAndDeadline1  & ok\\
-test\_PoisonAndDeadline2  & ok\\
-test\_Reader\_Inheritance  & ok\\
-test\_RetireAndDeadline  & ok\\
-test\_Writer\_Inheritance  & ok\\
-test\_channelpriority\_from\_low\_deadline  & ok\\
-test\_channelpriority\_from\_low\_deadline2  & ok\\
-test\_channelpriority\_from\_no\_deadline  & ok\\
-test\_channelpriority\_from\_no\_deadline2  & ok\\
-test\_readDeadline  &ok\\
-test\_writeDeadline  & ok\\
-test\_xreset\_inheritance  & ok\\
-test\_xreset\_inheritance\_from\_two\_step  & FAIL\\
-\end{longtable}
+%\subsection{Test af Korrekthed}
+%Vi har som i \des løbende skrevet test før vi implementerede hver ny funktion i \code{RTP}-versionen.  Tabellen herunder viser testresultaterne for de test der er lavet specifikt for \code{RTP}-versionen.
+%\begin{longtable}{lr}
+%   	\toprule
+%    \mc{Test} & \mc{Resultat} \\
+%    \midrule
+%    \endfirsthead 
+%    \toprule
+%    \mc{Test} & \mc{Resultat} \\
+%    \midrule
+%    \endhead % slut efterfølgende headere
+%    \bottomrule
+%    \multicolumn{2}{r}{\textit{fortsættes}}
+%    \endfoot % slut footer
+%    \bottomrule
+%    \endlastfoot % slut sidste footer
+%test\_Alternation  & ok\\
+%test\_AlternationChoiseReader  & ok \\
+%test\_AlternationChoiseWriter  & ok \\
+%test\_AlternationExecuteReadDeadline  & ok\\
+%test\_AlternationExecuteSkipDeadline  & ok\\
+%test\_AlternationExecuteTimeoutDeadline  & ok \\
+%test\_AlternationExecuteWriteDeadline  & ok \\
+%test\_Alternationchoise1Deadline  & ok \\
+%test\_Alternationchoise2Deadline  & ok \\
+%test\_ChoisemultipleReader  & ok \\
+%test\_ChoisemultipleReader2  & ok \\
+%test\_ChoisemultipleWriter  & ok\\
+%test\_PoisonAndDeadline1  & ok\\
+%test\_PoisonAndDeadline2  & ok\\
+%test\_Reader\_Inheritance  & ok\\
+%test\_RetireAndDeadline  & ok\\
+%test\_Writer\_Inheritance  & ok\\
+%test\_channelpriority\_from\_low\_deadline  & ok\\
+%test\_channelpriority\_from\_low\_deadline2  & ok\\
+%test\_channelpriority\_from\_no\_deadline  & ok\\
+%test\_channelpriority\_from\_no\_deadline2  & ok\\
+%test\_readDeadline  &ok\\
+%test\_writeDeadline  & ok\\
+%test\_xreset\_inheritance  & ok\\
+%test\_xreset\_inheritance\_from\_two\_step  & FAIL\\
+%\end{longtable}
 
 
- Alle test med en undtagelse fungerer korrekt. Testen der fejler hedder test"_xreset"_inheritance"_from"_two"_step, og viser en situation hvor den samme proces får løftets sin prioritet to gange i træk, først med en høj prioritet, og efterfølgende med en mellemprioritet. Efterfølgende skal processen sænke sin prioritet, først til  mellemprioriteten og tilslut til sin originale prioritet. Her viser det sig vi har lavet en fejl i implementeringen, således at prioriteten ikke bliver nedsat til mellemprioriteten. \CRef{fig:priority-inheritance} viser prioriteten mens processen bliver op- og nedprioriteret. Tiden har ikke tilladt os at løse problemet, men  kan løses ved at kræve at, når en proces opprioriteres gemmes hvilken proces der står bag, så når en proces ønsker at fjerne sin opprioritering fra andre processer er det kun sin egen  prioritet den fjerner.  
- 
-  
-\begin{figure}
- \begin{center}
-  \includegraphics[scale=1]{images/priority-inheritance}
-	\caption{Figuren viser hhv. forventet og faktisk prioritetsarvning. Der hvor den faktiske og forventede opførsel adskiller sig er forventet den fuldt optrukne streg, mens den stiplede streg er den faktiske opførsel.}
-	\label{fig:priority-inheritance}
-\end{center}
-\end{figure}
-  
+% Alle test med en undtagelse fungerer korrekt. Testen der fejler hedder test"_xreset"_inheritance"_from"_two"_step, og viser en situation hvor den samme proces får løftets sin prioritet to gange i træk, først med en høj prioritet, og efterfølgende med en mellemprioritet. Efterfølgende skal processen sænke sin prioritet, først til  mellemprioriteten og tilslut til sin originale prioritet. Her viser det sig vi har lavet en fejl i implementeringen, således at prioriteten ikke bliver nedsat til mellemprioriteten. \CRef{fig:priority-inheritance} viser prioriteten mens processen bliver op- og nedprioriteret. Tiden har ikke tilladt os at løse problemet, men  kan løses ved at kræve at, når en proces opprioriteres gemmes hvilken proces der står bag, så når en proces ønsker at fjerne sin opprioritering fra andre processer er det kun sin egen  prioritet den fjerner.  
+% 
+%  
+%\begin{figure}
+% \begin{center}
+%  \includegraphics[scale=1]{images/priority-inheritance}
+%	\caption{Figuren viser hhv. forventet og faktisk prioritetsarvning. Der hvor den faktiske og forventede opførsel adskiller sig er forventet den fuldt optrukne streg, mens den stiplede streg er den faktiske opførsel.}
+%	\label{fig:priority-inheritance}
+%\end{center}
+%\end{figure}
+%  
 
 \subsection{Slagterieksempel}
 
-Først vil vi sammenligne de to udviklede versioner, for at se på deres fordele og ulemper, og til slut vi i dette afsnit sammenholde de to versioner, med et  eksempel der er implementeret i RTP-versionen.
+Vi vil nu sammenligne de tre eksisterende versioner af \PyCSP mod hinanden og mod RTP-versionen. Ud fra denne sammenligning vil vi  se på deres fordele og ulemper ved de forskellige versioner.
 
-Ved at benytte et \pycsp netværk opnår man et netværk, der nemt kan udvides hvis de fysiske rammer for slagteriet ændrer sig. Viser det sig f.eks at kameraet holder den samlede produktivitet af netværket tilbage, kan slagteriet tilføje endnu et kamera, 	og nemt udvide procesnetværket med endnu en kameraproces, som kan arbejde samtidigt med det første kamera. 
+Ved at benytte \pycsp til slagterieksemplet opnår man et modulært design, der nemt kan udvides hvis de fysiske rammer for slagteriet ændrer sig. Viser det sig f.eks at kameraet holder den samlede produktivitet af netværket tilbage, kan slagteriet, nemt tilføje endnu et kamera og udvide procesnetværket med endnu en kameraproces, som kan arbejde samtidigt med det første kamera. 
 
-Forskellen i kode mellem \code{greenlets} og \code{proces}-versionen, består af en linje, som indikerer hvilken version \pycsp skal bruge. En kørsel mellem de to versioner giver dog forskelligt resultat, som vist i \cref{tab:deadline-runs}. Dermed har valget af version betydning, både for andelen af griseobjekter, der kan nå at blive bearbejdet, og hvor lang tid det tager at køre testen. Dette skyldes, at testen køres på en multikerne CPU, hvor \code{proces}-versionen dermed har mulighed for at køre parallelt. \code{Greenelts}-versionen derimod er begrænset til kørsel af en proces, hvorfor der er flere grise der ikke når at blive bearbejdet inden for sin deadline.
+En kørsel af de tre eksisternede versioner giver et meget forskelligt resultat, som vist i \cref{tab:deadline-runs}. I denne tabel har vi foretaget en simulation af 100 grise. Denne simulation er kørt 10 gange, og tabellen viser gennemmsnittet og standardvariationen. Dermed har valget af version betydning, både for andelen af griseobjekter, der kan nå at blive bearbejdet, og hvor lang tid det tager at køre testen. Dette skyldes, at testen køres på en multikerne CPU, hvor \code{proces}-versionen dermed har mulighed for at køre parallelt. \code{Greenelts}-versionen derimod er begrænset til kørsel af en proces, hvorfor der er flere grise der ikke når at blive bearbejdet inden for sin deadline.
 
 \begin{table}[htbp]
 	\centering
@@ -69,9 +69,9 @@ Forskellen i kode mellem \code{greenlets} og \code{proces}-versionen, består af
        	\toprule
         \mc{Version}  &\mc{Succesrate (\%)}&\mc{Standard Afvigelse (SA)}\\
         \midrule
-        Greenlets & 54.6& 11.3 \\        
-        Processes(1 kerne) & &  \\
+        Processes(1 kerne) &100 & 0 \\
         Threads & 70 & 11\\
+        Greenlets & 54.6& 11.3 \\        
         RTP u. prioritet &41.1  &7.5 \\
         RTP m. prioritet & 40 & 7,6\\
         \bottomrule

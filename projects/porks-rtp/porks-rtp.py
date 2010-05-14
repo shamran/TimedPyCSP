@@ -1,25 +1,27 @@
 """ Configurable. Run once then poison channels. """
 from pycsp.deadline import *
 #from random import expovariate, uniform, seed
-import random, sys
-import heapq
-import scipy
+import random, sys, time , heapq, math, scipy
 
-mul = 0.5
-avg_convert_processing = 0.8*mul
-avg_camera_processing = 0.1*mul
-avg_analysis_processing = 0.5*mul
+
+avg_convert_processing = 0.66
+avg_camera_processing = 0.135
+avg_analysis_processing = 0.45
+
+cam_iter =   200000
+conv_iter = 1000000
+ana_iter =   700000
+dummy_iter = 100000
 std = 0.04
 
 avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*0.99
 
-time_to_camera_deadline = avg_camera_processing+max(avg_convert_processing,avg_analysis_processing)
-time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*1.3
-dummy_work = 0.09
+time_to_camera_deadline = avg_camera_processing+max(avg_convert_processing,avg_analysis_processing)*1
+time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*1.22
 
 
 pigs_to_simulate =  100
-number_of_simulations = 20
+number_of_simulations = 10
 
 class Pig:
   def __init__(self,_id, arrivaltime,ran,deadline = time_to_deadline):
@@ -40,18 +42,16 @@ class Pig:
     for x in self.wait : sun += x[1]
     return "%s\ttotal time inc queue : %0.3f, total processtime = %0.3f = %s"%(self.done,self.donetime-self.arrivaltime,sun, self.accum)
 
-def dummywork(stop_time):
+def dummywork(iterations):
     #Estimating Pi.
-    k = 0
     temp = 0
     import time    
-    if stop_time>0: time.sleep(stop_time-Now())
-    #while Now() < stop_time:
-    #     temp += (math.pow(-1,k)*4) / (2.0*k+1.0)
-    #     k +=1
+    for k in xrange(iterations):
+         temp += (math.pow(-1,k)*4) / (2.0*k+1.0)
+         k +=1
 
 @process
-def background_dummywork(dummy_in, time_out,work = dummy_work):
+def background_dummywork(dummy_in, time_out,work = dummy_iter):
     try:
         time_spent=0
         n = 0
@@ -59,11 +59,8 @@ def background_dummywork(dummy_in, time_out,work = dummy_work):
             time_spent +=work
             Alternation([{Timeout(seconds=0.005):None}, {dummy_in:None}]).select()    
             n+=1
-            #print "will do dummy_work : ",n
-            #yt=input()
-            dummywork(Now()+work)
+            dummywork(work)
     except ChannelPoisonException:
-        #print "time spent in dummy is ", time_spent
         time_out(time_spent)   
 
 @io
@@ -79,11 +76,10 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
     Set_deadline(NextpigArrival-Now())
     for x in xrange(pigs_to_simulate):
         try:
-            #if x % 20 == 0 : print "doing ",x
+            if x % 10 == 0 : print "\t\t",x
             pig = Pig(x,ThispigArrival,ran)
             robot(pig)
-            if pig.arrivaltime+time_to_camera_deadline-Now()>0:
-                #print "slack: ",pig.arrivaltime+time_to_deadline-Now()
+            if pig.arrivaltime+time_to_camera_deadline-Now()>0:               
                 camchannel = Channel()
                 conChannel = Channel()
                 feederChannel = Channel()
@@ -95,10 +91,10 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
                 Set_deadline((pig.arrivaltime+time_to_deadline)-Now(),ana)
                 Spawn(cam,conv,ana)
                 (-feederChannel)(pig)
-            #else: print "no slack !!"
+            else: print "no slack !!"
             Remove_deadline()
             ThispigArrival = NextpigArrival
-            NextpigArrival = NextpigArrival+ran.gauss(data, data*std)
+            NextpigArrival = ThispigArrival+ran.gauss(data, data*std)
             Set_deadline(NextpigArrival-Now())
             if ThispigArrival>Now() : sleep(ThispigArrival-Now())
         except DeadlineException:
@@ -106,6 +102,7 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
             Remove_deadline()
             NextpigArrival = NextpigArrival+ran.gauss(data, data*std)
             Set_deadline(NextpigArrival-Now())
+    #sleep(time_to_camera_deadline*2)    
     poison(robot)
     poison(dummy)
     
@@ -114,11 +111,11 @@ def cameraFunc(in0,out0,ran , data = avg_camera_processing):
     try:
         val0 = in0()                
         if Now() - val0.arrivaltime   < time_to_camera_deadline :
-            waittime = ran.gauss(data,data*std)
-            waits = "cam: ",waittime
+            #waittime = ran.gauss(data,data*std)
+            #waits = "cam: ",waittime
             val0.accum.append(Now()-val0.arrivaltime)
-            val0.wait.append(waits)
-            dummywork(waittime+Now())
+            #val0.wait.append(waits)
+            dummywork(cam_iter)
             out0(val0)
             Remove_deadline()
     except DeadlineException:
@@ -131,12 +128,12 @@ def convertFunc(in0,out0,ran , data = avg_convert_processing):
         val0 = in0() 
         if val0.deadline>Now():    
             Set_deadline(val0.deadline-Now())   
-            waittime = None
-            waittime = ran.gauss(data,std*data)                    
-            waits = "con: ",waittime
-            val0.wait.append(waits)
+            #waittime = None
+            #waittime = ran.gauss(data,std*data)                    
+            #waits = "con: ",waittime
+            #val0.wait.append(waits)
             val0.accum.append(Now()-val0.arrivaltime)
-            dummywork(waittime+Now())
+            dummywork(conv_iter)
             out0(val0)
             Remove_deadline()
     except DeadlineException:
@@ -152,11 +149,11 @@ def analysisFunc(in0,out0,ran , data = avg_analysis_processing):
         val0 = in0()
         if val0.deadline>Now():
             Set_deadline(val0.deadline-Now())
-            waittime = ran.gauss(data,std*data)                    
-            waits = "ana: ",waittime
+            #waittime = ran.gauss(data,std*data)                    
+            #waits = "ana: ",waittime
             val0.accum.append(Now()-val0.arrivaltime)
-            val0.wait.append(waits)
-            dummywork(waittime+Now())
+            #val0.wait.append(waits)
+            dummywork(ana_iter)
             out0(val0)
             Remove_deadline()
     except DeadlineException:
@@ -198,13 +195,12 @@ def robotFunc(feeder,analysis,ran, statC, data = time_to_deadline):
         #print "good = ",good,"bad =",bad, " = ",float(good)/(pigs_to_simulate)*100,"% (",normal,"/",pigs_to_simulate,") normal"
         statC(float(good)/(pigs_to_simulate))
 
-print "cam deadline:\t%3f\ndeadline:\t%3f"%(time_to_camera_deadline,time_to_deadline)
-print "avg procsessing time: ",avg_camera_processing+avg_convert_processing+avg_analysis_processing
 
 @process
 def Work(statC,timeC):
     start = Now()
     for x in range(number_of_simulations):
+        print x," / ", number_of_simulations
         ran = random.Random(x)
 
         robotC = Channel("robot")
@@ -214,9 +210,6 @@ def Work(statC,timeC):
         feed = feederFunc(-robotC,-analysisC, -dummyC, ran)
         rob = robotFunc(+robotC,+analysisC,ran,statC)
 
-        #Set_priority(10,feed)
-        #Set_priority(10,rob)
-
         try:
             Parallel(
             feed,
@@ -225,7 +218,6 @@ def Work(statC,timeC):
             )
         except DeadlineException:
             print  "fucking exception"       
-    #print "time to process: ", Now()-start,"sec"
     poison(statC, timeC)
     
 @process
@@ -233,14 +225,16 @@ def Statistic(statC):
     stc = []
     try:
         while True:
-            stc.append(statC())
+            stce = statC()
+            print stce
+            stc.append(stce)
             
     except ChannelPoisonException:
         print "number pigs processed in time:"
         #print stc
         #print "mean:  ",sum(stc, 0.0) / len(stc)
-        print "mean: %0.3f"%scipy.mean(stc) 
-        print "std variance : %0.3f\n"%scipy.std(stc)
+        print "mean: %0.2f"%scipy.mean(stc) 
+        print "std variance : %0.2f\n"%scipy.std(stc)
         
 @process
 def StatisticTime(statC):
@@ -265,3 +259,6 @@ Parallel(
     Statistic(+processeschan),
     StatisticTime(+timechan)
 )
+print "cam deadline:\t%3f\ndeadline:\t%3f"%(time_to_camera_deadline,time_to_deadline)
+print "avg procsessing time: ",avg_camera_processing+avg_convert_processing+avg_analysis_processing
+print "RTP version"
