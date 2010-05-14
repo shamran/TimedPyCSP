@@ -20,7 +20,7 @@ Vi har nu begrænset os til, at det kun er de processer der kan indgå i kommuni
 \begin{figure}
  \begin{center}
   \includegraphics[scale=1.00]{images/one-to-one-inheritance}
-\caption{Procesnetværk med en afsender og en modtager. Afsenderen har prioritet ti, mens modtageren har en initiel prioritet på fem. Modtageren  får via prioritetsnedarvning hævet sin prioritet til 10. (Højere er bedre)}
+\caption{Procesnetværk med en afsender og en modtager. Afsenderen har prioritet 10, mens modtageren har en initiel prioritet på fem. Modtageren  får via prioritetsnedarvning hævet sin prioritet til 10. (Højere er bedre)}
   \label{fig:one-to-one-inheritance}
   \end{center}
 \end{figure}
@@ -39,25 +39,28 @@ Når kommunikationen på kanalen er gennemført, befinder processens sig i en an
 Når det midlertidige afhængighedsforhold ophører skal processer der har arvet en prioritet miste denne. Der skal selvfølgelig tages højde for at en proces kan arve forskellige prioriteter fra forskellige andre processer, så det skal være muligt at falde tilbage til den næsthøjeste arvede prioritet, i stedet for blot at skifte tilbage til den oprindelige prioritet. 
 
 \subsubsection*{Prioritetsnedarvning i \code{alternations}}
-Vi har som nævnt en klar kæde af afhængigheder i \pycsp men vi skal være opmærksomme på ikke at højne processers prioritet unødigt. Dette kan let være tilfældet såfremt vi ikke holder ordentligt styr på hvorfor en proces har den prioritet den har, om den er sat af udvikleren eller den er nedarvet. Man kan forestille sig en situation hvor et uddrag af et proces-neværk består af en generator-forbruger model med to generatorer og en enkelt forbruger. De to generatorer er forbundet til forbrugeren vha. en \code{alternation} og generatorerne har henholdsvis høj og lav prioritet. Eksemplet er illustreret på \cref{fig:alt-inheritance}. Forbrugeren vil i dette scenarie arve den høje prioritet fra den tilsvarende generator, men utilsigtet vil den høje prioritet også propagere fra forbrugeren til generatoren med lav prioritet. Dette er ikke hensigtsmæssigt da de to generatorer nu har lige høj prioritet og ikke det forhold som udvikleren oprindeligt har angivet. Vi kan dog indse at dette ikke bliver et problem idet vi kun udfører prioritetsnedarvning i det tilfælde at der ikke er nogen processer der er er klar til at indgå i ønsket kommunikation. I det opstillede tilfælde vil forbrugeren derfor ikke foretage yderligere prioritetsnedarvning på generatoren med lav prioritet, da generatoren med høj prioritet altid vil være klar til at skrive i denne situation. 
+Vi har som nævnt en klar kæde af afhængigheder i \pycsp men vi skal være opmærksomme på ikke at højne processers prioritet unødigt. Dette kan let blive tilfældet såfremt vi ikke holder ordentligt styr på, hvorfor en proces har den prioritet, den har, om den er sat af udvikleren, eller den er nedarvet. Man kan forestille sig en situation, hvor et uddrag af et proces-neværk består af en generator-forbruger-model med to generatorer og en enkelt forbruger. De to generatorer er forbundet til forbrugeren vha. en \code{alternation}, og har henholdsvis høj og lav prioritet. Eksemplet er illustreret på \cref{fig:alt-inheritance}. Forbrugeren vil i dette scenarium arve den høje prioritet fra den tilsvarende generator, men utilsigtet vil den høje prioritet derefter også propagere fra forbrugeren til generatoren med lav prioritet. Dette er ikke hensigtsmæssigt, da de to generatorer nu har lige høj prioritet og ikke det forhold, som udvikleren oprindeligt har angivet. Vi kan dog indse, at dette ikke bliver et problem, idet vi kun udfører prioritetsnedarvning i det tilfælde, hvor der ikke er nogen processer, der er er klar til at indgå i ønsket kommunikation. I det opstillede tilfælde vil forbrugeren derfor ikke foretage yderligere prioritetsnedarvning på generatoren med lav prioritet, da generatoren med høj prioritet altid vil være klar til at skrive i denne situation. 
 
 \begin{figure}
  \begin{center}
   \includegraphics[scale=1.00]{images/alt-inheritance}
-  \caption{Prioritetsnedarvning i \code{alternations}}
+  \caption{Prioritetsnedarvning i \code{alternations.}}
   \label{fig:alt-inheritance}
   \end{center}
 \end{figure}
 
-
 \subsection{Tilknytning og overskridelse af deadlines}
-Som udgangspunkt skal vi kunne håndtere at en proces kan have forskellige typer deadlines. Umiddelbart giver det mening at der for hver proces tilknyttes en deadline samt hvilken type det er. Dette giver mulighed for at vi kan differentiere i måden hvorpå vi håndterer en overskreden deadline. F.eks. kan vi stoppe systemet helt i tilfælde af overskridelse af en kritisk deadline, kaste en exception ved en hard deadline og blot registrere overskridelser af soft deadlines. Uanset hvilken handling vi vælger at tilknytte til de respektive overskridelser, vil der være situationer hvor den valgte handling ikke er optimal. Vi har derfor valgt en anden løsning hvor en proces blot kaster en exception hvis den overskrider en deadline. Dette overflødiggør at der tilknyttes en specifik type deadline til en proces, da håndteringen af den kastede exception overgives til udvikleren. Det er herved op til den nekelte udvikler at definere hvad der skal ske i i hver enkelt proces såfremt den oplever en overskreden deadline. Dette giver den største frihed til at tilpasse håndteringen til den enkelte proces og applikation. 
+Som udgangspunkt skal vi kunne håndtere, at en proces kan have forskellige typer deadlines. Umiddelbart giver det mening, at der for hver proces tilknyttes en deadline samt hvilken type, det er. Dette giver mulighed for, at vi kan differentiere i den måde vi håndterer en overskreden deadline. F.eks. kan vi stoppe systemet helt i tilfælde af overskridelse af en kritisk deadline, kaste en exception ved en hard deadline og blot registrere overskridelser af soft deadlines. Uanset hvilken handling vi vælger at tilknytte til de respektive overskridelser, vil der altid være situationer, hvor den valgte handling ikke er optimal. 
+
+Vi har derfor valgt en anden løsning, hvor en proces blot kaster en exception, hvis den overskrider en deadline. Dette overflødiggør, at der tilknyttes en specifik type deadline til en proces, da håndteringen af den kastede exception overgives til udvikleren. Det er herved op til den enkelte udvikler at definere, hvad der skal ske i i hver enkelt proces, såfremt den oplever en overskreden deadline. Dette giver den største frihed til at tilpasse håndteringen til den enkelte proces og applikation. 
+\fxwarning{Dorte mener ikke vi svarer ordenligt på vores egne krav. Se kommentarer i print}
 
 \subsection{Udvælgelse i \code{alternations}}
-Som  beskrevet af \citeauthor{Burns1990}, opstår der en konflikt ved brugen af  prioriterede valg. ifh. til prioriteter på processer \cite{Burns1990}. De beskriver en kodestump som angivet i \cref{lst:pri-select}, hvor processernes prioritet er angivet som Pri1 og Pri2, og hvilken proces der udvælges afhænger af processernes indbyrdes forhold som angivet i \cref{tab:prioritizedSelect}.
+Som  beskrevet af \citeauthor{Burns1990} opstår der en konflikt ved brugen af  prioriterede valg. ifht. prioriteter på processer \cite{Burns1990}. De beskriver en eksempel, som vist i \cref{lst:pri-select}, hvor processernes prioritet er angivet som Pri1 og Pri2, og hvilken proces, der udvælges, afhænger af processernes indbyrdes forhold, som angivet i \cref{tab:prioritizedSelect}.
+\fxwarning{Hvad viser kodestumpen? problemet? løsningen? forklar problemet yderligere.}
 
 
-\begin{lstlisting}[firstnumber=1 ,float=hbtp, label=lst:pri-select, caption={(priority) select. Eksemplet er kopieret fra \cite{Burns1990}}]
+\begin{lstlisting}[firstnumber=1 ,float=hbtp, label=lst:pri-select, caption={(priority) select. Eksemplet er kopieret fra \cite[160]{Burns1990}}]
 (priority) select
    A1 -- Process P1
  or
@@ -79,11 +82,11 @@ Som  beskrevet af \citeauthor{Burns1990}, opstår der en konflikt ved brugen af 
     \label{tab:prioritizedSelect}
 \end{table}
 
-I \pycsp findes kun et prioriteret valg, og dermed kan vi se bort fra første række af \cref{tab:prioritizedSelect}, og konstatere at vi introducerer  en konflikt med introduktionen af prioriteter. For \citeauthor{Burns1990} er løsningen ``orthogonal solutions'', der  tager hånd om begge typer af prioriteter. De ønsker overordnet set to typer udvælgelsesmetoder, Weak- og Strong Select. Weak select sorterer primært ifh. til processernes prioritet og sekundært efter det prioriterede valg. Strong select udvælger udelukkende processer efter det prioriterede valg. De forestiller sig at weak select skal bruges som den primære metode, men i hjørnetilfælde skal en programmør have mulighed for at tvinge et prioriteret valg igennem.
+I \pycsp findes kun et prioriteret valg, og dermed kan vi se bort fra første række af \cref{tab:prioritizedSelect} og konstatere, at der opstår en konflikt ved introduktionen af prioriteter. For \citeauthor{Burns1990} er løsningen ``orthogonal solutions'', der håndterer begge typer prioriteter. De ønsker overordnet set to typer udvælgelsesmetoder, weak- og strong Select. Weak select sorterer primært efter processernes prioritet og sekundært efter det prioriterede valg. Strong select udvælger udelukkende processer efter det prioriterede valg. De forestiller sig, at weak select skal bruges som den primære metode, men i specielle tilfælde skal en udvikler have mulighed for at tvinge et prioriteret valg igennem.
 
-Vi ønsker at foretage udvælgelse i \code{alternations} udføres som weak select. Dvs at først skal der kigges der på om alternation kan vælge en guard umiddelbart. Hvis der er minimum en guard klar foretages der et prioriteret valg baseret på først processernes prioritet, og hvis flere processer har samme prioritet  foretages det prioriterede valg. Er ingen guards klar bør processen vente i dens alternation, og vælge den første guard der bliver klar, uden at skele til dens prioritet.
+Vi ønsker at udvælgelse i \code{alternations} udføres som weak select. Dvs. at først skal der kigges på, om \code{alternation} kan vælge en guard umiddelbart. Hvis der er minimum en guard klar, foretages der et prioriteret valg baseret på processernes prioritet. Hvis flere processer har samme prioritet foretages det prioriterede valg. Er ingen guards klar, bør processen vente i dens \code{alternation}, og vælge den første guard, der bliver klar, uden hensyn til dens prioritet.
 
-I artiklen fra \citeauthor{Burns1990} udvælger man en proces blandt flere mulige, mens en \code{alternation} udvælger en kanal der i \pycsp er af typen any-to-any. Dette medfører at man ikke  foretager et valg mellem processer, men foretager et valg mellem kanaler, som processen kommunikerer med. For at foretage en weak selection i vores \code{alternation}, skal man derfor kunne finde prioriteten for kanalerne. Dette skaber derfor et behov for at kunne tilknytte en prioritet til hver kanal, baseret på hvilke processer der er tilknyttet kanalen. 
+I artiklen fra \citeauthor{Burns1990} udvælger man en proces blandt flere mulige, mens en \code{alternation} udvælger en kanal, der i \pycsp er af typen any-to-any. Dette medfører, at man ikke  foretager et valg mellem processer, men foretager et valg mellem kanaler, som processen kommunikerer med. For at foretage en weak selection i vores \code{alternation}, skal man derfor kunne finde prioriteten for kanalerne. Dette skaber et behov for at kunne tilknytte en prioritet til hver kanal baseret på hvilke processer, der er tilknyttet kanalen. 
 \phantomsection
 \label{misc:kanal-prioritet}
 
