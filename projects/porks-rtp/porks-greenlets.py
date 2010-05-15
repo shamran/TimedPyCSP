@@ -11,17 +11,17 @@ avg_analysis_processing = 0.45
 cam_iter =   200000
 conv_iter = 1000000
 ana_iter =   700000
-dummy_iter = 100000
-std = 0.04
-concurrent = 2
-avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*(0.99/concurrent)
+dummy_iter = 50000
+std = 0.2
+concurrent = 1.0
+avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)/concurrent
 
-time_to_camera_deadline = avg_camera_processing*1.6
+time_to_camera_deadline = (avg_camera_processing+avg_convert_processing)*1.3
 time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*(1.22*concurrent)
 
 
-pigs_to_simulate =  100
-number_of_simulations = 10
+pigs_to_simulate =  20
+number_of_simulations = 5
 
 class Pig:
   def __init__(self,_id, arrivaltime,ran,deadline = time_to_deadline):
@@ -51,18 +51,28 @@ def dummywork(iterations):
          k +=1
 
 @process
-def background_dummywork(dummy_in, time_out,work = dummy_iter):
-    try:
-        time_spent=0
-        n = 0
-        while True:
-            Alternation([{Timeout(seconds=0.005):None}, {dummy_in:None}]).select()    
-            n+=1
-            time_spent -= time.time()
-            dummywork(work)
-            time_spent += time.time()
-    except ChannelPoisonException:
-        time_out(time_spent)   
+def background_dummywork(dummy, time_out):
+    @process
+    def internal_dummy(_id,dummy_in, dummy_out,time_out,work = dummy_iter):
+        try:
+            time_spent=0
+            n = 0
+            if _id == 0: dummy_out(time_spent)
+            while True:
+                time_spent = dummy_in()
+                n+=1
+                #print "spending time in dummy"
+                time_spent -= time.time()
+                dummywork(work)
+                time_spent += time.time()
+                dummy_out(time_spent)
+        except ChannelPoisonException:
+            poison(dummy_in,dummy_out)
+            if _id == 0: time_out(time_spent)
+
+    dummyC = Channel()   
+    Parallel(internal_dummy(0,+dummy,-dummyC,time_out),
+      internal_dummy(1,+dummyC,-dummy,time_out))
 
 @io
 def sleep(n):
@@ -94,7 +104,7 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
         ThispigArrival = NextpigArrival
         NextpigArrival = ThispigArrival+ran.gauss(data, data*std)
         if ThispigArrival>time.time() : sleep(ThispigArrival-time.time())
-    #sleep(time_to_camera_deadline*1.2)       
+    #sleep(time_to_deadline*1.2)       
     poison(robot)
     poison(dummy)
     
@@ -188,9 +198,9 @@ def Work(statC,timeC):
         rob = robotFunc(+robotC,+analysisC,ran,statC)
 
         Parallel(
+            3*background_dummywork(dummyC,timeC),
             feed,
-            rob,
-            1*background_dummywork(+dummyC,timeC)
+            rob            
         )          
     poison(statC, timeC)
 
@@ -200,7 +210,7 @@ def Statistic(statC):
     try:
         while True:
             stce = statC()
-            print stce
+            #print "pct good: ",stce
             stc.append(stce)
             
     except ChannelPoisonException:
@@ -215,7 +225,9 @@ def StatisticTime(statC):
     stc = []
     try:
         while True:
-            stc.append(statC())
+            stac = statC()
+            #print "time spent: ",stac
+            stc.append(stac)
             
     except ChannelPoisonException:
         print "Time spent in dummy:"        
