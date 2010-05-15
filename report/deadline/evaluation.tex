@@ -1,59 +1,59 @@
 \section{Evaluering}
-%\subsection{Test af Korrekthed}
-%Vi har som i \des løbende skrevet test før vi implementerede hver ny funktion i \code{RTP}-versionen.  Tabellen herunder viser testresultaterne for de test der er lavet specifikt for \code{RTP}-versionen.
-%\begin{longtable}{lr}
-%   	\toprule
-%    \mc{Test} & \mc{Resultat} \\
-%    \midrule
-%    \endfirsthead 
-%    \toprule
-%    \mc{Test} & \mc{Resultat} \\
-%    \midrule
-%    \endhead % slut efterfølgende headere
-%    \bottomrule
-%    \multicolumn{2}{r}{\textit{fortsættes}}
-%    \endfoot % slut footer
-%    \bottomrule
-%    \endlastfoot % slut sidste footer
-%test\_Alternation  & ok\\
-%test\_AlternationChoiseReader  & ok \\
-%test\_AlternationChoiseWriter  & ok \\
-%test\_AlternationExecuteReadDeadline  & ok\\
-%test\_AlternationExecuteSkipDeadline  & ok\\
-%test\_AlternationExecuteTimeoutDeadline  & ok \\
-%test\_AlternationExecuteWriteDeadline  & ok \\
-%test\_Alternationchoise1Deadline  & ok \\
-%test\_Alternationchoise2Deadline  & ok \\
-%test\_ChoisemultipleReader  & ok \\
-%test\_ChoisemultipleReader2  & ok \\
-%test\_ChoisemultipleWriter  & ok\\
-%test\_PoisonAndDeadline1  & ok\\
-%test\_PoisonAndDeadline2  & ok\\
-%test\_Reader\_Inheritance  & ok\\
-%test\_RetireAndDeadline  & ok\\
-%test\_Writer\_Inheritance  & ok\\
-%test\_channelpriority\_from\_low\_deadline  & ok\\
-%test\_channelpriority\_from\_low\_deadline2  & ok\\
-%test\_channelpriority\_from\_no\_deadline  & ok\\
-%test\_channelpriority\_from\_no\_deadline2  & ok\\
-%test\_readDeadline  &ok\\
-%test\_writeDeadline  & ok\\
-%test\_xreset\_inheritance  & ok\\
-%test\_xreset\_inheritance\_from\_two\_step  & FAIL\\
-%\end{longtable}
+\subsection{Test af Korrekthed}
+Vi har som i \des \fxnote{mangler henvisning} løbende skrevet tests, før vi implementerede hver ny funktion i \code{RTP}-versionen.  Tabellen herunder viser testresultaterne for de tests der er lavet specifikt for \code{RTP}-versionen.
+\begin{longtable}{lr}
+   	\toprule
+    \mc{Test} & \mc{Resultat} \\
+    \midrule
+    \endfirsthead 
+    \toprule
+    \mc{Test} & \mc{Resultat} \\
+    \midrule
+    \endhead % slut efterfølgende headere
+    \bottomrule
+    \multicolumn{2}{r}{\textit{fortsættes}}
+    \endfoot % slut footer
+    \bottomrule
+    \endlastfoot % slut sidste footer
+test\_Alternation  & ok\\
+test\_AlternationChoiseReader  & ok \\
+test\_AlternationChoiseWriter  & ok \\
+test\_AlternationExecuteReadDeadline  & ok\\
+test\_AlternationExecuteSkipDeadline  & ok\\
+test\_AlternationExecuteTimeoutDeadline  & ok \\
+test\_AlternationExecuteWriteDeadline  & ok \\
+test\_Alternationchoise1Deadline  & ok \\
+test\_Alternationchoise2Deadline  & ok \\
+test\_ChoisemultipleReader  & ok \\
+test\_ChoisemultipleReader2  & ok \\
+test\_ChoisemultipleWriter  & ok\\
+test\_PoisonAndDeadline1  & ok\\
+test\_PoisonAndDeadline2  & ok\\
+test\_Reader\_Inheritance  & ok\\
+test\_RetireAndDeadline  & ok\\
+test\_Writer\_Inheritance  & ok\\
+test\_channelpriority\_from\_low\_deadline  & ok\\
+test\_channelpriority\_from\_low\_deadline2  & ok\\
+test\_channelpriority\_from\_no\_deadline  & ok\\
+test\_channelpriority\_from\_no\_deadline2  & ok\\
+test\_readDeadline  &ok\\
+test\_writeDeadline  & ok\\
+test\_xreset\_inheritance  & ok\\
+test\_xreset\_inheritance\_from\_two\_step  & FAIL\\
+\end{longtable}
 
 
-% Alle test med en undtagelse fungerer korrekt. Testen der fejler hedder test"_xreset"_inheritance"_from"_two"_step, og viser en situation hvor den samme proces får løftets sin prioritet to gange i træk, først med en høj prioritet, og efterfølgende med en mellemprioritet. Efterfølgende skal processen sænke sin prioritet, først til  mellemprioriteten og tilslut til sin originale prioritet. Her viser det sig vi har lavet en fejl i implementeringen, således at prioriteten ikke bliver nedsat til mellemprioriteten. \CRef{fig:priority-inheritance} viser prioriteten mens processen bliver op- og nedprioriteret. Tiden har ikke tilladt os at løse problemet, men  kan løses ved at kræve at, når en proces opprioriteres gemmes hvilken proces der står bag, så når en proces ønsker at fjerne sin opprioritering fra andre processer er det kun sin egen  prioritet den fjerner.  
-% 
-%  
-%\begin{figure}
-% \begin{center}
-%  \includegraphics[scale=1]{images/priority-inheritance}
-%	\caption{Figuren viser hhv. forventet og faktisk prioritetsarvning. Der hvor den faktiske og forventede opførsel adskiller sig er forventet den fuldt optrukne streg, mens den stiplede streg er den faktiske opførsel.}
-%	\label{fig:priority-inheritance}
-%\end{center}
-%\end{figure}
-%  
+ Alle tests undtagen en fungerer korrekt. Testen, der fejler hedder test"_xreset"_inheritance"_from"_two"_step og viser en situation, hvor den samme proces får løftet sin prioritet to gange i træk, først med en høj prioritet og efterfølgende med en mellemprioritet. Efterfølgende skal processen sænke sin prioritet, først til  mellemprioriteten og til slut til sin originale prioritet. Her viser det sig, at vi har lavet en fejl i implementeringen, således at prioriteten ikke bliver nedsat til mellemprioriteten. \CRef{fig:priority-inheritance} viser prioriteten, mens processen bliver op- og nedprioriteret. Tiden har ikke tilladt os at løse problemet, men det kan løses ved at kræve, at når en proces opprioriteres, gemmes oplysningen om, hvilken proces der står bag, så når en proces ønsker at fjerne sin opprioritering fra andre processer, er det kun sin egen  prioritet, den fjerner.  
+ 
+  
+\begin{figure}
+ \begin{center}
+  \includegraphics[scale=1]{images/priority-inheritance}
+	\caption{Figuren viser hhv. forventet og faktisk prioritetsarvning. Der hvor den faktiske og forventede opførsel adskiller sig er forventet den fuldt optrukne streg, mens den stiplede streg er den faktiske opførsel.}
+	\label{fig:priority-inheritance}
+\end{center}
+\end{figure}
+  
 
 \subsection{Slagterieksempel}
 
