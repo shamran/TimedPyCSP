@@ -65,6 +65,8 @@ En kørsel af de tre eksisterende versioner giver et meget forskelligt resultat,
 
 \code{Proces}-versionen er ikke som forventet bedre en de andre versioner til at bearbejde griseobjekterne rettidigt. Dette skyldes at testen er gennemført på en maskine, med kun en kerne.  Dermed kan \code{process}-versionen ikke drage nytte  af flere kerner, men er begrænset til kun at kunne køre en proces af gangen. I \code{process}-versionen, skal konktekstskiftene foregår i operativsystemets \sched~ der er væsentligt langsommere end i \code{greenlets} og \code{RTP}-versionen hvor konktekstskiftene sker i vores \sched. 
 
+
+Efter at vi har afsluttet RTP har vi i forbindelse med \is, implementeret muligheden for at tilknytte prioriteter. Vi har for at vise effekten af prioriter inkluderet dem i vores tabeller, men vil ikke komme nærmere ind på dem da de ikke er blevet  nærmere behandlet\fxnote{bahh... hvda skal der stå her}\fxerror{Jeg har slet ikke snakket om prioritet!}
 \begin{table}[htbp]
 	\centering
 	\begin{tabular}{lcc}
@@ -130,23 +132,46 @@ Efter at have implementeret \code{RTP}-versionen, og implementeret vores eksempe
 
 Med udgangspunkt i at eksemplet ikke er optimalt til at vise vores løsning, ønsker vi at ændre eksemplet, for at se hvordan \code{RTP}-versionen bruges, hvis ikke alle processerne har en deadline. Vi har udvidet slagterieksemplet med en ekstra proces. Denne dummyproces har ingen deadline, og kører i en fast løkke, der estimerer $\pi$. Formålet med processen er at simulere et arbejde der også ønskes udført, men som ikke er tidskritisk. Når \code{greenlets}-versionen udvælger hvilke processer der skal køres, gøres det tilfældigt, hvorfor processen uden deadline kan risikere at blokere for at de tidskritiske processer. I \code{RTP}-versionen bør tiden vi spendere i  dummyproces til gengæld begrænses, når der er tidskritiske processer der skal bearbejdes.
 
+Ved at introducere en dummyprocessen, oplevde vi til en start at \code{greenlets}-versionen, ikke blev færdig, men befandt sig i en  livelock. Grunden til dette skyldtes  en blanding af vores implementering af dummyprocessen, og implementeringen af \code{greenlets}-versionen. Som det ses af \cref{dummy1}, bruger vi en \code{alternation} for midlertidigt at afgive kontrollen så den senere kunne genplanlægges, samt at detektere en hvornår vi skal slutte da kanalen så vil være blevet forgiftet.
+Denne løsning placere processen på \code{timers}listen, men da \sched en foretrækker at planlægge processer fra denne liste frem for \code{next}-listen, og dummyprocessen altid er klar til at blive udvalgt vil det kun være dummyprocessen der bliver bearbejdet. Det samme problem gør sig ikke gældene i \code{RTP}-versionen, da processer i \code{timers}-listen bliver planlagt på lige fod med alle andre processer.
+
+\begin{lstlisting}[firstnumber=1,float=hbtp, label=dummy1, caption=Uddrag af Dummyproces]
+while True:
+    Alternation([{Timeout(seconds=0.005):None}, {dummy_in:None}]).select()
+    time_spent -= time.time()
+    dummywork(work)
+    time_spent += time.time()          
+\end{lstlisting}
+
+For ikke unødigt at give vores version en fordel har vi valgt at ændre dummyprocessen, så også \code{greenlets}-versionen kan blive færdig. Vi har ikke mulighed for i \code{greenlets}-versionen at lade en proces blive placeret på \code{next}-list. Den eneste måde for en proces at være på denne liste er efter at have kommunikeret. Vi ændre derfor dummyprocessen til et dummynetværk bestående af to processer som vist i \cref{dummy2}.
+
+\begin{lstlisting}[firstnumber=1 ,float=hbtp, label=dummy2, caption=Uddrag Dummynetværk]
+while True:
+    time_spent = dummy_in()
+    time_spent -= time.time()
+    dummywork(work)
+    time_spent += time.time()
+    dummy_out(time_spent)  
+\end{lstlisting}
+
+I dette netværk findes der to dummyprocesser der skiftes til at sende hinanden den akkumulere tid de har været aktive. fordi de efter hver periode sender den akkumulere tid, bliver de hele tid lagt på \code{next}-listen, og indgår dermed på lige fod med alle andre processer der ønsker at blive aktiveret.
+
 \begin{table}[htbp]
 	\centering
 	\begin{tabular}{lllll}
        	\toprule
         \mc{Version}&\mc{Tid i dummyproces(s)}&\mc{SA.}& \mc{Succesrate (\%)}&\mc{SA.}\\
         \midrule
-        Greenlets &24,853& 0.345 & 2.2&1.3 \\
-
-        RTP &5.728& 0.296 & 23.2&2.4 \\
-        RTP med Prioritet &1.46&0.276&34.1&7.2\\
+        Greenlets         & 1.29 & 0.61 & 13 & 2  \\
+        RTP               & 1.05 & 0.28 & 24 & 6  \\
+        RTP med Prioritet & 0.74 & 0.34 & 42 & 13 \\
         \bottomrule
     \end{tabular}
-	\caption[]{20 * 100 grise køres igennem procesnetværket. Desuden er der tilknyttet en dummyproces, uden en deadline, der hele tiden ønsker at arbejde. For hver kørsel udregnes hvor meget kørselstid dummyprocessen har kørt, samt antallet af grise der bliver rettidigt bearbejdet.}\\
+	\caption[]{10 * 100 grise køres igennem procesnetværket. Desuden er der tilknyttet en dummyproces, uden en deadline, der hele tiden ønsker at arbejde. For hver kørsel udregnes hvor meget kørselstid dummyprocessen har kørt, samt antallet af grise der bliver rettidigt bearbejdet.}\\
 	\label{tab:dummy-run}
 \end{table}
 
 \CRef{tab:dummy-run} viser den gennemsnitlige tid hver version har brugt i dummyprocessen, samt hvor mange grise der er blevet bearbejdet rettidigt. 
-Som det ses bruges der væsentligt mindre tid i dummyfunktionen i \code{RTP}-versionen end i \code{Greenlets}-versionen. Dette medfører at antal grise der rettidigt bliver bearbejdet er højere i \code{RTP}-versionen. Denne test viser dermed at \code{RTP}-versionen formår at udvælge de tidskritiske processer på bekostning af processer uden deadline, og at denne udvælgelse medfører en øget succesrate på trods af den øgede kompleksitet i \code{RTP}-versionen.
+Som det ses bruges der mindre tid i dummyfunktionen i \code{RTP}-versionen end i \code{greenlets}-versionen. Dette medfører at antal grise der rettidigt bliver bearbejdet er højere i \code{RTP}-versionen. Denne test viser dermed at \code{RTP}-versionen formår at udvælge de tidskritiske processer på bekostning af processer uden deadline, og at denne udvælgelse medfører en øget succesrate på trods af den øgede kompleksitet i \code{RTP}-versionen.
 
-\fxerror{Jeg har slet ikke snakket om prioritet!}
+

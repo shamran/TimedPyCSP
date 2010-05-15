@@ -1,16 +1,10 @@
-\section{Konklusion}
-Vi har i dette kapitel beskrevet RTP og sat det i kontekst med \pycsp. Vi har præsenteret flere skemaplanlægningsalgoritmer og ud fra krav og muligheder valgt EDF. Denne algoritme, samt prioritetsnedarvning er blevet implementeret i \pycsp og og vi har vist brugen med et eksempel inspireret, der er inspireret af en reel problemstilling på et slagteri. 
+\section{Opsummering}
+Vi har i dette kapitel beskrevet RTP og sat det i kontekst med \pycsp. Vi har set på forskellige typer af deadlines, præsenteret flere skemaplanlægningsalgoritmer og ud fra krav og muligheder valgt EDF. 
 
-Eksemplet er implementeret på tre forskellige måder for derved bedst at kunne vise styrker og svagheder ved vores implementation. Vi kan konkludere at 
+Denne algoritme er blevet implementeret i \pycsp. Desuden har vi implementeret prioritetsnedarvning, og intelligent udvælgelse af hvilke processer der først skal kommunikere hvis der er flere processer med forskellig deadline tilknyttet den  samme kanal. \code{RTP}-versionen kræver kun en tilføjelsen af tre strukturer. \code{Now, Wait} og \code{DeadlineException} til \pycsp. Vi mener derfor det er simpelt for en udvikler der allerede kender \pycsp at bruge vore udvidelse.
 
-baggrund, teori
+Vi har med vist brugen med et eksempel,  der er inspireret af en reel problemstilling på et slagteri. Eksemplet er implementeret både ved hjælp af de eksisterende versioner af \pycsp  samt vores udviklede metode for derved bedst at kunne vise styrker og svagheder ved vores implementering. Vi kan konkludere at vi i dette eksempel ikke levere nævneværdigt bedre resultater end de eksisterende versioner. Dette mener vi kan føres tilbage til at eksemplet ikke er velvalgt, men vi har modelleret det for simpelt med for få processer. 
 
-viden: hvornår, hvor længe, prioritet
-
-
-problemer : prioritetsinvertering, udvælgelse
-
-slagterieksempel
 
 
 

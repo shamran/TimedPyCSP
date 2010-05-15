@@ -89,7 +89,7 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
     Set_deadline(NextpigArrival-Now())
     for x in xrange(pigs_to_simulate):
         try:
-            if x % 10 == 0 : print "\t\t",x
+            #if x % 10 == 0 : print "\t\t",x
             pig = Pig(x,ThispigArrival,ran)
             robot(pig)
             if pig.arrivaltime+time_to_camera_deadline-Now()>0:               

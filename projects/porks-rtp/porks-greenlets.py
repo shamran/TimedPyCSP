@@ -55,15 +55,12 @@ def background_dummywork(dummy, time_out):
     @process
     def internal_dummy(_id,dummy_in, dummy_out,time_out,work = dummy_iter):
         try:
-            time_spent=0
-            n = 0
+            time_spent = 0
             if _id == 0: dummy_out(time_spent)
             while True:
                 time_spent = dummy_in()
-                n+=1
-                #print "spending time in dummy"
                 time_spent -= time.time()
-                dummywork(work)
+                3*dummywork(work)
                 time_spent += time.time()
                 dummy_out(time_spent)
         except ChannelPoisonException:
@@ -85,7 +82,7 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
     NextpigArrival = time.time()+ran.gauss(data, data*std)
     ThispigArrival = time.time()
     for x in xrange(pigs_to_simulate):
-        if x % 10 == 0 : print "\t\t",x
+        #if x % 10 == 0 : print "\t\t",x
         pig = Pig(x,ThispigArrival,ran)
         robot(pig)
         if pig.arrivaltime+time_to_camera_deadline-time.time()>0:
@@ -198,7 +195,7 @@ def Work(statC,timeC):
         rob = robotFunc(+robotC,+analysisC,ran,statC)
 
         Parallel(
-            3*background_dummywork(dummyC,timeC),
+            1*background_dummywork(dummyC,timeC),
             feed,
             rob            
         )          
