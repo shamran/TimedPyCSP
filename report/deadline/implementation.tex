@@ -13,7 +13,7 @@ Vi har valgt, at der i vores system skal kaldes en exception, hvis en deadline o
 I en fremtidig version ville man kunne udvide muligheden med en hybridversion, der skulle kunne håndtere processer med soft deadlines, der skal markeres, og kalde exceptions ved processer med hard deadline. Processen kunne f.eks have tilknyttet dens type af deadline. Systemet kan så reagere passende efter typen af deadlines, så soft deadlines blev færdigbehandlet, mens hard deadlines resulterede i en exception.
 
 
-\subsubsection{Ændringer i \sched en}
+\subsection{Ændringer i \sched en}
 \phantomsection
 \label{sec:sched-changes}
 I \code{greenlets} versionen af \sched en findes der som nævnt i \cref{sec:scheduler} tre lister af processer: \code{new}, \code{next} og \code{timers}. De tre lister er prioriteret således, at der først kigges på processer fra \code{timers}, dernæst fra \code{new} og til sidst kigges der i \code{Next}.
@@ -29,7 +29,7 @@ Vi kan derfor blot benytte en proces' deadline som dens prioritet og benytte en 
 
 %Hvis man i en fremtidig version ønsker at udvide vores \sched , så en udvikler kan tilknytte bruger-prioriteter til proceserne, kan det f.eks implementeres ved efterfølgende at ændre \sched ens prioritet. Dette vil resultere i at processen bliver opprioriteret ifh. til andre processer.
 
-\subsubsection{Preempting}
+\subsection{Preempting}
 
 Som vi har beskrevet i \cref{sec:rtp-pycsp}, kan  man risikere, at en proces med lav prioritet proces og kørselstid kan blokere for en proces med høj prioritet. 
 Her konkluderede vi at det er udviklerens opgave at processen afgiver kontrol, og derfor skal det være nemt at afgive kontrollen for processen. Til dette har vi lavet funktionen \code{Release()}, der minder om \code{Yield} for \code{co-rutiner}.
@@ -38,7 +38,7 @@ Implementeringen er meget simpel og er blot en wrapperfunktion, da den underligg
 
 Problemet ved denne tvungne procesafgivelse er, at det kan tage lang tid at lægge processerne i en min\_hob, som vil være spildt, hvis den alligevel med det samme fjernes fra køen. Man vil derfor nok i en senere version kunne optimere hastigheden af \code{Release()}.
 
-\subsubsection{Udvidelse af \code{Process}}
+\subsection{Udvidelse af \code{Process}}
 \fxwarning{Dette afsnit er generelt uklart formuleret, bl.a. brug af prioritet/deadline, ``kunstig'' og som helhed.}
 Hver proces skal have mulighed for at få tilknyttet en deadline, og desuden skal det være muligt i forbindelse med prioritetsnedarvning midlertidigt at ændre dens prioritet til en kunstig prioritet.
 
@@ -76,7 +76,7 @@ Vi har valgt at udvide procesmodellen med variablen \code{deadline}, der indehol
 
 Når \sched en placerer processen i sin hob, bruges blot den mindste prioritet i listen ihht. vores implementering af \sched en. Dette medfører, at når en proces efterfølgende  får ændret i sin liste af prioriteter, skal processen genplanlægges for at sikre, at den placeres korrekt i min-hoben i \sched en. 
 
-\subsubsection*{Kanaler}
+\subsection{Kanaler}
 I \pycsp findes der kun kanaler af type \code{Any-To-Any}, og derfor kan der altid  være et vilkårligt antal kanalender i hver ende af kanalen, der kan være klar til at kommunikere. Vi skal derfor foretage en ændring, så kommunikationen mellem kanalenderne altid foregår mellem de højst prioriterede processer. 
 
 I greenletsversionen foregår udvælgelsen af kanalender til kommunikation ved hjælp af funktionen \code{match}, der udnytter at  hver kanal vedligeholder to lister af processer for hhv. de processer, der ønsker at sende, og modtage data på kanalen. Når en proces eks. ønsker at modtage data, tilføjer den sig selv til listen af processer, der ønsker at modtage, og prøver derefter i \code{match} funktionen at finde en proces, der vil sende data. Er der ingen processer, der venter på at sende data, venter processen på, at en proces melder sig klar til at sende data, ved at kalde \code{match}. Til hver vellykket kommunikation af data vil \code{match} altid blive kaldt to gange, hvor kun den sidste vil resultere i at kommunikationen lykkes.
@@ -96,14 +96,14 @@ def match(self):
 
 Funktionen \code{match} vil blive kaldt en gang for hver proces der ønsker at kommunikere, og derfor vil det kun være det sidste element i listen som ikke er sorteret korrekt ved hver kald af \code{match}. Desuden vil der altid i den ene liste maksimalt være et element der er aktiv, hvorfor den ene liste højst sandsynlig vil være kort, og kørselstiden for de to sorteringer vil derfor være lille. Bemærk desuden at listerne er sorteret så værdien af den interne prioritet er stigende, og derfor er det processen med lavest værdi, der først bliver udvalgt til et match, i overensstemmelse med repræsentationen af prioriteter som nævnt i afsnittet ``Ændringer i \sched en'' \vpageref{sec:sched-changes}.
 
-\subsubsection*{\code{Alternation}}
+\subsection{\code{Alternation}}
 
 Som nævnt i afsnit \cref{misc:kanal-prioritet} har vi behov for at kunne tilknytte en prioritet til en kanal for at kunne håndtere udvælgelse i \code{alternations}. Vi har allerede prioriteter for processer og ønsker, at kanalernes prioritet skal defineres på baggrund af hvilke processer, der er tilknyttet kanalen. Vi skal kunne håndtere både input- og output-guards og ønsker seperate prioriteter for disse. Vi tilknytter derfor to prioriteter til hver kanal. De to prioriteter er sat som  de højst prioriterede processer, der er klar til at hhv. modtage og sende data. En kanals prioritet er derfor ikke fast som for processerne, hvor de får sat en prioritet (der dog kan ændres med prioritetsnedarvning), men nærmere en emuleret prioritet, som ændre sig baseret på alle processernes tilstand. 
 
 Til at implementere de to prioriteter introduceres  to hjælpefunktioner, der løber hhv. \code{readqueue} og \code{writequeue} igennem og  finder den højst prioriterede proces, der er villig til hhv. at sende og modtage data. Når  \code{alternation} ønsker at finde prioriteten for en kanal, kigger den på om kanalen i \code{alternation} er tilknyttet en output- eller inputguard og finder den korrekte prioritet.
 
 
-\subsubsection*{Prioritetsnedarvning}
+\subsection{Prioritetsnedarvning}
 Prioritet i et RTP system skal ses i forhold til alle processers prioritet. En proces kan derfor ikke i sig selv have en absolut høj prioritet, men kun have høj prioritet ifht. de andre processers prioritet. Ved at give en høj prioritet til  en proces, vil dette dermed  indirekte sænke de andre processers prioritet, et fænomen vi vil kalde ``prioritetsdevaluering``.
 
 For at minimere prioritetsdevaluering i forbindelse med prioritetsnedarvning, ønsker vi at minimere den tid en proces har en kunstigt høj prioritet, og at minimere antallet af processer, hvis prioritet øges. 
