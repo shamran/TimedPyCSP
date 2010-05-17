@@ -44,11 +44,23 @@ Som vi beskrev i \des introducerede vi de to globale funktioner \code{Now} og \c
 For at benytte realtid i forhold til diskret tid bruger vi pythons \code{time} modul. Genimplementering består derfor kun i at ændre funktionen \code{Now} til at bede \code{time}-modulet om tiden i stedet for \sched en.
 
 \subsubsection{Prioriteter}
-I computerspilseksemplet, har processerne forskellige prioritet dikteret af udvikleren. Derfor skal vi finde en metode, til at udvide RTP således at det kan håndtere processer hvor udvikleren også kan tilknytte en prioritet. Denne udvikler-prioritet er ikke det samme som den prioritet der allerede findes i RTP eksemplet, da denne prioritet er beregnet af \sched en.
+I computerspilseksemplet, har processerne forskellige prioritet dikteret af udvikleren. 
+Denne prioritet er ikke det samme som den prioritet der allerede findes i RTP eksemplet, da denne prioritet er beregnet af \sched en. For at adskille dem vil vi kalde prioriteterne der er angivet af udvikleren direkte for udvikler-prioritet. Vi skal udvide RTP således at det kan håndtere processer, der både kan have deadlines og udvikler"-prioriteter tilknyttet. 
 
-I RTP versionen er \sched en baseret på EDF, som kun tager hensyn til processernes deadline når der beregnes prioriteter. Vi skal dermed bruge en anden skemaplanlægningsalgoritme, for også at kunne håndtere at udvikleren skal kunne definere prioriteter. I implementeringen af \sched en i \code{RTP}-versionen, konverteres deadlines til prioritetet. Vi behøver derfor ikke bruge en helt ny skemaplanlægningsalgoritme, men kan udvide EDF, så den også kan planlægge processer hvor udvikleren definere en prioritet.
 
-For at udvide \sched en skal vi definere den indbyrdes relation mellem deadlines og udvikler-prioriteter. Baseret på eksemplet kan vi se at udvikler"-prioriteterne, der er tilknyttet en af processerne skal gå forud for de processer der blot har tilknyttet en deadlines. Vi kan dermed bruge den samme 
+Først skal det fastlægges i hvilket interval prioriteter  man kan defineres. Vi ønsker ikke at begrænse udvikleren ved at have for få prioriteter, men omvendt reduceres \sched ens  mulighed for at udvælge processer hvis hver proces har sin egen unikke prioritet. Hvis en udvikler kan vælge mellem et stort antal prioriteter risikere man også at introducere en prioritetsskrue. Hvor udvikleren flere gange undervejs i udviklingen af et program øger den maksimale prioritet. Dermed risikere man at udvande prioriteterne for den enkelte proces.  Der skal derfor være en maksimal prioritet, og intervallet man kan angive prioriteter i, må ikke være så stort at processerne for unikke prioriteter.
+
+Præcis i hvor stort interval man skal kunne angive prioritet, kræver dog en bredere analyse af flere projekter, og vi vil derfor begrænse os til at lave et foreløbigt interval på ti, man senere nemt vil kunne ændre baseret på en bedre analyse.
+
+
+I RTP versionen er \sched en en EDF algoritme, som kun planlægger procsserne på basis af deres deadline. Vi kan derfor ikke bruge den samme skemaplanlægningsalgoritme. I implementeringen af \sched en i \code{RTP}-versionen, konverteres deadlines til prioriteter. Hvis vi kan sammenholde disse prioriteter med udvikler"-prioriteterne behøver vi  ikke designe en helt ny skemaplanlægningsalgoritme, men kan udvide den eksisterende EDF algoritme, så den både kan håndtere deadlines og udvikler"-prioritet når den udvælger processer der skal aktiveres.
+
+For at udvide \sched en skal vi definere den indbyrdes relation mellem deadlines og udvikler"-prioriteter. Baseret på eksemplet kan vi se at de processer 
+der har  tilknyttet en udvikler"-prioritet skal gå forud for både de processer der har tilknyttet en deadlines og dem uden noget. 
+
+I RTP  indeholder  \sched en alle processer med en prioritet i en enkelt hob kaldet \code{has\_priority}. Vi kan enten kan vi udvide denne hob så alle processer, både med og uden udvikler"-prioritet befinder sig i den samme hob. Alternativt kan vi oprette en liste af hobe. Denne liste vil være have intervallet af prioritet som længde.
+Med en liste af hobe vil hver hob være mindre og dermed vil de enkelte operationer på hoben være hurtigere. Når \sched en skal udvælge en proces, vælges altid den hob med elementer, som har højst prioritet.
+
 % dikterede valget af \sched at priorite
 
 

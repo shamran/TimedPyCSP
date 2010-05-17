@@ -143,7 +143,7 @@ while True:
     time_spent += time.time()          
 \end{lstlisting}
 
-For ikke unødigt at give vores version en fordel har vi valgt at ændre dummyprocessen, så også \code{greenlets}-versionen kan blive færdig. Vi har ikke mulighed for i \code{greenlets}-versionen at lade en proces blive placeret på \code{next}-list. Den eneste måde for en proces at være på denne liste er efter at have kommunikeret. Vi ændre derfor dummyprocessen til et dummynetværk bestående af to processer som vist i \cref{dummy2}.
+For ikke unødigt at give vores version en fordel har vi valgt at ændre dummyprocessen, så også \code{greenlets}-versionen kan blive færdig. Vi har ikke mulighed for i \code{greenlets}-versionen manuelt at stoppe eksekveringen af processen, og lade den  blive placeret på \code{next}-listen. Den eneste måde for en proces at komme på denne liste er efter at have kommunikeret. Vi ændre derfor dummyprocessen til et dummynetværk bestående af to processer, der hver foretager et stykke arbejde og kommunikere som vist i \cref{dummy2}. I dette netværk findes der to dummyprocesser der skiftes til at sende hinanden den akkumulere tid de har været aktive fordi de efter hver periode sender den akkumulere tid til den anden dummyproces, vil den ene hele tiden skulle vente, for så at blive lagt på \code{next}-listen. Dermed  indgår dummyprocesserne  på lige fod med alle andre aktive processer i netværket..
 
 \begin{lstlisting}[firstnumber=1 ,float=hbtp, label=dummy2, caption=Uddrag Dummynetværk]
 while True:
@@ -154,17 +154,17 @@ while True:
     dummy_out(time_spent)  
 \end{lstlisting}
 
-I dette netværk findes der to dummyprocesser der skiftes til at sende hinanden den akkumulere tid de har været aktive. fordi de efter hver periode sender den akkumulere tid, bliver de hele tid lagt på \code{next}-listen, og indgår dermed på lige fod med alle andre processer der ønsker at blive aktiveret.
+
 
 \begin{table}[htbp]
 	\centering
-	\begin{tabular}{lllll}
+	\begin{tabular}{lcccc}
        	\toprule
         \mc{Version}&\mc{Tid i dummyproces(s)}&\mc{SA.}& \mc{Succesrate (\%)}&\mc{SA.}\\
         \midrule
         Greenlets         & 1.29 & 0.61 & 13 & 2  \\
         RTP               & 1.05 & 0.28 & 24 & 6  \\
-        RTP med Prioritet & 0.74 & 0.34 & 42 & 13 \\
+        RTP m. prioritet  & 0.74 & 0.34 & 42 & 13 \\
         \bottomrule
     \end{tabular}
 	\caption[]{10 * 100 grise køres igennem procesnetværket. Desuden er der tilknyttet en dummyproces, uden en deadline, der hele tiden ønsker at arbejde. For hver kørsel udregnes hvor meget kørselstid dummyprocessen har kørt, samt antallet af grise der bliver rettidigt bearbejdet.}\\
