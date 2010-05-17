@@ -1,6 +1,6 @@
 \section{Evaluering}
 \subsection{Test af Korrekthed}
-Vi har som i \des \fxnote{mangler henvisning} løbende skrevet tests, før vi implementerede hver ny funktion i \code{RTP}-versionen.  Tabellen herunder viser testresultaterne for de tests der er lavet specifikt for \code{RTP}-versionen.
+Vi har som i \des i \cref{sec:des-eval} løbende skrevet tests, før vi implementerede hver ny funktion i \code{RTP}-versionen.  Tabellen herunder viser testresultaterne for de tests der er lavet specifikt for \code{RTP}-versionen.
 \begin{longtable}{lr}
    	\toprule
     \mc{Test} & \mc{Resultat} \\
@@ -63,7 +63,7 @@ Ved at benytte \pycsp til slagterieksemplet opnår man et modulært design, der 
 
 En kørsel af de tre eksisterende versioner giver et meget forskelligt resultat, som vist i \cref{tab:deadline-runs}. I denne tabel har vi foretaget en simulation af 100 grise. Denne simulation er kørt 10 gange, og tabellen viser gennemsnittet og standardvariationen. Af tabellen kan man se at versionen som forventet har betydning for antallet af grise der rettidigt kan nå at blive bearbejdet. 
 
-\code{Proces}-versionen er ikke som forventet bedre en de andre versioner til at bearbejde griseobjekterne rettidigt. Dette skyldes at testen er gennemført på en maskine, med kun en kerne.  Dermed kan \code{process}-versionen ikke drage nytte  af flere kerner, men er begrænset til kun at kunne køre en proces af gangen. I \code{process}-versionen, skal konktekstskiftene foregår i operativsystemets \sched~ der er væsentligt langsommere end i \code{greenlets} og \code{RTP}-versionen hvor konktekstskiftene sker i vores \sched. 
+\code{Proces}-versionen er ikke som forventet bedre en de andre versioner til at bearbejde griseobjekterne rettidigt. Dette skyldes at testen er gennemført på en maskine, med kun en kerne.  Dermed kan \code{processes}-versionen ikke drage nytte  af flere kerner, men er begrænset til kun at kunne køre en proces af gangen. I \code{processes}-versionen, skal konktekstskiftene foregår i operativsystemets \sched~ der er væsentligt langsommere end i \code{greenlets} og \code{RTP}-versionen hvor konktekstskiftene sker i vores \sched. 
 
 
 Efter at vi har afsluttet RTP har vi i forbindelse med \is, implementeret muligheden for at tilknytte prioriteter. Vi har for at vise effekten af prioriter inkluderet dem i vores tabeller, men vil ikke komme nærmere ind på dem da de ikke er blevet  nærmere behandlet\fxnote{bahh... hvda skal der stå her}\fxerror{Jeg har slet ikke snakket om prioritet!}

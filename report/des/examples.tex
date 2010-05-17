@@ -161,8 +161,8 @@ tidsrum, hvorefter de igen forlader banken. I dette eksempel kan der ikke
 uddrages meget information, men det viser, hvordan en simpel model er opbygget i 
 hhv.  \simpy og \pycsp for at håndtere tid.
 
-I det andet eksempel er modellen udvidet med en servicedisk, dermed bliver eksemplet en M/M/1 kømodel\fxnote{Brian - er det relevant at snakke om kømodeller?}. Her skal alle 
-kunderne betjenes af en servicemedarbejder, som kun kan ekspedere en kunde ad 
+I det andet eksempel er modellen udvidet med en servicedisk, hvor alle 
+kunderne skal betjenes af en servicemedarbejder, som kun kan ekspedere en kunde ad 
 gangen. Alle kunder ankommer til banken på tilfældige tidspunkter  og stiller sig i 
 kø for at blive serviceret. Det er igen et tilfældigt tidsrum, som kunden bruger på at blive 
 serviceret.  Dette er stadigt en meget simpel model, men med introduktionen af 
@@ -192,9 +192,9 @@ mulighed for at modtage et vilkårligt antal kunder i samme tidsskridt, samt
 vide hvornår der ikke vil komme flere kunder.  Vi kan, ved simpel indsigt, ræsonnere os frem til, at 
 barrieren stadig virker efter hensigten.
 For at generatorprocessen kan komme foran med et tidsskridt og sende en kunde i et forkert tidsskridt,
-skal den have fuldført begge begge kald til barrieren, mens bankprocessen ikke 
-har modtaget et kald fra barrieren. \fxnote{Dorte: sætning ikke forstået}Barrieren vil dog ikke modtage kald fra 
-nogle, før den har  kaldt bankprocessen. Derfor må generatorprocessen vente i 
+skal den have fuldført begge begge kald til barrieren, samtidig med at bankprocessen ikke 
+har modtaget et kald fra barrieren. Barrieren vil dog ikke modtage kald fra 
+nogen, før den har  kaldt bankprocessen. Derfor må generatorprocessen vente i 
 sit første kald til barrieren, indtil banken har modtaget sit kald fra 
 barrieren, før den kan sende en ny kunde.
 Når bankprocessen har modtaget et kald fra barrieren er den ikke længere villig 
@@ -254,5 +254,5 @@ Det kan løses med en \code{alternation} og \code{skip guard}, men så
 skal bankprocessen håndtere fejlede forsendelser og må nødvendigvis introducere en 
 sekundær kø, hvilket gør brugen af en bufferkanal overflødig. For undgå dette har vi i vores tilfælde valgt blot at 
 angive en maksimal størrelse på bufferen som er større end det totale antal 
-kunder banken modtager. \fxnote*{RS: Afhænger af den forrige fixme om M/M/1}{Dette medfører, at det ikke længere er en teoretisk korrekt M/M/1 kømodel, da denne specifikt angiver, at køen skal have mulighed for at have uendelig længde. I praksis er det ikke et problem, da vi blot kan ræsonnere os frem til, at køen ikke bliver fuld.}
+kunder banken modtager. 
 

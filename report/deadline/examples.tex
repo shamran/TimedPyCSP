@@ -1,12 +1,11 @@
 \section{Slagterieksempel}
-\fxnote{mere intro -  Rasmus hjælp}
-Til at illustrere brugen af RTP vil vi tage udgangspunkt i et  problem fra Danish Crown slagteriet, der skal udvikle en beslutningsmodel, for hvordan en robot skal  udskære hver gris. På Danish Crown slagteriet i Horsens foretages udskæringen  grise som beskrevet på deres hjemmeside:
+Til at illustrere brugen af RTP, vil vi tage udgangspunkt i et problem fra Danish Crown slagteriet. Slagteriet skal udvikle en beslutningsmodel for, hvordan en robot, skal udskære hver gris. På Danish Crown slagteriet i Horsens foretages udskæringen af grise, som beskrevet på deres hjemmeside:
 
 \begin{quote}\textit{``Grisen [\ldots] skal nu skæres i mindre, håndterbare stykker. Det sker i en meget avanceret maskine -- en såkaldt tredeler -- hvor hver halvdel af grisen deles i tre stykker: bov, mellemstykke og skinke. \\ 
 \\
 Robotten starter med at fotografere hver halvdel. Dataene fra billedet kombineres med ordren og kundens ønsker, hvorefter stykket deles i tre - nøjagtigt afpasset kundens ønsker.''}{ Danish Crowns hjemmeside\footnote{\url{http://www.danishcrown.dk/custom/horsens/3772.asp}}}\end{quote}
 
-Et billede af den automatiske tredeler er vist  på \cref{fig:pig}.  Det har dog vist sig at udskæringen ikke  altid er optimal, da  ca. 10\% af alle grise har et ekstra sæt ribben som der ikke tages højde for. Til at løse dette problem skal robotten kunne bestemme om grisen har et ekstra sæt ribben inden den foretager udskæringen.
+Et billede af den automatiske tredeler er vist  på \cref{fig:pig}. Problemet med den nuværende maskine er, at den ikke kan tage højde for den enkelte gris' anatomi. Omtrent 10\% af grisene har et ekstra sæt ribben, og slagteriet vil derfor gerne ændre deres udskæring til at tage højde for om dette ribben er til stede. 
 
 \begin{figure}
  \begin{center}
@@ -64,14 +63,13 @@ Hvis eksemplet implementeres I \code{greenlets}-versionen, kan kun  en proces v�
 
 Alternativt kan processerne deles op i to separate applikationer. En applikation skrevet i \pycsp der skal stå for konvertering og analyse mens en anden skal styre robotten. De to applikationer skal kunne kommunikere og  udveksle data, f.eks. igennem en database, harddisk eller anden delt datastruktur. Hvis analysen bliver færdig gemmes den i den delte datastruktur og applikationen der styrer robotten kan udnytte analysen. Hvis ikke den er klar bruges i stedet standardmodellen. Som beskrevet i \autoref{chap:csp} og som vi også kom ind på i implementeringen i \autoref{sec:des-examples}, strider en delt datastruktur dog mod ideerne i CSP, hvorfor det ikke er optimalt, men dog bedrer end at sænke ydelsen systemet ved at indsætte tvungne \code{timeouts}.
 
-I stedet for at vælge \code{greenlets}-versionen kunne man vælge \code{process}-versionen. Hermed vil man kunne køre processer samtidigt, og udnytte operativsystemet til at foretage preemptiv afbrydelse af processerne, således at alle samtidigt får en del CPU-tid. Dermed kan alle tre processer kører samtidigt og robotten kan foretage udskæringen. \code{Process}-versionen risikerer dog at operativsystemet foretager et preemptivt processkift, mens udskæringsprocessen kører, således at konvertering og  analyseprocessen også kan arbejde. Potentielt vil dette kunne resultere i at grisen ikke bliver udskåret, selvom griseobjektet ankommer rettidigt til udskæringsprocessen.
+I stedet for at vælge \code{greenlets}-versionen kunne man vælge \code{processes}-versionen. Hermed vil man kunne køre processer samtidigt, og udnytte operativsystemet til at foretage preemptiv afbrydelse af processerne, således at alle samtidigt får en del CPU-tid. Dermed kan alle tre processer kører samtidigt og robotten kan foretage udskæringen. \code{Processes}-versionen risikerer dog at operativsystemet foretager et preemptivt processkift, mens udskæringsprocessen kører, således at konvertering og  analyseprocessen også kan arbejde. Potentielt vil dette kunne resultere i at grisen ikke bliver udskåret, selvom griseobjektet ankommer rettidigt til udskæringsprocessen.
 
-Med tanke på de ovenstående fordele og ulemper der findes ved hhv.  \code{greenlets}-versionen og \code{process}-versionen,  har vi valgt at implementere begge versioner for i evalueringen at sammenligne dem med RTP-versionen. Fra et praktisk synspunkt vil \code{greenlets}-versionen ikke være relevant, da denne har nogle flere ulemper end \code{process}-versionen. Men til at danne grundlaget for en sammenligning med RTP-versionen har den sin berettigelse.
+Med tanke på de ovenstående fordele og ulemper der findes ved hhv.  \code{greenlets}-versionen og \code{processes}-versionen,  har vi valgt at implementere begge versioner for i evalueringen at sammenligne dem med RTP-versionen. Fra et praktisk synspunkt vil \code{greenlets}-versionen ikke være relevant, da denne har nogle flere ulemper end \code{processes}-versionen. Men til at danne grundlaget for en sammenligning med RTP-versionen har den sin berettigelse.
 
 I \code{greenlets}-versionen er udskæringsprocessen reduceret til en IO-proces der modtager grisene og gemmer dem så en anden applikation kan tilgå dem. Til dette har vi valgt at bruge en \code{dictonary} datastruktur til at gemme  hver gris under deres unikke id. Første gang processen modtager en gris gemmes den i datastrukturen, så i tilfælde af at analysen ikke bliver færdig vil den anden applikation som minimum vide der kommer en gris. Anden gang den samme gris modtages er det fra analyseprocessen, med det færdige resultat hvorfor  den gamle gris overskrives. Den anden applikation, kender derfor til alle grisene, uanset om analysen er blevet rettidigt færdig.
 
-\code{Process}-versionen, er magen til \code{greenlets}-versionen, men den praktiske forskel at processerne kører som selvstændige python-processer og derfor har muligheden for parallel kørsel. 
+\code{Processes}-versionen, er magen til \code{greenlets}-versionen, men den praktiske forskel at processerne kører som selvstændige python-processer og derfor har muligheden for parallel kørsel. 
 
-\fxwarning{konsekvent brug af process- vs processes-versionen}
 %\subsection{Eksempel 2 - Sensornetværk med høj/lav -prioritet}
-%\inline{eks2: skal vise alternation, kan være en sensor som modtager måledata med lav prioritet og som skal sende måledata på opdordring med høj prioritet.}
+%eks2: skal vise alternation, kan være en sensor som modtager måledata med lav prioritet og som skal sende måledata på opdordring med høj prioritet.
