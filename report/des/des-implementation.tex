@@ -19,9 +19,9 @@ from pycsp.greenlets.channel import ChannelPoisonException, ChannelRetireExcepti
 
 I \cref{fig:init} kan man se, at funktionerne \code{choice}, \code{ChannelPoisonException} og \code{ChannelRetireException} alle bliver hentet fra \emph{greenlets}"-versionen, mens funktionerne \code{Timeout, Skip} og \code{Alternation} bliver importeret fra samme mappe og derfor er modificerede versioner. For slutbrugeren  vil dette dog ikke være synligt, og han vil blot se \emph{simulation}"-versionen som en selvstændig version på lige fod med de andre tre versioner.
 
-\subsection{Scheduler-klassen}
+\subsection{\code{Scheduler}-klassen}
 \label{sec:scheduler}
-Med valget af \emph{greenlets}"-versionen som grundversion, og med henblik på at hovedparten af vores ændringer vil være i \sched en, vil vi kort gennemgå dele af klassen \code{Scheduler}.
+Med valget af \code{greenlets}"-versionen som grundversion, og med henblik på at hovedparten af vores ændringer vil være i \sched en, vil vi kort gennemgå dele af klassen \code{Scheduler}.
 
 \begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i \emph{greenlets}versionen.]
     def getInstance(cls, *args, **kargs):
@@ -184,7 +184,7 @@ self.cond.release()
 \end{figure}
 
 
-\subsection{Funktionen Wait}\label{sec:Wait}
+\subsection{Funktionen \code{Wait}}\label{sec:Wait}
 Vi har valgt at anskue planlægningen af en begivenhed til et bestemt tidspunkt, sådan at den proces der skal udføre begivenheden venter indtil tiden for begivnheden er nået, og først her begynde udførslen. Dette vil i praksis være det samme som en planlægning til tidspunktet men det letter implementeringen da vi ikke behøver nogen viden om specifikke begivenheder i vores \sched. 
 
 \begin{lstlisting}[firstnumber=11 , stepnumber=2, numbers=left,float=hbtp, label=fig:simpy:yield, caption= Et yield i \simpy (taget fra Bank05.py i eksemplet fra \simpy)] 
