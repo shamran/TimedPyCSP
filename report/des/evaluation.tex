@@ -7,42 +7,7 @@ Vi har  det foregående afsnit beskrevet hvad der skal til for at implementere \
 \subsection{Test af korrekthed}
   Vi har igennem designet og udviklingen af \emph{simulerings}"-versionen brugt Test Driven Development (TDD). I TDD starter man med at skrive tests til den nye egenskab, der skal udvikles. Efterfølgende skrives koden, så testen kan køres uden at fejle, og per defintion er designet implementeret korrekt, når alle tests kan gennemføres korrekt. Dette medfører, at vi løbende i forbindelsen med udviklingen af \emph{simulerings}"-versionen har skrevet tests. 
   
-  For yderligere at teste den udviklede kode har vi desuden integreret alle tests fra \emph{greenlets}"-versionen ind i \emph{simulerings}"-versionen. Således er alle de tests, der er skrevet til \emph{greenlets}"-versionen også med til at teste \emph{simulering}"-versionen. Resultaterne af de udførte tests kan ses i tabellen herunder og viser, at alle tests forløb tilfredstillende.
-\begin{longtable}{lr}
-   	\toprule
-    \mc{Test} & \mc{Resultat} \\
-    \midrule
-    \endfirsthead 
-    \toprule
-    \mc{Test} & \mc{Resultat} \\
-    \midrule
-    \endhead % slut efterfølgende headere
-    \bottomrule
-    \multicolumn{2}{r}{\textit{fortsættes}}
-    \endfoot % slut footer
-    \bottomrule
-    \endlastfoot % slut sidste footer
-    Doctest: simulation.Simulation & ok\\
-    Doctest: simulation.io & ok\\
-    Doctest: guard.testsuite & ok\\
-    Doctest: alternation.Alternation & ok\\
-    Doctest: alternation.testsuite & ok\\
-    Doctest: channel.Channel & ok\\
-    Doctest: channel.testsuite & ok\\
-    Doctest: process.Parallel & ok\\
-    Doctest: process.Spawn & ok\\
-    Doctest: process.test\_suite & ok\\
-    test\_alternation (test\_simulation.SimulationTestCase) & ok\\
-    test\_buffer (test\_simulation.SimulationTestCase) & ok\\
-    test\_buffered\_channels (test\_simulation.SimulationTestCase) & ok\\
-    test\_decompose (test\_simulation.SimulationTestCase) & ok\\
-    test\_io (test\_simulation.SimulationTestCase) & ok\\
-    test\_timers1 (test\_simulation.SimulationTestCase) & ok\\
-    test\_timers2 (test\_simulation.SimulationTestCase) & ok\\
-    test\_timers3 (test\_simulation.SimulationTestCase) & ok\\
-    test\_timers\_time\_in\_past (test\_simulation.SimulationTestCase) & ok\\
-    test\_wait (test\_io.TestCase) & ok\\
-\end{longtable}
+  For yderligere at teste den udviklede kode har vi desuden integreret alle tests fra \emph{greenlets}"-versionen ind i \emph{simulerings}"-versionen. Således er alle de tests, der er skrevet til \emph{greenlets}"-versionen også med til at teste \emph{simulering}"-versionen. Resultaterne af de udførte tests kan ses i bilag \ref{app:des-test} og viser, at alle tests forløb tilfredstillende.
   
 \subsection{Eksempler}
 For at evaluere fordele og ulemper af \emph{simulerings}"-versionen af \pycsp, har vi genimplementeret eksemplerne fra \cref{sec:des-examples}, med  brug af vores udviklede kode. Vi kan derfor i det følgende sammenholde de to versioner og se på fordele og ulemper ved \emph{simulerings}"-versionen.
