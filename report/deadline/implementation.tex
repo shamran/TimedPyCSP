@@ -36,7 +36,7 @@ Implementeringen er meget simpel og er blot en wrapperfunktion, da den underligg
 Problemet ved denne tvungne procesafgivelse er, at det kan tage lang tid at lægge processerne i en min\_hob, som vil være spildt, hvis den alligevel med det samme fjernes fra køen. Man vil derfor nok i en senere version kunne optimere hastigheden af \code{Release()}.
 
 \subsection{Udvidelse af \code{Process}}
-\fxwarning{Dette afsnit er generelt uklart formuleret, bl.a. brug af prioritet/deadline, ``kunstig'' og som helhed.}
+\fxnote{Dette afsnit er omskrevet. Er der en klar brug af prioritet, og deadline}
 Hver proces skal kunne tilknyttes en deadline, som er et tidsstempel, der angiver det tidspunkt, som udvikleren ønsker at processen skal være færdig inden. 
 Desuden skal hver proces tilknyttes en prioritet. Denne prioritet bruges af \sched en til at udvælge hvilken proces der skal eksekveres. I EDF er prioriteten og deadline for en proces som  den samme, og prioriteten er derfor også et tidsstempel.
 
@@ -53,7 +53,7 @@ En anden begrundelse for at lade en prioritet medføre en \code{deadlineExceptio
 \begin{figure}
  \begin{center}
   \includegraphics[scale=1.00]{images/producer-worker-consumer}
-  \caption{Et generator/arbejder/forbruger -netværk. Pil op indikere hvornår processen er klar til at blive eksekveret. Pil ned indikere en deadline for processen. De stiplede pile i proces B$_1$ og B$_2$ til t$=5$ viser en kunstig prioritet på baggrund af B$_3$'s deadline. Den lille stiplede pil mellem  B$_1$ og B$_2$ i t$=2$ og mellem B$_2$ og B$_3$ i t$=6$ viser kommunikation mellem processerne.}
+  \caption{Et generator/arbejder/forbruger -netværk. Kasserne repræsentere det tidsrum hvor processerne bliver bearbejdet. En pil op indikere hvornår processen er klar til at blive eksekveret. En pil ned indikere en deadline for processen. De stiplede pile i proces B$_1$ og B$_2$ til tiden t$=5$ viser en kunstig prioritet på baggrund af B$_3$'s deadline. Den lille stiplede pil mellem  B$_1$ og B$_2$ i t$=2$ og mellem B$_2$ og B$_3$ i t$=6$ viser kommunikation mellem processerne.}
   \label{fig:producer-worker-consumer}
   \end{center}
 \end{figure}
@@ -67,7 +67,7 @@ En anden begrundelse for at lade en prioritet medføre en \code{deadlineExceptio
 \end{figure}
 
 
-Der er dog ikke sikkert at en deadlineException i processer der har nedarvet en prioritet, er med til klarlægge hvilke processer der har brugt alt tiden, og derfor bære skylden for at en deadline ikke blev overholdt. \CRef{fig:producer-worker-consumer2} viser et sådanne eksempel. Netværk er opsat som i \autoref{fig:producer-worker-consumer}, men i dette tilfælde bruger generatorprocessen (B$_1$) alt tiden, og data bliver først sendt fra $B_1$ umiddelbart før en overskridelse af deadlinen. Fra en udvikler  vil det fremgå som var det arbejderprocessen (B$_2$) der er ansvarlig for overskridelsen lige som i \autoref{fig:producer-worker-consumer}, og ikke generatorprocessen $B_1$, som i dette eksempel brugte det meste af tiden. Dermed mister \code{deadlineException} sin troværdighed, og brugbarhed til debugging. I CSP findes desuden begrebet traces, som kan bruges til at se hele forløbet for et program. På nuværende tidspunkt arbejdes der med at introducere traces til \pycsp og når dette er færdigt, vil det være et meget stærkere værktøj til debugging.\fxwarning{se kommentarer i print, evt. efter omskrivning}
+Der er dog ikke sikkert at en deadlineException i processer der har nedarvet en prioritet, er med til klarlægge hvilke processer der har brugt alt tiden, og derfor bære skylden for at en deadline ikke blev overholdt. \CRef{fig:producer-worker-consumer2} viser et sådanne eksempel. Netværk er opsat som i \autoref{fig:producer-worker-consumer}, men i dette tilfælde bruger generatorprocessen (B$_1$) alt tiden, og data bliver først sendt fra $B_1$ umiddelbart før en overskridelse af deadlinen. Fra en udvikler  vil det fremgå som var det arbejderprocessen (B$_2$) der er ansvarlig for overskridelsen lige som i \autoref{fig:producer-worker-consumer}, og ikke generatorprocessen $B_1$, som i dette eksempel brugte det meste af tiden. Dermed mister \code{deadlineException} sin troværdighed, og brugbarhed til debugging. I CSP findes desuden begrebet traces, som kan bruges til at se hele forløbet for et program. På nuværende tidspunkt arbejdes der med at introducere traces til \pycsp og når dette er færdigt, vil det være et meget stærkere værktøj til debugging.
 
 Et andet problem ved at kaste en \code{deadlineException} når prioriteterne er overskredet er, at processer måske  ikke er designet til at håndtere en \code{deadlineException}. Udvikleren skal dermed sikrer alle sine processer, hvis ikke hele applikationen skal risikere at stoppe ved en \code{deadlineException}, der ikke bliver håndteret korrekt.  Det er ikke altid en udvikler kan lade processen håndtere en \code{deadlineException}, da begrundelsen for at have introduceret denne oprindelige deadline er kontekstafhængig. og  det er ikke sikkert processen kender denne begrundelse og derfor ikke vil kunne reagere optimalt.
 
