@@ -224,9 +224,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="6.1157108"
-     inkscape:cx="176.92137"
-     inkscape:cy="48.663349"
+     inkscape:zoom="3.789819"
+     inkscape:cx="129.55763"
+     inkscape:cy="62.964437"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -365,10 +365,10 @@
        y="77.219917" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4, 4;stroke-dashoffset:0;marker-start:url(#Arrow1Mstart)"
-       d="m 335.28586,130.50458 0,-29.99958"
+       d="m 335.022,130.50458 0,-29.99958"
        id="path5399-8"
        inkscape:path-effect="#path-effect5401-9"
-       inkscape:original-d="m 335.28586,130.50458 0,-29.99958" />
+       inkscape:original-d="m 335.022,130.50458 0,-29.99958" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-end:url(#Arrow1Mend-6)"
        d="m 183.13274,132.86969 0,-29.99957"
@@ -510,22 +510,22 @@
        id="rect3087"
        style="fill:#63b0dd;fill-opacity:0.57647059;stroke:#000000;stroke-width:0.70692229;stroke-miterlimit:1;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
     <path
-       inkscape:original-d="m 335.28586,170.50458 0,-29.99958"
+       inkscape:original-d="m 335.022,170.50458 0,-29.99958"
        inkscape:path-effect="#path-effect3095"
        id="path3089"
-       d="m 335.28586,170.50458 0,-29.99958"
+       d="m 335.022,170.50458 0,-29.99958"
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow1Mstart)" />
     <path
-       inkscape:original-d="m 195.26467,172.70934 0,-29.99957"
+       inkscape:original-d="m 195.00081,172.70934 0,-29.99957"
        inkscape:path-effect="#path-effect3097"
        id="path3091"
-       d="m 195.26467,172.70934 0,-29.99957"
+       d="m 195.00081,172.70934 0,-29.99957"
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-end:url(#Arrow1Mend-6)" />
     <path
-       inkscape:original-d="m 335.28586,90.50458 0,-29.99958"
+       inkscape:original-d="m 335.022,90.50458 0,-29.99958"
        inkscape:path-effect="#path-effect3924"
        id="path3922"
-       d="m 335.28586,90.50458 0,-29.99958"
+       d="m 335.022,90.50458 0,-29.99958"
        style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:4, 4;stroke-dashoffset:0;marker-start:url(#Arrow1Mstart)" />
     <path
        sodipodi:nodetypes="cccccccccs"
@@ -548,13 +548,13 @@
        inkscape:path-effect="#path-effect4159"
        inkscape:original-d="m 229.62554,116.31025 0,-21.988866" />
     <path
-       inkscape:original-d="m 369.54972,156.31025 0,-21.98887"
+       inkscape:original-d="m 370.07744,156.31025 0,-21.98887"
        inkscape:path-effect="#path-effect4561"
        id="path4559"
-       d="m 369.54972,156.31025 0,-21.98887"
+       d="m 370.07744,156.31025 0,-21.98887"
        style="fill:none;stroke:#000000;stroke-width:0.84143901;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.84143902, 3.36575608;stroke-dashoffset:0;marker-start:url(#Arrow1Mstart-71)" />
     <rect
-       style="fill:#63b0dd;fill-opacity:0.57647059;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:#63b0dd;fill-opacity:0.57647059000000000;stroke:#000000;stroke-width:0.712;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect4940"
        width="140.62143"
        height="15"
