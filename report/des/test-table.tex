@@ -1,0 +1,38 @@
+\section{Testresultater for \des}
+\label{app:des-test}
+\begin{longtable}{lr}
+   	\toprule
+    \mc{Test} & \mc{Resultat} \\
+    \midrule
+    \endfirsthead 
+    \toprule
+    \mc{Test} & \mc{Resultat} \\
+    \midrule
+    \endhead % slut efterfølgende headere
+    \bottomrule
+    \multicolumn{2}{r}{\textit{fortsættes}}
+    \endfoot % slut footer
+    \bottomrule
+    \endlastfoot % slut sidste footer
+    Doctest: simulation.Simulation & ok\\
+    Doctest: simulation.io & ok\\
+    Doctest: guard.testsuite & ok\\
+    Doctest: alternation.Alternation & ok\\
+    Doctest: alternation.testsuite & ok\\
+    Doctest: channel.Channel & ok\\
+    Doctest: channel.testsuite & ok\\
+    Doctest: process.Parallel & ok\\
+    Doctest: process.Spawn & ok\\
+    Doctest: process.test\_suite & ok\\
+    test\_alternation (test\_simulation.SimulationTestCase) & ok\\
+    test\_buffer (test\_simulation.SimulationTestCase) & ok\\
+    test\_buffered\_channels (test\_simulation.SimulationTestCase) & ok\\
+    test\_decompose (test\_simulation.SimulationTestCase) & ok\\
+    test\_io (test\_simulation.SimulationTestCase) & ok\\
+    test\_timers1 (test\_simulation.SimulationTestCase) & ok\\
+    test\_timers2 (test\_simulation.SimulationTestCase) & ok\\
+    test\_timers3 (test\_simulation.SimulationTestCase) & ok\\
+    test\_timers\_time\_in\_past (test\_simulation.SimulationTestCase) & ok\\
+    test\_wait (test\_io.TestCase) & ok\\
+\end{longtable}
+

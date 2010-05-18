@@ -1,0 +1,44 @@
+\section{Testresultater for RTP}
+\label{app:rtp-test}
+\fxnote{RS: ret stavefejl og sørg for at de to tabeller er formatteret ens}
+\begin{longtable}{lr}
+   	\toprule
+    \mc{Test} & \mc{Resultat} \\
+    \midrule
+    \endfirsthead 
+    \toprule
+    \mc{Test} & \mc{Resultat} \\
+    \midrule
+    \endhead % slut efterfølgende headere
+    \bottomrule
+    \multicolumn{2}{r}{\textit{fortsættes}}
+    \endfoot % slut footer
+    \bottomrule
+    \endlastfoot % slut sidste footer
+test\_Alternation  & ok\\
+test\_AlternationChoiseReader  & ok \\
+test\_AlternationChoiseWriter  & ok \\
+test\_AlternationExecuteReadDeadline  & ok\\
+test\_AlternationExecuteSkipDeadline  & ok\\
+test\_AlternationExecuteTimeoutDeadline  & ok \\
+test\_AlternationExecuteWriteDeadline  & ok \\
+test\_Alternationchoise1Deadline  & ok \\
+test\_Alternationchoise2Deadline  & ok \\
+test\_ChoisemultipleReader  & ok \\
+test\_ChoisemultipleReader2  & ok \\
+test\_ChoisemultipleWriter  & ok\\
+test\_PoisonAndDeadline1  & ok\\
+test\_PoisonAndDeadline2  & ok\\
+test\_Reader\_Inheritance  & ok\\
+test\_RetireAndDeadline  & ok\\
+test\_Writer\_Inheritance  & ok\\
+test\_channelpriority\_from\_low\_deadline  & ok\\
+test\_channelpriority\_from\_low\_deadline2  & ok\\
+test\_channelpriority\_from\_no\_deadline  & ok\\
+test\_channelpriority\_from\_no\_deadline2  & ok\\
+test\_readDeadline  &ok\\
+test\_writeDeadline  & ok\\
+test\_xreset\_inheritance  & ok\\
+test\_xreset\_inheritance\_from\_two\_step  & FAIL\\
+\end{longtable}
+
