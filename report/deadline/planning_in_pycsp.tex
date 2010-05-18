@@ -1,12 +1,58 @@
 \section{Realtime planlægning i \pycsp}
 \label{sec:rtp-pycsp}
-\fxwarning{(Flyttet fra RTP overordnet) Husk at snakke om begrænsning af greenlets mht. parallelitet når vi arbejder i realtid}
-\fxwarning{Vi skal kigge på strukturen i dette kapitel. vi nævner indedningsvis fire ting vi skal foretage, men har kun afsnit for tre af dem. vi skal yderligere sikre at rækkefølgen de nævnes i, og bagefter skrives i, giver mening.}
+\fxnote{(Flyttet fra RTP overordnet) Husk at snakke om begrænsning af greenlets mht. parallelitet når vi arbejder i realtid}
 Da vi ønsker at introducere RTP i \pycsp, er der er række forhold, som vi skal tage højde for. Vi vil i dette afsnit tage udgangspunkt i de ovenstående opstillede muligheder og sammenholde dem med \pycsp. 
 
-I \pycsp kan vi anskue processerne som begivenheder og derved bruge skemaplanlæggeren i \code{greenlets}-versionen til at styre hvilken proces og dermed hvilken begivenhed, der udføres. Vi har ikke umiddelbart informationer om, hvor lang tid en proces er om at blive udført, og det vil kræve en analyse af den enkelte proces at udlede estimater for det. Vi har valgt at fokusere på selve planlægningen af processerne og ikke på analysen. Dermed har vi ikke mulighed for at benytte RM og LL algoritmerne, da de begge benytter information om udførselstiden for en proces. Derved har vi EDF tilbage som mulighed, hvilket vi i det følgende vil implementere. En udvidelse af \pycsp til at benytte EDF er forholdsvis ligetil. Der skal laves en mulighed for, at brugeren kan angive en deadline til en proces, og vi skal ved kontekstskift sikre, at vi aktiverer den proces, der har den førstkomne deadline. \pycsp har per definition interne afhængigheder mellem processerne i form af kommunikation over kanaler, og vi kan derfor opleve problemer med prioritetsinvertering. Den eneste metode til håndtering af dette, der kan bruges sammen med \pycsp, er prioritetsnedarvning, da de andre metoder forudsætter prioritetsinverteringen  sker som resultat af tilgang til kritiske regioner og ikke pga. kommunikation. Vi skal derfor også implementere prioritetsnedarvning for at sikre os mod prioritetsinvertering. Endeligt skal vi håndtere overskredne deadlines.
+I \pycsp kan vi anskue processerne som begivenheder og derved bruge skemaplanlæggeren i \code{greenlets}-versionen til at styre hvilken proces og dermed hvilken begivenhed, der udføres. Vi har ikke umiddelbart informationer om, hvor lang tid en proces er om at blive udført, og det vil kræve en analyse af den enkelte proces at udlede estimater for det. Vi har valgt at fokusere på selve planlægningen af processerne og ikke på analysen. Dermed har vi ikke mulighed for at benytte RM og LL algoritmerne, da de begge benytter information om udførselstiden for en proces. Derved har vi EDF tilbage som mulighed, hvilket vi i det følgende vil implementere. En udvidelse af \pycsp til at benytte EDF er forholdsvis ligetil. Der skal laves en mulighed for, at brugeren kan angive en deadline til en proces, og vi skal ved kontekstskift sikre, at vi aktiverer den proces, der har den førstkomne deadline. Såfremt en deadline overskrides, skal vi have funktionalitet, til at håndtere dette. 
+
+\pycsp har per definition interne afhængigheder mellem processerne i form af kommunikation over kanaler, og vi kan derfor opleve problemer med prioritetsinvertering. Den eneste metode til håndtering af dette, der kan bruges sammen med \pycsp, er prioritetsnedarvning, da de andre metoder forudsætter prioritetsinverteringen  sker som resultat af tilgang til kritiske regioner og ikke pga. kommunikation. Vi skal derfor også implementere prioritetsnedarvning for at sikre os mod prioritetsinvertering. 
 
 Da vi benytter os af \code{greenlets}-versionen af \pycsp arbejder vi med en skemaplanlægger, der ikke kan foretage preemptive kontekstskift. Dette kan lede til problemstillinger som det illustreret på \cref{fig:edf-nonpreemptive}. En metode til at mindske denne type problemer er at lade de enkelte processer afgive kontrollen med jævne mellemrum. Herved vil der blive foretaget en ny evaluering om hvilken proces, der skal aktiveres, og hvis der er processer, der har en nærmere deadline, som er blevet klar, aktiveres en af disse. Dette beror helt og holdent på at hver enkelt proces frivilligt afgiver kontrollen og gør det med jævne mellemrum, når den er aktiv. Dette betyder, at det er overladt til udvikleren at indsætte det på relevante steder i processens kode. 
+
+\subsection{Tilknytning og overskridelse af deadlines}
+Som udgangspunkt skal vi kunne håndtere, at en proces kan have forskellige typer deadlines. Umiddelbart er det oplagt, at der for hver proces tilknyttes en deadline samt hvilken type, det er. Dette giver mulighed for, at vi kan differentiere i den måde vi håndterer en overskreden deadline. F.eks. kan vi stoppe systemet helt i tilfælde af overskridelse af en kritisk deadline, kaste en exception ved en hard deadline og blot registrere overskridelser af soft deadlines. Uanset hvilken handling vi vælger at tilknytte til de respektive overskridelser, vil der altid være situationer, hvor den valgte handling ikke er optimal. 
+
+Vi har derfor valgt en anden løsning, hvor en proces blot kaster en exception, hvis den overskrider en deadline. Dette overflødiggør, at der tilknyttes en specifik type deadline til en proces, da håndteringen af den kastede exception overgives til udvikleren. Det er herved op til den enkelte udvikler at definere, hvad der skal ske i hver enkelt proces, såfremt den overskrider en deadline. Dette giver den største frihed til at tilpasse håndteringen til den enkelte proces og applikation. 
+
+\subsection{Udvælgelse af proces}
+Udvælgelsen af hvilken proces der skal aktiveres, ved et kontekstskift, er givet ud fra vores valg af EDF. Som beskrevet i \cref{sec:edf} specificerer EDF, at det altid processen med den nærmeste deadline der skal aktiveres. For at opnå dette kan vi benytte stort set samme metode som vi brugte i \des. I \des sorterede vi processerne efter hvilket tidskridt de skulle aktiveres i, her kan vi sortere dem ud fra deres deadline.  
+
+\subsubsection{Udvælgelse i \code{alternations}}
+\fxwarning{Simon skriv noget metatekst her. Det skal gøres klart i starten hvorfor denne problemsstilling er relevant i pycsp}
+Som  beskrevet af \citeauthor{Burns1990} opstår der en konflikt ved brugen af  prioriterede valg. ifht. prioriteter på processer \cite{Burns1990}. De beskriver en eksempel, som vist i \cref{lst:pri-select}, hvor processernes prioritet er angivet som Pri1 og Pri2, og hvilken proces, der udvælges, afhænger af processernes indbyrdes forhold, som angivet i \cref{tab:prioritizedSelect}.
+\fxwarning{Hvad viser kodestumpen? problemet? løsningen? forklar problemet yderligere.}
+
+
+\begin{lstlisting}[firstnumber=1 ,float=hbtp, label=lst:pri-select, caption={(priority) select. Eksemplet er kopieret fra \cite{Burns1990}}]
+(priority) select
+   A1 -- Process P1
+ or
+   A2 -- Process P2
+ end select
+\end{lstlisting}
+
+\begin{table}[htbp]
+	\centering
+	\begin{tabular}{lccc}
+       	\toprule
+        &Pri1 > Pri2 & Pri1 = Pri2 & Pri1 < Pri2\\
+        \midrule
+          	select          & A1 & Arbitrary    & A2 \\
+		    priority select & A1 & A1           & ? \\    
+        \bottomrule
+        \end{tabular}
+    \caption[]{Konflikten ved brug af prioriteret valg og procesprioriteter. Eksemplet er kopieret fra \cite[160]{Burns1990}}\\
+    \label{tab:prioritizedSelect}
+\end{table}
+
+I \pycsp findes kun et prioriteret valg, og dermed kan vi se bort fra første række af \cref{tab:prioritizedSelect} og konstatere, at der opstår en konflikt ved introduktionen af prioriteter. For \citeauthor{Burns1990} er løsningen ``orthogonal solutions'', der håndterer begge typer prioriteter. De ønsker overordnet set to typer udvælgelsesmetoder, weak- og strong Select. Weak select sorterer primært efter processernes prioritet og sekundært efter det prioriterede valg. Strong select udvælger udelukkende processer efter det prioriterede valg. De forestiller sig, at weak select skal bruges som den primære metode, men i specielle tilfælde skal en udvikler have mulighed for at tvinge et prioriteret valg igennem.
+
+Vi ønsker at udvælgelse i \code{alternations} udføres som weak select. Dvs. at først skal der kigges på, om \code{alternation} kan vælge en guard umiddelbart. Hvis der er minimum en guard klar, foretages der et prioriteret valg baseret på processernes prioritet. Hvis flere processer har samme prioritet foretages det prioriterede valg. Er ingen guards klar, bør processen vente i dens \code{alternation}, og vælge den første guard, der bliver klar, uden hensyn til dens prioritet.
+
+I artiklen fra \citeauthor{Burns1990} udvælger man en proces blandt flere mulige, mens en \code{alternation} udvælger en kanal, der i \pycsp er af typen any-to-any. Dette medfører, at man ikke  foretager et valg mellem processer, men foretager et valg mellem kanaler, som processen kommunikerer med. For at foretage en weak selection i vores \code{alternation}, skal man derfor kunne finde prioriteten for kanalerne. Dette skaber et behov for at kunne tilknytte en prioritet til hver kanal baseret på hvilke processer, der er tilknyttet kanalen. 
+\phantomsection
+\label{misc:kanal-prioritet}
+
 
 \subsection{Prioritetsnedarvning}\label{sec:rtp-pycsp-nedarvning}
 At introducere prioritetsnedarvning i \pycsp virker umiddelbart ligetil, idet vi kan se de indbyrdes afhængigheder klart ud fra forbindelserne gennem kanalerne. Der kan forekomme andre afhængigheder, som er mindre synlige, men vi mener ikke disse vil forekomme i velskrevne CSP applikationer, og vi har derfor valgt at begrænse os til afhængigheder repræsenteret vha. kanaler. På trods af den umiddelbare simplicitet skal vi overveje hvornår, hvem og hvor længe, der skal arves i forbindelse med prioritetsnedarvning.
@@ -50,46 +96,8 @@ Vi har som nævnt en klar kæde af afhængigheder i \pycsp men vi skal være opm
   \end{center}
 \end{figure}
 
-\subsection{Tilknytning og overskridelse af deadlines}
-Som udgangspunkt skal vi kunne håndtere, at en proces kan have forskellige typer deadlines. Umiddelbart giver det mening, at der for hver proces tilknyttes en deadline samt hvilken type, det er. Dette giver mulighed for, at vi kan differentiere i den måde vi håndterer en overskreden deadline. F.eks. kan vi stoppe systemet helt i tilfælde af overskridelse af en kritisk deadline, kaste en exception ved en hard deadline og blot registrere overskridelser af soft deadlines. Uanset hvilken handling vi vælger at tilknytte til de respektive overskridelser, vil der altid være situationer, hvor den valgte handling ikke er optimal. 
 
-Vi har derfor valgt en anden løsning, hvor en proces blot kaster en exception, hvis den overskrider en deadline. Dette overflødiggør, at der tilknyttes en specifik type deadline til en proces, da håndteringen af den kastede exception overgives til udvikleren. Det er herved op til den enkelte udvikler at definere, hvad der skal ske i i hver enkelt proces, såfremt den oplever en overskreden deadline. Dette giver den største frihed til at tilpasse håndteringen til den enkelte proces og applikation. 
+
+
+
 \fxwarning{Dorte mener ikke vi svarer ordenligt på vores egne krav. Se kommentarer i print}
-
-\subsection{Udvælgelse i \code{alternations}}
-Som  beskrevet af \citeauthor{Burns1990} opstår der en konflikt ved brugen af  prioriterede valg. ifht. prioriteter på processer \cite{Burns1990}. De beskriver en eksempel, som vist i \cref{lst:pri-select}, hvor processernes prioritet er angivet som Pri1 og Pri2, og hvilken proces, der udvælges, afhænger af processernes indbyrdes forhold, som angivet i \cref{tab:prioritizedSelect}.
-\fxwarning{Hvad viser kodestumpen? problemet? løsningen? forklar problemet yderligere.}
-
-
-\begin{lstlisting}[firstnumber=1 ,float=hbtp, label=lst:pri-select, caption={(priority) select. Eksemplet er kopieret fra \cite{Burns1990}}]
-(priority) select
-   A1 -- Process P1
- or
-   A2 -- Process P2
- end select
-\end{lstlisting}
-
-\begin{table}[htbp]
-	\centering
-	\begin{tabular}{lccc}
-       	\toprule
-        &Pri1 > Pri2 & Pri1 = Pri2 & Pri1 < Pri2\\
-        \midrule
-          	select          & A1 & Arbitrary    & A2 \\
-		    priority select & A1 & A1           & ? \\    
-        \bottomrule
-        \end{tabular}
-    \caption[]{Konflikten ved brug af prioriteret valg og procesprioriteter. Eksemplet er kopieret fra \cite[160]{Burns1990}}\\
-    \label{tab:prioritizedSelect}
-\end{table}
-
-I \pycsp findes kun et prioriteret valg, og dermed kan vi se bort fra første række af \cref{tab:prioritizedSelect} og konstatere, at der opstår en konflikt ved introduktionen af prioriteter. For \citeauthor{Burns1990} er løsningen ``orthogonal solutions'', der håndterer begge typer prioriteter. De ønsker overordnet set to typer udvælgelsesmetoder, weak- og strong Select. Weak select sorterer primært efter processernes prioritet og sekundært efter det prioriterede valg. Strong select udvælger udelukkende processer efter det prioriterede valg. De forestiller sig, at weak select skal bruges som den primære metode, men i specielle tilfælde skal en udvikler have mulighed for at tvinge et prioriteret valg igennem.
-
-Vi ønsker at udvælgelse i \code{alternations} udføres som weak select. Dvs. at først skal der kigges på, om \code{alternation} kan vælge en guard umiddelbart. Hvis der er minimum en guard klar, foretages der et prioriteret valg baseret på processernes prioritet. Hvis flere processer har samme prioritet foretages det prioriterede valg. Er ingen guards klar, bør processen vente i dens \code{alternation}, og vælge den første guard, der bliver klar, uden hensyn til dens prioritet.
-
-I artiklen fra \citeauthor{Burns1990} udvælger man en proces blandt flere mulige, mens en \code{alternation} udvælger en kanal, der i \pycsp er af typen any-to-any. Dette medfører, at man ikke  foretager et valg mellem processer, men foretager et valg mellem kanaler, som processen kommunikerer med. For at foretage en weak selection i vores \code{alternation}, skal man derfor kunne finde prioriteten for kanalerne. Dette skaber et behov for at kunne tilknytte en prioritet til hver kanal baseret på hvilke processer, der er tilknyttet kanalen. 
-\phantomsection
-\label{misc:kanal-prioritet}
-
-
-
