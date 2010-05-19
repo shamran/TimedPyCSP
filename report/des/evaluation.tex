@@ -52,7 +52,8 @@ for i in xrange(iterations):
   Wait(2)
 \end{lstlisting}
 
-I arbejderprocessen (\cref{fig:sim:worker}) kan man også se hvordan brugen af tid  sikrer adgang til en delt ressource. I  \emph{greenlets}"-versionen skulle barrieren  kaldes flere gange i træk for at sikre, at en delt datastruktur ikke blev brugt af processen. Med \emph{simulering}"-versionen kan man, som det ses på linje 140 i \cref{fig:sim:worker}, nøjes med at kalde \code{Wait} og vente i to tidsskridt. Dermed har denne proces ikke adgang til den delte data, da processen  ligger og venter i kø på \code{timers} listen \fxwarning{Uddyb argumentation om det her}. Hvis flere forskellige processer skal have eksklusive rettigheder, kan man blot øge antallet af tidsskridt, processen venter. Hvis dette skulle opnås med barrierer, skulle man lave en løkke, der et antal gange lod processen gå igennem barrieren.
+I arbejderprocessen (\cref{fig:sim:worker}) kan man også se hvordan brugen af tid  sikrer adgang til en delt ressource. I  \emph{greenlets}"-versionen skulle barrieren  kaldes flere gange i træk for at sikre, at en delt datastruktur ikke blev brugt af processen. Med \emph{simulering}"-versionen kan man, som det ses på linje 140 i \cref{fig:sim:worker}, nøjes med at kalde \code{Wait} og vente i to tidsskridt. 
+\code{Wait} sikre hermed mod at processerne kan skrive samtidigt til den samme data da arbejderprocessen ligger og venter i kø på \code{timers} mens visualiseringsprocessen tilgår data. Tiden kan med fordel bruges hvis flere forskellige processer skal have eksklusive rettigheder, kan man blot øge antallet af tidsskridt, hver proces venter. Hvis dette skulle opnås med barrierer, skulle man lave en løkke, der et antal gange lod processen gå igennem barrieren.
 
 \subsubsection{Kunder i en bank}
 De to bankeksempler har krævet en betydelig omskrivning for at udnytte den nyudviklede \emph{simulerings}"-version. I generatorprocessen ses tydeligst forskellen på de to versioner. \emph{Greenlets}"-versionen bruger jævnfør \cref{fig:green:generator} 20 linjer kode, hvor \cref{fig:sim:generator} viser at \emph{simulerings}"-versionen kun bruger 6 linjer. 
@@ -110,6 +111,7 @@ def generate(self,number,meanTBA,resource):
 \end{lstlisting}
 
 En sammenligning af generatorfunktionen i \simpy med generatorprocessen i \emph{simulerings}"-versionen viser ikke den store forskel. I \simpy aktiverer man kunden direkte, mens man i \emph{simulerings}"-versionen sender kunden over en kanal. Der findes derimod en større forskel på de to implementeringer i kundedelen. Dette skyldes, at i \emph{simulerings}"-versionen findes der en bankproces, som er delt på tværs af alle kunder, mens man i \simpy har en kundefunktion, der er unik for hver kunde. Denne forskel medvirker til, at bankprocessen i \simpy skal vedligeholde afgangstiden for samtlige kunder i banken  hvilket kræver mere kode. Dette er implementeret i  \cref{fig:sim:bank} på linjerne 46-53 med en \code{alternation}. Her venter processen hele tiden på enten at modtage en ny kunde, eller på at en kunden ønsker at forlade banken.
+
 \begin{lstlisting}[firstnumber=39,float=hbtp, label=fig:sim:bank, caption= Uddrag af bank processen i simulation]
     while True:
       msg = customerREADER()
