@@ -26,8 +26,11 @@ En kørsel af de tre eksisterende versioner giver et meget forskelligt resultat,
 
 \code{Proces}-versionen er ikke som forventet bedre en de andre versioner til at bearbejde griseobjekterne rettidigt. Dette skyldes at testen er gennemført på en maskine, med kun en kerne.  Dermed kan \code{processes}-versionen ikke drage nytte  af flere kerner, men er begrænset til kun at kunne køre en proces af gangen. I \code{processes}-versionen, foregår konntekstskiftene i operativsystemets \sched~, der er væsentligt langsommere end i \code{greenlets}- og \code{RTP}-versionen, hvor konktekstskiftene sker i vores \sched. 
 
-Efter at vi har afsluttet RTP har vi i forbindelse med Interaktiv Planlægning, implementeret muligheden for at tilknytte prioriteter. Vi har for at vise effekten af prioriter inkluderet dem i vores tabeller, men vil ikke komme nærmere ind på dem da de ikke er blevet  nærmere behandlet.\fxwarning{bahh... hvad skal der stå mere her. prioritet er meget dårligt behandlet}
+I vores arbejde med anvendelsesområdet Interaktiv Planlægning i kapitel \ref{chap:is}, har vi implementeret et prioritetssystem for processer, som vi efterfølgende har ført tilbage i RTP-versionen, da vi netop indenfor dette anvendelsesområde, har tænkt på det som en mulig udvidelse. Vi har derfor medtaget resultater hvor vi har højere prioriteter på de essentielle processer. Umiddelbart ser det ud til at forværre ydelsen, hvilket må tillægges at håndteringen af prioriteter skaber et overhead, sammenholdt med, at alle processer i denne version af eksemplet er lige vigtige. 
+
+
 \begin{table}[htbp]
+  \vspace{0.5cm}
 	\centering
 	\begin{tabular}{lcc}
        	\toprule
@@ -104,7 +107,7 @@ while True:
 \end{lstlisting}
 
 For ikke unødigt at give vores version en fordel har vi valgt at ændre dummyprocessen, så også \code{greenlets}-versionen kan blive færdig. Vi har ikke mulighed for i \code{greenlets}-versionen manuelt at stoppe eksekveringen af processen, og lade den  blive placeret på \code{next}-listen. Den eneste måde for en proces at komme på denne liste er efter at have kommunikeret. Vi ændrer derfor dummyprocessen til et dummynetværk bestående af to processer, der hver foretager et stykke arbejde og kommunikerer, som vist i \cref{dummy2}. I dette netværk findes der to dummyprocesser, der skiftes til at sende hinanden den akkumulerede tid de har været aktive. Fordi de efter hver periode, sender den akkumulerede tid til den anden dummyproces, vil den ene hele tiden skulle vente, for så at blive lagt på \code{next}-listen. Dermed  indgår dummyprocesserne  på lige fod med alle andre aktive processer i netværket.
-
+\fxwarning{Snak om at prioriteter kommer til sin i ret i RTP, når vi har dummyprocesser.}
 \begin{lstlisting}[firstnumber=1 ,float=hbtp, label=dummy2, caption=Uddrag Dummynetværk]
 while True:
     time_spent = dummy_in()

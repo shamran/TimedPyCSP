@@ -9,8 +9,7 @@ Vi vil i dette afsnit beskrive hvilke ændringer og tilføjelser vi skal foretag
 
 %Vi har valgt, at der i vores system skal kaldes en exception, hvis en deadline overskrides. Dette er gjort ud fra en betragtning om, at systemet ikke kender konsekvensen af en overskredet deadline, men på processniveau har udvikleren tilføjet en deadline, og derfor må det være udviklerens ansvar at håndtere processen ved en overskridelse af deadline.  Hvis processen stadig kan bidrage med værdi, kan programmøren lade processen fortsætte sin kørsel. Alternativt kan processen lukkes korrekt ned. Ulempen ved at kalde en exception er, at processen stopper sin eksekvering i utide, hvilket kan give problemer, f.eks. hvis processen er tilknyttet en kanal og venter på at kommunikere.  Kanalerne holder i \pycsp styr på antallet af processer, der vil kommunikere, og hvis processen pludseligt forsvinder vil tilstandsvariablerne ikke være sat korrekt. Det er derfor vigtigt at processen korrekt fjerne sig selv fra kanalen i forbindelse med en exception.
 Vi har i foregående afsnit argumenteret for, at alle overskredne deadlines bør resultere i en exception. Dette er oplagt at implementere i \sched en, så det checkes ved kontekstskift, om en deadline for den proces der skiftes fra, er overskredet, og i givet fald, kaster en exception. Vi ønsker dog at få kastet vores exceptions så hurtigt som muligt, for derved at gøre opmærksom på den overskredne deadline. Derfor checker vi yderligere for overskredne deadlines, når der kommunikeres på en kanal, og når der foretages et valg i en \code{alternation}. 
-
- \fxwarning{Skriv mere om hvordan vi håndterer de interne variable inden vi kaster en exception til udvikleren}
+\fxnote{Mere i dette afsnit ville være rigtig rart}
 
 \subsection{Ændringer i \sched en}
 \phantomsection
