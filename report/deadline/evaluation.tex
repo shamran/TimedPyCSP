@@ -1,5 +1,6 @@
 \section{Evaluering}
-\fxwarning{metatekst}
+\fxwarning{metatekst - Done}
+Vi har  det foregående afsnit beskrevet hvad der skal til for at implementere RTP i \pycsp. Vi vil i dette afsnit først se på hvordan RTP er blevet implementeret, for derefter at evaluere vores løsning, med udgangspunkt i slagterieksemplet.
 \subsection{Test af Korrekthed}
 Vi har som i \des i \cref{sec:des-eval} løbende skrevet tests, før vi implementerede hver ny funktion i \code{RTP}-versionen.  Bilag \ref{app:rtp-test} viser testresultaterne for de tests der er lavet specifikt for \code{RTP}-versionen.
 
@@ -25,7 +26,7 @@ En kørsel af de tre eksisterende versioner giver et meget forskelligt resultat,
 
 \code{Proces}-versionen er ikke som forventet bedre en de andre versioner til at bearbejde griseobjekterne rettidigt. Dette skyldes at testen er gennemført på en maskine, med kun en kerne.  Dermed kan \code{processes}-versionen ikke drage nytte  af flere kerner, men er begrænset til kun at kunne køre en proces af gangen. I \code{processes}-versionen, foregår konntekstskiftene i operativsystemets \sched~, der er væsentligt langsommere end i \code{greenlets}- og \code{RTP}-versionen, hvor konktekstskiftene sker i vores \sched. 
 
-Efter at vi har afsluttet RTP har vi i forbindelse med Interaktiv Planlægning, implementeret muligheden for at tilknytte prioriteter. Vi har for at vise effekten af prioriter inkluderet dem i vores tabeller, men vil ikke komme nærmere ind på dem da de ikke er blevet  nærmere behandlet.\fxnote{bahh... hvda skal der stå her}\fxerror{Jeg har slet ikke snakket om prioritet!}
+Efter at vi har afsluttet RTP har vi i forbindelse med Interaktiv Planlægning, implementeret muligheden for at tilknytte prioriteter. Vi har for at vise effekten af prioriter inkluderet dem i vores tabeller, men vil ikke komme nærmere ind på dem da de ikke er blevet  nærmere behandlet.\fxwarning{bahh... hvad skal der stå mere her. prioritet er meget dårligt behandlet}
 \begin{table}[htbp]
 	\centering
 	\begin{tabular}{lcc}
@@ -68,9 +69,9 @@ Efter at vi har afsluttet RTP har vi i forbindelse med Interaktiv Planlægning, 
 
 For at få mere samtidigt arbejde har vi ændret indstillingerne for simuleringen, så transportbåndet er længere, og dermed giver mere tid til at nå deadlinen, men samtidig har vi flere grise samtidigt i simuleringe. Resultaterne af dette fremgår af \cref{tab:deadline-runs2}. Når antallet af grise, der skal bearbejdes samtidigt stiger, øges antallet af processer, der må kæmper mod hinanden for CPU-tid. Dette er ens for de tre eksisterende versionerne af \pycsp.  
 
-I \code{Proces}-versionen medfører det  muligheden for, at griseobjekterne kan blive  bearbejdet parallelt, hvis computeren har denne mulighed.  Ofte vil der være flere griseobjekterne end processorer, hvorfor griseobjekterne stadig vil skulle kæmpe mod hinanden, for at komme igennem netværket. Når griseobjekterne skal kæmpe for at komme igennem netværket, sker det, i denne version, uden hensyn til hvilken gris der er nærmest robotten. Man risikerer dermed en starvation\fxwarning{SB: specificer brug af starvation} situation hvor griseobjekterne kan overhale hinanden, så det ikke er grisene nærmest robotten der først bliver bearbejdet.
+I \code{Proces}-versionen medfører det  muligheden for, at griseobjekterne kan blive  bearbejdet parallelt, hvis computeren har denne mulighed.  Ofte vil der være flere griseobjekterne end processorer, hvorfor griseobjekterne vil derfor stadig vil skulle kæmpe mod hinanden, for at komme igennem netværket. Når griseobjekterne skal kæmpe for at komme igennem netværket, sker det, i denne version, uden hensyn til hvilken gris der er nærmest robotten. Man risikerer dermed en situation hvor griseobjekterne kan overhale hinanden, så det ikke er grisene nærmest robotten der først bliver bearbejdet.
 
-\code{RTP}-udvidelsen bygger på \code{greenlets}-versionen, og vil derfor have de samme begrænsninger som denne, som diskuteret i implementeringen i afsnit \cref{sec:deadline-exampel-implementation}. Starvation er ikke på samme måde et problem i \code{RTP}-versionen, da hver proces har tilknyttet griseobjektets deadline. Dermed sikres, at det altid er griseobjektet tættest på sin deadline, der sendes igennem netværket først.
+\code{RTP}-udvidelsen bygger på \code{greenlets}-versionen, og vil derfor have de samme begrænsninger som denne, som diskuteret i implementeringen i afsnit \cref{sec:deadline-exampel-implementation}. Grisseobjekter kan ikke  på samme måde overhale hinanden i \code{RTP}-versionen, da hver proces har tilknyttet griseobjektets deadline. Dermed sikres, at det altid er griseobjektet tættest på sin deadline, der sendes igennem netværket først.
 
 I \code{RTP}-versionen, slipper de enkelte processer desuden for at holde styr på tiden, og vurdere om det enkelte griseobjekts deadline, er overskredet. Når de starter, har de en deadline svarende til det tidspunkt robotten senest skal have griseobjektet. Denne sættes via funktionen \code{Set\_deadline}. \code{Set\_deadline} kan resultere i en exception, og derfor skal hver proces kunne håndtere en \code{DeadlineException}, som de i dette eksempel blot kan håndtere, ved at smide griseobjektet væk. Det kan de gøre, da robotten på dette tidspunkt tager sin beslutning, og derfor vælger at udskære grisen uden specialviden. Griseobjektet er dermed ikke længere relevant og kan smides væk, så processen kan gå i gang med modtage et nyt griseobjekt.
 

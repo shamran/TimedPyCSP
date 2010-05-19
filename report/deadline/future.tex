@@ -10,7 +10,7 @@ Den primære begrænsning i vores løsning er manglen på at kunne evaluere hvor
 \subsubsection{Håndtering af forskellige typer deadlines}
 I den nuværende løsning håndterer vi alle deadlines ens. Det er der fordele og ulemper ved, hvor en fordel er, at udvikleren får maksimal kontrol over hvad der skal ske såfremt en given deadline overskrides. Vi håndterer overskridelser af deadlines ved at kaste en exception når det sker. Dette er måske ikke altid ønskværdigt hvis det er en soft deadline der overskrides, da processen derved afbrydes. Det kunne tænkes at der er tilfælde hvor det er mere hensigtsmæssigt at udføre processen helt, og først her give besked om at den ikke nåede sin deadline.
 
-\fxerror*{Skal dette med}{I en fremtidig version ville man kunne udvide muligheden med en hybridversion, der skulle kunne håndtere processer med soft deadlines, der skal markeres, og kalde exceptions ved processer med hard deadline. Processen kunne f.eks have tilknyttet dens type af deadline. Systemet kan så reagere passende efter typen af deadlines, så soft deadlines blev færdigbehandlet, mens hard deadlines resulterede i en exception.}
+%\fxerror*{Skal dette med}{I en fremtidig version ville man kunne udvide muligheden med en hybridversion, der skulle kunne håndtere processer med soft deadlines, der skal markeres, og kalde exceptions ved processer med hard deadline. Processen kunne f.eks have tilknyttet dens type af deadline. Systemet kan så reagere passende efter typen af deadlines, så soft deadlines blev færdigbehandlet, mens hard deadlines resulterede i en exception.}
 
 
 \subsubsection{Udviklerbestemte prioriteter}
