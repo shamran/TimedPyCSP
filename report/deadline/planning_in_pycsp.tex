@@ -17,51 +17,17 @@ Vi har derfor valgt en anden løsning, hvor en proces blot kaster en exception, 
 \subsection{Udvælgelse af proces}
 Udvælgelsen af hvilken proces der skal aktiveres, ved et kontekstskift, er givet ud fra vores valg af EDF. Som beskrevet i \cref{sec:edf} specificerer EDF, at det altid processen med den nærmeste deadline der skal aktiveres. For at opnå dette kan vi benytte stort set samme metode som vi brugte i \des. I \des sorterede vi processerne efter hvilket tidskridt de skulle aktiveres i, her kan vi sortere dem ud fra deres deadline.  
 
-\subsection{Kommunikation}
-I litteraturen for  RTP fokuseres der kun på udvælgelsen og planlægningen af processer i \sched en. I \pycsp er det ikke kun  \sched en der bestemmer om en proces kan eksekveres, men er også afhængig af at kunne kommunikere over kanalerne. Dette er ikke et problem ved one-to-one kanaler, hvor der kun er en proces i hver ende, og processen dermed er garanteret at gennemføre kommunikationen hvis modparten er klar til at kommunikere. I \pycsp er one-to-one kanalerne blevet fjernet, og erstattet af any-to-any kanaler. Ud fra et teknisk synspunkt er disse mere generelle og kan alt som one-to-one kanalerne kan. Dette er dog ikke optimalt i forbindelse med RTP, da der til hver af kanalerne kan være et vilkårligt antal processer der ønsker at sende og modtage data på et givent tidspunkt. I one-to-one kanalerne kan man  umiddelbart foretage kommunikationen når der findes to processer der ønsker at kommunikere. I any-to-any kanalerne kan der være flere processer i den samme kanal, der venter på en proces der ønsker at kommunikere. Når der ankommer en proces der ønsker at kommunikere kan kun en af de ventende processer fuldføre sin kommunikation. I \pycsp foregår denne parring mellem processer tilfældigt, og kan derfor resultere i at processer med en lav prioritet foretager kommunikationen før en højt prioriteret proces. Når processer kommunikere i RTP i any-to-any kanaler, kan man med fordel sikre at det altid kommer til at foregå mellem de to processer der har den højeste prioritet.
+\subsection{Kanalkommunikation}\label{sec:rtp-kommunikation}
+I litteraturen for  RTP fokuseres der kun på udvælgelsen og planlægningen af processer i \sched en. I \pycsp er kommunikation blokerende, hvilket betyder at fra en proces, ønsker at kommunikere, er den blokeret, indtil kommunikationen er gennemført. Ved one-to-one kanaler, er der kun en proces i hver ende, og derfor er  processen garanteret at gennemføre kommunikationen når modparten er klar til at kommunikere. Har processerne forskellige prioriteter risikere man prioritetsinvertering, og kan afhjælpe det med prioritetsnedarvning. 
 
-\subsubsection{Kommunikation i \code{alternations}}
-Det er dog ikke kun i forbindelse med blokerende kommunikation vi skal forholde os til introduktionen af processer med  prioritet. I kodestrukturen \code{alternation}
- har en udvikler mulighed for at foretage et  prioriteret valg mellem flere forskellige kanaler. Et prioriteret valg mellem flere kanaler, kan dog være i konflikt med de processernes prioritet. 
-  
-\citeauthor{Burns1990} beskriver præcist denne problemstilling\cite{Burns1990}. Til at illustrere problemet beskriver de et eksempel, som er vist i \cref{lst:pri-select}. Denne kodestump viser et prioriteret valg mellem kanalerne A1 og A2. Til hver kanal er tilknyttet en proces, P1 og P2. Disse to processer har en prioritet tilknyttet på hhv.  Pri1 og Pri2. \CRef{tab:prioritizedSelect} viser resultatet af dette valg, afhængig af prioriteternes indbyrdes forhold.
-
-
-\begin{lstlisting}[firstnumber=1 ,float=hbtp, label=lst:pri-select, caption={(priority) select. Eksemplet er kopieret fra \cite{Burns1990}}]
-(priority) select
-   A1 -- Process P1
- or
-   A2 -- Process P2
- end select
-\end{lstlisting}
-
-\begin{table}[htbp]
-	\centering
-	\begin{tabular}{lccc}
-       	\toprule
-        &Pri1 > Pri2 & Pri1 = Pri2 & Pri1 < Pri2\\
-        \midrule
-		    priority select & A1 & A1           & ?  \\
-        \bottomrule
-        \end{tabular}
-    \caption[]{Konflikten ved brug af prioriteret valg og procesprioriteter. Eksemplet er kopieret fra \cite[160]{Burns1990}}\\
-    \label{tab:prioritizedSelect}
-\end{table}
-
-MANGLER MERE HERRRRR\\
-\cref{tab:prioritizedSelect} og konstatere, at der opstår en konflikt ved introduktionen af prioriteter. For \citeauthor{Burns1990} er løsningen ``orthogonal solutions'', der håndterer begge typer prioriteter. De ønsker overordnet set to typer udvælgelsesmetoder, weak- og strong Select. Weak select sorterer primært efter processernes prioritet og sekundært efter det prioriterede valg. Strong select udvælger udelukkende processer efter det prioriterede valg. De forestiller sig, at weak select skal bruges som den primære metode, men i specielle tilfælde skal en udvikler have mulighed for at tvinge et prioriteret valg igennem.
-
-Vi ønsker at udvælgelse i \code{alternations} udføres som weak select. Dvs. at først skal der kigges på, om \code{alternation} kan vælge en guard umiddelbart. Hvis der er minimum en guard klar, foretages der et prioriteret valg baseret på processernes prioritet. Hvis flere processer har samme prioritet foretages det prioriterede valg. Er ingen guards klar, bør processen vente i dens \code{alternation}, og vælge den første guard, der bliver klar, uden hensyn til dens prioritet.
-
-I artiklen fra \citeauthor{Burns1990} udvælger man en proces blandt flere mulige, mens en \code{alternation} udvælger en kanal, der i \pycsp er af typen any-to-any. Dette medfører, at man ikke  foretager et valg mellem processer, men foretager et valg mellem kanaler, som processen kommunikerer med. For at foretage en weak selection i vores \code{alternation}, skal man derfor kunne finde prioriteten for kanalerne. Dette skaber et behov for at kunne tilknytte en prioritet til hver kanal baseret på hvilke processer, der er tilknyttet kanalen. 
-\phantomsection
-\label{misc:kanal-prioritet}
+I \pycsp er one-to-one kanalerne blevet fjernet, og erstattet af any-to-any kanaler, der ud fra et teknisk synspunkt er mere generelle og kan alt som one-to-one kanalerne kan. I any-to-any kanalerne er man ikke begrænset til kun at have en proces i hver ende af kanalen, men der kan være et vilkårligt antal processer. 
+Benyttes prioritetsnedarvning på any-to-any kanaler, er man ikke som ved one-to-one kanaler sikret at det  processen der startede  prioritetsnedarvningen der får gavn af den, da parringen mellem processer der ønsker at kommunikere i \pycsp tilfældigt. Når processer kommunikere i  any-to-any kanaler kan man derfor med fordel sikre at det altid foregår mellem de to processer der har den højeste prioritet.
 
 
 \subsection{Prioritetsnedarvning}\label{sec:rtp-pycsp-nedarvning}
 At introducere prioritetsnedarvning i \pycsp virker umiddelbart ligetil, idet vi kan se de indbyrdes afhængigheder klart ud fra forbindelserne gennem kanalerne. Der kan forekomme andre afhængigheder, som er mindre synlige, men vi mener ikke disse vil forekomme i velskrevne CSP applikationer, og vi har derfor valgt at begrænse os til afhængigheder repræsenteret vha. kanaler. På trods af den umiddelbare simplicitet skal vi overveje hvornår, hvem og hvor længe, der skal arves i forbindelse med prioritetsnedarvning.
 
-\subsubsection*{Ændring af prioritet}
+\subsubsection{Ændring af prioritet}
 \label{sec:aendring-af-prioritet}
 Vi arbejder med et dynamisk system af processer, hvor en proces, på baggrund af sin tilstand, er afhængig af forskellige andre processer for at kunne arbejde videre. 
 Hvis vi højner prioriteten på alle processer, der er forbundet til en proces med høj prioritet, vil mange af processerne, der arver den høje prioritet, reelt ikke kunne bidrage til udførelsen af den proces, der starter med høj prioritet. Det er en bedre løsning, at det kun er den eller de processer, der kan sikre videre udførsel af den aktuelle proces, der tildeles højere prioritet. Hvis eksempelvis en proces med høj prioritet ønsker at skrive på en kanal, skal alle processer, der læser på den kanal, arve den høje prioritet, men de processer, som ønsker at skrive til en anden kanal, som processen med høj prioritet læser fra, skal ikke arve den høje prioritet. Generelt set betyder det, at der kun skal udføres prioritetsnedarvning, såfremt en højt prioriteret proces venter på at kommunikere, uden der er andre processer, der er klar til at indgå i den ønskede kommunikation. 
@@ -84,11 +50,46 @@ Vi har nu begrænset os til, at det kun er de processer der kan indgå i kommuni
   \end{center}
 \end{figure}
 
- Prioritetsnedarvning i et miljø med any-to-any kanaler har dermed en risiko for at medføre prioritetsdevaluering. Man kan forstille sig forskellige metoder til at eliminere eller minimere problemet f.eks ved at begrænse antallet af processer, der kan modtage en prioritetsnedarvning. Dette kunne gøres ved kun at lade en enkelt proces arve prioriteten,  men så skal man tage stilling til, hvilken proces, der skal udvælges. Dette kunne være den proces, der er tættest på at indgå i kommunikationen.  Udvælgelsen af processer må dog bero på en analyse af den enkelte applikation og dens aktuelle tilstand. Da vi ikke ønsker at begynde på en analyse af brugerens kode, må vi nødvendigvis sende prioritetsnedarvningen til alle processerne på kanalen. For at løse problemet vil vi i stedet fokusere på at minimere antallet af processer, der starter prioritetsnedarvningen, og det tidsrum processerne har arvet en prioritet.
+Prioritetsnedarvning i et miljø med any-to-any kanaler har dermed en risiko for at medføre prioritetsdevaluering. Man kan forstille sig forskellige metoder til at eliminere eller minimere problemet f.eks ved at begrænse antallet af processer, der kan modtage en prioritetsnedarvning. Dette kunne gøres ved kun at lade en enkelt proces arve prioriteten,  men så skal man tage stilling til, hvilken proces, der skal udvælges. Dette kunne være den proces, der er tættest på at indgå i kommunikationen.  Udvælgelsen af processer må dog bero på en analyse af den enkelte applikation og dens aktuelle tilstand. Da vi ikke ønsker at begynde på en analyse af brugerens kode, må vi nødvendigvis sende prioritetsnedarvningen til alle processerne på kanalen. For at løse problemet vil vi i stedet fokusere på at minimere antallet af processer, der starter prioritetsnedarvningen, og det tidsrum processerne har arvet en prioritet.
 
 Når kommunikationen på kanalen er gennemført, befinder processens sig i en anden tilstand og er afhængig af noget andet for at komme videre i sin udførsel. 
 Når det midlertidige afhængighedsforhold ophører skal processer der har arvet en prioritet miste denne. Der skal selvfølgelig tages højde for at en proces kan arve forskellige prioriteter fra forskellige andre processer, så det skal være muligt at falde tilbage til den næsthøjeste arvede prioritet, i stedet for blot at skifte tilbage til den oprindelige prioritet. 
 
+\subsection{Alternation}
+Det er dog ikke kun i forbindelse med almindelig kommunikation vi skal forholde os til introduktionen af processer med et prioritet. I kodestrukturen \code{alternation}
+ har en udvikler mulighed for at foretage et  prioriteret valg mellem flere forskellige kanaler. Et prioriteret valg mellem flere kanaler, kan dog være i konflikt med de processer som får opfyldt deres kommunikation. 
+  
+\citeauthor{Burns1990} beskriver og illustrerer præcist denne problemstilling i \citetitle{Burns1990}\cite{Burns1990}. Til at illustrere problemet beskriver de et eksempel, som er vist i \cref{lst:pri-select}. Denne kodestump viser et prioriteret valg mellem kanalerne A1 og A2. Til hver kanal er tilknyttet en proces, P1 og P2. Disse to processer har en prioritet tilknyttet på hhv.  Pri1 og Pri2. \CRef{tab:prioritizedSelect} viser hvilken kanal der bliver valgt, afhængig af processernes prioritet.
+
+\begin{lstlisting}[firstnumber=1 ,float=hbtp, label=lst:pri-select, caption={(priority) select. Eksemplet er kopieret fra \cite{Burns1990}}]
+(priority) select
+   A1 -- Process P1
+ or
+   A2 -- Process P2
+ end select
+\end{lstlisting}
+
+\begin{table}[htbp]
+	\centering
+	\begin{tabular}{lccc}
+       	\toprule
+                        & Pri1 > Pri2 & Pri1 = Pri2 & Pri1 < Pri2\\
+        \midrule
+	    priority select & A1          & A1          & ?  \\
+        \bottomrule
+        \end{tabular}
+    \caption[]{Konflikten ved brug af prioriteret valg og procesprioriteter. Eksemplet er kopieret fra \cite[160]{Burns1990}}\\
+    \label{tab:prioritizedSelect}
+\end{table}
+
+Man kan af \cref{tab:prioritizedSelect}  konstatere at der opstår en konflikt i kolonne tre, hvis udvikleren foretrækker en kanal, hvor den  tilknyttede proces' prioritet er lavere  end den anden proces'  prioritet. Man vil ikke kunne opfylde begge krav om både at kommunikere med den proces med højst prioritet, og lade udvikleren bestemme kanalen. For \citeauthor{Burns1990} er løsningen en ``orthogonal solutions'', der håndterer begge typer prioriteter. De ønsker overordnet set to typer udvælgelsesmetoder, weak- og strong Select. Weak select sorterer primært efter processernes prioritet og sekundært efter det prioriterede valg. Strong select udvælger udelukkende processer efter det prioriterede valg. De forstiller sig, at weak select skal bruges som den primære metode, men i specielle tilfælde skal en udvikler have mulighed for at tvinge et prioriteret valg igennem.
+
+I artiklen fra \citeauthor{Burns1990} har de kun beskæftiget sig med one-to-one kanaler, og det er denne antagelse der medfører at et valg af kanal medfører et valg af en proces og dennes prioritet. Dette er ikke en mulighed i \pycsp hvor kanalerne er af typen any-to-any. Et valg af en kanal, medfører derfor ikke en direkte kobling til en proces, men til vilkårligt mange processer, der kan have individuelle  prioriteter. I \cref{sec:rtp-kommunikation} kommer vi frem til at kommunikationen altid skal sørge for at det er den højst prioriterede proces der kommunikerer. Dette kan bruges i \code{alternation} til at finde den højeste prioritet blandt de processer der er klar til at kommunikere, og bruge denne prioritet til udvælgelsen af kanal i \code{alternation}.
+
+På baggrund af artiklen har vi valgt at \code{alternations} udfører en weak select, da denne version egner sig bedst til RTP . Vi vil i vores version ikke inkludere en strong select. Dette gør vi ud fra en betragtning om at den kun bør bruges i sjældne tilfælde,  da den vil modarbejde ideen bag RTP. Hvis en udvikler alligevel ønsker denne funktionalitet, vil har godt kunne opnå det i \pycsp, men vi ønsker ikke at tilskynde brugen, ved direkte at inkludere den.
+
+\phantomsection
+\label{misc:kanal-prioritet}
 \subsubsection*{Prioritetsnedarvning i \code{alternations}}
 Vi har som nævnt en klar kæde af afhængigheder i \pycsp men vi skal være opmærksomme på ikke at højne processers prioritet unødigt. Dette kan let blive tilfældet såfremt vi ikke holder ordentligt styr på, hvorfor en proces har den prioritet, den har, om den er sat af udvikleren, eller den er nedarvet. Man kan forestille sig en situation, hvor et uddrag af et proces-neværk består af en generator-forbruger-model med to generatorer og en enkelt forbruger. De to generatorer er forbundet til forbrugeren vha. en \code{alternation}, og har henholdsvis høj og lav prioritet. Eksemplet er illustreret på \cref{fig:alt-inheritance}. Forbrugeren vil i dette scenarium arve den høje prioritet fra den tilsvarende generator, men utilsigtet vil den høje prioritet derefter også propagere fra forbrugeren til generatoren med lav prioritet. Dette er ikke hensigtsmæssigt, da de to generatorer nu har lige høj prioritet og ikke det forhold, som udvikleren oprindeligt har angivet. Vi kan dog indse, at dette ikke bliver et problem, idet vi kun udfører prioritetsnedarvning i det tilfælde, hvor der ikke er nogen processer, der er er klar til at indgå i ønsket kommunikation. I det opstillede tilfælde vil forbrugeren derfor ikke foretage yderligere prioritetsnedarvning på generatoren med lav prioritet, da generatoren med høj prioritet altid vil være klar til at skrive i denne situation. 
 
