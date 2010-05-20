@@ -1,16 +1,23 @@
 Gennemgå IP
       Hvor vigtigt er det at lave eksempler
       ok at sige at det er RTP med lidt ekstra?
+
       
 RTP - prioriteter i evaluering (Ikke diskuteret andre steder)
 
 
 Hvordan skal kode inkluderes? som bilag eller bare på en cd?
+    Som url i starten. enten i abstract eller indledning
+
+
 
 Fremlæggelse: 
       dato
-      hvor lang en præsentation?
-      noget individuelt?
+      29 juni, med møde om fremlæggelse d. 22
+      
+      hvor lang en præsentation? 20 -25 min
+      
+      noget individuelt? alles
       forløb generelt
 
 
