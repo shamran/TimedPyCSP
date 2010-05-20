@@ -1,6 +1,5 @@
 \section{Evaluering}
-\fxnote{metatekst - Done}
-Vi har  det foregående afsnit beskrevet hvad der skal til for at implementere RTP i \pycsp. Vi vil i dette afsnit først se på hvordan RTP er blevet implementeret, for derefter at evaluere vores løsning, med udgangspunkt i slagterieksemplet.
+Vi har i det foregående afsnit beskrevet hvad der skal til, for at implementere RTP i \pycsp. Vi vil i dette afsnit gennemgå hvordan RTP kan implementeres, for derefter at evaluere vores løsning med udgangspunkt i slagterieksemplet.
 \subsection{Test af Korrekthed}
 Vi har som i \des i \cref{sec:des-eval} løbende skrevet tests, før vi implementerede hver ny funktion i \code{RTP}-versionen.  Bilag \ref{app:rtp-test} viser testresultaterne for de tests der er lavet specifikt for \code{RTP}-versionen.
 
@@ -107,7 +106,7 @@ while True:
 \end{lstlisting}
 
 For ikke unødigt at give vores version en fordel har vi valgt at ændre dummyprocessen, så også \code{greenlets}-versionen kan blive færdig. Vi har ikke mulighed for i \code{greenlets}-versionen manuelt at stoppe eksekveringen af processen, og lade den  blive placeret på \code{next}-listen. Den eneste måde for en proces at komme på denne liste er efter at have kommunikeret. Vi ændrer derfor dummyprocessen til et dummynetværk bestående af to processer, der hver foretager et stykke arbejde og kommunikerer, som vist i \cref{dummy2}. I dette netværk findes der to dummyprocesser, der skiftes til at sende hinanden den akkumulerede tid de har været aktive. Fordi de efter hver periode, sender den akkumulerede tid til den anden dummyproces, vil den ene hele tiden skulle vente, for så at blive lagt på \code{next}-listen. Dermed  indgår dummyprocesserne  på lige fod med alle andre aktive processer i netværket.
-\fxwarning{Snak om at prioriteter kommer til sin i ret i RTP, når vi har dummyprocesser.}
+
 \begin{lstlisting}[firstnumber=1 ,float=hbtp, label=dummy2, caption=Uddrag Dummynetværk]
 while True:
     time_spent = dummy_in()
@@ -135,6 +134,6 @@ while True:
 \end{table}
 
 \CRef{tab:dummy-run} viser den gennemsnitlige tid hver version har brugt i dummyprocessen, samt hvor mange grise, der er blevet bearbejdet rettidigt. 
-Som det ses, bruges der mindre tid i dummyfunktionen i \code{RTP}-versionen end i \code{greenlets}-versionen. Dette medfører at antallet af grise, der rettidigt bliver bearbejdet, er højere i \code{RTP}-versionen. Denne test viser dermed, at \code{RTP}-versionen formår at udvælge de tidskritiske processer, på bekostning af processer uden deadline, og at denne udvælgelse medfører en øget succesrate, på trods af den øgede kompleksitet i \code{RTP}-versionen.
+Som det ses, bruges der mindre tid i dummyfunktionen i \code{RTP}-versionen end i \code{greenlets}-versionen. Dette medfører at antallet af grise, der rettidigt bliver bearbejdet, er højere i \code{RTP}-versionen. Denne test viser dermed, at \code{RTP}-versionen formår at udvælge de tidskritiske processer, på bekostning af processer uden deadline, og at denne udvælgelse medfører en øget succesrate, på trods af den øgede kompleksitet i \code{RTP}-versionen. Vi ser yderligere at den ekstra funktionalitet til at håndtere prioritet spiller en stor rolle, når vi introducerer dummyprocesserne. Det sker fordi vi nu har en et scenarium, hvor vi kan differentiere i i prioriteten af de enkelte processer, og sikre at de højt prioriterede processer afvikles når der er brug for det.
 
 
