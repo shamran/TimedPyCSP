@@ -13,14 +13,14 @@ conv_iter = 1000000
 ana_iter =   700000
 dummy_iter =  50000
 std = 0.2
-concurrent = 1.0
+concurrent = 2.0
 avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)/concurrent
 
 time_to_camera_deadline = (avg_camera_processing+avg_convert_processing)*1.3
 time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*(1.22*concurrent)
 
 
-pigs_to_simulate =  20
+pigs_to_simulate =  100
 number_of_simulations = 5
 
 class Pig:
@@ -47,7 +47,6 @@ def dummywork(iterations):
     temp = 0
     import time    
     for k in xrange(int(iterations)):
-         #if k%120000 ==0 : Release()
          temp += (math.pow(-1,k)*4) / (2.0*k+1.0)
          k +=1
 
@@ -57,12 +56,9 @@ def background_dummywork(dummy, time_out):
     def internal_dummy(_id,dummy_in, dummy_out,time_out,work = dummy_iter):
         try:
             time_spent=0
-            n = 0
             if _id == 0: dummy_out(time_spent)
             while True:
                 time_spent = dummy_in()
-                n+=1
-                #print "spending time in dummy"
                 time_spent -= Now()
                 dummywork(work)
                 time_spent += Now()
@@ -282,4 +278,5 @@ Parallel(
 )
 print "cam deadline:\t%3f\ndeadline:\t%3f"%(time_to_camera_deadline,time_to_deadline)
 print "avg procsessing time: ",avg_camera_processing+avg_convert_processing+avg_analysis_processing
+print "concurrent: ",concurrent
 print "RTP with prioritet"

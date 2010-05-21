@@ -28,41 +28,45 @@ En kørsel af de tre eksisterende versioner giver et meget forskelligt resultat,
 I vores arbejde med anvendelsesområdet Interaktiv Planlægning i kapitel \ref{chap:is}, har vi implementeret et prioritetssystem for processer, som vi efterfølgende har ført tilbage i RTP-versionen, da vi netop indenfor dette anvendelsesområde, har tænkt på det som en mulig udvidelse. Vi har derfor medtaget resultater hvor vi har højere prioriteter på de essentielle processer. Umiddelbart ser det ud til at forværre ydelsen, hvilket må tillægges at håndteringen af prioriteter skaber et overhead, sammenholdt med, at alle processer i denne version af eksemplet er lige vigtige. 
 
 
-\begin{table}[htbp]
-  \vspace{0.5cm}
-	\centering
-	\begin{tabular}{lcc}
-       	\toprule
-        \mc{Version}  &\mc{Succesrate (\%)}&\mc{Standard Afvigelse (SA)}\\
-        \midrule
-        Processes&1 & 1 \\
-        Threads & 14 & 7\\
-        Greenlets & 18& 9 \\        
-        RTP u. prioritet &22  &8 \\
-        RTP m. prioritet & 17 & 8\\
-        \bottomrule
-    \end{tabular}
-	\caption[]{10 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }\\
-	\label{tab:deadline-runs}
-\end{table}
+%\begin{table}[htbp]
+%  \vspace{0.5cm}
+%	\centering
+%	\begin{tabular}{lcc}
+%       	\toprule
+%        \mc{Version}  &\mc{Succesrate (\%)}&\mc{Standard Afvigelse (SA)}\\
+%        \midrule
+%        Processes&1 & 1 \\
+%        Threads & 14 & 7\\
+%        Greenlets & 18& 9 \\        
+%        RTP u. prioritet &22  &8 \\
+%        RTP m. prioritet & 17 & 8\\
+%        \bottomrule
+%    \end{tabular}
+%	\caption[]{10 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }\\
+%	\label{tab:deadline-runs}
+%\end{table}
 
 \begin{table}[htbp]
 	\centering
 	\begin{tabular}{lccc}
        	\toprule
-        \mc{Version}  &\mc{Samtidige grise}&\mc{Succesrate (\%)}&\mc{Standard Afvigelse (SA)}\\
+        \mc{Version}  &\mc{Samtidige grise} & \mc{Succesrate (\%)} & \mc{Standard Afvigelse (SA)} \\
         \midrule
-        Greenlets & 1 & 18& 9 \\
-        Greenlets & 2 & 49& 0 \\
-        Greenlets & 3 & 32& 0\\
-        Greenlets & 5 & 20& 0 \\
+        Greenlets        & 1 & 44 & 7 \\
+        Greenlets        & 2 & 49 & 1 \\
+        Greenlets        & 3 & 32 & 0\\
+        Greenlets        & 5 & 20 & 0 \\
         \midrule
-        RTP u. prioritet &1&22  &8 \\
-        RTP u. prioritet &2&45  &2 \\
-        RTP u. prioritet &3&29  &0 \\
-        RTP u. prioritet &5&17  &0 \\
+        RTP u. prioritet & 1 & 42 & 6 \\
+        RTP u. prioritet & 2 & 44 & 2 \\
+        RTP u. prioritet & 3 & 31 & 2 \\
+        RTP u. prioritet & 5 & 19 & 0 \\
         \midrule
-        RTP m. prioritet &1& 17 & 8\\
+        RTP m. prioritet & 1 & 44 & 10\\
+        RTP m. prioritet & 2 & 21 & 5\\
+        RTP m. prioritet & 3 & 21 & 7\\
+        RTP m. prioritet & 5 &  7 & 3\\
+
         \bottomrule
     \end{tabular}
 	\caption[]{10 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }\\

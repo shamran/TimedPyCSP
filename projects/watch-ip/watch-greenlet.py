@@ -18,17 +18,20 @@ class Watch:
 
     def print_time(self):
         offset = time.time()-start_time
-        print "time in watch is %02.0f:%02.0f:%02.0f (real time spent %f = diff %f)"%(self.present_time.hour,self.present_time.minut, self.present_time.second, offset, offset-self.present_time.internal_seconds)
+        print "time in watch is %02.0f:%02.0f:%02.0f (late by %f)"%(self.present_time.hour,self.present_time.minut, self.present_time.second, offset-self.present_time.internal_seconds)
     def set_time(self,timestamp):
         self.present_time = timestamp         
         self.offset =  time.time()-start_time-self.present_time.internal_seconds        
+
+
+
+
 
 def dummywork(iterations):
     #Estimating Pi.
     temp = 0
     import time    
     for k in xrange(int(iterations)):
-         #if k%120000 ==0 : Release()
          temp += (math.pow(-1,k)*4) / (2.0*k+1.0)
          k +=1
 
@@ -80,8 +83,9 @@ def background_dummywork(dummy, time_out):
 @io
 def sleep(n):
     import time
+    #b4 = time.time()
     if n>0: time.sleep(n)
-
+    #print "in sleep", time.time()-b4,"=",n
 
 @process 
 def watch_process(time_in_channel,ack_out_channel):
@@ -89,23 +93,36 @@ def watch_process(time_in_channel,ack_out_channel):
     try:
         offsets = []
         while True:
-            watch.set_time(time_in_channel())
-            offsets.append(watch.offset)
-            watch.print_time()
-            ack_out_channel(True)
+            timestamp = time_in_channel()
+            if time.time()-start_time < (timestamp.internal_seconds+1):
+                watch.set_time()
+                offsets.append(watch.offset)
+                watch.print_time()
+                #ack_out_channel(True)
     except ChannelPoisonException:
         print "mean: %0.3f"%scipy.mean(offsets) 
         #print "variance :", scipy.var(stc)
         print "std variance : %0.3f\n"%scipy.std(offsets)
+        print "len of received timestamps; %0.3f"%len(offsets)
 
         poison(time_in_channel,ack_out_channel)    
 
 @process
-def set_time(_id,timeset, time_out_Channel, ack_in_channel):
-        
-        sleep(timeset.internal_seconds-(time.time()-start_time))
-        time_out_Channel(timeset)
-        ack = ack_in_channel()
+def set_time(_id,timeset, time_out_Channel, ack_in_channel):       
+    sleeptime = (timeset.internal_seconds-(time.time()-start_time))
+    sleep(sleeptime)
+    realtime = time.time()-start_time
+    #print "internal time :%0.0f , real time: %f, diff: %f slept for %f"%(timeset.internal_seconds,realtime,timeset.internal_seconds-realtime,sleeptime)
+
+    sending_time = (timeset.internal_seconds-(time.time()-start_time)+1)
+    
+    if timeset.internal_seconds-time.time()+start_time+1 > 0 :
+        Alternation([
+            {(time_out_Channel,timeset):None},
+            {Timeout(sending_time):None}
+            ]).execute()   
+    #ack = ack_in_channel()
+
 
 @process
 def close_watch(time_channel,dummy_channel,time):
@@ -117,18 +134,12 @@ time_channel = Channel()
 ack_channel = Channel()
 dummy_channel = Channel()
 dummy_timer_channel = Channel()
-time_steps = 130
+time_steps = 100
 start_time = time.time()
 #try:
 Parallel(
     watch_process(+time_channel,-ack_channel)
     ,[set_time(i,Time(i/(60*60),i/60,i%60),-time_channel,+ack_channel) for i in range(time_steps)]
     ,close_watch(+time_channel,+dummy_channel,time_steps)
-    ,6*background_dummywork(dummy_channel,-dummy_timer_channel)
-    #,StatisticTime(+dummy_timer_channel)
+    ,10*background_dummywork(dummy_channel,-dummy_timer_channel)
     )    
-#except DeadlineException:
-#    print "fucking excewption"
-
-print "done"
-

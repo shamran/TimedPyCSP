@@ -11,16 +11,16 @@ avg_analysis_processing = 0.45
 cam_iter =   200000
 conv_iter = 1000000
 ana_iter =   700000
-dummy_iter = 50000
+dummy_iter =  50000
 std = 0.2
-concurrent = 1.0
+concurrent = 5.0
 avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)/concurrent
 
 time_to_camera_deadline = (avg_camera_processing+avg_convert_processing)*1.3
 time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*(1.22*concurrent)
 
 
-pigs_to_simulate =  20
+pigs_to_simulate =  100
 number_of_simulations = 5
 
 class Pig:
@@ -47,7 +47,6 @@ def dummywork(iterations):
     temp = 0
     import time    
     for k in xrange(int(iterations)):
-         #if k%120000 ==0 : Release()
          temp += (math.pow(-1,k)*4) / (2.0*k+1.0)
          k +=1
 
@@ -57,12 +56,9 @@ def background_dummywork(dummy, time_out):
     def internal_dummy(_id,dummy_in, dummy_out,time_out,work = dummy_iter):
         try:
             time_spent=0
-            n = 0
             if _id == 0: dummy_out(time_spent)
             while True:
-                time_spent = dummy_in()
-                n+=1
-                #print "spending time in dummy"
+                time_spent = dummy_in()                
                 time_spent -= Now()
                 dummywork(work)
                 time_spent += Now()
@@ -89,7 +85,7 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
     Set_deadline(NextpigArrival-Now())
     for x in xrange(pigs_to_simulate):
         try:
-            #if x % 10 == 0 : print "\t\t",x
+            if x % 10 == 0 : print "\t\t",x
             pig = Pig(x,ThispigArrival,ran)
             robot(pig)
             if pig.arrivaltime+time_to_camera_deadline-Now()>0:               
@@ -228,7 +224,7 @@ def Work(statC,timeC):
 
         try:
             Parallel(
-            3*background_dummywork(dummyC,timeC),
+            #3*background_dummywork(dummyC,timeC),
             feed,
             rob            
             )
@@ -279,4 +275,5 @@ Parallel(
 )
 print "cam deadline:\t%3f\ndeadline:\t%3f"%(time_to_camera_deadline,time_to_deadline)
 print "avg procsessing time: ",avg_camera_processing+avg_convert_processing+avg_analysis_processing
+print "concurrent: ",concurrent
 print "RTP version"

@@ -11,16 +11,16 @@ avg_analysis_processing = 0.45
 cam_iter =   200000
 conv_iter = 1000000
 ana_iter =   700000
-dummy_iter = 50000
+dummy_iter =  50000
 std = 0.2
-concurrent = 1.0
+concurrent = 5.0
 avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)/concurrent
 
 time_to_camera_deadline = (avg_camera_processing+avg_convert_processing)*1.3
 time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*(1.22*concurrent)
 
 
-pigs_to_simulate =  20
+pigs_to_simulate =  100
 number_of_simulations = 5
 
 class Pig:
@@ -60,7 +60,7 @@ def background_dummywork(dummy, time_out):
             while True:
                 time_spent = dummy_in()
                 time_spent -= time.time()
-                3*dummywork(work)
+                dummywork(work)
                 time_spent += time.time()
                 dummy_out(time_spent)
         except ChannelPoisonException:
@@ -68,7 +68,8 @@ def background_dummywork(dummy, time_out):
             if _id == 0: time_out(time_spent)
 
     dummyC = Channel()   
-    Parallel(internal_dummy(0,+dummy,-dummyC,time_out),
+    Parallel(
+        internal_dummy(0,+dummy,-dummyC,time_out),
       internal_dummy(1,+dummyC,-dummy,time_out))
 
 @io
@@ -82,7 +83,7 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
     NextpigArrival = time.time()+ran.gauss(data, data*std)
     ThispigArrival = time.time()
     for x in xrange(pigs_to_simulate):
-        #if x % 10 == 0 : print "\t\t",x
+        if x % 10 == 0 : print "\t\t",x
         pig = Pig(x,ThispigArrival,ran)
         robot(pig)
         if pig.arrivaltime+time_to_camera_deadline-time.time()>0:
@@ -195,7 +196,7 @@ def Work(statC,timeC):
         rob = robotFunc(+robotC,+analysisC,ran,statC)
 
         Parallel(
-            1*background_dummywork(dummyC,timeC),
+            #3*background_dummywork(dummyC,timeC),
             feed,
             rob            
         )          
@@ -244,4 +245,5 @@ Parallel(
 )
 print "cam deadline:\t%3f\ndeadline:\t%3f"%(time_to_camera_deadline,time_to_deadline)
 print "avg procsessing time: ",avg_camera_processing+avg_convert_processing+avg_analysis_processing
+print "concurrent: ",concurrent
 print "Greenlets version"

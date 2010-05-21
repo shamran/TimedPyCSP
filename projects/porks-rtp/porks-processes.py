@@ -1,6 +1,5 @@
 """ Configurable. Run once then poison channels. """
 from pycsp.processes import *
-#   from pycsp.threads import *
 #from random import expovariate, uniform, seed
 import random, sys, time , heapq, math, scipy
 
@@ -12,17 +11,17 @@ avg_analysis_processing = 0.45
 cam_iter =   200000
 conv_iter = 1000000
 ana_iter =   700000
-dummy_iter = 100000
-std = 0.04
+dummy_iter = 50000
+std = 0.2
+concurrent = 1.0
+avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)/concurrent
 
-avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*0.5
-
-time_to_camera_deadline = avg_camera_processing+max(avg_convert_processing,avg_analysis_processing)*1
-time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*2.22
+time_to_camera_deadline = (avg_camera_processing+avg_convert_processing)*1.3
+time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*(1.22*concurrent)
 
 
-pigs_to_simulate =  5
-number_of_simulations = 2
+pigs_to_simulate =  100
+number_of_simulations = 5
 
 class Pig:
   def __init__(self,_id, arrivaltime,ran,deadline = time_to_deadline):
@@ -47,22 +46,30 @@ def dummywork(iterations):
     #Estimating Pi.
     temp = 0
     import time    
-    for k in xrange(iterations):
+    for k in xrange(int(iterations)):
          temp += (math.pow(-1,k)*4) / (2.0*k+1.0)
          k +=1
 
 @process
-def background_dummywork(dummy_in, time_out,work = dummy_iter):
+def background_dummywork(dummy, time_out):
+    @process
+    def internal_dummy(_id,dummy_in, dummy_out,time_out,work = dummy_iter):
     try:
         time_spent=0
-        n = 0
-        while True:
-            time_spent +=work
-            Alternation([{Timeout(seconds=0.005):None}, {dummy_in:None}]).select()    
-            n+=1
-            dummywork(work)
-    except ChannelPoisonException:
-        time_out(time_spent)   
+            if _id == 0: dummy_out(time_spent)
+            while True:
+                time_spent = dummy_in()
+                time_spent -= time.time()
+                3*dummywork(work)
+                time_spent += time.time()
+                dummy_out(time_spent)
+        except ChannelPoisonException:
+            poison(dummy_in,dummy_out)
+            if _id == 0: time_out(time_spent)
+
+    dummyC = Channel()   
+    Parallel(internal_dummy(0,+dummy,-dummyC,time_out),
+      internal_dummy(1,+dummyC,-dummy,time_out))
 
 @io
 def sleep(n):
@@ -75,7 +82,7 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
     NextpigArrival = time.time()+ran.gauss(data, data*std)
     ThispigArrival = time.time()
     for x in xrange(pigs_to_simulate):
-        if x % 1 == 0 : print "\t\t",x
+        #if x % 1 == 0 : print "\t\t",x
         pig = Pig(x,ThispigArrival,ran)
         robot(pig)
         if pig.arrivaltime+time_to_camera_deadline-time.time()>0:
@@ -90,7 +97,7 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
                 {((-feederChannel),pig):None},
                 {Timeout(NextpigArrival-time.time()):None}
                 ]).execute()       
-        else: print "no slack !!"
+        #else: print "no slack !!"
         ThispigArrival = NextpigArrival
         NextpigArrival = ThispigArrival+ran.gauss(data, data*std)
         if ThispigArrival>time.time() : sleep(ThispigArrival-time.time())       

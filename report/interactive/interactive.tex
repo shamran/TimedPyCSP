@@ -12,7 +12,7 @@ Vi vil derfor i stedet på baggrund af en række praktiske eksempler indkredse h
 Vi har valgt to scenarier som vi forventer med fordel kan benytte \is. Det første er en repræsentation af et ur, hvilket vi mener er det simpleste eksempel der kan gøre brug af \is. Det andet eksempel er en del af et computerspil, som er vores forventede primære anvendelsesområde for \is. 
 
 \subsection{Et ur}
-Det første eksempel på \is er en repræsentation af et digitalur. Uret består af fire cifre, og en gang i minuttet skal minuttallet tælles op. Det er et  krav at en opdatering af uret skal sætte uret til at vise det korrekte tidspunkt. Vi forestiller os at uret er en del af et større system hvor der er andre ressourcekrævende begivenheder der er vigtigere at få udført end opdateringen af uret. Opdatering af uret foregår ved at planlægge en begivenhed til hvert minut, der specificerer hvad uret skal vise. Da det har en lav prioritet, er der ikke er nogen garanti for at denne begivenhed indtræffer i det minut den er planlagt til. Derfor skal begivenheden  bortkastes såfremt den overskrider sin deadline. Deadlinen vil være det sidste sekund inden et nyt minut begynder, for at sikre den krævede korrekthed. 
+Det første eksempel på \is er en repræsentation af et digitalur. Uret består af seks cifre, og en gang i sekundet skal sekunderne tælles op. Det er et  krav at en opdatering af uret skal sætte uret til at vise det korrekte tidspunkt. Vi forestiller os at uret er en del af et større system hvor der er andre ressourcekrævende begivenheder der er vigtigere at få udført end opdateringen af uret. Opdatering af uret foregår ved at planlægge en begivenhed til hvert sekund, der specificerer hvad uret skal vise. Da det har en lav prioritet, er der ikke er nogen garanti for at denne begivenhed indtræffer i det sekund den er planlagt til. Derfor skal begivenheden  bortkastes såfremt den overskrider sin deadline. Deadlinen vil være det når et nyt sekund begynder, for at sikre den krævede korrekthed. 
 
 Uret er repræsentativt for \is da der planlægges en række begivenheder der skal foregå i fremtiden, og hvor hver begivenhed også har tilknyttet en deadline.
 
@@ -68,7 +68,18 @@ Vi valgt at implementere en simpelt løsning, hvor  de to tal lægges efter hina
 
     
 \section{Evaluering}
+Vi har i det foregående afsnit beskrevet hvad der skal til, for at implementere \is i \pycsp. Vi vil i dette afsnit gennemgå hvordan \is kan implementeres, for derefter at evaluere vores løsning med udgangspunkt i ureksemplet.
 
+Netværket er struktureret som vist i figur \cref{fig:watch_network}. Som vi kom ind på tidligere, har vi en urproces, en række tidsstempel processer, og nogle dummyprocesser. Urprocessen modtager et tidstempel fra alle  tidsstempelprocceserne, og står så for at  opdatere uret. Tidsstempelprocesserne modtager fra start af hver sit tidsstempel og de står så for at vente indtil dette tidspunkt, for så at sende tidspunktet til ur-processen. Samtidigt med at uret tælles op køres der også en række dummyprocesser i par, som snakker med hinanden. disse processer brugte vi også i RTP eksemplet, og skal vise at der foregå andet arbejde på maskinen. 
+\begin{figure}
+ \begin{center}
+  \includegraphics[scale=1]{images/watch-network}
+	\caption{Procesnetværk med flere konverteringsprocesser, og analyseprocesser}
+	\label{fig:watch_network}
+\end{center}
+\end{figure}
+Ved implementeringen af \code{greelets}-versionen, opstår der et problem i opdateringen af uret. For kun at ville opdatere uret så længe tidsstemplet er korrekt, har vi implementeret i en \code{alternation}, med en timeout.  Tidsstempel-processen, skal derfor inden et sekund have sendt beskeden til uret, og vil ellers helt droppe forsendelsen. Som man kan se af linje 1 i \cref{tab:watch}, er den gennemsnitlige forsinkelse over et hvilket burde være umligt, da opdateringer på over et sekund bør falde bort. Grunden til forsinkelsen skyldes at tidsstempel-processen korrekt får overført tidsstemplet til urprocessen. Denne bliver så lagt på listen \code{next}, men skal der slås med dummy-processerne for at blive udvalgt af \sched en. Når ur-processen bliver aktiveret er tiden forpasset og uret bliver opdateret for sent.
+Vi har derfor lavet endnu en version hvor vi også ur-processen efter den har modtaget tidsstemplet kontrollere at tiden ikke er forpasset. Resultatet af denne ændring ses af linje 2 i tabellen, hvor vi kan se at ikke en eneste gang når uret at blive opdateret inden tiden ar forpasset.
 
 \begin{table}[htbp]
 	\centering
@@ -76,21 +87,13 @@ Vi valgt at implementere en simpelt løsning, hvor  de to tal lægges efter hina
        	\toprule
         \mc{Version}  &\mc{Gennemsnitlig forsinkelse}&\mc{Standard Afvigelse (SA)}\\
         \midrule
-        Greenlets & 1 & 18& 9 \\
-        Greenlets & 2 & 49& 0 \\
-        Greenlets & 3 & 32& 0\\
-        Greenlets & 5 & 20& 0 \\
-        \midrule
-        RTP u. prioritet &1&22  &8 \\
-        RTP u. prioritet &2&45  &2 \\
-        RTP u. prioritet &3&29  &0 \\
-        RTP u. prioritet &5&17  &0 \\
-        \midrule
-        RTP m. prioritet &1& 17 & 8\\
+        Greenlets & 1.529 & 0.276 \\
+        Greenlets ver. 2 & NaN & 0\\
+        \is       & 0.539 & 0.411 \\
         \bottomrule
     \end{tabular}
-	\caption[]{10 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }\\
-	\label{tab:deadline-runs2}
+	\caption[]{Proces-netværk betstående af et ur, 100 opdateringer, og baggrundsprocesser }\\
+	\label{tab:watch}
 \end{table}
 
 

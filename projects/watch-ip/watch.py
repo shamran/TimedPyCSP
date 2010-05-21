@@ -14,24 +14,22 @@ class Time:
 
 class Watch:
     def __init__(self):
-        self.time = None
+        self.present_time = None
 
     def print_time(self):
         offset = Now()-start_time
-        print "time in watch is %02.0f:%02.0f:%02.0f (real time spent %f = diff %f)"%(self.time.hour,self.time.minut, self.time.second, offset, offset-self.time.internal_seconds)
-
-    def set_time(self,time):
-        self.time = time
-        self.offset =  Now()-start_time-self.time.internal_seconds        
+        print "time in watch is %02.0f:%02.0f:%02.0f (real time spent %f = diff %f)"%(self.present_time.hour,self.present_time.minut, self.present_time.second, offset, offset-self.present_time.internal_seconds)
+    def set_time(self,timestamp):
+        self.present_time = timestamp         
+        self.offset =   Now()-start_time-self.present_time.internal_seconds        
         
 def dummywork(iterations):
     #Estimating Pi.
     temp = 0
     import time    
     for k in xrange(int(iterations)):
-         #if k%120000 ==0 : Release()
-         temp += (math.pow(-1,k)*4) / (2.0*k+1.0)
-         k +=1
+        temp += (math.pow(-1,k)*4) / (2.0*k+1.0)
+        k +=1
 
 @process
 def StatisticTime(statC):
@@ -98,15 +96,15 @@ def watch_process(time_in_channel,ack_out_channel):
         print "mean: %0.3f"%scipy.mean(offsets) 
         #print "variance :", scipy.var(stc)
         print "std variance : %0.3f\n"%scipy.std(offsets)
-
+        print "len of received timestamps; %0.3f"%len(offsets)
         poison(time_in_channel,ack_out_channel)    
 
 @process
-def set_time(_id,time, time_out_Channel, ack_in_channel):
+def set_time(_id,timeset, time_out_Channel, ack_in_channel):
     try:
-        Set_deadline(time.internal_seconds+1)
-        Wait(time.internal_seconds)
-        time_out_Channel(time)
+        Set_deadline(timeset.internal_seconds+1)
+        Wait(timeset.internal_seconds-(Now()-start_time))
+        time_out_Channel(timeset)
         ack = ack_in_channel()
     except DeadlineException:
         print "skipped one update"
@@ -121,15 +119,12 @@ time_channel = Channel()
 ack_channel = Channel()
 dummy_channel = Channel()
 dummy_timer_channel = Channel()
-time_steps = 30
-
+time_steps = 100    
 start_time = Now()
-
+#try:
 Parallel(
     watch_process(+time_channel,-ack_channel)
     ,[set_time(i,Time(i/(60*60),i/60,i%60),-time_channel,+ack_channel) for i in range(time_steps)]
     ,close_watch(+time_channel,+dummy_channel,time_steps)
-    ,14*background_dummywork(dummy_channel,-dummy_timer_channel)
+    ,10*background_dummywork(dummy_channel,-dummy_timer_channel)
     )    
-
-
