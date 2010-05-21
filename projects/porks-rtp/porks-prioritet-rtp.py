@@ -231,7 +231,7 @@ def Work(statC,timeC):
 
         try:
             Parallel(
-            3*background_dummywork(dummyC,timeC),
+            #3*background_dummywork(dummyC,timeC),
             feed,
             rob            
             )

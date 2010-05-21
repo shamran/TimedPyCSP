@@ -1,39 +1,38 @@
 \input{preamble}
 \bibliography{bibliography} %indsaet en reference til bib filen
 
-%\includeonly{deadline/deadline}
+%\includeonly{interactive/interactive}
 \begin{document}
 \pagenumbering{Roman} 
-%\begin{titlingpage}
-%\newcommand{\HRule}{\rule{\linewidth}{1mm}}
-%\vspace*{\stretch{1}}
-%\noindent\HRule
-%\begin{flushright}
-%                \large 
-%                Rasmus Sørensen\\
-%                Simon Bognolo
-%                \\[5mm]
-%            \huge \Title
-%\end{flushright}                
-%\HRule
-%\vspace*{\stretch{2}}
-%\begin{center}
-%\large\textsc{maj 2010}\\
-%\large\textsc{Datalogisk Institut, Københavns Universitet}
-%\end{center}
-%\end{titlingpage}
+\begin{titlingpage}
+\newcommand{\HRule}{\rule{\linewidth}{1mm}}
+\vspace*{\stretch{1}}
+\noindent\HRule
+\begin{flushright}
+                \large 
+                Rasmus Sørensen\\
+                Simon Bognolo
+                \\[5mm]
+            \huge \Title
+\end{flushright}                
+\HRule
+\vspace*{\stretch{2}}
+\begin{center}
+\large\textsc{maj 2010}\\
+\large\textsc{Datalogisk Institut, Københavns Universitet}
+\end{center}
+\end{titlingpage}
 
-%\frontmatter
-%\include{other/abstract}
+\frontmatter
+\include{other/abstract}
 
 \tableofcontents
-%\newpage
+\newpage
 
 \listoffixmes
-%\listofpdfcomments
 \newpage
 \lstlistoflistings   
-%\newpage
+\newpage
 
 %\savepagenumber
 
@@ -54,10 +53,10 @@
 
 
 \SingleSpacing
-%\fxwarning{Check at sidetallet på litteraturlisten passer}
+\fxerror{Check at sidetallet på litteraturlisten passer}
 \printbibliography
-%\newpage
-%\backmatter
+\newpage
+\backmatter
 
 \appendix
 \chapter{Bilag}
@@ -68,5 +67,5 @@
 \input{des/test-table}
 \newpage
 \input{deadline/rtp-test}
-%\input{../bilag} %Fjern %, så vedhæftes bilag (i final)
+
 \end{document}

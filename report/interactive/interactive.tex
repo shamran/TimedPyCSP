@@ -68,6 +68,33 @@ Vi valgt at implementere en simpelt løsning, hvor  de to tal lægges efter hina
 
     
 \section{Evaluering}
+
+
+\begin{table}[htbp]
+	\centering
+	\begin{tabular}{lccc}
+       	\toprule
+        \mc{Version}  &\mc{Gennemsnitlig forsinkelse}&\mc{Standard Afvigelse (SA)}\\
+        \midrule
+        Greenlets & 1 & 18& 9 \\
+        Greenlets & 2 & 49& 0 \\
+        Greenlets & 3 & 32& 0\\
+        Greenlets & 5 & 20& 0 \\
+        \midrule
+        RTP u. prioritet &1&22  &8 \\
+        RTP u. prioritet &2&45  &2 \\
+        RTP u. prioritet &3&29  &0 \\
+        RTP u. prioritet &5&17  &0 \\
+        \midrule
+        RTP m. prioritet &1& 17 & 8\\
+        \bottomrule
+    \end{tabular}
+	\caption[]{10 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }\\
+	\label{tab:deadline-runs2}
+\end{table}
+
+
+
 \section{Fremtidigt arbejde}
 Noget om mulighederne for at lave det i proces-versionen af \pycsp.
 \section{Konklusion}

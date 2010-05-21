@@ -117,14 +117,14 @@ time_channel = Channel()
 ack_channel = Channel()
 dummy_channel = Channel()
 dummy_timer_channel = Channel()
-time_steps = 30
+time_steps = 130
 start_time = time.time()
 #try:
 Parallel(
     watch_process(+time_channel,-ack_channel)
     ,[set_time(i,Time(i/(60*60),i/60,i%60),-time_channel,+ack_channel) for i in range(time_steps)]
     ,close_watch(+time_channel,+dummy_channel,time_steps)
-    ,14*background_dummywork(dummy_channel,-dummy_timer_channel)
+    ,6*background_dummywork(dummy_channel,-dummy_timer_channel)
     #,StatisticTime(+dummy_timer_channel)
     )    
 #except DeadlineException:
