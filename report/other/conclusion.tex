@@ -23,6 +23,14 @@ I vores løsning til realtidsplanlægning har vi implementeret EDF, som den grun
 
 Vi er kommet frem til at interaktiv planlægning ikke kan anses som et selvstændigt anvendelsesområde, men nærmere som en gren af realtidsplanlægning. De benytte begge reel tid som basis, har deadlines og prioriteter. Interaktiv planlægning har yderligere tilføjet et starttidspunkt, men det ændrer ikke fundamentalt på modellen. 
 
+
+RTP: estimater for afvikling
+
+
+Vi har lavet en basisimplementering af RTP der benytter EDF. Det kunne være interessant at kigge på mulighederne for at bedømme en proces' udførselstid, eller lade udvikleren angive dette. Det vil åbne op for brug af andre algoritmer end EDF, hvorved der åbnes op for brug af adskillige andre algoritmer til skemaplanlægningen og udvider anvendelsesområdet.  
+
+
+
 %lettere at modellere processer
 %Simpy kan ikke reservere begrænsede ressourcer
 
@@ -33,12 +41,6 @@ Vi er kommet frem til at interaktiv planlægning ikke kan anses som et selvstæn
 %Praktisk anvendelig implementering
 
 %nuværende tilstand for anvendelsesområderne
-
-%DES
-
-%RTP
-
-%IP
 
 %\endgroup 
 
