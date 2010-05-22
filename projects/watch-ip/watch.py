@@ -44,13 +44,13 @@ def StatisticTime(statC):
         print "Time spent in dummy:"        
         #print stc
         #print "mean:  ",sum(stc, 0.0) / len(stc)
-        print "mean: %0.3f"%scipy.mean(stc) 
+        print "mean: %0.5f"%scipy.mean(stc) 
         #print "variance :", scipy.var(stc)
-        print "std variance : %0.3f\n"%scipy.std(stc)
+        print "std variance : %0.5f\n"%scipy.std(stc)
 
 
 @process
-def background_dummywork(dummy, time_out):
+def background_dummywork(dummy, time_out,stat_out):
     @process
     def internal_dummy(_id,dummy_in, dummy_out,time_out,work = 50000):
         try:
@@ -64,10 +64,11 @@ def background_dummywork(dummy, time_out):
                 b4 = Now()
                 dummywork(work)
                 time_spent += Now()
-                #print "time in dummy : ",Now()-b4
+                stat_out(Now()-b4)
+                #print "d"
                 dummy_out(time_spent)
         except ChannelPoisonException:
-            poison(dummy_in,dummy_out)
+            poison(dummy_in,dummy_out,stat_out)
             if _id == 0: 
                 print time_spent
 
@@ -91,20 +92,26 @@ def watch_process(time_in_channel,ack_out_channel):
             watch.set_time(time_in_channel())
             offsets.append(watch.offset)
             watch.print_time()
+            #PrintProcess()
             ack_out_channel(True)
     except ChannelPoisonException:
         print "mean: %0.3f"%scipy.mean(offsets) 
         #print "variance :", scipy.var(stc)
         print "std variance : %0.3f\n"%scipy.std(offsets)
-        print "len of received timestamps; %0.3f"%len(offsets)
+        print "len: %0.3f, max:%d, min : %f"%(len(offsets),max(offsets),min(offsets))
+        #print offsets
         poison(time_in_channel,ack_out_channel)    
 
 @process
 def set_time(_id,timeset, time_out_Channel, ack_in_channel):
     try:
-        Set_deadline(timeset.internal_seconds+1)
-        Wait(timeset.internal_seconds-(Now()-start_time))
+        wakeup_time = timeset.internal_seconds-(Now()-start_time) 
+        Set_deadline(wakeup_time+1)
+        Wait(wakeup_time)
+        #PrintProcess()
+        woke_up = (Now()-start_time)-timeset.internal_seconds
         time_out_Channel(timeset)
+        #print "woke up delayed by: %f, done sending by: %f"%(woke_up,(Now()-start_time)-timeset.internal_seconds)
         ack = ack_in_channel()
     except DeadlineException:
         print "skipped one update"
@@ -119,12 +126,14 @@ time_channel = Channel()
 ack_channel = Channel()
 dummy_channel = Channel()
 dummy_timer_channel = Channel()
-time_steps = 100    
+stat_channel = Channel()
+time_steps = 30
 start_time = Now()
 #try:
 Parallel(
     watch_process(+time_channel,-ack_channel)
     ,[set_time(i,Time(i/(60*60),i/60,i%60),-time_channel,+ack_channel) for i in range(time_steps)]
     ,close_watch(+time_channel,+dummy_channel,time_steps)
-    ,10*background_dummywork(dummy_channel,-dummy_timer_channel)
-    )    
+    ,10*background_dummywork(dummy_channel,-dummy_timer_channel,-stat_channel)
+    ,StatisticTime(+stat_channel) 
+    )   

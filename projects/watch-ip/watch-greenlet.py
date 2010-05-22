@@ -83,9 +83,7 @@ def background_dummywork(dummy, time_out):
 @io
 def sleep(n):
     import time
-    #b4 = time.time()
     if n>0: time.sleep(n)
-    #print "in sleep", time.time()-b4,"=",n
 
 @process 
 def watch_process(time_in_channel,ack_out_channel):
