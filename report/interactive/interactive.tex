@@ -80,7 +80,7 @@ Netværket er struktureret som vist i figur \cref{fig:watch_network}. Som vi kom
 \end{center}
 \end{figure}
 
-I \code{greenlets}-versionen skal Tidsstempel-processerne vente på at kunne sende sit tidsstempel. Dette gør de ved at oprette en separat tråd  via \code{IO}-dekoratøren. I den separate tråd venter de via funktionen \code{sleep}. Dette er standardmetoden for \emph{greenlets}-versionen når processer  ønsker at kunne vente uden at blokere for hele programmet, og er beskrevet på \pycsp hjemmeside. Det medfører dog et overhead at skulle oprette en ny tråd blot for at vente.  Med introduktionen af \code{Wait}, bliver processen lagt på \code{timers}-hoben, og vil  
+I \code{greenlets}-versionen skal Tidsstempel-processerne vente på at kunne sende sit tidsstempel. Dette gør de ved at oprette en separat tråd  via \code{IO}-dekoratøren. I den separate tråd venter de via funktionen \code{sleep}. Dette er standardmetoden for \emph{greenlets}-versionen når processer  ønsker at kunne vente uden at blokere for hele programmet, og er beskrevet på \pycsp hjemmeside. Det medfører dog et overhead at skulle oprette en ny tråd blot for at vente.  Med introduktionen af \code{Wait}, bliver processen lagt på \code{timers}-hoben, og det er derfor ikke krævet at oprette en separat tråd til proces der ønsker at vente. 
  
 Ved implementeringen af \code{greelets}-versionen, opstår der et problem i opdateringen af uret. begrænsningen om kun at  opdatere uret så længe tidsstemplet er korrekt, har vi implementeret med en \code{alternation}, og en timeout.  Tidsstempel-processen, skal derfor inden et sekund have sendt beskeden til uret, og vil ellers helt droppe forsendelsen. Resultatet af denne implementering kan man se af linje 1 i \cref{tab:watch}. Den gennemsnitlige forsinkelse på 1.529 sekunder burde være umuligt, da opdateringer på over et sekund bør falde bort. Grunden til forsinkelsen ikke falder bort skyldes at tidsstempel-processen korrekt får overført tidsstemplet til urprocessen inden for et sekund. Ur-processen bliver efterfølgende lagt på \code{next} listen da den er klar til at blive kørt. Her skal den så slås med dummy-processerne for at blive udvalgt af \sched en. Når ur-processen bliver udvalgt er tiden forpasset og uret bliver opdateret for sent.
 Vi har derfor lavet endnu en version hvor vi også ur-processen efter den har modtaget tidsstemplet kontrollere at tiden ikke er forpasset. Resultatet af denne ændring ses af linje 2 i tabellen, hvor vi kan se at ikke en eneste gang når uret at blive opdateret inden sekundet er forpasset.
@@ -100,6 +100,8 @@ Vi har derfor lavet endnu en version hvor vi også ur-processen efter den har mo
 \end{table}
 
 De to forskellige implementeringer af \code{Greenlets}-versionen viser godt hvorfor den ikke er egnet til planlægge processer der er skal aktiveres inden for en tidsperiode. Problemet er at selvom tidsstempel-processerne sender sit data til ur-processen inden for tidsgrænsen. Skal denne stadig kæmpe om at blive aktiveret mod alle dummy-processerne. \Sched en aktiverer processerne ud fra en FIFO strategi, og ur-processen vil derfor komme sidst i køen der ønsker at blive aktiveret. 
+
+I modsætning til \code{greenlets}-versionen, og dens FIFO strategi ser vi at \is 
 
 
 \section{Fremtidigt arbejde}
