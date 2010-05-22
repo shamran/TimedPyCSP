@@ -3,49 +3,34 @@
 \chapter{Konklusion} 
 \label{chap:konklusion}
 
-Vores mål med dette speciale var, at undersøge muligheden for at lave en udvidelse af \pycsp, der muliggør brugen af tid direkte i sproget. Der findes allerede et massivt teoretisk arbejde indenfor området, men ingen praktisk anvendelig implementeringer, så vores fokus har været på at det skulle være praktisk anvendeligt. Dette afspejles ved at vi har valgt at benytte eksempler som omdrejningspunkt for vores analyser af de tre anvendelsesområder. 
+Vores mål med dette speciale var, at undersøge muligheden for at lave en udvidelse af \pycsp, der muliggør brugen af tid direkte i sproget. Der findes allerede et massivt teoretisk arbejde indenfor området, men ingen praktisk anvendelige implementeringer, så vores fokus har været på, at det skulle være praktisk anvendeligt. Dette afspejles ved at vi har valgt at benytte eksempler som omdrejningspunkt for vores analyser af de tre anvendelsesområder. 
 
 De tre anvendelsesområder vi identificerede i introduktionen var diskret simulering, realtids-planlægning og interaktiv tid. 
 
 Indenfor diskret simulering har vi udviklet en løsning, der er let at anvende, og som eliminerer kravet om en delt datastruktur for at administrere tid i \pycsp. Yderligere kræver løsningen væsentligt mindre kode til at administrere tiden, end en tilsvarende løsning lavet i ren \pycsp. 
 
-Sammenligner vi vores løsning med \simpy, der er et framework til simuleringer, skrevet i Python, mener vi at vores løsning er mere intuitiv at benytte, da vi får repræsentationen af arbejdsprocesser, der skal simuleres, foræret fra \pycsp 's processer. \simpy arbejder på at udvide deres framework til at kunne håndtere reservation af flere begrænsede ressourser som skal benyttes samtidigt. Dette er allerede muligt i vores løsning, igen grundet at vi bygger på \pycsp, hvorved man kan repræsentere denne reservation ved at lade en proces vente på kommunikation. 
+Sammenligner vi vores løsning med \simpy, der er et framework til simuleringer, skrevet i Python, mener vi at vores løsning er mere intuitiv at benytte, med henblik på at repræsentere arbejdsprocesser der skal simuleres. Dette tillægges i høj grad at vi direkte kan benytte \pycsp's processer. \simpy arbejder på at udvide deres framework til at kunne håndtere reservation af flere begrænsede ressourser som skal benyttes samtidigt. Dette er allerede muligt i vores løsning, igen grundet at vi bygger på \pycsp, hvorved man kan repræsentere denne reservation ved at lade en proces vente på kommunikation. 
 
-I vores løsning til realtidsplanlægning har vi implementeret EDF, som den grundlæggende algoritme til at bestemme rækkefølgen, for udførsel af processer. Vi har implementeret prioritetsnedarvning for at imødekomme problemer med prioritetsinvertering, og har indført en prioriteret udvælgelse i \code{alternations} og ved kommunikation over kanaler. Vores eksempel viser tydeligt at vores RTP-løsning kan være meget brugtbar, såfremt det problem der kan foretages en differentiering i prioriteten af de processer der skal afvikles. 
+I vores løsning til realtidsplanlægning har vi implementeret EDF, som den grundlæggende algoritme til at bestemme rækkefølgen, for udførsel af processer. Vi har implementeret prioritetsnedarvning for at imødekomme problemer med prioritetsinvertering, og har indført en prioriteret udvælgelse i \code{alternations} og ved kommunikation over kanaler. Vores eksempel viser tydeligt at vores RTP-løsning kan være meget brugtbar, såfremt der i programmet, kan foretages en differentiering i prioriteten af de processer der skal afvikles. 
 
-
-
-
+Vi er kommet frem til at interaktiv planlægning ikke kan anses som et selvstændigt anvendelsesområde, men nærmere som en gren af realtidsplanlægning. De benytte begge reel tid som basis, har deadlines og prioriteter. Interaktiv planlægning har yderligere tilføjet et starttidspunkt, men det ændrer ikke fundamentalt på modellen. 
 
 lettere at modellere processer
 Simpy kan ikke reservere begrænsede ressourcer
 
-
-
 Sammenligning med Simpy her 
-
-
-
-
 
 Tidsmodeller/anvendelsesområder
 
-
 Praktisk anvendelig implementering
-
 
 nuværende tilstand for anvendelsesområderne
 
 DES
 
-
-
 RTP
 
-
-
 IP
-
 
 %\endgroup 
 
