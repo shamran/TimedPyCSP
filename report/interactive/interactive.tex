@@ -33,16 +33,17 @@ Vi kan dermed se \is som en blanding af RTP og \des, med tidsmodellen og deadlin
 %\is og \des minder også om hinanden da man i begge modeller skal kunne planlægge en begivenhed til at foregå ud i fremtiden. Men hvor \des kan garantere at begivenheden sker på præcist det angivne tidspunkt kan vi i \is kun garantere at det sker efter et givent tidspunkt.
 
 \section{Design og implementering} 
-Vi argumenterer i kapitel \ref{chap:des} for at planlægning af begivenheder til et givet tidspunkt, kan tolkes som venten indtil tidspunktet. Vi kan derfor se \is som RTP med den yderligere mulighed at kunne vente. Som nævnt ovenfor vil det også være et krav at vi kan sætte en prioritet på en proces uafhængigt at processens deadline. 
 
-Da kravene til \is rent teoretisk ligger meget tæt op ad de løsninger vi tidligere har beskrevet, vil vi også tage udgangspunkt i de allerede udviklede implementeringer. 
+Da kravene til \is rent praktisk ligger meget tæt op af de løsninger vi tidligere har beskrevet, i RTP , vil vi ikke implementere en selvstændig version der har et stort overlap med \code{RTP}-versionen. Vi vil i stedet udvide RTP-versionen med den krævede funktionalitet så den samme version vil kunne foretage både RTP og IP.
+Vi skal derfor udvide RTP så man kan planlægge begivenheder der skal foregå ud i fremtiden, samt kunne sætte en prioritet på en proces uafhængigt at processens deadline. 
 
 %I \des kom vi frem til at planlægningen af begivenheder ud i fremtiden også kan tolkes som en venten. Dermed kan man se på \is som en udvidelse til RTP, hvor man udover at have mulighed for at sætte en deadline skal have mulighed for at vente. For at kunne bruge RTP til \is vil det desuden være hensigtsmæssigt at  udvide RTP så det er muligt for udvikleren at tilknytte en prioritet til begivenheden.
 
 \subsection{Funktionerne \code{Now} og \code{Wait}}
-Som vi beskrev i \des introducerede vi de to globale funktioner \code{Now} og \code{Wait} der hhv. returnerer den aktuelle tid og lader en proces vente i et givent tidsrum. Vi har ændret den interne implementering af funktionerne, så de bruger realtid. Ved at genbruge de samme funktioner, sikres en ensartet implementering af tid på tværs af TimedPyCSP, og man kan i vores øjne med fordel tilføje dem til alle \pycsp versionerne, for på den måde at ensrette de forskellige implementeringer. Hvis \code{Now} og \code{Wait} blev inkluderet i \code{greenlets}-versionen kunne de fjernes helt i \is, da de to baserer sig på den samme tidsmodel.
 
-For at benytte realtid i forhold til diskret tid bruger vi pythons \code{time} modul. Genimplementering består derfor kun i at ændre funktionen \code{Now} til at bede \code{time}-modulet om tiden i stedet for \sched en.
+Vi argumenterer i kapitel \ref{chap:des} for at planlægning af begivenheder til et givet tidspunkt, kan tolkes som venten indtil tidspunktet. Vi vil derfor også i forbindelse med \ip, introducere de to globale funktioner \code{Now} og \code{Wait}, der hhv. returnerer den aktuelle tid og lader en proces vente i et givent tidsrum. Vi har ændret den interne implementering af funktionerne, så de bruger realtid. Ved at genbruge de samme funktioner, sikres en ensartet implementering af tid på tværs af TimedPyCSP, og man kan i vores øjne med fordel tilføje funktionen \code{Now} til alle \pycsp versionerne, for på den måde at ensrette de forskellige implementeringer. Hvis \code{Now} blev inkluderet i \code{greenlets}-versionen kunne den fjernes helt fra denne version, da de baserer sig på den samme tidsmodel nemlig realtid.
+
+Forskellen i implementering mellem versionen der benytter  realtid som tidsmodel ifh. til versionen der bruger diskrettid som tidsmodel er simpelt. I stedet at det er \sched en, der kender tiden, og derfor er dennes tid vi returnere i diskret tid, bruger vi nu Pythons \code{time}-modul. Genimplementeringen består derfor kun i at ændre funktionen \code{Now} til at bede \code{time}-modulet om det nuværende tidspunkt. 
 
 \subsection{Udvikler"-prioriteter}
 I computerspilseksemplet, har processerne forskellige prioritet dikteret af udvikleren. Denne prioritet er ikke det samme som den prioritet der allerede findes i RTP, da denne  er beregnet af \sched en. For at adskille dem vil vi kalde prioriteterne der er angivet af udvikleren for udvikler-prioritet. Vi skal udvide RTP således at det kan håndtere processer, der både kan have deadlines og udvikler"-prioriteter tilknyttet. Dette har vi allerede beskæftiget os med i \cref{sec:deadlineFuture}, som en fremtidsmulighed, og passer derfor godt sammen med RTP.
@@ -70,7 +71,7 @@ Vi valgt at implementere en simpelt løsning, hvor  de to tal lægges efter hina
 \section{Evaluering}
 Vi har i det foregående afsnit beskrevet hvad der skal til, for at implementere \is i \pycsp. Vi vil i dette afsnit gennemgå hvordan \is kan implementeres, for derefter at evaluere vores løsning med udgangspunkt i ureksemplet.
 
-Netværket er struktureret som vist i figur \cref{fig:watch_network}. Som vi kom ind på tidligere, har vi en urproces, en række tidsstempel processer, og nogle dummyprocesser. Urprocessen modtager et tidstempel fra alle  tidsstempelprocceserne, og står så for at  opdatere uret. Tidsstempelprocesserne modtager fra start af hver sit tidsstempel og de står så for at vente indtil dette tidspunkt, for så at sende tidspunktet til ur-processen. Samtidigt med at uret tælles op køres der også en række dummyprocesser i par, som snakker med hinanden. disse processer brugte vi også i RTP eksemplet, og skal vise at der foregå andet arbejde på maskinen. 
+Netværket er struktureret som vist i figur \cref{fig:watch_network}. Som vi kom ind på tidligere, har vi en ur-proces, en række tidsstempel-processer, og nogle dummy.processer. Ur-processen modtager et tidstempel fra alle  tidsstempel-procceserne, og står så for at  opdatere uret. Tidsstempel-processerne modtager fra start af hver sit tidsstempel og de står så for at vente indtil dette tidspunkt, for så at sende tidspunktet til ur-processen. Samtidigt med at uret tælles op køres der også en række dummyprocesser i par, som snakker med hinanden. disse processer brugte vi også i RTP eksemplet, og skal vise at der foregå andet arbejde på maskinen. 
 \begin{figure}
  \begin{center}
   \includegraphics[scale=1]{images/watch-network}
@@ -78,24 +79,27 @@ Netværket er struktureret som vist i figur \cref{fig:watch_network}. Som vi kom
 	\label{fig:watch_network}
 \end{center}
 \end{figure}
-Ved implementeringen af \code{greelets}-versionen, opstår der et problem i opdateringen af uret. For kun at ville opdatere uret så længe tidsstemplet er korrekt, har vi implementeret i en \code{alternation}, med en timeout.  Tidsstempel-processen, skal derfor inden et sekund have sendt beskeden til uret, og vil ellers helt droppe forsendelsen. Som man kan se af linje 1 i \cref{tab:watch}, er den gennemsnitlige forsinkelse over et hvilket burde være umligt, da opdateringer på over et sekund bør falde bort. Grunden til forsinkelsen skyldes at tidsstempel-processen korrekt får overført tidsstemplet til urprocessen. Denne bliver så lagt på listen \code{next}, men skal der slås med dummy-processerne for at blive udvalgt af \sched en. Når ur-processen bliver aktiveret er tiden forpasset og uret bliver opdateret for sent.
-Vi har derfor lavet endnu en version hvor vi også ur-processen efter den har modtaget tidsstemplet kontrollere at tiden ikke er forpasset. Resultatet af denne ændring ses af linje 2 i tabellen, hvor vi kan se at ikke en eneste gang når uret at blive opdateret inden tiden ar forpasset.
 
+I \code{greenlets}-versionen skal Tidsstempel-processerne vente på at kunne sende sit tidsstempel. Dette gør de ved at oprette en separat tråd  via \code{IO}-dekoratøren. I den separate tråd venter de via funktionen \code{sleep}. Dette er standardmetoden for \emph{greenlets}-versionen når processer  ønsker at kunne vente uden at blokere for hele programmet, og er beskrevet på \pycsp hjemmeside. Det medfører dog et overhead at skulle oprette en ny tråd blot for at vente.  Med introduktionen af \code{Wait}, bliver processen lagt på \code{timers}-hoben, og vil  
+ 
+Ved implementeringen af \code{greelets}-versionen, opstår der et problem i opdateringen af uret. begrænsningen om kun at  opdatere uret så længe tidsstemplet er korrekt, har vi implementeret med en \code{alternation}, og en timeout.  Tidsstempel-processen, skal derfor inden et sekund have sendt beskeden til uret, og vil ellers helt droppe forsendelsen. Resultatet af denne implementering kan man se af linje 1 i \cref{tab:watch}. Den gennemsnitlige forsinkelse på 1.529 sekunder burde være umuligt, da opdateringer på over et sekund bør falde bort. Grunden til forsinkelsen ikke falder bort skyldes at tidsstempel-processen korrekt får overført tidsstemplet til urprocessen inden for et sekund. Ur-processen bliver efterfølgende lagt på \code{next} listen da den er klar til at blive kørt. Her skal den så slås med dummy-processerne for at blive udvalgt af \sched en. Når ur-processen bliver udvalgt er tiden forpasset og uret bliver opdateret for sent.
+Vi har derfor lavet endnu en version hvor vi også ur-processen efter den har modtaget tidsstemplet kontrollere at tiden ikke er forpasset. Resultatet af denne ændring ses af linje 2 i tabellen, hvor vi kan se at ikke en eneste gang når uret at blive opdateret inden sekundet er forpasset.
 \begin{table}[htbp]
 	\centering
-	\begin{tabular}{lccc}
+	\begin{tabular}{l>{\centering\arraybackslash}p{3.1cm}>{\centering\arraybackslash}p{3.1cm}>{\centering\arraybackslash}p{3.1cm}}
        	\toprule
-        \mc{Version}  &\mc{Gennemsnitlig forsinkelse}&\mc{Standard Afvigelse (SA)}\\
+        \mc{Version}     & Rettidige tidsopdateringer&Gennemsnitlig forsinkelse&Standard Afvigelse (SA)\\
         \midrule
-        Greenlets & 1.529 & 0.276 \\
-        Greenlets ver. 2 & NaN & 0\\
-        \is       & 0.539 & 0.411 \\
+        Greenlets ver. 1 & 0  & 1.529 & 0.276 \\
+        Greenlets ver. 2 & 0  & NaN   & 0\\
+        \is              & 80 & 0.539 & 0.411 \\
         \bottomrule
     \end{tabular}
 	\caption[]{Proces-netværk betstående af et ur, 100 opdateringer, og baggrundsprocesser }\\
 	\label{tab:watch}
 \end{table}
 
+De to forskellige implementeringer af \code{Greenlets}-versionen viser godt hvorfor den ikke er egnet til planlægge processer der er skal aktiveres inden for en tidsperiode. Problemet er at selvom tidsstempel-processerne sender sit data til ur-processen inden for tidsgrænsen. Skal denne stadig kæmpe om at blive aktiveret mod alle dummy-processerne. \Sched en aktiverer processerne ud fra en FIFO strategi, og ur-processen vil derfor komme sidst i køen der ønsker at blive aktiveret. 
 
 
 \section{Fremtidigt arbejde}
