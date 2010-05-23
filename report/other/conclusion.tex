@@ -5,7 +5,7 @@
 
 Vores mål med dette speciale var, at undersøge muligheden for, at lave en udvidelse af \pycsp, der muliggør brugen af tid direkte i sproget. Der findes allerede et massivt teoretisk arbejde indenfor området, men ingen praktisk anvendelige implementeringer, så vores fokus har været på, at det skulle være praktisk anvendeligt. Dette afspejles ved, at vi har valgt at benytte eksempler som omdrejningspunkt for vores analyser af de tre anvendelsesområder. 
 
-De tre anvendelsesområder vi identificerede i introduktionen var diskret simulering, realtids-planlægning og interaktiv tid. vi har gennem vores analyse fundet ud af at det er mere hensigtsmæssigt at anskue anvendelsesområderne ud fra hvilken tidsmodel de bygger på. Figur \ref{fig:timemodel} viser således opdelingen af anvendelsesområderne i henholdsvis diskret og real tid.  
+De tre anvendelsesområder vi identificerede i introduktionen var diskret simulering, realtids-planlægning og interaktiv tid. Vi har gennem vores analyse kommet frem til at det er mere hensigtsmæssigt at anskue anvendelsesområderne ud fra hvilken tidsmodel de bygger på. \CRef{fig:timemodel} viser således opdelingen af anvendelsesområderne i henholdsvis diskret og realtid.
 
 \begin{figure}[htp]
  \begin{center}
@@ -16,18 +16,14 @@ De tre anvendelsesområder vi identificerede i introduktionen var diskret simule
 \end{figure}
 
 Indenfor diskret simulering har vi udviklet en løsning, der er let at anvende, og som eliminerer kravet om en delt datastruktur for at administrere tid i \pycsp. Yderligere kræver løsningen væsentligt mindre kode til at administrere tiden, end en tilsvarende løsning lavet i ren \pycsp. 
+Sammenligner vi vores løsning med \simpy, der er et framework til simuleringer, skrevet i Python, mener vi at vores løsning er mere intuitiv og fleksibel at benytte, til at modellere et givet problem, så det kan  simuleres. Dette tillægges i høj grad at vi direkte kan benytte \pycsp's processer og kanaler. Et eksempel på hvordan diskret simulering i \pycsp giver udvikleren større frihed til sin modellering finder vi i en kommende udvidelser til \simpy. De arbejder  på at udvide deres framework til at kunne håndtere reservation af flere begrænsede ressourser som skal benyttes samtidigt. Dette er allerede muligt i vores løsning, uden det har været vores fokus, da ressourcer blot modeleres som processer i \pycsp. Ønsker man at reservere flere ressourcer, kommunikerer man blot med flere processer, og når alle processerne har svaret, holder man alle de begrænsede resourcer. Arbejdet kan nu udføres, og ressourcerne frigives igen. 
 
-Sammenligner vi vores løsning med \simpy, der er et framework til simuleringer, skrevet i Python, mener vi at vores løsning er mere intuitiv og fleksibel at benytte, med henblik på at repræsentere arbejdsprocesser der skal simuleres. Dette tillægges i høj grad at vi direkte kan benytte \pycsp's processer. Eksempelvis arbejder \simpy på at udvide deres framework til at kunne håndtere reservation af flere begrænsede ressourser som skal benyttes samtidigt. Dette er allerede muligt i vores løsning, igen grundet at vi bygger på \pycsp, hvorved man kan repræsentere denne reservation ved at lade en proces vente på kommunikation. 
-
-I vores løsning til realtidsplanlægning har vi implementeret EDF, som den grundlæggende algoritme til at bestemme rækkefølgen, for udførsel af processer. Vi har implementeret prioritetsnedarvning for at imødekomme problemer med prioritetsinvertering, og har indført en prioriteret udvælgelse i \code{alternations} og ved kommunikation over kanaler. Vores eksempel viser tydeligt at vores RTP-løsning kan være meget brugtbar, såfremt der i programmet, kan foretages en differentiering i prioriteten af de processer der skal afvikles. 
+I vores løsning til realtidsplanlægning har vi implementeret EDF, som den grundlæggende algoritme til at bestemme rækkefølgen, for udførsel af processer. Vi har implementeret prioritetsnedarvning for at imødekomme problemer med prioritetsinvertering, samt indført en prioriteret udvælgelse i \code{alternations} og når der kommunikeres over kanaler. Vores eksempel viser tydeligt at vores RTP-løsning kan gøre en forskel, såfremt der i programmet, kan foretages en differentiering i prioriteten af de processer der skal afvikles. 
 
 Vi er kommet frem til at interaktiv planlægning ikke kan anses som et selvstændigt anvendelsesområde, men nærmere som en gren af realtidsplanlægning. De benytte begge realtid som tidsmodel, og har deadlines og prioriteter. Interaktiv planlægning har yderligere tilføjet et starttidspunkt, men det ændrer ikke fundamentalt på modellen. 
 
 Vores løsninger er brugbare i den nuværende form, men der kan foretages en række udvidelser der vil gøre dem endnu mere anvendelige. 
-
-Indenfor \des synes vi det kunne være spændende at udvide løsningen til at kunne foretage en dynamisk evaluering af køer, for derved at give ekstra fleksibilitet i de udviklede simuleringer. 
-
-I RTP har vi lavet en basisimplementation der benytter EDF. Det kunne være interessant at kigge på mulighederne for at bedømme en proces' udførselstid, eller lade udvikleren angive dette. Det vil åbne op for brug af andre algoritmer end EDF, hvorved der åbnes op for brug af adskillige andre algoritmer til skemaplanlægningen og udvider anvendelsesområdet.  
+Indenfor \des synes vi det kunne være spændende at udvide løsningen til at kunne foretage en dynamisk evaluering af køer, for derved at give ekstra fleksibilitet i de udviklede simuleringer. I RTP har vi lavet en basisimplementation der benytter EDF. Det kunne være interessant at kigge på mulighederne for at bedømme en proces' udførselstid, eller lade udvikleren angive dette. Det vil åbne op for brug af andre algoritmer end EDF, hvorved der åbnes op for brug af adskillige andre algoritmer til skemaplanlægningen og udvider anvendelsesområdet.  
 
 %lettere at modellere processer
 %Simpy kan ikke reservere begrænsede ressourcer
