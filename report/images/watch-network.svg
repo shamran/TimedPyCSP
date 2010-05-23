@@ -415,7 +415,7 @@
      inkscape:cx="185.48504"
      inkscape:cy="34.712468"
      inkscape:document-units="px"
-     inkscape:current-layer="g4043"
+     inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="1440"
      inkscape:window-height="851"
@@ -441,7 +441,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -529,7 +529,7 @@
          sodipodi:role="line"
          x="191.21423"
          y="141.78712"
-         id="tspan4041">tids-</tspan><tspan
+         id="tspan4041">Tids-</tspan><tspan
          sodipodi:role="line"
          x="191.21423"
          y="154.28712"
