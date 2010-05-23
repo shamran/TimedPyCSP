@@ -60,11 +60,6 @@ Alternativt kan vi udvide den ene hob, der allerede findes så alle processer, b
 Vi mener at fordelene ved kun at have en hob, og muligheden for at kunne ændre på vægtningen af forholdet mellem udvikler-prioritet er større end besparelsen i tid ved at have flere hobe der skal vedligeholdes. Derfor vælger vi  at genbruge bruge \code{has\_priority}, som den eneste hob til  processer der har deadlines og udvikler"-prioritet. Med kun en hob skal vi derfor udvikle en ekstern funktion der kombinerer to tal til en endelig prioritet. Det kombinerede tal skal have den egenskab altid at udvikler"-prioriteten har forrang. Hver at bemærke er at des højere udvikler-prioriteten er des vigtigere er processen. I implementeringen af \code{has\_priority} bruges der en min-hob, hvorfor vi internt invertere udvikler"-prioriteten, så 0 er den højeste prioritet, og processer, hvor udvikleren ikke har angivet en prioritet, sættes til 10.
 
 Vi valgt at implementere en simpelt løsning, hvor  de to tal lægges efter hinanden. Hvis man eksempelvis har en udvikler"-prioritet på 2 og en deadline på 20, sættes de efter hinanden så den endelige prioritet bliver 220. Dette kan vi gøre da antallet af cifre i hhv. deadlines og udvikler-prioritet ligger fast, så vi ikke risikere en forskydning, når de ligges efter hinanden. For at sikre at processer der har en udvikler"-prioritet, men ingen deadline også kan planlægges, bruges der en kunstig høj deadline. Man vil i vores løsning nemt kunne ændre på måden hvordan de to tal kombineres, blot ved at ændre i en funktion. 
-
-
-% dikterede valget af \sched at priorite
-
-
     
 \section{Evaluering}
 Vi har i det foregående afsnit beskrevet hvad der skal til, for at implementere \is i \pycsp. Vi vil i dette afsnit gennemgå hvordan \is kan implementeres, for derefter at evaluere vores løsning med udgangspunkt i ureksemplet.
