@@ -127,7 +127,7 @@ ack_channel = Channel()
 dummy_channel = Channel()
 dummy_timer_channel = Channel()
 stat_channel = Channel()
-time_steps = 30
+time_steps = 100
 start_time = Now()
 #try:
 Parallel(

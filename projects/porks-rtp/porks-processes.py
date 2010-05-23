@@ -1,5 +1,5 @@
 """ Configurable. Run once then poison channels. """
-from pycsp.processes import *
+from pycsp.threads import *
 #from random import expovariate, uniform, seed
 import random, sys, time , heapq, math, scipy
 
@@ -54,13 +54,13 @@ def dummywork(iterations):
 def background_dummywork(dummy, time_out):
     @process
     def internal_dummy(_id,dummy_in, dummy_out,time_out,work = dummy_iter):
-    try:
-        time_spent=0
+        try:
+            time_spent=0
             if _id == 0: dummy_out(time_spent)
             while True:
                 time_spent = dummy_in()
                 time_spent -= time.time()
-                3*dummywork(work)
+                dummywork(work)
                 time_spent += time.time()
                 dummy_out(time_spent)
         except ChannelPoisonException:
@@ -68,7 +68,8 @@ def background_dummywork(dummy, time_out):
             if _id == 0: time_out(time_spent)
 
     dummyC = Channel()   
-    Parallel(internal_dummy(0,+dummy,-dummyC,time_out),
+    Parallel(
+        internal_dummy(0,+dummy,-dummyC,time_out),
       internal_dummy(1,+dummyC,-dummy,time_out))
 
 @io
@@ -82,7 +83,7 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
     NextpigArrival = time.time()+ran.gauss(data, data*std)
     ThispigArrival = time.time()
     for x in xrange(pigs_to_simulate):
-        #if x % 1 == 0 : print "\t\t",x
+        if x % 10 == 0 : print "\t\t",x
         pig = Pig(x,ThispigArrival,ran)
         robot(pig)
         if pig.arrivaltime+time_to_camera_deadline-time.time()>0:
@@ -101,8 +102,7 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
         ThispigArrival = NextpigArrival
         NextpigArrival = ThispigArrival+ran.gauss(data, data*std)
         if ThispigArrival>time.time() : sleep(ThispigArrival-time.time())       
-    sleep(time_to_deadline*2)
-    print "poison robot"
+    #sleep(time_to_deadline*1.2)       
     poison(robot)
     poison(dummy)
     
@@ -114,7 +114,7 @@ def cameraFunc(in0,out0,ran , data = avg_camera_processing):
                 #waits = "cam: ",waittime
                 val0.accum.append(time.time()-val0.arrivaltime)
                 #val0.wait.append(waits)
-                dummywork(cam_iter)
+                dummywork(ran.gauss(cam_iter,cam_iter*std))
                 out0(val0)                
         
 @process
@@ -127,7 +127,7 @@ def convertFunc(in0,out0,ran , data = avg_convert_processing):
                 #waits = "con: ",waittime
                 #val0.wait.append(waits)
                 val0.accum.append(time.time()-val0.arrivaltime)
-                dummywork(conv_iter)
+                dummywork(ran.gauss(conv_iter,conv_iter*std))
                 out0(val0)
     except ChannelPoisonException:
         poison(in0,out0)
@@ -141,7 +141,7 @@ def analysisFunc(in0,out0,ran , data = avg_analysis_processing):
                 #waits = "ana: ",waittime
                 val0.accum.append(time.time()-val0.arrivaltime)
                 #val0.wait.append(waits)
-                dummywork(ana_iter)
+                dummywork(ran.gauss(ana_iter,ana_iter*std))                
                 out0(val0)
     except ChannelPoisonException:
         exit
@@ -169,7 +169,6 @@ def robotFunc(feeder,analysis,ran, statC, data = time_to_deadline):
                 {analysis:process_pig2()}
                 ]).execute()
     except ChannelPoisonException:
-        print "rob got poison"
         good = 0
         bad = 0
         normal = 0
@@ -197,11 +196,10 @@ def Work(statC,timeC):
         rob = robotFunc(+robotC,+analysisC,ran,statC)
 
         Parallel(
+            #3*background_dummywork(dummyC,timeC),
             feed,
-            rob#,
-            #1*background_dummywork(+dummyC,timeC)
+            rob            
         )
-        print "ended work"     
     poison(statC, timeC)
 
 @process
@@ -210,7 +208,7 @@ def Statistic(statC):
     try:
         while True:
             stce = statC()
-            print stce
+            #print "pct good: ",stce
             stc.append(stce)
             
     except ChannelPoisonException:
@@ -225,7 +223,9 @@ def StatisticTime(statC):
     stc = []
     try:
         while True:
-            stc.append(statC())
+            stac = statC()
+            #print "time spent: ",stac
+            stc.append(stac)
             
     except ChannelPoisonException:
         print "Time spent in dummy:"        
@@ -245,4 +245,5 @@ Parallel(
 )
 print "cam deadline:\t%3f\ndeadline:\t%3f"%(time_to_camera_deadline,time_to_deadline)
 print "avg procsessing time: ",avg_camera_processing+avg_convert_processing+avg_analysis_processing
-print "Processes version"
+print "concurrent: ",concurrent
+print "Threads version"
