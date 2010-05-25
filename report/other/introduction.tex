@@ -8,13 +8,13 @@ Vi vil indledningsvis præsentere konteksten for dette speciale. Herefter klarl�
 \section{Kontekst}
 Over de sidste par år er multi-kerne cpu'er blevet hyldevarer, hvilket har afledt et stigende behov for at udvikle programmer, der kan udnytte flere kerner samtidigt. Dette behov har gjort CSP til et populært sprog, da det gør det let at repræsentere samtidighed og desuden kræver eksplicit udveksling af data frem for at benytte delte datastrukturer, som kræver låsemekanismer eller anden form for kontrol over hvem der tilgår og hvordan det delte data tilgås. CSP's stigende popularitet har affødt at det er blevet blevet implementeret i flere andre programmeringssprog, og senest har Google lavet sproget Go, der er baseret på CSP. 
 
-Tid har altid været et brugbart værktøj indenfor datalogi, men har ofte været besværligt at repræsentere og håndtere. Det har ført til megen forskning og udvikling indenfor området, og har resulteret i adskillige modeller og frameworks. I den forbindelse er der også lavet en model for tid i CSP, kaldet TimedCSP. Dette er hovedsageligt et teoretisk arbejde som aldrig har vundet indpas i nogle af de gængse implementation af CSP. Der er derfor, så vidt vi ved, på nuværende tidspunkt ikke nogen gængs anvendt implementation af tid i CSP. 
+Tid har altid været et brugbart værktøj indenfor datalogi, men har ofte været besværligt at repræsentere og håndtere. Det har ført til megen forskning og udvikling indenfor området, og har resulteret i adskillige modeller og frameworks. I den forbindelse er der også lavet en model for tid i CSP, kaldet TimedCSP. Dette er hovedsageligt et teoretisk arbejde som aldrig har vundet indpas i nogle af de gængse implementation af CSP. Der er derfor, så vidt vi ved, på nuværende tidspunkt ikke nogen praktisk anvendt implementation af tid i CSP. 
 
 \fxnote{RS: Jeg har lavet udkast, du kan prøve at kaste flere ord efter det hvis du lyster}
 \section{Specialets problemformulering og struktur}
 Set i lyset af den nuværende mangel på en praktisk anvendelig implementering af tid i CSP, vil vi undersøge om det er muligt at lave en sådan - dvs. en implementering, som kan bruges af udviklere til at løse problemer, hvori tid indgår.
 
-For at opnå dette vil vi undersøge, hvad der skal til for at introducere følgende tre anvendelsesområder i \pycsp: Diskret simulering, realtids planlægning og interaktiv planlægning. Disse anvendelsesområder repræsenterer områder hvor tid indgår  og dækker tilsammen bredt over tid som helhed. Diskret simulering anvendes i stor udstrækning i discrete event simulation. Realtids planlægning benyttes i tidskritiske systemer hvor der er stringente krav om at en given begivenhed er blevet udført inden for en tidsramme. Endeligt bruges interaktiv planlægning i spilindustrien til at udregne scenen i et computerspil. På \cref{fig:intro} viser vi hvordan vi forventer at kombinere anvendelsområderne med \pycsp for derved at komme frem til vores Timed \pycsp. 
+For at opnå dette vil vi undersøge, hvad der skal til for at introducere følgende tre anvendelsesområder i \pycsp: Diskret simulering, realtids planlægning og interaktiv planlægning. Disse anvendelsesområder repræsenterer områder hvor tid indgår  og dækker tilsammen bredt over tid som helhed. Diskret simulering anvendes i stor udstrækning i discrete event simulation. Realtids planlægning benyttes i tidskritiske systemer hvor der er stringente krav om at en given begivenhed er blevet udført inden for en tidsramme. Endeligt bruges interaktiv planlægning i spilindustrien til bl.a. at udregne den visuelle scene i et computerspil. På \cref{fig:intro} viser vi hvordan vi forventer at kombinere anvendelsområderne med \pycsp for derved at komme frem til vores Timed \pycsp. 
 
 \begin{figure}[htp]
  \begin{center}
@@ -43,7 +43,7 @@ I forbindelse med dette speciale vil vi bruge følgende termer:
 fremskrives kontinuerligt og uafhængigt af nogle eksterne kræfter.
 \item \textbf{Diskret tid} er en anden tidsmodel. Her samples værdier fra den kontinuerlige tid, således at tiden fremskrives i ryk. Den enkelte sample er normal taget med et konstant tidsinterval, men kan også være taget med et variabelt tidsinterval. I diskret tid kan tiden enten drives frem af tiden selv, som i realtid, eller fremskrives manuelt. I dette speciale defineres diskret tid til at have variable tidsintervaller, og skal fremskrives manuelt.
 \item \textbf{Anvendelsesområde} er en konkret implementation af en tidsmodel.
-\item \textbf{\code{Skrivemaskine-font}} markerer i dette speciale de  variabelnavne, funktioner,  klasser og moduler der er der er specifikke for Python og \pycsp.
+\item \textbf{\code{Skrivemaskine-font}} markerer i dette speciale variabelnavne, funktioner,  klasser og moduler som findes i koden. 
 \end{list}
 
 

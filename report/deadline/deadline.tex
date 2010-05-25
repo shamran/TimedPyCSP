@@ -1,7 +1,7 @@
 \chapter{Real-time planlægning}
 \label{chap:rtp}
 \fxnote{Kom ind på starvation et eller andet sted.}
-Vi vil i dette kapitel beskrive Real-time planlægning (RTP), samt diskutere hvordan det kan implementeres i \pycsp. 
+Det andet anvendelsesområde vil vi behandle, med henblik på at inføre tid i \pycsp , er Real-time planlægning (RTP). Vi vil i dette kapitel gennemgå RTP samt diskutere hvordan det kan implementeres i \pycsp. 
 
 RTP er baseret på den kendsgerning at nogle begivenheder i programmer kan være vigtigere at få udført end andre indenfor en afgrænset tidsperiode. Dette kan f.eks. være interrupts, input- eller output enheder eller interne processer. Med RTP tilknytter man en deadline for hver begivenhed, som bruges til at planlægge rækkefølgen for afvikling af begivenhederne. Formålet er at optimere antallet af begivenheder der når at blive udført inden deres deadline er overskredet. Normalt anses alle begivenheder for at være lige vigtige, og de planlægges ud fra en optimal udnyttelse af processoren. Denne optimale processorudnyttelse kan man være nødt til at gå på kompromis med hvis man ønsker at bruge RTP og derved prioritere visse begivenheder højere end andre. Man kan forestille sig en situation hvor man ikke starter en begivenhed med lav prioritet selv om den er klar, hvis man ved at en begivenhed med høj prioritet er klar kort tid efter, og venter derfor på at den er klar og igangsætter begivenheden med høj prioritet med det samme. 
 RTP benyttes meget i specialiserede indlejrede systemer til f.eks medicinsk udstyr, kontrol af luftrummet, på rumstationen ISS\cite{Audsley1990} og mange andre steder. Det er dog også anvendeligt i mere gængse applikationer, typisk i forbindelse med en eller anden form for interaktion med den virkelige verden. 
@@ -32,7 +32,7 @@ Vi definerer en begivenhed til at have en hard deadline såfremt en færdiggøre
 \end{figure}
 
 \subsubsection{Soft deadline}
-Færdiggørelse af en begivenhed med en soft deadline til tiden tilføjer samme værdi til systemet som hvis den havde haft en hard deadline. Forskellen ligger i den tilførte værdi såfrem deadlinen overskrides. Hvor en hard deadline ikke tilføjer nogen værdi ved en overskridelse, vil en overskridelse af en soft deadline stadig tilføre en reduceret værdi ved færdiggørelse. Den tilførte værdi vil være omvendt proportional med længden af overskridelsen. \CRef{figure:soft-dl} illustrerer en soft deadline. 
+Færdiggørelse af en begivenhed med en soft deadline til tiden tilføjer samme værdi til systemet som hvis den havde haft en hard deadline. Forskellen ligger i den tilførte værdi såfremt deadlinen overskrides. Hvor en hard deadline ikke tilføjer nogen værdi ved en overskridelse, vil en overskridelse af en soft deadline stadig tilføre en reduceret værdi ved færdiggørelse. Den tilførte værdi vil være omvendt proportional med længden af overskridelsen. \CRef{figure:soft-dl} illustrerer en soft deadline. 
 
 \begin{figure}
  \begin{center}
@@ -51,8 +51,8 @@ Et soft real-time system kan indeholde alle typer deadlines men opstiller ikke n
 Generelt vil der i et real-time system ikke være alle begivenheder der har den samme type af deadline. Nogle begivenheder har ingen deadline, nogle har en soft deadline, og få har en hard eller eventuelt en kritisk deadline. 
  
 \input{deadline/planning}
-\input{deadline/examples}
 \input{deadline/planning_in_pycsp}
+\input{deadline/examples}
 \input{deadline/implementation}
 \input{deadline/evaluation}
 \input{deadline/future}
