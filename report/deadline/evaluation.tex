@@ -1,6 +1,6 @@
 \section{Evaluering}\label{sec:rtp_evalation}
 Vi har i dette afsnit beskrevet hvad der skal til, for at implementere RTP i \pycsp. Vi vil i dette afsnit gennemgå hvordan RTP kan implementeres, for derefter at evaluere vores løsning med udgangspunkt i slagterieksemplet.
-\subsection{Test af korrekthed}
+\subsection{Test af Korrekthed}
 Vi har som i \des i \cref{sec:des-eval} løbende skrevet tests, før vi implementerede hver ny funktion i \code{RTP}-versionen.  Bilag \ref{app:rtp-test} viser testresultaterne for de tests der er lavet specifikt for \code{RTP}-versionen.
 
 Alle tests undtagen én fungerer korrekt. Testen, der fejler hedder test"_xreset"_inheritance"_from"_two"_step og viser en situation, hvor den samme proces får løftet sin prioritet to gange i træk, først med en høj prioritet og efterfølgende med en mellemprioritet. Efterfølgende skal processen sænke sin prioritet, først til  mellemprioriteten og til slut til sin originale prioritet. Her viser det sig, at vi har lavet en fejl i implementeringen, således at prioriteten ikke bliver nedsat til mellemprioriteten. \CRef{fig:priority-inheritance} viser prioriteten, mens processen bliver op- og nedprioriteret. Vi har ikke prioriteret at løse dette problem, men det kan løses ved at kræve, at når en proces opprioriteres, gemmes oplysningen om, hvilken proces der står bag, så når en proces ønsker at fjerne sin opprioritering fra andre processer, er det kun sin egen  prioritet, den fjerner.  
