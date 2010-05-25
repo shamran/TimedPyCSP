@@ -5,7 +5,7 @@ For at designe en implementering af simulering i diskret tid i \pycsp, skal vi f
 
 
 \subsection{Kodestruktur}  
-Efter i kapitel \ref{chap:csp} at have valgt at udvide \emph{greenlets}"-versionen, skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra \emph{greenlets}"-versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale \emph{greenlets}"-versionen. Med denne isolation forventer vi, at hvis/når der sker tilrettelser af \emph{greenlets}"-versionen af \pycsp, vil man ikke skulle foretage de samme tilrettelser i vores version. 
+Efter i kapitel \ref{chap:csp} at have valgt at udvide \emph{greenlets}"-versionen, skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra \emph{greenlets}"-versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale \emph{greenlets}"-version. Med denne isolation forventer vi, at hvis/når der sker tilrettelser af \emph{greenlets}"-versionen af \pycsp, vil man ikke skulle foretage de samme tilrettelser i vores version. 
 Isolationen mellem de to versioner skal opnås via nedarvning, således at det fra en brugers synsvinkel ser ud til, at vores version er fuldstændigt sepereret fra \emph{greenlets}"-versionen.
 
 Hver af de tre versioner har sin egen mappe i \pycsp og i hver af disse findes en tilhørende \code{\_\_init\_\_.py} fil, der fungerer som et manifest for den givne version. Vi opretter vores egen version kaldet \emph{simulation} og opretter også en tilhørende mappe på samme niveau som de andre versioner og med sin egen manifestfil. Manifestfilen kan nu bruges til at udvælge de funktioner, der skal tages direkte fra \emph{greenlets}-versionen, og hvilke funktioner, der skal udvides og som derfor vil ligge i den nye mappe.
@@ -84,7 +84,7 @@ Alternation([{Timeout(seconds=0.5):None},
 
 Fra en brugers synsvinkel repræsenteres tiden internt i \pycsp som realtid, men dette er ikke korrekt. Helt generelt kan computere ikke håndtere kontinuerlige begreber, som realtid er, og \code{time}-modulet, der står for håndtering af tid i Python og dermed \pycsp, kan derfor ikke give brugeren mulighed for at benytte realtid. 
 
- I stedet tilbyder \code{time}-modulet det, vi vil kalde ``pseudo realtid'', der minder om realtid, men på en række områder afviger fra denne. Den største forskel mellem realtid og pseudo realtid er, at i computere kan tiden ikke være kontinuerlig, men må nødvendigvis være diskritiseret, og som oftest i et fast lille tidsskridt. Vi skal med vores diskrete tidsmodel derfor ikke foretage en konvertering fra kontinuerlig til diskret tid, men i stedet skal foretage en konvertering fra en diskret tidsmodel. hvor tiden stiger med et fast tidsskridt, til en diskret tidsmodel, hvor tiden stiger med variable tidsskridt. Vi skal desuden ændre fremskrivningen af tiden så den  drives af begivenheder og ikke af et eksternt modul i pseudo realtid. \fxnote{Kan vi ryste noget ud med hvorfor det er godt vi ikke skal gå fra kontinuerlig til diskret tid?}
+ I stedet tilbyder \code{time}-modulet det, vi vil kalde ``pseudo realtid'', der minder om realtid, men på en række områder afviger fra denne. Den største forskel mellem realtid og pseudo realtid er, at i computere kan tiden ikke være kontinuerlig, men må nødvendigvis være diskritiseret, og som oftest i et fast lille tidsskridt. Vi skal med vores diskrete tidsmodel derfor ikke foretage en konvertering fra kontinuerlig til diskret tid, men i stedet skal foretage en konvertering fra en diskret tidsmodel. hvor tiden stiger med et fast tidsskridt, til en diskret tidsmodel, hvor tiden stiger med variable tidsskridt. Vi skal desuden ændre fremskrivningen af tiden så den  drives af begivenheder og ikke af et eksternt modul, som i pseudo realtid. \fxnote{Kan vi ryste noget ud med hvorfor det er godt vi ikke skal gå fra kontinuerlig til diskret tid?}
  
  
 \subsubsection{Sammenhæng mellem tidsintervaller i realtid og diskret tid}
@@ -120,7 +120,7 @@ if self.timers and self.timers[0][0] <= Now():
 \end{lstlisting}
 \end{minipage}
 \end{figure}
-Her sammenlignes på linje 204 den første tidsværdi i \code{timers} med det nuværende tidspunkt givet af \code{time}-modulet.
+Her sammenlignes på linje 204 tidsværdi for den første proces i \code{timers} med det nuværende tidspunkt givet af \code{time}-modulet.
 Hvis det nuværende tidspunkt er større end værdien i \code{timers}, udvælges denne proces til at køre næste gang og fjernes fra listen.
 For at planlægge begivenheder præcist, skal processerne kunne eksekveres på et specifikt tidspunkt. Dermed har  \sched en i \code{simulations}-versionen behov for at kunne  styre aktiveringen af processerne på et finere niveau end, hvad der er muligt med \code{greenlets}"-versionen.  
 I \code{simulation}"-versionen har vi fuld kontrol over tiden, da  den står stille, mens processerne eksekveres, hvorfor dette ikke er et problem.
@@ -131,9 +131,9 @@ I pseudo realtid drives tiden frem af et eksternt modul for at efterligne realti
 
 \fxnote*{skriv tegning}{Vi kan demonstrere, hvordan den kontinuerlige tid har indflydelse på  \pycsp med et eksempel}. Proces 1 har startet en ny tråd via \code{io-decoratoren} og er derfor blokeret. Proces 2 står i en \code{alternation} med en \code{timeout-guard}. Uafhængigt af den tid, det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide hvornår dens timeout er indtrådt. Dette er implementeret i \code{greenlets}-versionen i \cref{fig:blocking_sleep} på linjerne 242 til 251. Her startes en separat tråd, der vil signalere til \sched en, når tiden for næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu nøjes med at vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
 
-Når tiden i \des ikke er drevet af en eksternt modul, er nødvendigheden af en ekstra tråd til  håndtering af tid irrelevant. Først når alle begivenheder til et tidsskridt er eksekveret, skal tiden i \des tælles op. Dette betyder i vores konkrete eksempel, at  så længe proces 1 er blokeret, står tiden stille, og  \sched en venter på dem. Vi kan ikke tælle tiden op, blot fordi nogle processer er blokeret af \code{io-decoratoren}, ligesom vi ikke kan tælle tiden op, blot mens nogle processer eksekvere en anden tilfældig funktion.
+Når tiden i \des ikke er drevet af en eksternt modul, er nødvendigheden af en ekstra tråd til  håndtering af tid irrelevant. Først når alle begivenheder til et tidsskridt er eksekveret, skal tiden i \des tælles op. Dette betyder i vores konkrete eksempel, at  så længe proces 1 er blokeret, står tiden stille, og  \sched en venter på dem. Vi kan ikke tælle tiden op, blot fordi nogle processer er blokeret af \code{io-decoratoren}, ligesom vi ikke kan tælle tiden op, så længe der er processer der er aktive. %blot mens nogle processer eksekvere en anden tilfældig funktion.
 
-Først når alle processer venter i enten \code{timers} listen eller på kommunikation, kan der ikke ske flere begivenheder og tiden sættes op. 
+Først når alle processer venter i enten \code{timers} listen eller på kommunikation, kan der ikke ske flere begivenheder og tiden fremskrives. 
 I dette tilfælde  kan \sched en finde tidspunktet for den begivenhed, der ligger tættest på det nuværende tidspunkt,  og springe frem til denne begivenhed. Dette er implementeret i \cref{fig:sim_sleep}.
 \begin{figure}[hbtp]
 \begin{minipage}[c]{\linewidth}
@@ -183,6 +183,22 @@ self.cond.release()
 \end{minipage}
 \end{figure}
 
+
+\subsubsection{Timeout} 
+I \pycsp findes der, som nævnt i \autoref{chap:csp} en \code{alternation}, hvor brugeren har mulighed for at tilknytte to specielle guards. Den ene er en SKIP-guard, der giver mulighed for at kommunikere, hvis kanalen er klar, og ellers fortsætte uden at kommunikere. Den anden er timeout-guarden, der udvider SKIP-guarden, så man venter på kommunikation i en given periode, hvorefter man tager SKIP-guarden. 
+Når \des indføres, ændres tiden, så timeout-guarden opererer på tidsskridt fremfor en tidsperiode. Vi går derved fra en situation hvor en timeout-guard f.eks. er villig til at vente i fem sekunder, til en situation hvor den er villig til at vente i 5 tidsskridt. Denne ændring virker umiddelbart simpel, men introducerer et problem i forhold til hvornår timeout-guarden vælges: En proces kan nu ønske at kommunikere i indeværende tidsskridt, men ikke i det efterfølgende. Vi kan dog ikke i tidsskridtet evaluere om kommunikation er muligt. Dette skyldes, at tiden står stille, mens processerne er aktive, så selvom kommunikation ikke er muligt på ét tidspunkt i tidsskridtet, så kan en efterfølgende begivenhed i samme tidsskridt muliggøre kommunikation.
+
+
+En løsningsmodel på denne problemstilling kunne være at lade processer i timeout-guards vente helt frem til næste tidsskridt, og så her lade dem vælge SKIP-guarden. Dette efterfølgende tidsskridt kan enten være et ekstra skridt, vi introducerer specifikt for at håndtere disse timeout-guards, eller det kan være det næste tidsskridt, hvortil der er planlagt en begivenhed. 
+Såfremt vi introducerer et kunstigt tidsskridt, skal dette specificeres i definitionen af timeout-guarden. Uanset hvor lille et tidsskridt vi specificerer, kan vi ikke garantere, at der ikke efterfølgende i samme tidsskridt vil blive planlagt en begivenhed, der skal indtræffe mellem indeværende tidsskridt og det kunstige tidsskridt, vi specificerede i timeout-guarden. Herved er der risiko for, at rækkefølgen af begivenheder, der skal udføres, bliver ændret, hvilket er uacceptabelt. 
+Alternativt kan man vælge at lade tiden springe til den næste begivenhed, der er planlagt, og der som det første vælge SKIP-guarden. Her vil man ikke risikere at ændre på rækkefølgen, men derimod at springe for langt frem i tiden. Dette kan være et problem, hvis en proces, der tager en SKIP-guard, efterfølgende planlægger en begivenhed.
+Begge muligheder har grundlæggende den svaghed, at oprindeligt ønskede man kun at kommunikere i det indeværende tidsskridt og ikke i hverken et vilkårligt lille tidsrum eller i et tilfældigt tidsrum frem til en efterfølgende begivenhed.
+
+En sidste løsningsmodel er at vente til lige før, tiden tælles op, og der kalde de ventende processers SKIP-guards. 
+For at kunne adskille hvilke processer, der har en begivenhed til et tidsskridt, og hvilke, der venter på kommunikation, kan vi \fxnote*{illustration}{benytte os af edge-triggering} til at dele hvert tidsskridt op i to grupper, henholdsvis wake-first og wake-last.
+I wake-first-gruppen udføres de processer, der har tilknyttet en begivenhed til det givne tidsskridt, mens man i  wake-last-gruppen aktiverer SKIP-guarden for de processer, der venter på en timeout.
+
+Edge-triggering er den bedste løsningsmodel af de beskrevne, da man her har mulighed for at udføre alle begivenheder, som måske resulterer i kommunikation, og først derefter aktivere SKIP-guards for de processer, der har en timeout til samme tidsskridt. Ulempen ved denne metode er at det kræver en mere kompleks implementering, da der nu findes to seperate måder at vente for hhv. begivenheder og timeouts.
 
 \subsection{Funktionen \code{Wait}}\label{sec:Wait}
 Vi har valgt at anskue planlægningen af en begivenhed til et bestemt tidspunkt, sådan at den proces der skal udføre begivenheden venter indtil tiden for begivnheden er nået, og først her begynde udførslen. Dette vil i praksis være det samme som en planlægning til tidspunktet men det letter implementeringen da vi ikke behøver nogen viden om specifikke begivenheder i vores \sched. 

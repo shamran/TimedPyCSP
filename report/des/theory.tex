@@ -1,6 +1,5 @@
 \subsubsection{PDES}
-Et alternativ til \des  er parallel discrete event simulation(\pdes). I \pdes paralleliserer man simuleringen for at kunne udnytte flere cpu'er, eller flere maskiner. Dette introducerer dog flere problemstillinger relateret til håndtering af tid, da tiden er nødt til at være lokal i stedet for global, og dermed kan varierer på tværs af simuleringen. Dette giver problemer som f.eks. modtagelse af beskeder fra fotiden, der kan tvinge en enkelt maskine til at rulle sin del af simuleringe tilbage til et tidligere tidspunkt. 
-\pdes har ikke vundet stort indpas i den videnskabelig verden, som man kan se af \cref{tab:des}. En grund til dette er, at når tiden kan køre parallelt, øges omkostningerne ved at administrere den mere komplekse tidsrepræsentation, hvilket resulterer i lavere hastighed, end når tiden kan holdes synkront på tværs af processerne.
+Når vi arbejder med CSP, hvis styrke bl.a. er samtidighed, er det oplagt at afsøge hvilket arbejde, der er lavet med henblik på samtidighed og paralellitet i \des. Dette forskningsområde kaldes parallel discrete event simulation(\pdes). Formålet med \pdes er en parallelisering af simuleringen for at kunne udnytte flere cpu'er, eller flere maskiner. Dette introducerer dog flere problemstillinger relateret til håndtering af tid, da tiden er nødt til at være lokal i stedet for global, og dermed kan varierer på tværs af simuleringen. Dette giver problemer som f.eks. modtagelse af beskeder fra fotiden, der kan tvinge en enkelt maskine til at rulle sin del af simuleringe tilbage til et tidligere tidspunkt. 
 
 \begin{table}[ht]
 	\centering
@@ -27,11 +26,13 @@ Et alternativ til \des  er parallel discrete event simulation(\pdes). I \pdes pa
 %  \item model vs. simulering
 %\end{itemize}
 
+\pdes har ikke vundet stort indpas i den videnskabelige verden, som man kan se af \cref{tab:des}. En grund til dette er, at når tiden kan køre parallelt, øges omkostningerne ved at administrere den mere komplekse tidsrepræsentation, hvilket resulterer i lavere hastighed, end når tiden kan holdes synkront på tværs af processerne.
+Grundet den forholdsvis dårlige ydelse og deraf følgende manglende interesse, har vi også valgt at lade \pdes ligge, og fokusere udelukkende på almindelig \des indenfor simulering i diskret tid. 
 
 \subsubsection{Barrierer} \label{sec:barrierer}
 %\inline{Hele afsnittet skal skrives om for at få det generelle samlet i starten, og vores specifikke efterfølgende. Evt. have mindre om vores implementation}
 
-I \des er tiden den samme for alle processer, og de skal derfor have en fælles tid, der samtidigt for alle processerne tælles op. En global viden som tid kræver derfor synkronisering af alle 
+I \des er tiden den samme for alle processer, og de skal derfor have en fælles tid, der fremskrives samtidigt for alle processerne. En global viden som tid kræver derfor synkronisering af alle 
 processerne, og til denne koordinering og synkronisering af flere 
 processer er  den mest brugte metode at introducere en barriere. Barrierer blev først introduceret i MPI \cite{mpi-barrier}, hvor den bruges til at 
 sikre, at alle tråde venter i barrieren før de  fortsætter. 
@@ -93,21 +94,5 @@ af barrierer, selvom det er nemt at implementere. Problemet er at hver proces b�
 \mycite[1]{crew}{[\ldots] where the barriers may be used to maintain global and/or localised models of time and to synchronise safe access to shared data[\ldots]}
 \end{otherlanguage}
 Barrierens berettigelse i CSP er derfor at  introducere tid og at kunne bruge delt data. I \csp bør der ikke være delt data mellem processerne, men derimod kun lokalt data. Hvis data er delt pga. den arkitektur \csp er implementeret på, bør dette abstraheres væk og udnyttes internt i kanalerne. At introducere hjælpemidler for at styre delt data, er derfor at tilskynde til en forkert brug af \csp. Tiden er den anden begrundelse for at benytte barrierer.
-Men barrierer giver kun en  primitiv model for tid, og vi vil vise, at med brugen af \des får man et stærkere værktøj, der blandt meget andet også kan erstatte brugen af barrierer.
-
-\subsubsection{Timeout} 
-I den eksisterende \pycsp findes der som nævnt i \autoref{chap:csp} en \code{alternation}, hvor brugeren har mulighed for at tilknytte to specielle guards. Den ene er en SKIP-guard, der giver mulighed for at kommunikere, hvis kanalen er klar, og ellers fortsætte uden at kommunikere. Den anden er timeout-guarden, der udvider SKIP-guarden, så man venter på kommunikation i en given periode, hvorefter man tager SKIP-guarden. 
-Når \des indføres, ændres tiden, så timeout-guarden opererer på tidsskridt fremfor en tidsperiode. Vi går derved fra en situation hvor en timeout-guard f.eks. er villig til at vente i fem sekunder, til en situation hvor den er villig til at vente i 5 tidsskridt. Denne ændring virker umiddelbart simpel, men introducerer et problem i forhold til hvornår timeout-guarden vælges: En proces kan nu ønske at kommunikere i indeværende tidsskridt, men ikke i det efterfølgende. Vi kan dog ikke i tidsskridtet evaluere om kommunikation er muligt. Dette skyldes, at tiden står stille, mens processerne er aktive, så selvom kommunikation ikke er muligt på ét tidspunkt i tidsskridtet, så kan en efterfølgende begivenhed i samme tidsskridt muliggøre kommunikation.
-
-
-En løsningsmodel på denne problemstilling kunne være at lade processer i timeout-guards vente helt frem til næste tidsskridt, og så her lade dem vælge SKIP-guarden. Dette efterfølgende tidsskridt kan enten være et ekstra skridt, vi introducerer specifikt for at håndtere disse timeout-guards, eller det kan være det næste tidsskridt, hvortil der er planlagt en begivenhed. 
-Såfremt vi introducerer et kunstigt tidsskridt, skal dette specificeres i definitionen af timeout-guarden. Uanset hvor lille et tidsskridt vi specificerer, kan vi ikke garantere, at der ikke efterfølgende i samme tidsskridt vil blive planlagt en begivenhed, der skal indtræffe mellem indeværende tidsskridt og det kunstige tidsskridt, vi specificerede i timeout-guarden. Herved er der risiko for, at rækkefølgen af begivenheder, der skal udføres, bliver ændret, hvilket er uacceptabelt. 
-Alternativt kan man vælge at lade tiden springe til den næste begivenhed, der er planlagt, og der som det første vælge SKIP-guarden. Her vil man ikke risikere at ændre på rækkefølgen, men derimod at springe for langt frem i tiden. Dette kan være et problem, hvis en proces, der tager en SKIP-guard, efterfølgende planlægger en begivenhed.
-Begge muligheder har grundlæggende den svaghed, at oprindeligt ønskede man kun at kommunikere i det indeværende tidsskridt og ikke i hverken et vilkårligt lille tidsrum eller i et tilfældigt tidsrum frem til en efterfølgende begivenhed.
-
-En sidste løsningsmodel er at vente til lige før, tiden tælles op, og der kalde de ventende processers SKIP-guards. 
-For at kunne adskille hvilke processer, der har en begivenhed til et tidsskridt, og hvilke, der venter på kommunikation, kan vi \fxnote*{illustration}{benytte os af edge-triggering} til at dele hvert tidsskridt op i to grupper, henholdsvis wake-first og wake-last.
-I wake-first-gruppen udføres de processer, der har tilknyttet en begivenhed til det givne tidsskridt, mens man i  wake-last-gruppen aktiverer SKIP-guarden for de processer, der venter på en timeout.
-
-Edge-triggering er den bedste løsningsmodel af de beskrevne, da man her har mulighed for at udføre alle begivenheder, som måske resulterer i kommunikation, og først derefter aktivere SKIP-guards for de processer, der har en timeout til samme tidsskridt. Ulempen ved denne metode er at det kræver en mere kompleks implementering, da der nu findes to seperate måder at vente for hhv. begivenheder og timeouts.
+Barrierer giver dog kun en  primitiv model for tid, og vi vil vise, at med brugen af \des får man et stærkere værktøj, der blandt meget andet også kan erstatte brugen af barrierer.
 

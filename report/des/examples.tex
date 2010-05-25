@@ -1,6 +1,6 @@
 \section{Eksempler}\label{sec:des-examples}
 %\inline{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}
-
+Som eksempler på programmer der kan benytte \des har vi valgt to eksempler. Vi har brugt ``Hajer og fisk på Wa-Tor'' som ligger inden for området continous simations, og vi kigger på en simulering af en bank, som er et klassisk eksempel inden for simulering. 
 
 \subsection{Hajer og fisk på Wa-Tor} 
 Vores første eksempel tager  udgangspunkt i et Lotka-Volterra predator-prey scenarie, som \citeauthor{wator}
@@ -144,8 +144,8 @@ synkronisering af worldpart med vizualize, samt en som
 worldpart-processerne bruger til synkroniseringen af de to sidste kolonner. 
 
 \subsection{Kunder i en bank}\label{bank-eksempel}
-Et klassisk eksempel inden for \des er at simulere  en række kunder, der alle 
-ankommer til en butik, hvor de skal serviceres. Dette simple problem kan 
+Vores andet eksempel indenfor diskret tid, er simulering af en bank. Det repræsenterer et klassisk eksempel inden for \des, hvor en række kunder, der alle 
+ankommer til en butik, skal serviceres. Dette simple problem kan 
 udvides til at modellere mange forskellige problemstillinger, der berører, 
 hvordan flowet ændrer sig hvis man varierer en eller flere parametre
 i systemet. Programmeringssproget \simpy\footnote{\url{http://simpy.sourceforge.net/}}har som et af deres 
@@ -177,7 +177,7 @@ modellere eksemplet i \pycsp med kunder som en proces. I \pycsp er processerne d
 arbejderproces, hvor  arbejdet flyttes 
 mellem processerne igennem kanaler. Vi har derfor ændret modellen, så   
 generatorprocessen i \pycsp er som i \simpy, men vi introducerer en bankproces i stedet for en kundeproces og lader kunderne være arbejdet, der flyttes mellem dem. 
-I \pycsp findes muligheden for at oprette processer dynamisk med funktionen \code{spawn}, og man kunne derfor god lade generatoprocessen oprette kundeprocesser dynamisk, men vi ønsker ikke kun at kopiere eksemplet fra \simpy til \pycsp, men også konvertere eksemplet, så det overholder stilen for et program skrevet til \csp. 
+I \pycsp findes muligheden for at oprette processer dynamisk med funktionen \code{spawn}, og man kunne derfor lade generatoprocessen oprette kundeprocesser dynamisk, men vi ønsker ikke kun at kopiere eksemplet fra \simpy til \pycsp, men også konvertere eksemplet, så det overholder stilen for et program skrevet til \csp. 
 
 Mens \simpy kalder kundeprocessen fra generatoren og lader denne stå for håndteringen af kunden 
 og den tid, hun befinder sig i banken, kender bankprocessen i \pycsp ikke tid som 
