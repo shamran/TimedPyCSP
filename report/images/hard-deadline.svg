@@ -58,16 +58,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.5400446"
-     inkscape:cx="467.13171"
-     inkscape:cy="31.552553"
+     inkscape:zoom="2.3782806"
+     inkscape:cx="240.89579"
+     inkscape:cy="125.72107"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:snap-global="true"
      showguides="false"
      inkscape:window-width="1440"
-     inkscape:window-height="826"
+     inkscape:window-height="851"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="1">
@@ -152,5 +152,11 @@
          x="521.31451"
          y="491.52277"
          style="font-size:18px">Time</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 330,211.44215 145,0"
+       id="path3167"
+       transform="translate(89.509969,261.31448)"
+       sodipodi:nodetypes="cc" />
   </g>
 </svg>
