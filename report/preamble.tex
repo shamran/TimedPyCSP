@@ -4,7 +4,7 @@ final,% Når man skal skifte kompileringsmetode mellem draft og final skal man
       %flytte kommenteringen %  i Draft kommanoerne, nedenfor.
 11pt, % standardstørrelse på fonten
 %openany,%, % anvnedes hvis kapitler bare skal starte på den næste side
-oneside%,
+%oneside%,
 %article
 ]{memoir}%
 % marginer, memoir to to metoder
@@ -130,7 +130,7 @@ oneside%,
 \newcommand{\ikkef}[1]{\fxnote*{Ikke forstået, gør dataloger?}{#1}}
 
 %\def\figurename{Figur}%
-\def\lstlistingname{Kodestump}%
+\def\lstlistingname{Kodeuddrag1}%
 
 
 %%% We need to redefine \autoref. We should use 
@@ -151,7 +151,7 @@ oneside%,
          \def\subsubsectionautorefname{Afsnit}%
          \def\Itemautorefname{Item}%
          \def\tableautorefname{Tabel}%
-         \def\lstlistingname{Kodestump}%
+         \def\lstlistingname{Kodeuddrag}%
          \orgautoref}
 %
 %% \Autorefs is plural for the beginning of the sentence
@@ -166,6 +166,7 @@ oneside%,
          \def\Itemautorefname{Items}%
          \def\tableautorefname{Tabellerne}%
          \def\chapterautorefname{Kapitlerne}% 
+         \def\lstlistingname{Kodeuddrag}%
          \orgautoref}
 
 
@@ -196,6 +197,7 @@ oneside%,
          \def\Itemautorefname{items}%
          \def\tableautorefname{tabellerne}%
          \def\chapterautorefname{kapitlerne}% 
+         \def\lstlistingname{kodeuddragene}%
          \orgautoref}
 
 
@@ -237,8 +239,8 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 
 
 \fxfatal[layout=index,target=cref]{Ændre pageref til vpageref}
-\newcommand{\cref}[1]{\autoref{#1}\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final  \vpageref{#1}}
-\newcommand{\CRef}[1]{\Autoref{#1}\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final
+\newcommand{\cref}[1]{\autoref{#1}\vpageref{#1}}%\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final  \vpageref{#1}}
+\newcommand{\CRef}[1]{\Autoref{#1}\vpageref{#1}}%\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final
 
 \newcommand{\nref}[1]{\nameref{#1}\textcolor{darkblue}{~på side}~\pageref{#1}}
 \newcommand{\tcite}[1]{\citetitle{#1}\xspace\cite{#1}}
@@ -276,7 +278,7 @@ typeeditors 	= {{udgivere}{udg\adddot}},
     \fi  \end{quote}}
 
 %Overskrifter til tabeller - bliver centreret
-\newcommand\mc[1]{\multicolumn{1}{c}{{\textbf #1}}} % sparer plads
+\newcommand\mc[1]{\multicolumn{1}{c}{\textbf {#1}}} % sparer plads
 \newcommand\nc[1]{\multicolumn{1}{c}{#1}} % sparer plads
 % OPSÆTNING TIL INKLUDERING AF SOURCE CODE
 %\usepackage[final]{listings}

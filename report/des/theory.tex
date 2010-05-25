@@ -1,5 +1,5 @@
 \subsubsection{PDES}
-Når vi arbejder med CSP, hvis styrke bl.a. er samtidighed, er det oplagt at afsøge hvilket arbejde, der er lavet med henblik på samtidighed og paralellitet i \des. Dette forskningsområde kaldes parallel discrete event simulation(\pdes). Formålet med \pdes er en parallelisering af simuleringen for at kunne udnytte flere cpu'er, eller flere maskiner. Dette introducerer dog flere problemstillinger relateret til håndtering af tid, da tiden er nødt til at være lokal i stedet for global, og dermed kan varierer på tværs af simuleringen. Dette giver problemer som f.eks. modtagelse af beskeder fra fotiden, der kan tvinge en enkelt maskine til at rulle sin del af simuleringe tilbage til et tidligere tidspunkt. 
+Når vi arbejder med CSP, hvis styrke bl.a. er samtidighed, er det oplagt at afsøge hvilket arbejde, der er lavet med henblik på samtidighed og paralellitet i \des. Dette forskningsområde kaldes parallel discrete event simulation(\pdes). Formålet med \pdes er en parallelisering af simuleringen for at kunne udnytte flere cpu'er, eller flere maskiner. Dette introducerer dog flere problemstillinger relateret til håndtering af tid, da tiden er nødt til at være lokal i stedet for global, og dermed kan varierer på tværs af simuleringen. Dette giver problemer som f.eks. modtagelse af beskeder fra fortiden, der kan tvinge en enkelt maskine til at rulle sin del af simuleringen tilbage til et tidligere tidspunkt. 
 
 \begin{table}[ht]
 	\centering
@@ -35,7 +35,7 @@ Grundet den forholdsvis dårlige ydelse og deraf følgende manglende interesse, 
 I \des er tiden den samme for alle processer, og de skal derfor have en fælles tid, der fremskrives samtidigt for alle processerne. En global viden som tid kræver derfor synkronisering af alle 
 processerne, og til denne koordinering og synkronisering af flere 
 processer er  den mest brugte metode at introducere en barriere. Barrierer blev først introduceret i MPI \cite{mpi-barrier}, hvor den bruges til at 
-sikre, at alle tråde venter i barrieren før de  fortsætter. 
+sikre, at alle processer venter i barrieren før de  fortsætter. 
 
 I \csp kan man lave sin egen barriere ved at udnytte, at begge 
 kanalender skal være klar, før der kan kommunikeres, og at en proces, der 
@@ -89,7 +89,7 @@ Barrierer er en meget effektiv metode til at synkronisere processer, der kører
 parallelt, og er brugt flittigt i MPI. I \csp findes der dog en konflikt i brugen 
 af barrierer, selvom det er nemt at implementere. Problemet er at hver proces bør fungere i isolation, og den eneste interaktion mellem processerne er via kanalerne. Derfor virker introduktionen af barrierer og kald til disse kunstig i \csp. 
 
-\citeauthor{crew} beskriver brugen af barrierer som:
+\citeauthor{crew} beskriver begrundelsen for brugen af barrierer:
 \begin{otherlanguage}{english}
 \mycite[1]{crew}{[\ldots] where the barriers may be used to maintain global and/or localised models of time and to synchronise safe access to shared data[\ldots]}
 \end{otherlanguage}

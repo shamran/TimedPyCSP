@@ -14,13 +14,13 @@ opførsel:
 \item[\textbf{Fisk}]
 Lever af plankton, en ressource som er uendelig. Hvis der er ét ledigt 
 tilstødende felt, bevæger den sig til dette felt. Hvis der er flere ledige 
-felter vælges et tilfældigt. Såfremt en fisk overlever 3 tidsskridt, forplanter 
+felter vælges et tilfældigt. Såfremt en fisk overlever tre tidsskridt, formere 
 den sig.
 \item[\textbf{Hajer}]
 Såfremt der er fisk i et eller flere tilstødende felter, vil hajen bevæge sig 
 til et af disse felter og spise fisken. Hvis der er ikke er nogen fisk i et af 
 disse felter flytter hajen sig til et tilfældigt valgt ledigt felt. Hvis en haj 
-ikke spiser i 3 tidsskridt dør den. Overlever den i 10 tidsskridt forplanter 
+ikke spiser i tre tidsskridt dør den. Overlever den i ti tidsskridt formere 
 den sig.
 \end{itemize}
 
@@ -38,12 +38,12 @@ introducerer problemstillinger omkring synkronisering, når det paralleliseres.
 Disse problemstillinger optræder, fordi en opdatering af hvert felt er afhængigt 
 af de omkringliggende felter, og derfor også er afhængig af felter fra andre 
 processer i grænsetilfælde. Ud over at være afhængig af information fra andre 
-processer, kan en opdatering også påvirke data hos andre processer. Eksemplet er repræsentativt for de problemer, der ligger i kategorien af continuous simulation, og viser, at hvis vi kan bruge vores implementation af \des til simulering af dette eksempel vil man helt generelt kunne bruge det til continuous simulations.
+processer, kan en opdatering også påvirke data hos andre processer. Eksemplet er repræsentativt for de problemer, der ligger i kategorien af \fxnote *{Vi kan ikke bare trække cont. simulation ud af hatten helt til sidst}{continuous simulation}, og viser, at hvis vi kan bruge vores implementation af \des til simulering af dette eksempel vil man helt generelt kunne bruge det til continuous simulations.
 
 \subsubsection{Før introduktion af et tidsbegreb i \pycsp}
 For at simulere Wa-Tor verdenen i \pycsp, hvori tidsbegrebet ikke er introduceret, er vi nødt 
 til at udføre en synkronisering af de enkelte processers arbejde. Denne 
-synkronisering kan ske ved brug af barrierer, hvor alle processer udfører en 
+synkronisering kan ske ved brug af en barriere, hvor alle processer udfører en 
 handling og mødes i barrieren, før de fortsætter.
 
 Vi har valgt at basere vores model på \citetitle{crew}\cite{crew}, hvor verdenen repræsenteres 
@@ -89,8 +89,7 @@ separat tidsskridt.
 
 \begin{figure}[hbtp] 
 \begin{minipage}{\linewidth}
-\begin{lstlisting}[label=code:wator-worldpart,caption=Uddrag af processen 
-  \code{worldpart} i Wator]
+\begin{lstlisting}[label=code:wator-worldpart,caption=Uddrag af worldpart-processen i WaTor]
   @proces
   def worldpart (part_id, barR, barW):  
     ...  
@@ -110,8 +109,7 @@ separat tidsskridt.
       barR()
 \end{lstlisting}
 
-\begin{lstlisting}[label=code:wator-visualize,caption=Processen 
-  \emph{visualize} i Wator]
+\begin{lstlisting}[label=code:wator-visualize,caption=Uddrag af visualize-processen i WaTor]
 @proces
  def visualize(barR,barW):
    for i in xrange(iterations):
@@ -126,7 +124,7 @@ separat tidsskridt.
 \end{lstlisting}
 
 \end{minipage}
-\caption[test]{\code{barW(1)} og \code{barR()} er henholdsvis skrivning til og læsning fra en barriere, som defineret i \cref{sec:barrierer}.}
+\caption[test]{\code{barW(1)} og \code{barR()} er henholdsvis skrivning til og læsning fra en barriere, som defineret i afsnit \cref{sec:barrierer}.}
 \end{figure}
 Afviklingen af programmet sker ved, at et antal worldpart-, en 
 visualize- og en barrier-proces køres parallelt. Af 
@@ -135,11 +133,11 @@ overordnede design af henholdsvis worldpart- og
 vizualize-processen.  
 \subsubsection{Konklusion} 
 %\inline{konklusion hvordan var det at implementere og hvor stor parallelitet kan man opnå. }
-Det var ikke svært at implementere et predator/prey simulering i \pycsp, men da store dele af koden bruges på at simulere  de forskellige fisk og ikke på synkronisering, forventer vi ikke, at introduktionen af tid i \pycsp vil medføre de store ændringer. 
+Det var ikke svært at implementere et predator-prey simulering i \pycsp, men da store dele af koden bruges på at simulere  de forskellige fisk og ikke på synkronisering, forventer vi ikke, at introduktionen af tid i \pycsp vil medføre de store ændringer. 
 
-Værd at bemærke er det store antal barrierekald i 
+Værd at bemærke i \cref{code:wator-visualize} er det store antal barrierekald i 
 visualize-processen. Dette er til for, at man kan benytte den samme barriere som 
-worldpart-processerne. Alternativt kunne man have to barriere-processer; en til 
+worldpart-processerne i \cref{code:wator-worldpart}. Alternativt kunne man have to barriere-processer; en til 
 synkronisering af worldpart med vizualize, samt en som 
 worldpart-processerne bruger til synkroniseringen af de to sidste kolonner. 
 
@@ -148,7 +146,7 @@ Vores andet eksempel indenfor diskret tid, er simulering af en bank. Det repræs
 ankommer til en butik, skal serviceres. Dette simple problem kan 
 udvides til at modellere mange forskellige problemstillinger, der berører, 
 hvordan flowet ændrer sig hvis man varierer en eller flere parametre
-i systemet. Programmeringssproget \simpy\footnote{\url{http://simpy.sourceforge.net/}}har som et af deres 
+i systemet. Programmeringssproget \simpy\cite{simpy} har som et af deres 
 eksempler en simulering af kunder i en bank. \simpy bruger dette som et 
 gennemgående eksempel, hvor de løbende udvider modellen for at vise 
 forskellige egenskaber ved \simpy. For at kunne sammenligne \simpy  med vores 
@@ -172,12 +170,12 @@ servicemedarbejdere, samt hvordan køen opfører sig over tid.
 
 \subsubsection{Før introduktion af et tidsbegreb i \pycsp}
 
-I \simpy opretter generatorfunktionen dynamisk en kundeprocess og  kører den parallelt med sig selv. Det vil  være nærliggende ligeledes at 
-modellere eksemplet i \pycsp med kunder som en proces. I \pycsp er processerne dog mere statiske end i \simpy, gerne med en generatorproces og 
-arbejderproces, hvor  arbejdet flyttes 
-mellem processerne igennem kanaler. Vi har derfor ændret modellen, så   
-generatorprocessen i \pycsp er som i \simpy, men vi introducerer en bankproces i stedet for en kundeproces og lader kunderne være arbejdet, der flyttes mellem dem. 
-I \pycsp findes muligheden for at oprette processer dynamisk med funktionen \code{spawn}, og man kunne derfor lade generatoprocessen oprette kundeprocesser dynamisk, men vi ønsker ikke kun at kopiere eksemplet fra \simpy til \pycsp, men også konvertere eksemplet, så det overholder stilen for et program skrevet til \csp. 
+I \simpy opretter generatorfunktionen dynamisk en kundeprocess og  kører den parallelt med sig selv,
+%Det vil  være nærliggende ligeledes at modellere eksemplet i \pycsp med kunder som en proces. I \pycsp er processerne dog mere statiske end i \simpy, 
+%mens vi i \pycsp e med en generatorproces og arbejderproces, hvor  arbejdet flyttes mellem processerne igennem kanaler. 
+%Vi har derfor ændret modellen, så   
+I \pycsp opretter vi en generatorproces  som i \simpy, men vi introducerer en bankproces i stedet for en kundeproces og lader kunderne være arbejdet, der flyttes mellem dem, over kanalerne. Dermed skal vi selv modellere vores ressource, som i dette tilfælde er banken, i modsætning til \simpy, hvor de blot bruger den interne ressource-klasse.
+%Hvis man ville have I \pycsp findes muligheden for at oprette processer dynamisk med funktionen \code{spawn}, og man kunne derfor lade generatoprocessen oprette kundeprocesser dynamisk, men vi ønsker ikke kun at kopiere eksemplet fra \simpy til \pycsp, men også konvertere eksemplet, så det overholder stilen for et program skrevet til \csp. 
 
 Mens \simpy kalder kundeprocessen fra generatoren og lader denne stå for håndteringen af kunden 
 og den tid, hun befinder sig i banken, kender bankprocessen i \pycsp ikke tid som 
@@ -230,7 +228,7 @@ hensyntagen til håndtering af køen, og blot lade processen læse fra kanalen, 
 at lade køen være repræsenteret ved en bufferkanal, da denne  kræver 
 færrest linjer kode, men den kunne lige så godt være repræsenteret som en liste 
 i servicedisk-processen.
-
+\fxnote{vi snakker om det avancerede eksempel, men vi inkludere intet kode derfra.}
 
 \subsubsection{Konklusion}
 Ved at sammenligne implementeringen af de to eksempler af kunder i en bank med implementeringen i \simpy, kan man se, at \des  egner sig godt til 
@@ -248,11 +246,12 @@ bankprocessen er derfor reduceret til blot at sende kunden videre til
 servicedisken og lade kanalen håndtere køen. 
 
 En ulempe ved brugen af bufferkanaler som kø er, at kanalen har en fast størrelse på sin buffer, som 
-angives, når kanalen oprettes. Man kan dermed risikere en deadlock ved brug af bufferkanaler sammen med barrierer. Dette opstår, hvis ikke processen i samme 
-tidsskridt kan foretage transmissionen og kalde barrieren.
+angives, når kanalen oprettes. Man kan dermed risikere en deadlock ved brug af bufferkanaler sammen med barrierer. Dette opstår, hvis ikke generatoreprocessen i samme 
+tidsskridt kan foretage kommunikationen og kalde barrieren.
 Det kan løses med en \code{alternation} og \code{skip guard}, men så 
 skal bankprocessen håndtere fejlede forsendelser og må nødvendigvis introducere en 
 sekundær kø, hvilket gør brugen af en bufferkanal overflødig. For undgå dette har vi i vores tilfælde valgt blot at 
 angive en maksimal størrelse på bufferen som er større end det totale antal 
 kunder banken modtager. 
 
+\fxnote{metatekst om afslutningen til eksemplerne}

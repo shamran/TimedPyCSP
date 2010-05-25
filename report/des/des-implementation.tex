@@ -23,7 +23,7 @@ I \cref{fig:init} kan man se, at funktionerne \code{choice}, \code{ChannelPoison
 \label{sec:scheduler}
 Med valget af \code{greenlets}"-versionen som grundversion, og med henblik på at hovedparten af vores ændringer vil være i \sched en, vil vi kort gennemgå dele af klassen \code{Scheduler}.
 
-\begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i \emph{greenlets}versionen.]
+\begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i \code{greenlets}versionen.]
     def getInstance(cls, *args, **kargs):
         '''Static method to have a reference to **THE UNIQUE** instance'''
         if cls.__instance is None:
@@ -46,13 +46,13 @@ Med valget af \code{greenlets}"-versionen som grundversion, og med henblik på a
             cls.__instance.blocking = 0
 \end{lstlisting}
 
- I \cref{fig:scheduling} ses et uddrag af initialiseringskoden, der er interessant, fordi det er her alle de interne datastrukturer oprettes. Man kan her se de tre lister af processer, som \sched en har til rådighed til at varetage processkifte. 
+ I \cref{fig:scheduling} ses et uddrag af initialiseringskoden, der er interessant, fordi det er her alle de interne datastrukturer oprettes. Man kan her se de tre lister af processer, som \sched en har til rådighed til at varetage processkiftene. 
  \begin{list}
  \tightlist 
- \item \code{new}: Initieres på linje 140 og består af processer, som lige er blevet planlagt for første gang. Nye processer kan ankomme til listen \code{new} via funktionerne \code{Parallel, Sequence} og \code{Spawn}.
- \item \code{next}: Initieres på linje 141 og indeholder de processer, der er klar til at blive kørt, og som har været kørt på et tidligere tidspunkt. Et eksempel kunne være en proces, der har stoppet sin kørsel for at vente på kommunikation. Processen vil blive placeret i denne liste, når kommunikationen er overstået. 
- \item \code{timers}: Initieres på linje 147 og indeholder de processer, der har tilknyttet en timeout. De skal først planlægges på et senere tidspunkt og venter dermed blot. Hvert element i listen består både af processen samt et tidsstempel for hvornår processen skal genaktiveres. 
- \item \code{blocking}: Initieres på linje 151 og er en variabel. Processer, der venter på IO-operationer, er ikke klar til at blive planlagt, men heller ikke afsluttet. \Sched en kan derfor ikke planlægge dem, men holder styr på antallet af ventende processer vha. denne variabel. Dette bruges bla. for at kunne afgøre om \sched en har planlagt alle processer.
+ \item \code{new}: Initieres på linje 140 og består af processer, som lige er blevet planlagt for første gang. Nye processer kan ankomme til listen \code{new} via funktionerne \code{Parallel} og \code{Spawn}.
+ \item \code{next}:\quad Initieres på linje 141 og indeholder de processer, der er klar til at blive kørt, og som har været kørt på et tidligere tidspunkt. Et eksempel kunne være en proces, der har stoppet sin kørsel for at vente på kommunikation. Processen vil blive placeret i denne liste, når kommunikationen er overstået. 
+ \item \code{timers}:\quad Initieres på linje 147 og indeholder de processer, der har tilknyttet en timeout. De skal først planlægges på et senere tidspunkt og venter dermed blot. Hvert element i listen består både af processen samt et tidsstempel for hvornår processen skal genaktiveres. 
+ \item \code{blocking}:\quad Initieres på linje 151 og er en variabel. Processer, der venter på IO-operationer, er ikke klar til at blive planlagt, men heller ikke afsluttet. \Sched en kan derfor ikke planlægge dem, men holder styr på antallet af ventende processer vha. denne variabel. Dette bruges bla. for at kunne afgøre om \sched en har planlagt alle processer.
 \end{list}
 
 Når \sched en er startet, gennemløber den alle tre lister gentagne gange, indtil de alle er tomme, og der ikke er nogle processer, der er blokeret. Dette betyder at der ikke længere kan komme nye processer til der ønsker at blive lagt på \sched en, og dermed kan den afslutte.
