@@ -1,4 +1,8 @@
 \chapter{Introduktion}
+\fxnote{simulering ikke simulation}
+\fxnote{implementering ikke implementation.}
+\fxnote{søg igennem grenelts og varianter}
+\fxnote{SKIP-guard, skip-guard \code{skip-guard}? træf et valg mht. både skip og timeout.}
 Vi vil indledningsvis præsentere konteksten for dette speciale. Herefter klarlægger vi, hvilke problemer vi ønsker at berøre samt hvad vores tilgangsvinkel er. Afslutningsvis giver vi et overblik over specialets struktur. 
 
 \section{Kontekst}
@@ -22,7 +26,7 @@ For at opnå dette vil vi undersøge, hvad der skal til for at introducere følg
 
 For hver model vil vi definere en række eksempler, der illustrerer disse anvendelsesområderne. Eksemplerne skal sikre den praktiske anvendelighed og senere bruges til at vise, hvordan et tidsspecifikt problem kan løses henholdsvis med og uden vores udvidelse. Eksemplernes formål er altså, at give et klart indblik i de krav, der stilles til en udvidelse af \pycsp, og hvilke fordele en introduktion af de givne anvendelsesområderne i \pycsp vil give. På denne baggrund vil vi komme med løsningsforslag som tager udgangspunkt i den praktiske anvendelighed. Disse løsningsforslag vil såfremt det er muligt, blive implementeret som en udvidelse af \pycsp.
 
-Specialet vil derfor være struktureret som følger. I \autoref{chap:csp} vil vi gennemgå CSP og \pycsp med fokus på de dele der er relevante i forhold til at introducere tid. I \autorefs{chap:des}, \ref{chap:rtp} og \ref{chap:is} vil vi gennemgå de tre anvendelsesområder som beskrevet ovenfor. Afslutningsvis vil vi foretage en samlet i evaluering og konklusion i \autoref{chap:konklusion} på baggrund af delkonklusionerne i \autorefs{chap:des}, \ref{chap:rtp} og \ref{chap:is}.
+Specialet vil derfor være struktureret som følger. I \autoref{chap:csp} vil vi gennemgå CSP og \pycsp med fokus på de dele der er relevante i forhold til at introducere tid. I \autorefs{chap:des}, \ref{chap:rtp} og \ref{chap:is} vil vi gennemgå de tre anvendelsesområder som beskrevet ovenfor. Afslutningsvis vil vi foretage en samlet i evaluering og konklusion i \autoref{chap:konklusion}.
 
 %Mål: At lave en praktisk anvendelig udviddelse af pycsp, som kan bruges af udviklere til at løse problemer, der har en naturlig dimension af tid.
 
@@ -31,16 +35,7 @@ Specialet vil derfor være struktureret som følger. I \autoref{chap:csp} vil vi
 \section{Vores bidrag}
 \fxwarning{Slet dette afsnit eller skriv noget}
 \section{Termer}
-
-%\item I \des beskriver det enkelte \code{event} en begivenhed, og vi vil i dette speciale bruge ordet begivenhed for en event i \des. 
-%\item simulering ikke simulation
-%\item implementering ikke implementation.
-%\item event: begivenhed
-%\item Vi har fra koden der vises fjernet kode der ikke er relevant for sammenhængen, som f.eks kald til logging. Linje nr. vil derfor ikke altid passe, men det første linje nr i kodestumpen vil svare til linjenr i source koden.
-%\item TODO: vi skal søge og styr på  greenlet vs. greenlets
-%\item søg igennem grenelts og varianter
-%\item SKIP-guard, skip-guard \code{skip-guard}? træf et valg mht. både skip og timeout. 
-
+I forbindelse med dette speciale vil vi bruge følgende termer:
 \begin{list}{}{}
 \item \textbf{\Sched} dækker over det engelske ord Scheduler. En \sched~ er det software der står for at planlægge i hvilken rækkefølge processerne skal udføres på computeren.
 %\item \textbf{Tidsdomænet} Tidsdomænet er den overordnede .... \fxwarning{Hvad fanden skal der stå her}
@@ -48,7 +43,7 @@ Specialet vil derfor være struktureret som følger. I \autoref{chap:csp} vil vi
 fremskrives kontinuerligt og uafhængigt af nogle eksterne kræfter.
 \item \textbf{Diskret tid} er en anden tidsmodel. Her samples værdier fra den kontinuerlige tid, således at tiden fremskrives i ryk. Den enkelte sample er normal taget med et konstant tidsinterval, men kan også være taget med et variabelt tidsinterval. I diskret tid kan tiden enten drives frem af tiden selv, som i realtid, eller fremskrives manuelt. I dette speciale defineres diskret tid til at have variable tidsintervaller, og skal fremskrives manuelt.
 \item \textbf{Anvendelsesområde} er en konkret implementation af en tidsmodel.
-\item \textbf{\code{Skrivemaskine-font}} markerer i dette speciale de  variabelnavne, funktioner,  klasser og moduler der er der er specifikke for Python.
+\item \textbf{\code{Skrivemaskine-font}} markerer i dette speciale de  variabelnavne, funktioner,  klasser og moduler der er der er specifikke for Python og \pycsp.
 \end{list}
 
 

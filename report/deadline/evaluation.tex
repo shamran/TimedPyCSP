@@ -21,7 +21,7 @@ Vi vil nu sammenligne implementeringerne i de tre eksisterende versioner af \pyc
 
 Ved at benytte \pycsp til slagterieksemplet opnår man et modulært design, der nemt kan udvides hvis de fysiske rammer for slagteriet ændrer sig. Viser det sig f.eks at kameraet holder den samlede produktivitet af netværket tilbage, kan slagteriet nemt tilføje endnu et kamera, og udvide procesnetværket med endnu en kameraproces, som kan arbejde samtidigt med det første kamera. 
 
-En kørsel af de tre eksisterende versioner giver et meget forskelligt resultat, som vist i \cref{tab:deadline-runs}. I denne tabel har vi foretaget en simulering af 100 grise. Denne simulering er kørt 10 gange, og tabellen viser gennemsnittet og standardafvigelsen. Af tabellen kan man se at versionen som forventet har betydning for antallet af grise der rettidigt kan nå at blive bearbejdet. 
+En kørsel af de tre eksisterende versioner giver et meget forskelligt resultat, som vist i \cref{tab:deadline-runs2}. I denne tabel har vi foretaget en simulering af 100 grise. Denne simulering er kørt 10 gange, og tabellen viser gennemsnittet og standardafvigelsen. Af tabellen kan man se at versionen som forventet har betydning for antallet af grise der rettidigt kan nå at blive bearbejdet. 
 
 \code{Proces}-versionen er ikke som forventet bedre en de andre versioner til at bearbejde griseobjekterne rettidigt. Dette skyldes at testen er gennemført på en maskine, med kun en kerne.  Dermed kan \code{processes}-versionen ikke drage nytte  af flere kerner, men er begrænset til kun at kunne køre en proces af gangen. I \code{processes}-versionen, foregår konntekstskiftene i operativsystemets \sched~, der er væsentligt langsommere end i \code{greenlets}- og \code{RTP}-versionen, hvor konktekstskiftene sker i vores \sched. 
 
@@ -51,6 +51,16 @@ I vores arbejde med anvendelsesområdet Interaktiv Planlægning i kapitel \ref{c
 	\begin{tabular}{lccc}
        	\toprule
         \mc{Version}  &\mc{Samtidige grise} & \mc{Succesrate (\%)} & \mc{Standard Afvigelse (SA)} \\
+        \midrule
+        Processes        & 1 & 16 & 2 \\
+        Processes        & 2 &  0 & 0 \\
+        Processes        & 3 &  0 & 0 \\
+        Processes        & 5 &  0 & 0\\
+        \midrule
+        Threads          & 1 & 34 & 6 \\
+        Threads          & 2 &  1 & 1 \\
+        Threads          & 3 &  1 & 0 \\
+        Threads          & 5 &  1 & 1 \\
         \midrule
         Greenlets        & 1 & 44 & 7 \\
         Greenlets        & 2 & 49 & 1 \\
