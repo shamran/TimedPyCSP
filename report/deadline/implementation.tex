@@ -42,13 +42,19 @@ Desuden skal hver proces tilknyttes en prioritet. Denne prioritet bruges af \sch
 
 I forbindelse med prioritetsnedarvning kan en proces midlertidigt få ændret sin prioritet, hvilket vi diskuterer yderligere i \cref{sec:deadline-implementation-priorityinheritance}. For at kunne adskille prioriteten, der ikke altid er sat af udvikleren, og en deadline, der altid er sat af udvikleren, har vi  valgt at holde de to variable adskilt. 
 
+For at en udvikler kan  tilknytte en deadline til en proces har vi introduceret funktion \code{Set\_deadline}. Denne funktion har to parametre, et tal, der  angiver tiden  til deadline og en proces. Processen er en valgfri parameter, da funktionen antager at det er processen selv der ønsker at sætte en deadline. Hvis en udvikler ønsker at sætte en deadline for en proces umiddelbart efter oprettelsen af processen, bruges samme funktion, men med processen som en parameter.
+
+Til at angive at processen har nået sin deadline introducere vi funktionen \code{Remove"_deadline}, der står for at fjerne en givet deadline fra enten processen selv, eller den proces der gives som en valgfri parameter.
+
+Selvom det ikke umiddelbart er nødvendigt har vi også introduceret funktionen \code{Get\_deadline}, der som navnet antyder returnere den givne deadline for en proces.
+
 Når en proces bliver udvalgt til at arve en prioritet gennem prioritetsnedarvning, skal \sched en  planlægge processen ifht. den nye prioritet.
 Den nye prioritet er også et tidsstempel, og hvis ikke processen er færdig, inden denne prioritet er overskredet, vil en anden proces' deadline være overskredet. 
 Vi kan derfor vælge at \code{RTP} skal kaste en  \code{deadlineException},  hvis  prioriteten overskrides. Ved at kaste en \code{deadlineException} i processer hvor prioriteten er overskredet, kan udvikleren se præcist hvilken proces, der var aktiv, og dermed se hvorfor den originale proces også kaster en \code{deadlineException}. 
 
 \CRef{fig:producer-worker-consumer} viser et tidsdiagram for et generator/arbejder/forbruger-netværk bestående af tre processer B$_1$, B$_2$ og B$_3$. B$_3$ har den højeste prioritet, og B$_2$ arver denne prioritet. Hvis B$_2$ også kaster en \code{deadlineException} vil det tydeligt fremgå for udvikleren, at det er B$_2$ der bærer skylden for, at B$_1$'s deadline ikke blev overholdt.
 
-En anden begrundelse for at lade en nedarvet prioritet medføre en \code{deadlineException} er hvis processerne er afhængige af hinanden. I \cref{fig:producer-worker-consumer}  nedarver  arbejderprocessen(B$_2$) og generatorprocessen (B$_1$) en  prioritet fra forbrugerprocessen (B$_3$). Hvis denne deadline ikke nås, er det data som arbejderprocessen bearbejder ikke længere relevant, og arbejderprocessen kan med fordel stoppe det irrelevante arbejde. I eksemplet ville arbejderprocessen (B$_2$) kunne stoppe sit arbejde til tiden $t = 5$ i modsætning til at fuldføre arbejdet, og stoppe i tiden $t = 6$.
+En anden begrundelse for at lade en nedarvet prioritet medføre en \code{deadline\-Exception} er hvis processerne er afhængige af hinanden. I \cref{fig:producer-worker-consumer}  nedarver  arbejderprocessen(B$_2$) og generatorprocessen (B$_1$) en  prioritet fra forbrugerprocessen (B$_3$). Hvis denne deadline ikke nås, er det data som arbejderprocessen bearbejder ikke længere relevant, og arbejderprocessen kan med fordel stoppe det irrelevante arbejde. I eksemplet ville arbejderprocessen (B$_2$) kunne stoppe sit arbejde til tiden $t = 5$ i modsætning til at fuldføre arbejdet, og stoppe i tiden $t = 6$.
 
 \begin{figure}
  \begin{center}

@@ -1,10 +1,10 @@
 \chapter{Simulering i diskret tid}
 \label{chap:des}
 \thispagestyle{empty}
-Det første anvendelsesområde vi vil kigge på, er simulering i diskret tid. Vi vil i dette kapitel gennemgå, hvad simuleringer i diskret tid kan bruges til, med fokus på discrete event simulation (\des). Indenfor \des vil vi redegøre for hvilke problemstillinger, vi skal tage højde for, for at kunne implementere \des i \pycsp. 
+Det første anvendelsesområde vi vil kigge på, er simulering i diskret tid. Vi vil i dette kapitel gennemgå, hvad simuleringer i diskret tid kan bruges til, samt redegøre for hvilke problemstillinger, vi skal tage højde for, for at kunne implementere diskret simulering i \pycsp. 
 
-Simuleringer har længe været et værdifuldt værktøj til at klarlægge, hvordan et system fungerer og er specielt brugbart til at repræsentere systemer, hvis 
-tilstand ændres over tid, eller hvis der er interaktion mellem flere systemer. Typiske områder, hvor simulering ofte bruges, fremgår af tabel \ref{tab:simulation_examples}. 
+Overordnet set har simuleringer længe været et værdifuldt værktøj til at klarlægge, hvordan et system fungerer og er specielt brugbart til at repræsentere systemer, hvis 
+tilstand ændres over tid, eller hvis der er interaktion mellem flere systemer.  Typiske områder, hvor simulering ofte bruges, fremgår af tabel \ref{tab:simulation_examples}. 
 
 \begin{table}[ht]
   \begin{otherlanguage}{english} 	
@@ -31,7 +31,7 @@ tilstand ændres over tid, eller hvis der er interaktion mellem flere systemer. 
 \end{table}
 
 
-Inden for simulering ønsker vi at fokusere på \des. \des adskiller sig fra andre simuleringsmodeller i den måde tid opfattes på. I \des anskues tid som diskrete tidsskridt uden kobling til realtid. I disse tidsskridt udføres en eller flere begivenheder, som hver især ændrer på systemets tilstand. Når alle begivenheder for et tidsskridt er udført, kan tiden tælles op, og begivenheder for det næste tidsskridt kan udføres. Der kan være fastlagt et vilkårligt antal begivenheder til et tidsskridt, og hver begivenhed kan variere vilkårligt ifht., hvor langt tid den tager at udføre i realtid. Dermed er der ikke nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan variere vilkårligt i realtid. Begivenhederne, der skal udføres af systemet, kan enten være givet på forhånd eller blive skemaplanlagt dynamisk under afviklingen af andre begivenheder. 
+Inden for simulering ønsker vi at fokusere på diskret simulering, der i  litteraturen ofte kaldes discrete event simulation (\des), for at vise at fokus ligger på simuleringen af begivenheder. \des adskiller sig fra andre simuleringsmodeller i den måde tid opfattes på. I \des anskues tid som diskrete tidsskridt uden kobling til realtid. I disse tidsskridt udføres en eller flere begivenheder, som hver især ændrer på systemets tilstand. Når alle begivenheder for et tidsskridt er udført, kan tiden tælles op, og begivenheder for det næste tidsskridt kan udføres. Der kan være fastlagt et vilkårligt antal begivenheder til et tidsskridt, og hver begivenhed kan variere vilkårligt ifht., hvor langt tid den tager at udføre i realtid. Dermed er der ikke nogen kobling mellem den diskrete tid og realtid, og et diskret tidsskridt kan variere vilkårligt i realtid. Begivenhederne, der skal udføres af systemet, kan enten være givet på forhånd eller blive skemaplanlagt dynamisk under afviklingen af andre begivenheder. 
 Afhængig af hvad der simuleres, kan man udtrække relevant information om systemet f.eks. gennemsnitlig behandlingstid for elementer, længden af køer i systemet eller den samlede aktivitetstid for hvert delelement i systemet.
 For at kunne konstruere en \des skal vi have følgende til rådighed:
 \begin{enumerate}

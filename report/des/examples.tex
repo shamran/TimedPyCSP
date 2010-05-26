@@ -1,10 +1,12 @@
 \section{Eksempler}\label{sec:des-examples}
 %\inline{Beskrivelse af eksemplet og hvordan det er relateret til problemet/modellen. Beskrivelse af løsning uden vores tid}
-Som eksempler på programmer der kan benytte \des har vi valgt to eksempler. Vi har brugt ``Hajer og fisk på Wa-Tor'' som ligger inden for området continous simations, og vi kigger på en simulering af en bank, som er et klassisk eksempel inden for simulering. 
+Som eksempler på programmer der kan benytte \des har vi valgt to eksempler. Vi har brugt ``Hajer og fisk på Wa-Tor'' der er af typen  continous simulations, og ``kunder i  en bank'', som er et klassisk eksempel inden for \des. 
 
 \subsection{Hajer og fisk på Wa-Tor} 
 Vores første eksempel tager  udgangspunkt i et Lotka-Volterra predator-prey scenarie, som \citeauthor{wator}
-har beskrevet i artiklen \citetitle{wator}\cite{wator}. Artiklen beskriver den
+har beskrevet i artiklen \citetitle{wator}\cite{wator}. Vi har valgt dette eksempel, da det indeholder en global verden, hvor en implementering  i CSP, umiddelbart vil kræve en synkronisering af flere processer. Til at foretage denne synkronisering  virker det oplagt at introducere barrierer, og vi vil med eksemplet vise om vores løsning kan erstatte brugen af disse barrierer. Desuden vil eksemplet vise om vores løsning kan bruges til simuleringer af typen continous simulations.
+
+Artiklen beskriver den
 fiktive planet Wa-Tor, der har form som en torus og er fuldstændig
 dækket af vand. Verdenen er inddelt i felter, som kan være tomme, indeholde en
 fisk eller en haj\cite[20]{wator}. Følgende karakteristika beskriver fisk og hajers
@@ -14,13 +16,13 @@ opførsel:
 \item[\textbf{Fisk}]
 Lever af plankton, en ressource som er uendelig. Hvis der er ét ledigt 
 tilstødende felt, bevæger den sig til dette felt. Hvis der er flere ledige 
-felter vælges et tilfældigt. Såfremt en fisk overlever tre tidsskridt, formere 
+felter vælges et tilfældigt. Såfremt en fisk overlever tre tidsskridt, formerer 
 den sig.
 \item[\textbf{Hajer}]
 Såfremt der er fisk i et eller flere tilstødende felter, vil hajen bevæge sig 
 til et af disse felter og spise fisken. Hvis der er ikke er nogen fisk i et af 
 disse felter flytter hajen sig til et tilfældigt valgt ledigt felt. Hvis en haj 
-ikke spiser i tre tidsskridt dør den. Overlever den i ti tidsskridt formere 
+ikke spiser i tre tidsskridt dør den. Overlever den i ti tidsskridt formerer 
 den sig.
 \end{itemize}
 

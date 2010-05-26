@@ -3,6 +3,7 @@
 
 %\includeonly{interactive/interactive}
 \begin{document}
+\frontmatter
 \pagenumbering{Roman} 
 \begin{titlingpage}
 \newcommand{\HRule}{\rule{\linewidth}{1mm}}
@@ -24,16 +25,18 @@
 \end{titlingpage}
 
 \cleardoublepage
-\frontmatter
 \include{other/abstract}
 \cleardoublepage
+
 \tableofcontents
+\thispagestyle{empty}
 \newpage
 
 \listoffixmes
-\newpage
-\lstlistoflistings   
+%\newpage
+%\lstlistoflistings   
 \cleardoublepage
+
 \mainmatter
 %\SingleSpacing
 %\DoubleSpacing
@@ -51,7 +54,7 @@
 
 
 \SingleSpacing
-\fxerror{Check at sidetallet på litteraturlisten passer}
+%\fxerror{Check at sidetallet på litteraturlisten passer}
 \printbibliography
 \newpage
 %\backmatter
