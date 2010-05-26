@@ -58,7 +58,8 @@ Når det midlertidige afhængighedsforhold ophører skal processer der har arvet
 
 \subsection{Alternation}\label{misc:kanal-prioritet}
 Det er dog ikke kun i forbindelse med almindelig kommunikation vi skal forholde os til introduktionen af processer med prioritet. I kodestrukturen \code{alternation}
-har en udvikler mulighed for at foretage et  prioriteret valg mellem flere forskellige kanaler. Et prioriteret valg mellem flere kanaler, kan dog være i konflikt med de processer som får opfyldt deres kommunikation\fxwarning{Denne sætning giver ikke mening}
+har en udvikler mulighed for at foretage et  prioriteret valg mellem flere forskellige kanaler. Når man kommunikerer vil man opfylde en proces' ønske om kommunikation, og vi ønsker at opfylde kommunikationen for den proces der har den højest prioritet. Det prioriterede valg i en \code{alternation} kan derfor komme i konflikt med dette ønske.
+
   
 \citeauthor{Burns1990} beskriver og illustrerer præcist denne problemstilling i \citetitle{Burns1990}\cite{Burns1990}. Til at illustrere problemet beskriver de et eksempel, som er vist i \cref{lst:pri-select}. Dette kodeuddrag viser et prioriteret valg mellem kanalerne A1 og A2. Til hver kanal er tilknyttet en proces, P1 og P2. Disse to processer har en prioritet tilknyttet på hhv.  Pri1 og Pri2. \CRef{tab:prioritizedSelect} viser hvilken kanal der bliver valgt, afhængig af processernes prioritet.
 

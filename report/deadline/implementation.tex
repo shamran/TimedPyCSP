@@ -29,7 +29,7 @@ Vi kan derfor blot benytte en proces' deadline som dens prioritet og benytte en 
 
 \subsection{Preempting}
 
-Som vi har beskrevet i \cref{sec:rtp-pycsp}, kan  man risikere, at en proces med lav prioritet proces og kørselstid\fxwarning{``med lav prioritet og kørselstid'' hvad betyder det?} kan blokere for en proces med høj prioritet. 
+Som vi har beskrevet i \cref{sec:rtp-pycsp}, kan  man uden preempting risikere, at en proces med lav prioritet kan blokere for en proces med høj prioritet. 
 Her konkluderede vi at det er udviklerens opgave at processen afgiver kontrol, og derfor skal det være nemt at afgive kontrollen for processen. Til dette har vi lavet funktionen \code{Release()}, der minder om \code{Yield} for \code{co-rutiner}.
 
 Implementeringen er meget simpel og er blot en wrapperfunktion, da den underliggende funktionalitet allerede eksisterer. Den aktive proces stopper og bliver genplanlagt til senere kørsel af \sched en. Dermed lægges processen på den relevante kø, og  \sched en får mulighed for at vælge en ny proces der skal udføres. Er der ikke kommet nye processer, vil det stadig være den originale proces, der vælges og kan fortsætte sin kørsel. Hvis der derimod er ankommet en eller flere nye processer i mellemtiden, som har højere prioritet, vil disse blive valgt i stedet.
@@ -90,7 +90,7 @@ I \pycsp findes der kun kanaler af typen \code{Any-To-Any}, og derfor kan der al
 
 I greenletsversionen foregår udvælgelsen af kanalender til kommunikation ved hjælp af funktionen \code{match}, der udnytter at  hver kanal vedligeholder to lister af processer for hhv. de processer, der ønsker at sende, og modtage data på kanalen. Når en proces eks. ønsker at modtage data, tilføjer den sig selv til listen af processer, der ønsker at modtage, og prøver derefter i \code{match} funktionen at finde en proces, der vil sende data. Er der ingen processer, der venter på at sende data, venter processen på, at en proces melder sig klar til at sende data, ved at kalde \code{match}. Til hver vellykket kommunikation af data vil \code{match} altid blive kaldt to gange, hvor kun den sidste vil resultere i at kommunikationen lykkes.
 
-Ideen bag funktionen \code{match} er enkel og  udnytter, at \code{greenlets}-versionen er enkelttrådet, så hver proces kan løbe listerne igennem, uden andre processer ændre på listernes tilstand.  Vi er kommet frem til, at  en simpel sortering af listerne ud fra processernes interne prioritet vil resultere i, at det altid er den højst prioriterede proces der indgår i kommunikationen. Den ændrede \code{match} kan ses i \cref{lst:match}, hvor det kun er linje 119 og 120 der er ændret.
+Ideen bag funktionen \code{match} er enkel og  udnytter, at \code{greenlets}-versionen er enkelttrådet, så hver proces kan løbe listerne igennem, uden andre processer ændre på listernes tilstand.  Vi er kommet frem til, at  en simpel sortering af listerne ud fra processernes interne prioritet vil resultere i, at det altid er den højst prioriterede proces der indgår i kommunikationen. Den ændrede \code{match}, hvor der foretages en sortering af de to lister, kan ses i \cref{lst:match}, hvor det kun er linje 119 og 120 der er ændret.
 
 \begin{lstlisting}[firstnumber=117 ,float=hbtp, label=lst:match, caption=Funktionen \code{match} der sorterer kanalrequests.]
 def match(self):        
