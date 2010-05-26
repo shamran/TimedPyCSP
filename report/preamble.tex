@@ -5,8 +5,13 @@ final,% Når man skal skifte kompileringsmetode mellem draft og final skal man
 11pt, % standardstørrelse på fonten
 %openany,%, % anvnedes hvis kapitler bare skal starte på den næste side
 %oneside%,
-%article
+book%article
 ]{memoir}%
+
+  \setlrmarginsandblock{4.2cm}{2.8cm}{*}
+  \setulmarginsandblock{2.8cm}{4.2cm}{*}
+  \setheadfoot{2cm}{1cm}
+
 % marginer, memoir to to metoder
 % den traditionelle, se memoir manualen
 % venstre: 2.5cm, højre: 3.5cm, top: 3cm, bund: 4cm
@@ -14,8 +19,8 @@ final,% Når man skal skifte kompileringsmetode mellem draft og final skal man
 %\setlrmarginsandblock{3.5cm}{3.5cm}{*}
 
 
-\setlrmarginsandblock{1.5cm}{3.5cm}{*}
-\setulmarginsandblock{3cm}{4cm}{*}
+%\setlrmarginsandblock{1.5cm}{3.5cm}{*}
+%\setulmarginsandblock{3cm}{4cm}{*}
 
 %her kan margenen sættes manuelt, hvis man har lyst
 
