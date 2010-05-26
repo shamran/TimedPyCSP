@@ -60,7 +60,7 @@ final,% Når man skal skifte kompileringsmetode mellem draft og final skal man
 \selectlanguage{danish}
 
 %har vi ord der bliver delt forkert kan de indsættes i hyphernation med bindestreg alle steder hvor ordet kan deles
-\hyphenation{trans-port-bånd-et tit-len mo-del-len pro-du-ce-rer an-svars-hav-ende om-for-deles for-bind-elses-mulig-heder ska-ber æn-dring-er net-værks-en-hed-er peer backup backup-system fast-track backup-systemer nabo-peers frame-work efter-som Grund-lag-et plads-effek-tivi-teten audits soft-ware dead-line-Excep-tion}
+\hyphenation{trans-port-bånd-et tit-len mo-del-len pro-du-ce-rer an-svars-hav-ende om-for-deles for-bind-elses-mulig-heder ska-ber æn-dring-er net-værks-en-hed-er peer backup backup-system fast-track backup-systemer nabo-peers frame-work efter-som Grund-lag-et plads-effek-tivi-teten audits soft-ware dead-line-Excep-tion prio-ri-tets-in-ver-te-ring prio-ri-tets-ned-arv-ning dead-line}
 
 
 
@@ -239,8 +239,8 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 
 
 \fxfatal[layout=index,target=cref]{Ændre pageref til vpageref}
-\newcommand{\cref}[1]{\autoref{#1}\vpageref{#1}}%\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final  \vpageref{#1}}
-\newcommand{\CRef}[1]{\Autoref{#1}\vpageref{#1}}%\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final
+\newcommand{\cref}[1]{\autoref{#1}\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final  \vpageref{#1}}
+\newcommand{\CRef}[1]{\Autoref{#1}\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final
 
 \newcommand{\nref}[1]{\nameref{#1}\textcolor{darkblue}{~på side}~\pageref{#1}}
 \newcommand{\tcite}[1]{\citetitle{#1}\xspace\cite{#1}}
