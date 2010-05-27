@@ -97,15 +97,16 @@ book%article
 \usepackage{color}
 \definecolor{darkblue}{rgb}{0,0.1,0.5}
 \usepackage{hycolor}
-\usepackage[draft, danish,layout=margin,innerlayout=inline]{fixme} % til at skrive \fixme kommentarer til sig
+\usepackage[ danish,layout=margin,innerlayout=inline]{fixme} % til at skrive \fixme kommentarer til sig
 
-\fxfatal[layout=index,target=settoc]{Hvor meget skal med i toc, og hvad skal stå med tal. preamble linje 47.}
+%\fxfatal[layout=index,target=settoc]{Hvor meget skal med i toc, og hvad skal stå med tal. preamble linje 47.}
 
 
 \usepackage[colorlinks%
            ,linkcolor=darkblue%
            ,citecolor=darkblue%
            ,urlcolor=darkblue%
+           ,colorlinks=false%
            ,pdfusetitle%
            ,pdfstartview=FitBH%fit width of page to the window
            ,plainpages=false%
@@ -117,6 +118,7 @@ book%article
   pdfsubject={\Subject},%  
   pdfkeywords={\Keywords},%  
 }%
+
 %giver mulighed for at hoppe i pdf'filen via referencerne.
 %hyperref er ustabil med varieof,
 %og skal udkommenteres hvis der opstår problemer.
@@ -243,7 +245,7 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 
 
 
-\fxfatal[layout=index,target=cref]{Ændre pageref til vpageref}
+%\fxfatal[layout=index,target=cref]{Ændre pageref til vpageref}
 \newcommand{\cref}[1]{\autoref{#1}\vpageref{#1}}%\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final  \vpageref{#1}}
 \newcommand{\CRef}[1]{\Autoref{#1}\vpageref{#1}}%\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final
 
