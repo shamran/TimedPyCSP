@@ -5,10 +5,10 @@ For at designe en implementering af simulering i diskret tid i \pycsp, skal vi f
 
 
 \subsection{Kodestruktur}  
-Efter i kapitel \ref{chap:csp} at have valgt at udvide \emph{greenlets}"-versionen, skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra \emph{greenlets}"-versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale \emph{greenlets}"-version. Med denne isolation forventer vi, at hvis/når der sker tilrettelser af \emph{greenlets}"-versionen af \pycsp, vil man ikke skulle foretage de samme tilrettelser i vores version. 
-Isolationen mellem de to versioner skal opnås via nedarvning, således at det fra en brugers synsvinkel ser ud til, at vores version er fuldstændigt sepereret fra \emph{greenlets}"-versionen.
+Efter i kapitel \ref{chap:csp} at have valgt at udvide greenlets-versionen, skal vi vælge hvordan vi ønsker at videreudvikle koden. Vi forventer at genbruge store dele af koden fra greenlets-versionen, og kun foretage udvidelser på enkelte afgrænsede områder. Desuden ønsker vi at isolere vores ændringer fra den originale greenlets-version. Med denne isolation forventer vi, at hvis/når der sker tilrettelser af greenlets-versionen af \pycsp, vil man ikke skulle foretage de samme tilrettelser i vores version. 
+Isolationen mellem de to versioner skal opnås via nedarvning, således at det fra en brugers synsvinkel ser ud til, at vores version er fuldstændigt sepereret fra greenlets-versionen.
 
-Hver af de tre versioner har sin egen mappe i \pycsp og i hver af disse findes en tilhørende \code{\_\_init\_\_.py} fil, der fungerer som et manifest for den givne version. Vi opretter vores egen version kaldet \emph{simulation} og opretter også en tilhørende mappe på samme niveau som de andre versioner og med sin egen manifestfil. Manifestfilen kan nu bruges til at udvælge de funktioner, der skal tages direkte fra \emph{greenlets}-versionen, og hvilke funktioner, der skal udvides og som derfor vil ligge i den nye mappe.
+Hver af de tre versioner har sin egen mappe i \pycsp og i hver af disse findes en tilhørende \code{\_\_init\_\_.py} fil, der fungerer som et manifest for den givne version. Vi opretter vores egen version kaldet \emph{simulation} og opretter også en tilhørende mappe på samme niveau som de andre versioner og med sin egen manifestfil. Manifestfilen kan nu bruges til at udvælge de funktioner, der skal tages direkte fra greenlets-versionen, og hvilke funktioner, der skal udvides og som derfor vil ligge i den nye mappe.
 
 \begin{lstlisting}[float=hbtp,label=fig:init,caption=Uddrag af \code{\_\_init\_\_.py} for simulationsversionen.]
 from guard import Timeout, Skip
@@ -17,11 +17,11 @@ from alternation import Alternation
 from pycsp.greenlets.channel import ChannelPoisonException, ChannelRetireException
 \end{lstlisting}
 
-I \cref{fig:init} kan man se, at funktionerne \code{choice}, \code{ChannelPoisonException} og \code{ChannelRetireException} alle bliver hentet fra \emph{greenlets}"-versionen, mens funktionerne \code{Timeout, Skip} og \code{Alternation} bliver importeret fra samme mappe og derfor er modificerede versioner. For udvikleren  vil dette dog ikke være synligt, og han vil blot se \emph{simulation}"-versionen som en selvstændig version på lige fod med de andre tre versioner.
+I \cref{fig:init} kan man se, at funktionerne \code{choice}, \code{ChannelPoisonException} og \code{ChannelRetireException} alle bliver hentet fra greenlets-versionen, mens funktionerne \code{Timeout, Skip} og \code{Alternation} bliver importeret fra samme mappe og derfor er modificerede versioner. For udvikleren  vil dette dog ikke være synligt, og han vil blot se simulation-versionen som en selvstændig version på lige fod med de andre tre versioner.
 
 \subsection{\code{Scheduler}-klassen}
 \label{sec:scheduler}
-Med valget af \code{greenlets}"-versionen som grundversion, og med henblik på at hovedparten af vores ændringer vil være i \sched en, vil vi kort gennemgå dele af klassen \code{Scheduler}.
+Med valget af greenlets-versionen som grundversion, og med henblik på at hovedparten af vores ændringer vil være i \sched en, vil vi kort gennemgå dele af klassen \code{Scheduler}.
 
 \begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i \code{greenlets}versionen.]
     def getInstance(cls, *args, **kargs):
@@ -61,8 +61,8 @@ For at markere at vi ikke kun skal  planlægge rækkefølgen
 af processerne, men også styre tiden, har vi lavet en
 \code{Simulation}-klasse, der arver fra \code{Scheduler}-klassen. Alle ændringer
 vi skal foretage for at kunne planlægge processer under hensyntagen til tid, vil således være indkapslet i denne klasse. 
-Dette har yderligere den fordel, at man tydeligt kan se at alle klasserne i \code{simulation}-versionen arver en \sched~ fra \code{simulerings}-versionen og
-ikke en \sched \xspace fra \code{greenlets}-versionen.
+Dette har yderligere den fordel, at man tydeligt kan se at alle klasserne i simulation-versionen arver en \sched~ fra simulerings-versionen og
+ikke en \sched \xspace fra greenlets-versionen.
 
 \subsection{Tid} \label{sec:tid}
 For at kunne planlægge begivenheder i \des kræves det at alle processer og \sched en har en global forståelse af tid.  Det er derfor en af hjørnestenene i implementeringen af \des, hvordan tid introduceres til \pycsp.  
@@ -123,14 +123,14 @@ if self.timers and self.timers[0][0] <= Now():
 \end{figure}
 Her sammenlignes på linje 204 tidsværdi for den første proces i \code{timers} med det nuværende tidspunkt givet af \code{time}-modulet.
 Hvis det nuværende tidspunkt er større end værdien i \code{timers}, udvælges denne proces til at køre næste gang og fjernes fra listen.
-For at planlægge begivenheder præcist, skal processerne kunne eksekveres på et specifikt tidspunkt. Dermed har  \sched en i \code{simulations}-versionen behov for at kunne  styre aktiveringen af processerne på et finere niveau end, hvad der er muligt med \code{greenlets}"-versionen.  
-I \code{simulerings}-versionen har vi fuld kontrol over tiden, da  den står stille, mens processerne eksekveres, hvorfor tiden i dette tilfælde ikke er et problem.
-Vi har i \code{simulerings}-versioner tilføjer den begrænsning, at tiden skal være præcist det, der er angivet i \code{timers}-listen, før processen skal aktiveres, og ikke kun større, som angivet i \code{greenlets}-versionen. \CRef{fig:sim:timer} viser udvælgelsen af en proces fra \code{timers} i \code{simulerings}-versionen ved brug af \code{Now}-funktionen, hvor tidspunktet skal være præcist det som processen har angivet.
+For at planlægge begivenheder præcist, skal processerne kunne eksekveres på et specifikt tidspunkt. Dermed har  \sched en i simulations-versionen behov for at kunne  styre aktiveringen af processerne på et finere niveau end, hvad der er muligt med greenlets-versionen.  
+I simulerings-versionen har vi fuld kontrol over tiden, da  den står stille, mens processerne eksekveres, hvorfor tiden i dette tilfælde ikke er et problem.
+Vi har i simulerings-versioner tilføjer den begrænsning, at tiden skal være præcist det, der er angivet i \code{timers}-listen, før processen skal aktiveres, og ikke kun større, som angivet i greenlets-versionen. \CRef{fig:sim:timer} viser udvælgelsen af en proces fra \code{timers} i simulerings-versionen ved brug af \code{Now}-funktionen, hvor tidspunktet skal være præcist det som processen har angivet.
 
 \subsubsection{Fremskrivning af tid}
 I pseudo realtid drives tiden frem af et eksternt modul for at efterligne realtid, der kontinuerligt stiger. I pseudo realtid fremskrives tiden derfor uafhængigt af processernes tilstand og derfor vil et program der med gentagende gange beder om tiden, få et stigende tidspunkt. I \des  skal tiden i modsætning til realtid stå stille, når processerne er aktive, og kun i forbindelse med en planlagt begivenhed skal tiden drives frem til tidspunktet for denne begivenhed.
 
-\fxnote*{skriv tegning}{Vi kan demonstrere, hvordan den kontinuerlige tid har indflydelse på  \pycsp med et eksempel}. Proces 1 har startet en ny tråd via \code{io-decoratoren} og er derfor blokeret. Proces 2 står i en \code{alternation} med en \code{timeout-guard}. Uafhængigt af den tid, det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide hvornår dens timeout er indtrådt. Dette er implementeret i \code{greenlets}-versionen i \cref{fig:blocking_sleep} på linjerne 242 til 251. Her startes en separat tråd, der signalerer \sched en, når tiden for næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu nøjes med at vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
+\fxnote*{skriv tegning}{Vi kan demonstrere, hvordan den kontinuerlige tid har indflydelse på  \pycsp med et eksempel}. Proces 1 har startet en ny tråd via \code{io-decoratoren} og er derfor blokeret. Proces 2 står i en \code{alternation} med en \code{timeout-guard}. Uafhængigt af den tid, det tager proces 1 at komme ud fra sit blokerede kald, skal proces 2 vide hvornår dens timeout er indtrådt. Dette er implementeret i greenlets-versionen i \cref{fig:blocking_sleep} på linjerne 242 til 251. Her startes en separat tråd, der signalerer \sched en, når tiden for næste begivenhed i \code{timers} listen indtræffer. \Sched en kan nu nøjes med at vente på et signal, som vil komme fra enten en blokeret proces eller den nyoprettede tråd.
 
 Når tiden i \des ikke er drevet af en eksternt modul, er nødvendigheden af en ekstra tråd til  håndtering af tid irrelevant. Først når alle begivenheder til et tidsskridt er eksekveret, skal tiden i \des tælles op. Dette betyder i vores konkrete eksempel, at  så længe proces 1 er blokeret, står tiden stille, og  \sched en venter på dem. Vi kan ikke tælle tiden op, blot fordi nogle processer er blokeret af \code{io-decoratoren}, ligesom vi ikke kan tælle tiden op, så længe der er processer der er aktive. %blot mens nogle processer eksekvere en anden tilfældig funktion.
 
@@ -214,9 +214,9 @@ I programmeringssproget \simpy benytter man også denne metode med at lade en pr
 foretage kaldet \code{yield}, som sørger for, at processen ikke
 fortsætter, før et defineret tidsrum er gået. \CRef{fig:simpy:yield} viser, at en kunde er ankommet til banken, hvorefter kunden printer tiden, foretager et \code{yield}, printer tiden igen og afslutter.  Når processen har kaldt \code{yield}, er tiden steget med værdien af \code{timeInBank}. Grunden til at \simpy kan bruge \code{yield}, der er indbygget i Python og at dette kald afgiver kontrol over processen i et tidsrum, knytter sig til deres implementering af \simpy, hvor de bruger \code{corutine} som underliggende teknologi. Som standard kan  \code{corutine} afgive kontrollen med en proces via \code{yield}, og \simpy behøver derfor kun at sikre, at tiden er talt tilstrækkeligt op, før de returnerer til processen.
 
- Vi ønsker i \pycsp at have en lignende mulighed for at lade en proces vente. Med \code{greenlet}-modulet af brugertråde kan vi ikke bruge \code{yield}, da denne er specifik for \code{co-rutines}, men funktionaliteten er allerede delvist introduceret via \code{timeout} til \code{alternation} i \emph{greenlets}-versionen af \pycsp. Vi kan derfor bygge videre på denne funktionalitet med funktionen \code{Wait}, der fungerer som timeout, men som kan kaldes af processerne på et vilkårligt tidspunkt.
+ Vi ønsker i \pycsp at have en lignende mulighed for at lade en proces vente. Med \code{greenlet}-modulet af brugertråde kan vi ikke bruge \code{yield}, da denne er specifik for \code{co-rutines}, men funktionaliteten er allerede delvist introduceret via \code{timeout} til \code{alternation} i greenlets-versionen af \pycsp. Vi kan derfor bygge videre på denne funktionalitet med funktionen \code{Wait}, der fungerer som timeout, men som kan kaldes af processerne på et vilkårligt tidspunkt.
 
-\begin{lstlisting}[firstnumber=20,float=hbtp, label=fig:wait, caption=Wait i \code{simulering}-versionen.] 
+\begin{lstlisting}[firstnumber=20,float=hbtp, label=fig:wait, caption=Wait i simulering-versionen.] 
 def Wait(seconds):
   Simulation().timer_wait(Simulation().current, seconds)
   t = Now()+seconds
@@ -237,7 +237,7 @@ der ikke er implementeret som standard, er fjernelsen af et arbitrært element f
 aktiverer et andet valg i \code{alternation} end timeout. I dette tilfælde skal
 processen ikke vente på sin timeout, og derfor skal elementet fjernes fra \code{timers} listen. Her må man, som i
 en normal liste, lave en lineær søgning i hoben og derefter genoprette
-hob"-egenskaben i listen. Det vil dog ikke tage længere tid, da fjernelse af en timeout i \emph{greenlets}"-versionen på nuværende
+hob"-egenskaben i listen. Det vil dog ikke tage længere tid, da fjernelse af en timeout i greenlets-versionen på nuværende
 tidspunkt bruger en lineær søgning, til at finde elementet der skal
 fjernes, og genoprettelsen af hob"-egenskaben også kan gøres i lineær tid.
 

@@ -5,17 +5,17 @@
   % Vi skal opstille et klart problem i introduktionen, som vi så skal kunne svare på. Kunne være noget i stil med: Kan vi udvidde PyCSP så man kan foretage tidsbestemte simuleringer?}
 Vi har  det foregående afsnit beskrevet hvad der skal til for at implementere \des i \pycsp. Vi vil i dette afsnit evaluere vores løsning, med udgangspunkt i de eksempler vi tidligere har opstillet. 
 \subsection{Test af korrekthed}
-  Vi har igennem designet og udviklingen af \emph{simulerings}"-versionen brugt Test Driven Development (TDD). I TDD starter man med at skrive tests til den nye egenskab, der skal udvikles. Efterfølgende skrives koden, så testen kan køres uden at fejle, og per defintion er designet implementeret korrekt, når alle tests kan gennemføres korrekt. Dette medfører, at vi løbende i forbindelsen med udviklingen af \emph{simulerings}"-versionen har skrevet tests. 
+  Vi har igennem designet og udviklingen af simulerings-versionen brugt Test Driven Development (TDD). I TDD starter man med at skrive tests til den nye egenskab, der skal udvikles. Efterfølgende skrives koden, så testen kan køres uden at fejle, og per defintion er designet implementeret korrekt, når alle tests kan gennemføres korrekt. Dette medfører, at vi løbende i forbindelsen med udviklingen af simulerings-versionen har skrevet tests. 
   
-For yderligere at teste den udviklede kode har vi desuden integreret alle tests fra \emph{greenlets}"-versionen ind i \emph{simulerings}"-versionen. Således er alle de tests, der er skrevet til \emph{greenlets}"-versionen også er med til at teste \emph{simulerings}"-versionen. Resultaterne af de udførte tests kan ses i bilag \ref{app:des-test} og viser, at alle tests forløb tilfredstillende.
+For yderligere at teste den udviklede kode har vi desuden integreret alle tests fra greenlets-versionen ind i simulerings-versionen. Således er alle de tests, der er skrevet til greenlets-versionen også er med til at teste simulerings-versionen. Resultaterne af de udførte tests kan ses i bilag \ref{app:des-test} og viser, at alle tests forløb tilfredstillende.
   
 \subsection{Eksempler}
-For at evaluere fordele og ulemper af \emph{simulerings}"-versionen af \pycsp, har vi genimplementeret eksemplerne fra \cref{sec:des-examples}, med  brug af vores udviklede kode. Vi kan derfor i det følgende sammenholde de to versioner og se på fordele og ulemper ved \emph{simulerings}"-versionen.
+For at evaluere fordele og ulemper af simulerings-versionen af \pycsp, har vi genimplementeret eksemplerne fra \cref{sec:des-examples}, med  brug af vores udviklede kode. Vi kan derfor i det følgende sammenholde de to versioner og se på fordele og ulemper ved simulerings-versionen.
  
 \subsubsection{Hajer og fisk på Wa-Tor}
-Implementeringen af dette problem  i et simuleringssprog har ikke medført den store omskrivning. Dette skyldes, at eksemplet er en kontinuerlig simulation, og at alle fisk og hajer ønsker at interagere med omverdenen i hvert tidsskridt. I processen \code{visualize} ser man tydeligst forskellen mellem standard \pycsp med dens brug af barrierer og \emph{simulerings}"-versionen med dens brug af tid vha. funktionen \code{Wait}. Hvor standard \pycsp må kalde en barriere tre gange for hver iteration (\cref{fig:green:visualize}), kan man i \emph{simulerings}"-versionen blot angive, at visualiseringen ønsker at vente tre tidsskridt (\cref{fig:sim:visualize}). 
+Implementeringen af dette problem  i et simuleringssprog har ikke medført den store omskrivning. Dette skyldes, at eksemplet er en kontinuerlig simulation, og at alle fisk og hajer ønsker at interagere med omverdenen i hvert tidsskridt. I processen \code{visualize} ser man tydeligst forskellen mellem standard \pycsp med dens brug af barrierer og simulerings-versionen med dens brug af tid vha. funktionen \code{Wait}. Hvor standard \pycsp må kalde en barriere tre gange for hver iteration (\cref{fig:green:visualize}), kan man i simulerings-versionen blot angive, at visualiseringen ønsker at vente tre tidsskridt (\cref{fig:sim:visualize}). 
 
-\begin{lstlisting}[firstnumber=157 ,float=hbtp, label=fig:green:visualize, caption=\code{Greenlets}"-versionen af visualize]
+\begin{lstlisting}[firstnumber=157 ,float=hbtp, label=fig:green:visualize, caption=greenlets-versionen af visualize]
 @process
 def visualize(barR,barW):
   for i in xrange(iterations):
@@ -28,7 +28,7 @@ def visualize(barR,barW):
     barR()
   poison(barW,barR)     
 \end{lstlisting}
-\begin{lstlisting}[firstnumber=144 ,float=hbtp, label=fig:sim:visualize, caption=\code{simulerings}"-versionen af visualize]
+\begin{lstlisting}[firstnumber=144 ,float=hbtp, label=fig:sim:visualize, caption=simulerings-versionen af visualize]
 @process
 def visualize():
   for i in xrange(iterations):
@@ -49,17 +49,17 @@ for i in xrange(iterations):
       element_iteration(Point(right_shadow_col+j,i))
   Wait(2)
 \end{lstlisting}
-I arbejderprocessen (\cref{fig:sim:worker}) kan man også se hvordan brugen af tid  sikrer adgang til en delt ressource. I  \emph{greenlets}"-versionen skulle barrieren  kaldes flere gange i træk for at sikre, at en delt datastruktur ikke blev brugt af processen. Med \emph{simulerings}"-versionen kan man, som det ses på linje 140 i \cref{fig:sim:worker}, nøjes med at kalde \code{Wait} og vente i to tidsskridt. 
+I arbejderprocessen (\cref{fig:sim:worker}) kan man også se hvordan brugen af tid  sikrer adgang til en delt ressource. I  greenlets-versionen skulle barrieren  kaldes flere gange i træk for at sikre, at en delt datastruktur ikke blev brugt af processen. Med simulerings-versionen kan man, som det ses på linje 140 i \cref{fig:sim:worker}, nøjes med at kalde \code{Wait} og vente i to tidsskridt. 
 \code{Wait} sikre hermed mod at processerne kan skrive samtidigt til den samme data da arbejderprocessen ligger og venter i kø på \code{timers} mens visualiseringsprocessen tilgår data. Brugen af tid kan på også med fordel bruges hvis der er endnu flere  processer skal have eksklusive rettigheder. Dette løses ved blot at øge antallet af tidsskridt, hver proces venter. Hvis dette skulle opnås med barrierer, skulle man lave en løkke, der et antal gange lod processen gå igennem barrieren.
 
 \subsubsection{Kunder i en bank}
-De to bankeksempler har krævet en betydelig omskrivning for at udnytte den nyudviklede \code{simulerings}"-version. I generatorprocessen ses tydeligst forskellen på de to versioner. \code{Greenlets}-versionen bruger jævnfør \cref{fig:green:generator}, 20 linjer kode, hvor \cref{fig:sim:generator} viser at \code{simulerings}"-versionen kun bruger 6 linjer. 
+De to bankeksempler har krævet en betydelig omskrivning for at udnytte den nyudviklede simulerings-version. I generatorprocessen ses tydeligst forskellen på de to versioner. Greenlets-versionen bruger jævnfør \cref{fig:green:generator}, 20 linjer kode, hvor \cref{fig:sim:generator} viser at simulerings-versionen kun bruger 6 linjer. 
 
 Den store forskel på de to funktioner er muligheden for at hoppe fra et tidspunkt til det næste i simuleringen. Dermed skal funktionen ikke være aktiv i hvert tidsskridt, men kun i de tidsskridt, hvor der skal produceres en kunde. Når processen kun er aktiv i de relevante tidsskridt, kan vi undgå hjælpevariablerne \code{t\_event, time} og \code{numberInserted}. 
 
-I  \code{greenlets}-versionen kan man af \cref{fig:green:generator}, linje 38 til 41 se at generatorprocessen forbliver aktiv efter den er færdig og ikke vil sende flere kunder. Dette gøres fordi antallet af processer der tilgår barrieren skal være det samme igennem hele kørslen (se afsnit \cref{sec:barrierer}).  Denne begrænsning slipper man for i \code{simulerings}-versionen, hvor processen derfor kan stoppe, når den har sendt alle sine kunder.
+I  greenlets-versionen kan man af \cref{fig:green:generator}, linje 38 til 41 se at generatorprocessen forbliver aktiv efter den er færdig og ikke vil sende flere kunder. Dette gøres fordi antallet af processer der tilgår barrieren skal være det samme igennem hele kørslen (se afsnit \cref{sec:barrierer}).  Denne begrænsning slipper man for i simulerings-versionen, hvor processen derfor kan stoppe, når den har sendt alle sine kunder.
 
-\begin{lstlisting}[firstnumber=21, label=fig:green:generator, caption=Generatorprocessen for \emph{greenlets}-versionen]
+\begin{lstlisting}[firstnumber=21, label=fig:green:generator, caption=Generatorprocessen for greenlets-versionen]
 @process
 def Generator(i,number,meanTBA, meanWT,
               customerWRITER,barrierWRITER,barrierREADER):
@@ -85,10 +85,10 @@ def Generator(i,number,meanTBA, meanWT,
     return
 \end{lstlisting}
 
-Generatorfunktionen er omskrevet, så koden er mere relateret til funktionaliteten og mindre til synkronisering.  I resten af koden opnår vi lignende kodekoncentration, men vi har også udvidet eksemplet, så vi gemmer antallet af kunder, der befinder sig i banken, i en \code{Monitor}. Dette er ikke strengt nødvendigt og gøres ikke i det originale eksempel fra \simpy, men er et godt eksemple på brugen af en \code{Monitor} til udtræk af data fra simuleringen. Det var forventet, at koden kunne forbedres, da eksemplet er et typisk \des problem, men det er tilfredsstillende, at vi opnår de forventede forbedringer i implementeringen af simulationen i forhold til \emph{greenlets}"-versionen.
+Generatorfunktionen er omskrevet, så koden er mere relateret til funktionaliteten og mindre til synkronisering.  I resten af koden opnår vi lignende kodekoncentration, men vi har også udvidet eksemplet, så vi gemmer antallet af kunder, der befinder sig i banken, i en \code{Monitor}. Dette er ikke strengt nødvendigt og gøres ikke i det originale eksempel fra \simpy, men er et godt eksemple på brugen af en \code{Monitor} til udtræk af data fra simuleringen. Det var forventet, at koden kunne forbedres, da eksemplet er et typisk \des problem, men det er tilfredsstillende, at vi opnår de forventede forbedringer i implementeringen af simulationen i forhold til greenlets-versionen.
 
 
-\begin{lstlisting}[firstnumber=20, label=fig:sim:generator, caption=Generatorprocessen for \emph{simulerings}-versionen]
+\begin{lstlisting}[firstnumber=20, label=fig:sim:generator, caption=Generatorprocessen for simulerings-versionen]
 @process
 def Generator(i,number,meanTBA, meanWT, customerWRITER):
   for numberInserted in range(number):
@@ -107,7 +107,7 @@ def generate(self,number,meanTBA,resource):
         yield hold,self,t
 \end{lstlisting}
 
-En sammenligning af generatorfunktionen i \simpy med generatorprocessen i \emph{simulerings}"-versionen viser ikke den store forskel. I \simpy aktiverer man kunden direkte, mens man i \emph{simulerings}"-versionen sender kunden over en kanal. Der findes derimod en større forskel på de to implementeringer i kundedelen. Dette skyldes, at i \emph{simulerings}"-versionen findes der en bankproces, som er delt på tværs af alle kunder, mens man i \simpy har en kundefunktion, der er unik for hver kunde. Denne forskel medvirker til, at bankprocessen i \simpy skal vedligeholde afgangstiden for samtlige kunder i banken  hvilket kræver mere kode. Dette er implementeret i  \cref{fig:sim:bank} på linjerne 46-53 med en \code{alternation}. Her venter processen hele tiden på enten at modtage en ny kunde, eller på at en kunden ønsker at forlade banken.
+En sammenligning af generatorfunktionen i \simpy med generatorprocessen i simulerings-versionen viser ikke den store forskel. I \simpy aktiverer man kunden direkte, mens man i simulerings-versionen sender kunden over en kanal. Der findes derimod en større forskel på de to implementeringer i kundedelen. Dette skyldes, at i simulerings-versionen findes der en bankproces, som er delt på tværs af alle kunder, mens man i \simpy har en kundefunktion, der er unik for hver kunde. Denne forskel medvirker til, at bankprocessen i \simpy skal vedligeholde afgangstiden for samtlige kunder i banken  hvilket kræver mere kode. Dette er implementeret i  \cref{fig:sim:bank} på linjerne 46-53 med en \code{alternation}. Her venter processen hele tiden på enten at modtage en ny kunde, eller på at en kunden ønsker at forlade banken.
 
 \begin{lstlisting}[firstnumber=39,float=hbtp, label=fig:sim:bank, caption= Uddrag af bank processen i simulation]
     while True:
@@ -155,4 +155,4 @@ def Bank(customerREADER):
       print "%94.0f: B: got retire"%(Now())
 
 \end{lstlisting}
-I det avancerede eksempel som vist i  \cref{fig:sim:bank2} indeholder bankprocessen mindre kode end i det simple eksempel. Det skyldes, at banken ikke længere skal holde styr på samtlige kunder, men blot skal håndtere en kunde ad gangen, mens resten af kunderne befinder sig i køen. Kundefunktionen i \simpy og bankprocessen i det avancerede eksempel minder derfor meget om hinanden og en fordel ved \emph{simulerings}-versionen er, at man kun foretager en \code{Wait} for at indikere, at den begrænsede ressource er optaget, hvor man i \simpy versionen skal foretage tre kald. Først et kald for at få adgang til den begrænsede ressource, så et kald for at holde ressourcen i et tidsperiode, og til sidst et kald for at slippe ressourcen.
+I det avancerede eksempel som vist i  \cref{fig:sim:bank2} indeholder bankprocessen mindre kode end i det simple eksempel. Det skyldes, at banken ikke længere skal holde styr på samtlige kunder, men blot skal håndtere en kunde ad gangen, mens resten af kunderne befinder sig i køen. Kundefunktionen i \simpy og bankprocessen i det avancerede eksempel minder derfor meget om hinanden og en fordel ved simulerings-versionen er, at man kun foretager en \code{Wait} for at indikere, at den begrænsede ressource er optaget, hvor man i \simpy versionen skal foretage tre kald. Først et kald for at få adgang til den begrænsede ressource, så et kald for at holde ressourcen i et tidsperiode, og til sidst et kald for at slippe ressourcen.
