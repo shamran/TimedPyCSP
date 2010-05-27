@@ -1,7 +1,7 @@
 \section{Implementering}\label{sec:deadline-implementation}
 Vi vil i dette afsnit beskrive hvilke ændringer og tilføjelser vi skal foretage i \pycsp, for at implementere RTP. Ændringerne vil tage udgangspunkt i de emner, vi har diskuteret i foregående afnit med fokus på de problemstillinger der skal tages højde for ved implementeringen af dem.  
 \subsection{Overskredne deadlines}
-%Planlægning i realtime kræver at man tager stilling til, hvordan  overskredne deadlines skal håndteres. Enten kan det opfattes som en egenskab for processen hvor dens deadline enten kan være overholdt eller ej, eller også kan en overskreden deadline resultere i en exception.
+%Planlægning i realtid kræver at man tager stilling til, hvordan  overskredne deadlines skal håndteres. Enten kan det opfattes som en egenskab for processen hvor dens deadline enten kan være overholdt eller ej, eller også kan en overskreden deadline resultere i en exception.
 
 %Hvilken metode, der egner sig bedst til RTP, afhænger af hvilken deadline, der er tilknyttet processen. Er der tilknyttet en soft deadline til en proces, vil processen stadig tilføje værdi til systemet, selvom det overskrider dens deadline. Derfor kan det stadig være bedst for systemet at fuldføre processen til ende. I dette tilfælde  skal systemet blot markere at dens deadline er overskredet, og senere må programmøren så manuelt håndtere den overskredne deadline. 
 
