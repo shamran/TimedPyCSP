@@ -1,15 +1,12 @@
 \chapter{Introduktion}
 \thispagestyle{empty}
-\fxnote{simulering ikke simulation}
-\fxnote{implementering ikke implementation.}
-\fxnote{søg igennem grenelts og varianter}
 \fxnote{SKIP-guard, skip-guard \code{skip-guard}? træf et valg mht. både skip og timeout.}
 Vi vil indledningsvis præsentere konteksten for dette speciale. Herefter klarlægger vi, hvilke problemer vi ønsker at berøre samt hvad vores tilgangsvinkel er. Afslutningsvis giver vi et overblik over specialets struktur. 
 
 \section{Kontekst}
 Over de sidste par år er multi-kerne cpu'er blevet hyldevarer, hvilket har afledt et stigende behov for at udvikle programmer, der kan udnytte flere kerner samtidigt. Dette behov har gjort CSP til et populært sprog, da det gør det let at repræsentere samtidighed og desuden kræver eksplicit udveksling af data frem for at benytte delte datastrukturer, som kræver låsemekanismer eller anden form for kontrol over hvem der tilgår og hvordan det delte data tilgås. CSP's stigende popularitet har affødt at det er blevet blevet implementeret i flere andre programmeringssprog, og senest har Google lavet sproget Go, der er baseret på CSP. 
 
-Tid har altid været et brugbart værktøj indenfor datalogi, men har ofte været besværligt at repræsentere og håndtere. Det har ført til megen forskning og udvikling indenfor området, og har resulteret i adskillige modeller og frameworks. I den forbindelse er der også lavet en model for tid i CSP, kaldet TimedCSP. Dette er hovedsageligt et teoretisk arbejde som aldrig har vundet indpas i nogle af de gængse implementation af CSP. Der er derfor, så vidt vi ved, på nuværende tidspunkt ikke nogen praktisk anvendt implementation af tid i CSP. 
+Tid har altid været et brugbart værktøj indenfor datalogi, men har ofte været besværligt at repræsentere og håndtere. Det har ført til megen forskning og udvikling indenfor området, og har resulteret i adskillige modeller og frameworks. I den forbindelse er der også lavet en model for tid i CSP, kaldet TimedCSP. Dette er hovedsageligt et teoretisk arbejde som aldrig har vundet indpas i nogle af de gængse implementering af CSP. Der er derfor, så vidt vi ved, på nuværende tidspunkt ikke nogen praktisk anvendt implementering af tid i CSP. 
 
 \fxnote{RS: Jeg har lavet udkast, du kan prøve at kaste flere ord efter det hvis du lyster}
 \section{Specialets problemformulering og struktur}
@@ -55,7 +52,7 @@ I forbindelse med dette speciale vil vi bruge følgende termer:
 \item \textbf{Realtid} er en tidsmodel, der i litteraturen også er defineret som absolut tid, eller Newtonisk tid. Tiden ses som en fundamental struktur i universet, der 
 fremskrives kontinuerligt og uafhængigt af nogle eksterne kræfter.
 \item \textbf{Diskret tid} er en anden tidsmodel. Her samples værdier fra den kontinuerlige tid, således at tiden fremskrives i ryk. Den enkelte sample er normal taget med et konstant tidsinterval, men kan også være taget med et variabelt tidsinterval. I diskret tid kan tiden enten drives frem af tiden selv, som i realtid, eller fremskrives manuelt. I dette speciale defineres diskret tid til at have variable tidsintervaller, og skal fremskrives manuelt.
-\item \textbf{Anvendelsesområde} er en konkret implementation af en tidsmodel.
+\item \textbf{Anvendelsesområde} er en konkret implementering af en tidsmodel.
 \item \textbf{\code{Skrivemaskine-font}} markerer i dette speciale variabelnavne, funktioner,  klasser og moduler som findes i koden. 
 \end{list}
 

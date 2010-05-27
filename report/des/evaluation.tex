@@ -13,7 +13,7 @@ For yderligere at teste den udviklede kode har vi desuden integreret alle tests 
 For at evaluere fordele og ulemper af simulerings-versionen af \pycsp, har vi genimplementeret eksemplerne fra \cref{sec:des-examples}, med  brug af vores udviklede kode. Vi kan derfor i det følgende sammenholde de to versioner og se på fordele og ulemper ved simulerings-versionen.
  
 \subsubsection{Hajer og fisk på Wa-Tor}
-Implementeringen af dette problem  i et simuleringssprog har ikke medført den store omskrivning. Dette skyldes, at eksemplet er en kontinuerlig simulation, og at alle fisk og hajer ønsker at interagere med omverdenen i hvert tidsskridt. I processen \code{visualize} ser man tydeligst forskellen mellem standard \pycsp med dens brug af barrierer og simulerings-versionen med dens brug af tid vha. funktionen \code{Wait}. Hvor standard \pycsp må kalde en barriere tre gange for hver iteration (\cref{fig:green:visualize}), kan man i simulerings-versionen blot angive, at visualiseringen ønsker at vente tre tidsskridt (\cref{fig:sim:visualize}). 
+Implementeringen af dette problem  i et simuleringssprog har ikke medført den store omskrivning. Dette skyldes, at eksemplet er en kontinuerlig simulering, og at alle fisk og hajer ønsker at interagere med omverdenen i hvert tidsskridt. I processen \code{visualize} ser man tydeligst forskellen mellem standard \pycsp med dens brug af barrierer og simulerings-versionen med dens brug af tid vha. funktionen \code{Wait}. Hvor standard \pycsp må kalde en barriere tre gange for hver iteration (\cref{fig:green:visualize}), kan man i simulerings-versionen blot angive, at visualiseringen ønsker at vente tre tidsskridt (\cref{fig:sim:visualize}). 
 
 \begin{lstlisting}[firstnumber=157 ,float=hbtp, label=fig:green:visualize, caption=greenlets-versionen af visualize]
 @process
@@ -85,7 +85,7 @@ def Generator(i,number,meanTBA, meanWT,
     return
 \end{lstlisting}
 
-Generatorfunktionen er omskrevet, så koden er mere relateret til funktionaliteten og mindre til synkronisering.  I resten af koden opnår vi lignende kodekoncentration, men vi har også udvidet eksemplet, så vi gemmer antallet af kunder, der befinder sig i banken, i en \code{Monitor}. Dette er ikke strengt nødvendigt og gøres ikke i det originale eksempel fra \simpy, men er et godt eksemple på brugen af en \code{Monitor} til udtræk af data fra simuleringen. Det var forventet, at koden kunne forbedres, da eksemplet er et typisk \des problem, men det er tilfredsstillende, at vi opnår de forventede forbedringer i implementeringen af simulationen i forhold til greenlets-versionen.
+Generatorfunktionen er omskrevet, så koden er mere relateret til funktionaliteten og mindre til synkronisering.  I resten af koden opnår vi lignende kodekoncentration, men vi har også udvidet eksemplet, så vi gemmer antallet af kunder, der befinder sig i banken, i en \code{Monitor}. Dette er ikke strengt nødvendigt og gøres ikke i det originale eksempel fra \simpy, men er et godt eksemple på brugen af en \code{Monitor} til udtræk af data fra simuleringen. Det var forventet, at koden kunne forbedres, da eksemplet er et typisk \des problem, men det er tilfredsstillende, at vi opnår de forventede forbedringer i implementeringen af simuleringen i forhold til greenlets-versionen.
 
 
 \begin{lstlisting}[firstnumber=20, label=fig:sim:generator, caption=Generatorprocessen for simulerings-versionen]
@@ -109,7 +109,7 @@ def generate(self,number,meanTBA,resource):
 
 En sammenligning af generatorfunktionen i \simpy med generatorprocessen i simulerings-versionen viser ikke den store forskel. I \simpy aktiverer man kunden direkte, mens man i simulerings-versionen sender kunden over en kanal. Der findes derimod en større forskel på de to implementeringer i kundedelen. Dette skyldes, at i simulerings-versionen findes der en bankproces, som er delt på tværs af alle kunder, mens man i \simpy har en kundefunktion, der er unik for hver kunde. Denne forskel medvirker til, at bankprocessen i \simpy skal vedligeholde afgangstiden for samtlige kunder i banken  hvilket kræver mere kode. Dette er implementeret i  \cref{fig:sim:bank} på linjerne 46-53 med en \code{alternation}. Her venter processen hele tiden på enten at modtage en ny kunde, eller på at en kunden ønsker at forlade banken.
 
-\begin{lstlisting}[firstnumber=39,float=hbtp, label=fig:sim:bank, caption= Uddrag af bank processen i simulation]
+\begin{lstlisting}[firstnumber=39,float=hbtp, label=fig:sim:bank, caption= Uddrag af bank processen i simulation-versionen]
     while True:
       msg = customerREADER()
       print "%94.0f: %s enter bank"%(Now(),msg.name)

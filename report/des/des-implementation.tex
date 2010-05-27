@@ -23,7 +23,7 @@ I \cref{fig:init} kan man se, at funktionerne \code{choice}, \code{ChannelPoison
 \label{sec:scheduler}
 Med valget af greenlets-versionen som grundversion, og med henblik på at hovedparten af vores ændringer vil være i \sched en, vil vi kort gennemgå dele af klassen \code{Scheduler}.
 
-\begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i \code{greenlets}versionen.]
+\begin{lstlisting}[firstnumber=132,stepnumber=5,numbers=left, float, label=fig:scheduling, caption=Uddrag af Scheduler.py i greenlets-versionen.]
     def getInstance(cls, *args, **kargs):
         '''Static method to have a reference to **THE UNIQUE** instance'''
         if cls.__instance is None:
@@ -163,7 +163,7 @@ self.cond.release()
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[c]{\linewidth}
-\begin{lstlisting}[firstnumber=158, label=fig:sim_sleep, caption= Uddrag af \sched en i \code{Simulation}]
+\begin{lstlisting}[firstnumber=158, label=fig:sim_sleep, caption= Uddrag af \sched en i Simulation-versionen]
 self.cond.acquire()
 if not (self.next or self.new):
   # Waiting on blocking processes
