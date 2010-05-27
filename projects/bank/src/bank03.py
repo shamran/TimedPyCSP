@@ -79,8 +79,7 @@ if __name__ == "__main__":
   print "main starting"
   nprocesses = 10 
   mon = Monitor()
-  customer = Channel(buffer=9,mon = mon)
-  
+  customer = Channel(buffer=9,mon = mon) 
   numberCustomersprprocess=10
   meanTBA = 3.0
   meanWT =  5.0
@@ -91,5 +90,3 @@ if __name__ == "__main__":
       for i in range (nprocesses)]
   )
   print b.executed
-  print "end"
-

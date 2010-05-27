@@ -43,7 +43,6 @@ def Bank(customerREADER):
       pass
 
 if __name__ == "__main__":
-  print "main starting"
   nprocesses = 1
   numberCustomers=5
   queue = Channel(buffer=numberCustomers*nprocesses)

@@ -5,12 +5,12 @@ final,% Når man skal skifte kompileringsmetode mellem draft og final skal man
 11pt, % standardstørrelse på fonten
 %openany,%, % anvnedes hvis kapitler bare skal starte på den næste side
 %oneside%,
-book%article
+%book%article
 ]{memoir}%
-
-  \setlrmarginsandblock{4.2cm}{2.8cm}{*}
-  \setulmarginsandblock{2.8cm}{4.2cm}{*}
-  \setheadfoot{2cm}{2cm}
+  \hfuzz=3pt
+  \setlrmarginsandblock{4.3cm}{3cm}{*}
+  \setulmarginsandblock{3cm}{4.3cm}{*}
+  \setheadfoot{2.3cm}{2cm}
 
 % marginer, memoir to to metoder
 % den traditionelle, se memoir manualen
@@ -307,7 +307,7 @@ typeeditors 	= {{udgivere}{udg\adddot}},
          keywordstyle=[2]\textbf,    %
          keywordstyle=[3]\textbf,    %
          keywordstyle=[4]\textbf,   %\sqrt{\sqrt{}} %
-         stringstyle=\color{darkgray}\ttfamily, % Farbe der String
+         stringstyle=\color{black}\ttfamily, % Farbe der String
          showspaces=false,           % Leerzeichen anzeigen ?
          showtabs=false,             % Tabs anzeigen ?
          xleftmargin=17pt,
@@ -329,10 +329,6 @@ typeeditors 	= {{udgivere}{udg\adddot}},
 \lstset{language=Python}
 \lstset{emph={@process, @choise,choice, Alternation, Skip,Timeout,Parallel,Sequence, Spawn,@io,ChannelPoisonException, ChannelRetireException},emphstyle=\underbar}
 
-
-    %\DeclareCaptionFont{blue}{\color{blue}} 
-
-  %\captionsetup[lstlisting]{singlelinecheck=false, labelfont={blue}, textfont={blue}}
 \usepackage{caption}
 \DeclareCaptionFont{white}{\color{white}}
 \DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}

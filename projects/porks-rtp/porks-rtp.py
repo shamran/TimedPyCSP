@@ -1,8 +1,5 @@
-""" Configurable. Run once then poison channels. """
 from pycsp.deadline import *
-#from random import expovariate, uniform, seed
 import random, sys, time , heapq, math, scipy
-
 
 avg_convert_processing = 0.66
 avg_camera_processing = 0.135
@@ -14,14 +11,18 @@ ana_iter =   700000
 dummy_iter =  50000
 std = 0.2
 concurrent = 5.0
-avg_arrival_interval = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)/concurrent
+avg_arrival_interval = (avg_camera_processing+
+                        avg_convert_processing+
+                        avg_analysis_processing)/concurrent
 
-time_to_camera_deadline = (avg_camera_processing+avg_convert_processing)*1.3
-time_to_deadline = (avg_camera_processing+avg_convert_processing+avg_analysis_processing)*(1.22*concurrent)
-
+time_to_camera_deadline = (avg_camera_processing+
+                           avg_convert_processing)*1.3
+time_to_deadline = (avg_camera_processing+
+                    avg_convert_processing+
+                    avg_analysis_processing)*(1.22*concurrent)
 
 pigs_to_simulate =  100
-number_of_simulations = 5
+number_of_simulations = 10
 
 class Pig:
   def __init__(self,_id, arrivaltime,ran,deadline = time_to_deadline):
@@ -31,16 +32,18 @@ class Pig:
     self.donetime = arrivaltime
     self.done = False
     x = ran.uniform(0,9)
-    #print x
-    #t =  raw_input("press")
+
     if x<1: self.normal = False 
     else : self.normal = True 
+
     self.wait = []
     self.accum = []
+
   def __repr__(self):
     sun = 0
     for x in self.wait : sun += x[1]
-    return "%s\ttotal time inc queue : %0.3f, total processtime = %0.3f = %s"%(self.done,self.donetime-self.arrivaltime,sun, self.accum)
+    return "%s\ttotal time inc queue : %0.3f, total processtime = %0.3f = %s"%(
+      self.done,self.donetime-self.arrivaltime,sun, self.accum)
 
 def dummywork(iterations):
     #Estimating Pi.
@@ -52,17 +55,20 @@ def dummywork(iterations):
 
 @process
 def background_dummywork(dummy, time_out):
+
     @process
     def internal_dummy(_id,dummy_in, dummy_out,time_out,work = dummy_iter):
         try:
             time_spent=0
             if _id == 0: dummy_out(time_spent)
+            
             while True:
                 time_spent = dummy_in()                
                 time_spent -= Now()
                 dummywork(work)
                 time_spent += Now()
                 dummy_out(time_spent)
+                
         except ChannelPoisonException:
             poison(dummy_in,dummy_out)
             if _id == 0: time_out(time_spent)
@@ -79,7 +85,6 @@ def sleep(n):
 
 @process
 def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
-       #Insert work here
     NextpigArrival = Now()+ran.gauss(data, data*std)
     ThispigArrival = Now()
     Set_deadline(NextpigArrival-Now())
@@ -103,18 +108,17 @@ def feederFunc(robot, analysis, dummy,ran, data = avg_arrival_interval):
                     {((-feederChannel),pig):None},
                     {Timeout(NextpigArrival-Now()):None}
                     ]).execute()       
-            #else: print "no slack !!"
+
             Remove_deadline()
             ThispigArrival = NextpigArrival
             NextpigArrival = ThispigArrival+ran.gauss(data, data*std)
             Set_deadline(NextpigArrival-Now())
             if ThispigArrival>Now() : sleep(ThispigArrival-Now())
+
         except DeadlineException:
-            #print "failed in feeder"
             Remove_deadline()
             NextpigArrival = NextpigArrival+ran.gauss(data, data*std)
             Set_deadline(NextpigArrival-Now())
-    #sleep(time_to_deadline*1.2)    
     poison(robot)
     poison(dummy)
     
@@ -123,13 +127,11 @@ def cameraFunc(in0,out0,ran , data = avg_camera_processing):
     try:
         val0 = in0()                
         if Now() - val0.arrivaltime   < time_to_camera_deadline :
-            #waittime = ran.gauss(data,data*std)
-            #waits = "cam: ",waittime
             val0.accum.append(Now()-val0.arrivaltime)
-            #val0.wait.append(waits)
             dummywork(ran.gauss(cam_iter,cam_iter*std))
             out0(val0)
             Remove_deadline()
+
     except DeadlineException:
         Remove_deadline()
         poison(in0,out0)
@@ -140,17 +142,15 @@ def convertFunc(in0,out0,ran , data = avg_convert_processing):
         val0 = in0() 
         if val0.deadline>Now():    
             Set_deadline(val0.deadline-Now())   
-            #waittime = None
-            #waittime = ran.gauss(data,std*data)                    
-            #waits = "con: ",waittime
-            #val0.wait.append(waits)
             val0.accum.append(Now()-val0.arrivaltime)
             dummywork(ran.gauss(conv_iter,conv_iter*std))
             out0(val0)
             Remove_deadline()
+
     except DeadlineException:
         Remove_deadline()
         poison(in0,out0)
+
     except ChannelPoisonException:
         Remove_deadline()   
         poison(in0,out0)
@@ -161,15 +161,14 @@ def analysisFunc(in0,out0,ran , data = avg_analysis_processing):
         val0 = in0()
         if val0.deadline>Now():
             Set_deadline(val0.deadline-Now())
-            #waittime = ran.gauss(data,std*data)                    
-            #waits = "ana: ",waittime
             val0.accum.append(Now()-val0.arrivaltime)
-            #val0.wait.append(waits)
             dummywork(ran.gauss(ana_iter,ana_iter*std))                
             out0(val0)
             Remove_deadline()
+
     except DeadlineException:
         Remove_deadline()
+
     except ChannelPoisonException:
         Remove_deadline()
 
@@ -179,13 +178,14 @@ def robotFunc(feeder,analysis,ran, statC, data = time_to_deadline):
     try:
         @choice
         def process_pig(channel_input):
-            if channel_input.id not in next_deadline : next_deadline[channel_input.id] = channel_input
+            if channel_input.id not in next_deadline : 
+                next_deadline[channel_input.id] = channel_input
 
         @choice
         def process_pig2(channel_input):
             if channel_input.deadline>Now():
                 channel_input.done = True
-            #else :  print "arrived late in robot"
+
             channel_input.accum.append(Now()-channel_input.arrivaltime)
             channel_input.donetime = Now()
             next_deadline[channel_input.id] = channel_input
@@ -195,6 +195,7 @@ def robotFunc(feeder,analysis,ran, statC, data = time_to_deadline):
                 {feeder :process_pig()},
                 {analysis:process_pig2()}
             ]).execute()
+
     except ChannelPoisonException:
         good = 0
         bad = 0
@@ -203,10 +204,7 @@ def robotFunc(feeder,analysis,ran, statC, data = time_to_deadline):
             if pig.done : good +=1
             else : bad +=1
             if pig.normal : normal +=1
-            #print pig
-        #print "good = ",good,"bad =",bad, " = ",float(good)/(pigs_to_simulate)*100,"% (",normal,"/",pigs_to_simulate,") normal"
         statC(float(good)/(pigs_to_simulate))
-
 
 @process
 def Work(statC,timeC):
@@ -222,14 +220,11 @@ def Work(statC,timeC):
         feed = feederFunc(-robotC,-analysisC, -dummyC, ran)
         rob = robotFunc(+robotC,+analysisC,ran,statC)
 
-        try:
-            Parallel(
-            #3*background_dummywork(dummyC,timeC),
-            feed,
-            rob            
-            )
-        except DeadlineException:
-            print  "fucking exception"       
+        Parallel(
+          #1*background_dummywork(dummyC,timeC),
+          feed,
+          rob            
+        )
     poison(statC, timeC)
     
 @process
@@ -238,13 +233,10 @@ def Statistic(statC):
     try:
         while True:
             stce = statC()
-            #print "pct good: ",stce
             stc.append(stce)
             
     except ChannelPoisonException:
         print "number pigs processed in time:"
-        #print stc
-        #print "mean:  ",sum(stc, 0.0) / len(stc)
         print "mean: %0.2f"%scipy.mean(stc) 
         print "std variance : %0.2f\n"%scipy.std(stc)
         
@@ -254,15 +246,11 @@ def StatisticTime(statC):
     try:
         while True:
             stac = statC()
-            #print "time spent: ",stac
             stc.append(stac)
             
     except ChannelPoisonException:
         print "Time spent in dummy:"        
-        #print stc
-        #print "mean:  ",sum(stc, 0.0) / len(stc)
         print "mean: %0.3f"%scipy.mean(stc) 
-        #print "variance :", scipy.var(stc)
         print "std variance : %0.3f\n"%scipy.std(stc)
         
         
@@ -273,7 +261,10 @@ Parallel(
     Statistic(+processeschan),
     StatisticTime(+timechan)
 )
-print "cam deadline:\t%3f\ndeadline:\t%3f"%(time_to_camera_deadline,time_to_deadline)
-print "avg procsessing time: ",avg_camera_processing+avg_convert_processing+avg_analysis_processing
+print "cam deadline:\t%3f\ndeadline:\t%3f"%(
+    time_to_camera_deadline,time_to_deadline)
+print "avg procsessing time: ",avg_camera_processing+
+                               avg_convert_processing+
+                               avg_analysis_processing
 print "concurrent: ",concurrent
 print "RTP version"
