@@ -1,11 +1,10 @@
 \begin{otherlanguage}{english}
 \thispagestyle{empty}
   \begin{abstract}
-    \fxwarning{Abstract mangler}
 
-Over the last years, multi-core cpu's have become increasingly more common, which has lead to a demand for easy representation of concurrency in application development. This has increased the popularity of CSP, leading to implementations in several common programming languages one of which is Python. 
+Over the last years, multi-core cpu's have become increasingly more common, which has lead to a demand for easy representation of concurrency in application development. This has increased the popularity of CSP, leading to implementations in several common programming languages. 
 
-Most practical representations of time in \pycsp currently breaks with the CSP paradigm, so in this thesis we will explore the possibilities of including a representation of time directly in \pycsp. The goal is to make one or several representations of time that gives a developer the tools needed to handle problems within a timecentric domain. We limit ourselves to uses of time within discrete event simulation, real time planning and interactive planning. For each use we approach the problem using applicable examples to identify key issues and requirements. 
+Most practical representations of time in CSP currently breaks with the CSP paradigm, so in this thesis we will explore the possibilities of including a representation of time directly in an implementation of CSP. The goal is to make one or several representations of time that gives a developer the tools needed to handle problems within a timecentric domain. We limit ourselves to uses of time within discrete event simulation, real time planning and interactive planning. For each use we approach the problem using applicable examples to identify key issues and requirements. 
 
 We have found that representations of time in applications are not bound to their problem domain, but rather the time model they apply. As such we have developed two representations of time, one using discrete time, the other using real time. 
 
@@ -13,8 +12,13 @@ We have found that representations of time in applications are not bound to thei
 
 %Realtime planning and interactive planning have been joined in one representation as they share time model. The model uses the Earliest Deadline First (EDF) algorithm to prioritize events, with added priority inheritance to handle priority inversion. 
 
-Our solution provides developers with intuitive and flexible representations of time, allowing them to focus more on the actual problem, and less on representation and management of time. 
-
+Our solution provides developers with intuitive and flexible representations of time, allowing them to focus more on the actual problem, and less on representation and management of time.\\
+\\
+The implementation can be found at the address given below. The code specific for this thesis is located in \href{http://code.google.com/p/pycsp/source/browse/\#svn/branches/TimedPyCSP/pycsp/simulation}{\texttt{/pycsp/simulation}} and \href{http://code.google.com/p/pycsp/source/browse/\#svn/branches/TimedPyCSP}{\texttt{/pycsp/deadline}}. \\
+\url{http://code.google.com/p/pycsp/source/browse/\#svn/branches/TimedPyCSP}\\
+\\
+The examples used in the thesis are located at the address given below, and can also be found in the appendix.\\
+\url{http://github.com/shamran/TimedPyCSP/tree/master/projects}
 \end{abstract}
 \end{otherlanguage}
 %\begin{abstract}
