@@ -239,10 +239,10 @@ assert shark_img.get_height() == shark_img.get_width()
 assert fish_img.get_height() == fish_img.get_width()
 assert shark_img.get_bounding_rect() == fish_img.get_bounding_rect()
 multiplier = shark_img.get_height() 
-display = pygame.display.list_modes()[0]
+display = pygame.display.list_modes()[3]
 world_width = (display[0]/(multiplier*world_parts))*world_parts
 world_height = display[1]/multiplier
-screen = pygame.display.set_mode((world_width*multiplier,world_height*multiplier),FULLSCREEN)
+screen = pygame.display.set_mode((world_width*multiplier,world_height*multiplier))
 screen.fill(color["blue"])
 
 assert 0 == world_width%world_parts
@@ -268,11 +268,7 @@ part2aggr = Channel()
 aggr2vis = Channel()
 barrier_channel = Channel()
 
-
-
-#def worldpart (cIN, cOUT, barR, barW, leftR, leftW, rightR, rightW):
 Parallel(
-  # start(ch.writer(), workers), 
   [worldpart(i, +ch,+barrier_channel,-barrier_channel) for i in range(world_parts)],
   visualize(+barrier_channel,-barrier_channel),
   barrier(world_parts+1, +barrier_channel, -barrier_channel)
