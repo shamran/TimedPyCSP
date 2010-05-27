@@ -1,0 +1,353 @@
+
+\documentclass[a4paper, % papirstørrelse, skal altid med
+final,% Når man skal skifte kompileringsmetode mellem draft og final skal man 
+      %flytte kommenteringen %  i Draft kommanoerne, nedenfor.
+11pt, % standardstørrelse på fonten
+%openany,%, % anvnedes hvis kapitler bare skal starte på den næste side
+%oneside%,
+%book%article
+]{memoir}%
+  \hfuzz=3pt
+  \setlrmarginsandblock{3.75cm}{3.75cm}{*}
+  \setulmarginsandblock{3.75cm}{3.75cm}{*}
+  \setheadfoot{2.3cm}{2cm}
+
+% marginer, memoir to to metoder
+% den traditionelle, se memoir manualen
+% venstre: 2.5cm, højre: 3.5cm, top: 3cm, bund: 4cm
+%her kan margenen sættes manuelt, hvis man har lyst
+%\setlrmarginsandblock{3.5cm}{3.5cm}{*}
+
+
+%\setlrmarginsandblock{1.5cm}{3.5cm}{*}
+%\setulmarginsandblock{3cm}{4cm}{*}
+
+%her kan margenen sættes manuelt, hvis man har lyst
+
+
+% % mere utraditionelt, men hurtigt smartere
+% % vi sætter tekstblokken og placerer den
+% % værdierne som er angivet svarer ca. til dem anvende i LaTeXbogen
+% % 400pt bred og en højde svarende til at forholdet er det gyldne snit
+%%\settypeblocksize{*}{371pt}{1.618}
+% % placer tekstblokken på papriet, kun en værdi skal angives, her sider
+% % vi bare hvad forholder mellem marginerne skal være
+% \setlrmargins{*}{*}{1.6}
+% \setulmargins{*}{*}{1.3}
+\checkandfixthelayout % laver forskellige beregninger og sætter de
+% almindelige længder op
+
+%-------definitions-----
+\newcommand{\Author}{Simon Christiano Bognolo og Rasmus Ebdrup Sørensen} 
+\newcommand{\Title}{Timed PyCSP}
+\newcommand{\Subject}{Introducing discrete event simulation and real time scheduling in PyCSP}
+\newcommand{\Keywords}{Priority, Deadlines, Real-time, Discrete events, Scheduling}
+%-----------------------
+
+
+\title{\Title}
+\author{\Author}
+
+
+\setsecnumdepth{subsection} % Hvor dybt man nu ønsker at vi har
+\maxsecnumdepth{subsection}% overskrifterne nummereret
+\settocdepth{subsection} % hvor dybt ned vi ønsker ting med i
+ 
+\usepackage[T1]{fontenc} % bedre orddeling og ofte påkrævet at
+\usepackage[utf8]{inputenc} % eller utf8 eller ansinew eller ...
+\usepackage[english, danish]{babel} %direktiv til at bruge det danske sprog
+
+\renewcommand\danishhyphenmins{22} % bedre orddeling
+\addto\captionsdanish{
+\renewcommand\contentsname{Indholdsfortegnelse}
+\renewcommand\appendixname{Appendix}
+}
+\selectlanguage{danish}
+
+%har vi ord der bliver delt forkert kan de indsættes i hyphernation med bindestreg alle steder hvor ordet kan deles
+\hyphenation{trans-port-bånd-et tit-len mo-del-len pro-du-ce-rer an-svars-hav-ende om-for-deles for-bind-elses-mulig-heder ska-ber æn-dring-er net-værks-en-hed-er peer backup backup-system fast-track backup-systemer nabo-peers frame-work efter-som Grund-lag-et plads-effek-tivi-teten audits soft-ware dead-line-Excep-tion prio-ri-tets-in-ver-te-ring prio-ri-tets-ned-arv-ning dead-line dead-line-Excep-tion}
+
+
+
+\usepackage{amsmath,amssymb} % bedre matematik og ekstra fonte
+\usepackage{textcomp} % adgagn til tekstsymboler
+\usepackage[notcite,notref]{showkeys} % viser labels i margin,
+% udkommenteres for at fjerne, eller
+% anvend option final
+
+% OPSÆTNING AF SÆTNINGER etc.
+\usepackage[amsmath,thmmarks]{ntheorem} % bedre fleksimibitet
+\usepackage[final]{graphicx} % pakke til inklusion af grafik
+\usepackage{epsfig}
+
+\makeindex % hvis man ønsker at lave et index
+%\usepackage{pstricks}
+\usepackage{tikz}
+\usepackage{xspace} %Allow for a space after a new command in the right place
+\usepackage{longtable} %allow for tables that span more than one page 
+\usepackage[section]{placeins}%pakke til at stoppe float fra at drifte for længere end til \FloatBarrier. Med en section i option ændrers alle sections til at sætte en barriere.
+ 
+\makeatletter
+    \declare@shorthand{danish}{"/}{\nobreak\discretionary{/}{}{/}\bbl@allowhyphens}%Tillader orddeling på tværs af / ved at skrive "/
+    \declare@shorthand{danish}{"_}{\nobreak\discretionary{\_}{}{\_}\bbl@allowhyphens}%Tillader orddeling på tværs af _ ved at skrive "_
+\makeatother
+
+\usepackage{nameref}
+\usepackage[danish]{varioref} % smarte krydsreferencer via \vref
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0,0.1,0.5}
+\usepackage{hycolor}
+\usepackage[final, danish,layout=margin,innerlayout=inline]{fixme} % til at skrive \fixme kommentarer til sig
+
+%\fxfatal[layout=index,target=settoc]{Hvor meget skal med i toc, og hvad skal stå med tal. preamble linje 47.}
+
+
+\usepackage[colorlinks%
+           ,linkcolor=darkblue%
+           ,citecolor=darkblue%
+           ,urlcolor=darkblue%
+           %,colorlinks=false%
+           ,pdfusetitle%
+           ,pdfstartview=FitBH%fit width of page to the window
+           ,plainpages=false%
+           ]{hyperref}%
+
+\hypersetup{%
+  pdfauthor={\Author},%
+  pdftitle={\Title},%
+  pdfsubject={\Subject},%  
+  pdfkeywords={\Keywords},%  
+}%
+
+%giver mulighed for at hoppe i pdf'filen via referencerne.
+%hyperref er ustabil med varieof,
+%og skal udkommenteres hvis der opstår problemer.
+%specielt skal udkommenteres når man kompilere i final til print
+
+%% Make sure \autoref puts parentheses around 
+%% equations and enumeration items (similar to \eqref)
+%% NOTE: This allows us to use \ref instead of \eqref
+\labelformat{equation}{\textup{(#1)}}
+\labelformat{enumi}{\textup{(#1)}}
+%\usepackage[draft,author=Dorte]{pdfcomment}
+
+
+\newcommand{\inline}[1]{\fxwarning[inline,nomargin]{#1}}
+\newcommand{\kv}[1]{\fxnote*{Kendt viden?}{#1}}
+\newcommand{\ikkef}[1]{\fxnote*{Ikke forstået, gør dataloger?}{#1}}
+
+%\def\figurename{Figur}%
+\def\lstlistingname{Kodeuddrag1}%
+
+
+%%% We need to redefine \autoref. We should use 
+%%% abbreviations inside the sentence and full names 
+%%% at the beginning of sentences. Additionally,
+%%% need to handle the plural cases.
+%
+%% \Autoref is for the beginning of the sentence
+\let\orgautoref\autoref
+\providecommand{\Autoref}
+        {\def\chapterautorefname{Kapitel}% 
+         \def\equationautorefname{Ligning}%
+         \def\figureautorefname{Figur}%
+         \def\figurename{Figur}%
+         \def\subfigureautorefname{Figur}%
+         \def\sectionautorefname{Afsnit}%
+         \def\subsectionautorefname{Afsnit}%
+         \def\subsubsectionautorefname{Afsnit}%
+         \def\Itemautorefname{Item}%
+         \def\tableautorefname{Tabel}%
+         \def\lstlistingname{Kodeuddrag}%
+         \orgautoref}
+%
+%% \Autorefs is plural for the beginning of the sentence
+%
+\providecommand{\Autorefs}
+        {\def\equationautorefname{Ligningerne}%
+         \def\figureautorefname{Figurerne}%
+         \def\subfigureautorefname{}%
+         \def\sectionautorefname{Afsnittene}%
+         \def\subsectionautorefname{Afsnittene}%
+         \def\subsubsectionautorefname{Afsnittene}%
+         \def\Itemautorefname{Items}%
+         \def\tableautorefname{Tabellerne}%
+         \def\chapterautorefname{Kapitlerne}% 
+         \def\lstlistingname{Kodeuddrag}%
+         \orgautoref}
+
+
+%% \autoref is used inside a sentence 
+%% (this is a renew of the standard)
+\renewcommand{\autoref}
+        {\def\chapterautorefname{kapitel}% 
+         \def\equationautorefname{ligning}%
+         \def\figureautorefname{figur}%
+         \def\figurename{Figur}%
+         \def\subfigureautorefname{figur}%
+         \def\sectionautorefname{afsnit}%
+         \def\subsectionautorefname{afsnit}%
+         \def\subsubsectionautorefname{afsnit}%
+         \def\Itemautorefname{item}%
+         \def\tableautorefname{tabel}%
+         \def\lstlistingname{kodeuddrag}%
+         \orgautoref}
+%figurerne
+%% \autorefs is plural for inside a sentence
+\providecommand{\autorefs}
+        {\def\equationautorefname{ligningerne}%
+         \def\figureautorefname{figurerne}%
+         \def\subfigureautorefname{}%
+         \def\sectionautorefname{afsnittene}%
+         \def\subsectionautorefname{afsnittene}%
+         \def\subsubsectionautorefname{afsnittene}%
+         \def\Itemautorefname{items}%
+         \def\tableautorefname{tabellerne}%
+         \def\chapterautorefname{kapitlerne}% 
+         \def\lstlistingname{kodeuddragene}%
+         \orgautoref}
+
+
+
+\usepackage[style=numeric-comp,sorting=nyt]{biblatex}
+\defbibheading{bibliography}{%
+    \chapter{Litteraturliste}}
+\DefineBibliographyStrings{danish}{%
+references      = {Litteraturliste},
+bibliography    = {Litteraturliste},
+urlseen         = {Lokaliseret d\adddot},
+andothers 		= {m\adddot fl\adddot},
+typeeditor      = {{udgiver}{udg\adddot}},
+typeeditors 	= {{udgivere}{udg\adddot}},
+}
+
+
+
+ 
+\usepackage[babel, danish=quotes]{csquotes} %bedrer mulighed for at anførselstegn
+
+
+\let\newfloat\relax % memoir har allerede defineret denne men det gør float pakken også
+\usepackage{float}
+\restylefloat{table}
+\floatevery{table}{\centering\small} % alle tabel floats centreres og
+% skrives i \small
+\restylefloat{figure}
+\floatevery{figure}{\centering} % automatisk centrering af alle
+% figurer
+% float environments får ’htbp’ som standard placerings værdier når
+% man ikke har angivet noget
+
+\makeatletter
+\renewcommand\fps@figure{hbtp}
+\renewcommand\fps@table{hbtp}
+\makeatother
+
+
+
+%\fxfatal[layout=index,target=cref]{Ændre pageref til vpageref}
+\newcommand{\cref}[1]{\autoref{#1}\vpageref{#1}}%\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final  \vpageref{#1}}
+\newcommand{\CRef}[1]{\Autoref{#1}\vpageref{#1}}%\textcolor{darkblue}{~på side}~\pageref{#1}} %ændres fra pageref til vpageref in final
+
+\newcommand{\nref}[1]{\nameref{#1}\textcolor{darkblue}{~på side}~\pageref{#1}}
+\newcommand{\tcite}[1]{\citetitle{#1}\xspace\cite{#1}}
+
+\newcommand{\des}[0]{DES\xspace}
+\newcommand{\pdes}[0]{PDES\xspace}
+\newcommand{\Des}[0]{DES\xspace}
+\newcommand{\ds}[0]{RTP\xspace}
+\newcommand{\is}[0]{IP\xspace}
+\newcommand{\ip}[0]{IP\xspace}
+
+\newcommand{\simpy}[0]{SimPy\xspace}
+\newcommand{\pycsp}[0]{PyCSP\xspace}
+\newcommand{\csp}[0]{CSP\xspace}
+
+\newcommand{\sched}[0]{skemaplanlægger}
+\newcommand{\Sched}[0]{Skemaplanlægger}
+
+
+\newcommand{\code}[1]{\texttt{#1}\xspace}
+
+%\definecolor{darkred}{rgb}{.647,.129,.149}
+\definecolor{shadecolor}{rgb}{1,0.8,1}%{gray}{.87}
+
+
+% usage: 
+% \mycite[page no]{books bibname}{cited text}
+% or
+% \mycite{source}{cited text}
+\def\myempty{}
+\newcommand*{\mycite}[3][]{\begin{quote}\textit{``#3''~}%
+    \def\temp{#1}%
+    \ifx\temp\myempty \citep{#2}%
+    \else \cite[#1]{#2}%
+    \fi  \end{quote}}
+
+%Overskrifter til tabeller - bliver centreret
+\newcommand\mc[1]{\multicolumn{1}{c}{\textbf {#1}}} % sparer plads
+\newcommand\nc[1]{\multicolumn{1}{c}{#1}} % sparer plads
+% OPSÆTNING TIL INKLUDERING AF SOURCE CODE
+%\usepackage[final]{listings}
+\usepackage{listings}
+\renewcommand{\lstlistlistingname}{Kodestumper}
+\usepackage{courier}
+ \lstset{ 
+         basicstyle=\footnotesize\ttfamily, % Standardschrift
+         numbers=left,               % Ort der Zeilennummern
+         numberstyle=\tiny,          % Stil der Zeilennummern
+         stepnumber=2,               % Abstand zwischen den Zeilennummern
+         numbersep=5pt,              % Abstand der Nummern zum Text
+         tabsize=2,                  % Groesse von Tabs
+         extendedchars=true,         %
+         breaklines=false,            % Zeilen werden Umgebrochen
+         keywordstyle=\color{red},
+                frame=b,         
+         keywordstyle=[1]\textbf,    % Stil der Keywords
+         keywordstyle=[2]\textbf,    %
+         keywordstyle=[3]\textbf,    %
+         keywordstyle=[4]\textbf,   %\sqrt{\sqrt{}} %
+         stringstyle=\color{black}\ttfamily, % Farbe der String
+         showspaces=false,           % Leerzeichen anzeigen ?
+         showtabs=false,             % Tabs anzeigen ?
+         xleftmargin=17pt,
+         framexleftmargin=17pt,
+         framexrightmargin=5pt,
+         framexbottommargin=4pt,
+         %backgroundcolor=\color{lightgray},
+         showstringspaces=false      % Leerzeichen in Strings anzeigen ?        
+ }
+ \lstloadlanguages{% Check Dokumentation for further languages ...
+         [Visual]Basic,
+         Pascal,
+         C,
+         C++,
+         XML,
+         HTML,
+         PYTHON,
+ }
+\lstset{language=Python}
+\lstset{emph={@process, @choise,choice, Alternation, Skip,Timeout,Parallel,Sequence, Spawn,@io,ChannelPoisonException, ChannelRetireException},emphstyle=\underbar}
+
+\usepackage{caption}
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
+
+
+\let\oldlstlisting=\lstlisting
+\renewcommand{\lstlisting}{\SingleSpacing\oldlstlisting}
+ 
+
+
+\usepackage{pdfpages}
+\usepackage{cellspace}
+\addtolength\cellspacetoplimit{4pt}
+\addtolength\cellspacebottomlimit{4pt}
+
+
+%\includeonly{../litteratur}
+
+
+
+

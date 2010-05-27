@@ -1,0 +1,68 @@
+\input{preamble_noprint}
+\bibliography{bibliography} %indsaet en reference til bib filen
+
+%\includeonly{des/des}
+\begin{document}
+\frontmatter
+\pagenumbering{Roman} 
+\begin{titlingpage}
+\newcommand{\HRule}{\rule{\linewidth}{1mm}}
+\vspace*{\stretch{1}}
+\noindent\HRule
+\begin{flushright}
+                \large 
+                Rasmus Ebdrup Sørensen\\
+                Simon Bognolo
+                \\[5mm]
+            \huge \Title
+\end{flushright}                
+\HRule
+\vspace*{\stretch{2}}
+\begin{center}
+\large\textsc{maj 2010}\\
+\large\textsc{Datalogisk Institut, Københavns Universitet}
+\end{center}
+\end{titlingpage}
+
+\cleardoublepage
+\OnehalfSpacing
+\include{other/abstract}
+\cleardoublepage
+\SingleSpacing
+
+\tableofcontents
+\thispagestyle{empty}
+%\newpage
+
+\listoffixmes
+%\newpage
+%\lstlistoflistings   
+\cleardoublepage
+
+\mainmatter
+%\SingleSpacing
+\DoubleSpacing
+\OnehalfSpacing
+\selectfont 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\include{other/introduction}
+\include{csp/csp}
+\include{des/des}
+\include{deadline/deadline}
+\include{interactive/interactive}
+\include{other/conclusion} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\SingleSpacing
+%\fxerror{Check at sidetallet på litteraturlisten passer}
+\printbibliography
+\newpage
+%\backmatter
+\appendix
+
+\pagenumbering{Roman}
+\restorepagenumber
+\input{other/bilag}
+\end{document}
