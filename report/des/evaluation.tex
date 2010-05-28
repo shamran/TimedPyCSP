@@ -57,7 +57,7 @@ De to bankeksempler har krævet en betydelig omskrivning for at udnytte den nyud
 
 Den store forskel på de to funktioner er muligheden for at hoppe fra et tidspunkt til det næste i simuleringen. Dermed skal funktionen ikke være aktiv i hvert tidsskridt, men kun i de tidsskridt, hvor der skal produceres en kunde. Når processen kun er aktiv i de relevante tidsskridt, kan vi undgå hjælpevariablerne \code{t\_event, time} og \code{numberInserted}. 
 
-I  greenlets-versionen kan man af \cref{fig:green:generator}, linje 38 til 41 se at generatorprocessen forbliver aktiv efter den er færdig og ikke vil sende flere kunder. Dette gøres fordi antallet af processer der tilgår barrieren skal være det samme igennem hele kørslen (se afsnit \cref{sec:barrierer}).  Denne begrænsning slipper man for i simulerings-versionen, hvor processen derfor kan stoppe, når den har sendt alle sine kunder.
+I  greenlets-versionen kan man af \cref{fig:green:generator}, linje 38 til 41 se at generatorprocessen forbliver aktiv efter den er færdig og ikke vil sende flere kunder. Dette gøres fordi antallet af processer der tilgår barrieren skal være det samme igennem hele kørslen (se afsnittet ``Barrierer'' i kapitel \ref{sec:barrierer} \vpageref{sec:barrierer}). Denne begrænsning slipper man for i simulerings-versionen, hvor processen derfor kan stoppe, når den har sendt alle sine kunder.
 
 \begin{lstlisting}[firstnumber=21, label=fig:green:generator, caption=Generatorprocessen for greenlets-versionen]
 @process

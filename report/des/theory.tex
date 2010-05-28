@@ -29,8 +29,9 @@ Når vi arbejder med CSP, hvis styrke bl.a. er samtidighed, er det oplagt at afs
 \pdes har ikke vundet stort indpas i den videnskabelige verden, som man kan se af \cref{tab:des}. En grund til dette er, at når tiden kan køre parallelt, øges omkostningerne ved at administrere den mere komplekse tidsrepræsentation, hvilket resulterer i lavere hastighed, end når tiden kan holdes synkront på tværs af processerne.
 Grundet den forholdsvis dårlige ydelse og deraf følgende manglende interesse, har vi også valgt at lade \pdes ligge, og fokusere udelukkende på almindelig \des indenfor simulering i diskret tid. 
 
-\subsubsection{Barrierer} \label{sec:barrierer}
-
+\subsubsection{Barrierer} 
+\phantomsection
+\label{sec:barrierer}
 I \des er tiden den samme for alle processer, og de skal derfor have en fælles tid, der fremskrives samtidigt for alle processerne. En global viden som tid kræver derfor synkronisering af alle 
 processerne, og til denne koordinering og synkronisering af flere 
 processer er  den mest brugte metode at introducere en barriere. Barrierer blev først introduceret i MPI \cite{mpi-barrier}, hvor den bruges til at 
