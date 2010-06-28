@@ -1,0 +1,91 @@
+%q% Based on generic-ornate-15min-45min.en.tex by Till Tantau <tantau@users.sourceforge.net>.
+% Ilari Nieminen, 2007. No rights reserved.
+% http://www.tcs.hut.fi/Studies/T-79.4001/
+% T-79.4001 Seminar on Theoretical Computer Science
+
+% Original copyright notice:
+
+% http://www.lirmm.fr/~fiorio/AlgorithmSty/ (Place algorithm2e.sty in your working directory)
+
+\documentclass{beamer}
+\usepackage[]{algorithm2e}
+
+% A few keywords to use in pseudocode
+% You should also probably read the algorithm2e -documentation more than I did.
+
+%\SetKw{Send}{send}
+%\SetKw{To}{to}
+%\SetKw{Othera}{other}
+%\SetKw{Become}{become}
+
+\mode<presentation>
+{
+   \usetheme{Malmoe}
+   \setbeamercovered{transparent}
+   \definecolor{beamer@tkkblue}{HTML}{0041AD}
+   \setbeamercolor{structure}{fg=beamer@tkkblue}
+}
+
+\usepackage[T1]{fontenc} % bedre orddeling og ofte påkrævet at
+\usepackage[utf8]{inputenc} % eller utf8 eller ansinew eller ...
+\usepackage[english, danish]{babel} %direktiv til at bruge det danske sprog
+
+\renewcommand\danishhyphenmins{22} % bedre orddeling
+\addto\captionsdanish{
+\renewcommand\contentsname{Indholdsfortegnelse}
+\renewcommand\appendixname{Appendix}
+}
+\selectlanguage{danish}
+
+\title
+{Boundary Regocnition in Sensor Networks by Topological methods}
+\subtitle
+{RHS -2007}
+\author
+{Simon Bognolo}
+\date
+{12.07.2007}
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Outline}
+  \tableofcontents
+\end{frame}
+
+\section{Routing}
+
+\subsection[Proactive]{}
+\begin{frame}
+  \frametitle{Linkstate}
+  \begin{itemize}
+  	\item consisten view of system $\rho$
+    \item broadcast the cost of incomming linkcost 
+    \item consisten view of of network maintained
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{DSDV}
+  \begin{itemize}
+  	\item consisten view of system
+    \item broadcast the cost of incomming linkcost 
+    \item consisten view of of network maintained
+  \end{itemize}
+\end{frame}
+
+\end{document}
+
+
