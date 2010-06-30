@@ -20,8 +20,8 @@
 
 \mode<presentation>
 {
-\usetheme{Antibes}% Beamer theme v 3.0
-\usetheme{Berkeley}% Beamer theme v 3.0
+\usetheme{Copenhagen}% Beamer theme v 3.0
+%\usetheme{Berkeley}% Beamer theme v 3.0
 \usecolortheme{lily}
    \setbeamercovered{transparent}
    \definecolor{beamer@tkkblue}{HTML}{0041AD}
@@ -68,52 +68,187 @@
 \end{frame}
 
 \section{Indledning}
+\subsection{Motiv}
 \begin{frame}
-  \frametitle{Mål}
+  \frametitle{Tid}
   \begin{itemize}
-	\item Let -Repræsentation
-	\item Brugbart
-	\item Praktisk anvendlig implemetering af tid i CSP.
+\item Tide er en fundamental egenskab ved universet.
+\item og derfor vil tid være relevant når der skal laves programmer, der skal interagere med  eller simulerer den virkelige vereden.
   \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Motiv}
+  \frametitle{PyCSP}
   \begin{itemize}
-	\item Praktisk anvendlig implemetering af tid i CSP.
-	\item Tidsmodeller.
+\item Skrevet i Python, der er let at anvende
+\item CSP  gør det let at repræsentere samtidighed og desuden kræver eksplicit udveksling af data frem for at benytte
+delte datastrukturer.
+\item Vi bruger kun greenlets versionen, da denne har en scheduler.
   \end{itemize}
 \end{frame}
+
+\subsection{Mål}
+\begin{frame}
+  \frametitle{Praktisk anvendlig implemetering af tid i CSP.}
+  \begin{itemize}
+	\item 
+	\item Let at anvende.
+	\item Brugbart.
+	\item mindre kode og mindre tid på håndteringen af tid. 
+	\item Løsningen skal skal stå for håndtering af tilstande tilknyttet tid, som ikke direkter er relateret til problemet.
+  \end{itemize}
+\end{frame}
+
 
 \section{PyCSP}
+\subsection{Kort overblik}
 \begin{frame}		
   \frametitle{Kort overblik}
   \begin{itemize}
+	\item Praktisk anvendlig implemetering af tid i CSP.
+	\item Tidsmodeller.
 	\item Greenlet er små bruger-tråde.
   \end{itemize}
 \end{frame}
 
+\subsection{Scheduler}
 \begin{frame}
-  \frametitle{Gennemgan af Scheduler}
+  \frametitle{Gennemgang af Scheduler}
   \begin{itemize}
 	\item Timers og dennes ændring til hob.
   \end{itemize}
 \end{frame}
 
 
+\section{Tidsmodeller}
+\begin{frame}
+	\frametitle{Tre avendelsesområder}
+	\begin{itemize}
+		\item Diskret event simulering (DES)
+		\item Realtids planlægning (RTP)
+		\item interaktiv planlægning (IP)
+	\end{itemize}
+\end{frame}
 
-\section{DES.}
+\begin{frame}
+	\frametitle{To tidsmodeller}
+	\begin{enumerate}
+		\item Diskret tid
+		\begin{itemize}
+			\item Drives af begivenheder
+			\item variable tidsskridt
+			\item Har et starttidspunkt
+ 		\end{itemize}
+		\item Real tid
+		\begin{itemize}
+			\item Drives af tiden selv
+			\item Faste tidsskridt.
+			\item Kan have et starttidspunkt
+			\item Kan have en deadline.
+		\end{itemize}
+	\end{enumerate}
+\end{frame}
+
+
+\subsection{Diskret}
 \begin{frame}
   \frametitle{Blandede noter}
   \begin{itemize}
-    \item Håndtering af tilstande, som ikke direkter er relateret til problemet.
+    
     \item Sætte begrænsning på kommunikation ifh. til tid.
     \item MOTIVATION!
   \end{itemize}
 \end{frame}
 
+\section{DES}
+\begin{frame}
+  \frametitle{Eksempel}
+  \begin{itemize}   
+    \item Eksempel (se nedenfor)
+	
+    \item MOTIVATION!
+  \end{itemize}
+\end{frame}
 
-\section{Noter fra tavlen}
+\begin{frame}
+  \frametitle{Scheduler}
+  \begin{itemize}   
+\item Design	
+    \item Now
+\item Wait
+\item Scheduler
+\item plotter
+\item køer. ikke muh.
+  \end{itemize}
+\end{frame}
+
+
+\section{RTP}
+\begin{frame}
+  \frametitle{Eksempel}
+  \begin{itemize}   
+    \item GRIS , GUI	
+    \item MOTIVATION!
+  \end{itemize}
+\end{frame}
+
+\section{RTP}
+\begin{frame}
+  \frametitle{Teknologi}
+  \begin{itemize}   
+    \item Sched	
+    \item process
+	\item kanaler -> ANYTOANY
+	\item Alternation
+	\item prioritetsnedarvning
+  \end{itemize}
+\end{frame}
+
+
+\section{Resultater}
+\subsection{DES - bank2 eksempel}
+\begin{frame}
+  \frametitle{Kode sammenligning}
+  \begin{itemize}
+    \item .
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Tabeller}
+  \begin{itemize}
+    \item .
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Figurer?}
+  \begin{itemize}
+    \item .
+  \end{itemize}
+\end{frame}
+
+\subsection{RTP}
+\begin{frame}
+  \frametitle{Tabeller fra gris}
+  \begin{itemize}
+    \item .
+  \end{itemize}
+\end{frame}
+
+
+\section*{Vi mangler at snakke om:}
+\begin{frame}
+  \frametitle{Blandede noter}
+  \begin{itemize}
+    \item Barrierer
+	\item shared memory
+  \end{itemize}
+\end{frame}
+
+
+
+\section*{Noter fra tavlen}
 \begin{frame}
   \frametitle{Blandede noter}
   \begin{itemize}
