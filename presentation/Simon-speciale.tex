@@ -7,26 +7,13 @@
 
 % http://www.lirmm.fr/~fiorio/AlgorithmSty/ (Place algorithm2e.sty in your working directory)
 
-\documentclass{beamer}
+\documentclass[12pt]{beamer} 
+\usepackage{times}
 \usepackage[]{algorithm2e}
-
-% A few keywords to use in pseudocode
-% You should also probably read the algorithm2e -documentation more than I did.
-
-%\SetKw{Send}{send}
-%\SetKw{To}{to}
+\SetKw{def}{def}
+%\SetKw{To}{to} 
 %\SetKw{Othera}{other}
 %\SetKw{Become}{become}
-
-\mode<presentation>
-{
-\usetheme{Copenhagen}% Beamer theme v 3.0
-%\usetheme{Berkeley}% Beamer theme v 3.0
-\usecolortheme{lily}
-   \setbeamercovered{transparent}
-   \definecolor{beamer@tkkblue}{HTML}{0041AD}
-   \setbeamercolor{structure}{fg=beamer@tkkblue}
-}
 
 \usepackage[T1]{fontenc} % bedre orddeling og ofte påkrævet at
 \usepackage[utf8]{inputenc} % eller utf8 eller ansinew eller ...
@@ -38,32 +25,41 @@
 \renewcommand\appendixname{Appendix}
 }
 \selectlanguage{danish}
+ 
+\usepackage[]{booktabs}
+\newcommand\mc[1]{\multicolumn{1}{c}{\textbf {#1}}} % sparer plads
 
+
+% A few keywords to use in pseudocode
+% You should also probably read the algorithm2e -documentation more than I did.
+
+\usetheme[nat,dk,style=simple]{Frederiksberg}% Beamer theme v 3.0
+%\mode<presentation>
+%{
+%\usetheme{Rochester}% Beamer theme v 3.0
+%\usecolortheme{whale}
+%   \setbeamercovered{transparent}
+%   \definecolor{beamer@tkkblue}{HTML}{0041AD}
+%   \setbeamercolor{structure}{fg=beamer@tkkblue}
+%} 
 \title
 {Timed PyCSP}
-\subtitle
-{Specialeforsvar}
+%\subtitle
+%{Specialeforsvar}
+\institute
+{Datalogisk Institut \\ Københavns Universitet}
 \author
 {Simon Bognolo}
 \date
-{05.07.2010}
+{7 juli 2010}
 
-\AtBeginSection[]
-{
-  \begin{frame}<beamer>
-    \frametitle{Outline}
-    \tableofcontents[currentsection]
-  \end{frame}
-}
 
 \begin{document}
 
-\begin{frame}
-  \titlepage
-\end{frame}
+\frame[plain]\titlepage
 
 \begin{frame}
-  \frametitle{Outline}
+  \frametitle{Oversigt}
   \tableofcontents
 \end{frame}
 
@@ -209,9 +205,15 @@ delte datastrukturer.
 \subsection{DES - bank2 eksempel}
 \begin{frame}
   \frametitle{Kode sammenligning}
-  \begin{itemize}
-    \item .
-  \end{itemize}
+% \begin{algorithm}[H] 
+%	\def Generator(i,number,meanTBA, meanWT, customerWRITER):\;
+%	for numberInserted in range(number):\;
+%    	customerWRITER(Customer(name = "Customer%d:%02d"%(i,numberInserted),\;
+%                             meanWT = meanWT))\;
+%    Wait(expovariate(1/meanTBA))\;
+%	retire(customerWRITER)\;
+%   \caption{Generatorprocessen for simulerings-versionen}
+%   \end{algorithm} 
 \end{frame}
 
 \begin{frame}
@@ -223,7 +225,7 @@ delte datastrukturer.
 
 \begin{frame}
   \frametitle{Figurer?}
-  \begin{itemize}
+  \begin{itemize} 
     \item .
   \end{itemize}
 \end{frame}
@@ -231,56 +233,107 @@ delte datastrukturer.
 \subsection{RTP}
 \begin{frame}
   \frametitle{Tabeller fra gris}
-  \begin{itemize}
-    \item .
-  \end{itemize}
+\tiny 
+\begin{table}[htbp]
+	\centering
+	\begin{tabular}{lccc}
+       	\toprule
+        \mc{Version}  &\mc{Samtidige grise} & \mc{Succesrate (\%)} & \mc{Standard Afvigelse (SA)} \\
+        \midrule
+        Processes        & 1 & 16 & 2 \\
+        Processes        & 2 &  0 & 0 \\
+        Processes        & 3 &  0 & 0 \\
+        Processes        & 5 &  0 & 0\\
+        \midrule
+        Threads          & 1 & 34 & 6 \\
+        Threads          & 2 &  1 & 1 \\
+        Threads          & 3 &  1 & 0 \\
+        Threads          & 5 &  1 & 1 \\
+        \midrule
+        Greenlets        & 1 & 44 & 7 \\
+        Greenlets        & 2 & 49 & 1 \\
+        Greenlets        & 3 & 32 & 0\\
+        Greenlets        & 5 & 20 & 0 \\
+        \midrule
+        RTP u. prioritet & 1 & 42 & 6 \\
+        RTP u. prioritet & 2 & 44 & 2 \\
+        RTP u. prioritet & 3 & 31 & 2 \\
+        RTP u. prioritet & 5 & 19 & 0 \\
+        \midrule
+        RTP m. prioritet & 1 & 44 & 10\\
+        RTP m. prioritet & 2 & 21 & 5\\
+        RTP m. prioritet & 3 & 21 & 7\\
+        RTP m. prioritet & 5 &  7 & 3\\
+ 
+        \bottomrule
+    \end{tabular}
+	\caption[]{\tiny 10 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }
+\end{table}
 \end{frame}
 
-
-\section*{Vi mangler at snakke om:}
 \begin{frame}
-  \frametitle{Blandede noter}
-  \begin{itemize}
-    \item Barrierer
-	\item shared memory
-  \end{itemize}
+  	\frametitle{Tabeller fra gris}
+	\tiny 
+	\begin{table}[htbp]
+		\centering
+		\begin{tabular}{lcccc}
+		   	\toprule
+		    \mc{Version}&\mc{Tid i dummyproces(s)}&\mc{SA.}& \mc{Succesrate (\%)}&\mc{SA.}\\
+		    \midrule
+		    Greenlets         & 1.29 & 0.61 & 13 & 2  \\
+		    RTP               & 1.05 & 0.28 & 24 & 6  \\
+		    RTP m. prioritet  & 0.74 & 0.34 & 42 & 13 \\
+		    \bottomrule
+		\end{tabular}
+		\caption[]{\tiny 10 * 100 grise køres igennem procesnetværket. Samtidigt køres en dummyproces.}
+	\end{table}
 \end{frame}
 
 
-
-\section*{Noter fra tavlen}
-\begin{frame}
-  \frametitle{Blandede noter}
-  \begin{itemize}
-    \item Håndtering af tilstande, som ikke direkter er relateret til problemet.
-    \item Sætte begrænsning på kommunikation ifh. til tid.
-    \item MOTIVATION!
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Anvendelse}
-  \begin{itemize}
-	\item MIG
-	\item GRISE
-	\item Fabrik
-	\item Trafik
-	\item vejr, hav forudsigelser mv,
-  \end{itemize}
-\end{frame}
+%\section*{Vi mangler at snakke om:}
+%\begin{frame}
+%  \frametitle{Blandede noter}
+%  \begin{itemize}
+%    \item Barrierer
+%	\item shared memory
+%  \end{itemize}
+%\end{frame}
 
 
-\begin{frame}
-  \frametitle{TID}
-  \begin{itemize}
-	\item Forventet mål 3-5 min
-	\item Tidsmodel
-	\item DES 10 min.
-	\item RTP 5 min.
-	\item Finale 5 min.
-  \end{itemize}
-\end{frame}
+
+%\section*{Noter fra tavlen}
+%\begin{frame}
+%  \frametitle{Blandede noter}
+%  \begin{itemize}
+%    \item Håndtering af tilstande, som ikke direkter er relateret til problemet.
+%    \item Sætte begrænsning på kommunikation ifh. til tid.
+%    \item MOTIVATION!
+%  \end{itemize}
+%\end{frame}
+
+%\begin{frame}
+%  \frametitle{Anvendelse}
+%  \begin{itemize}
+%	\item MIG
+%	\item GRISE
+%	\item Fabrik
+%	\item Trafik
+%	\item vejr, hav forudsigelser mv,
+%  \end{itemize}
+%\end{frame}
+
+
+%\begin{frame}
+%  \frametitle{TID}
+%  \begin{itemize}
+%	\item Forventet mål 3-5 min
+%	\item Tidsmodel
+%	\item DES 10 min.
+%	\item RTP 5 min.
+%	\item Finale 5 min.
+%  \end{itemize}
+%\end{frame}
 
 \end{document}
 
-
+ 
