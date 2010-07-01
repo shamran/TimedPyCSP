@@ -27,6 +27,45 @@
 \selectlanguage{danish}
  
 \usepackage[]{booktabs}
+\usepackage{listings}
+ \lstset{ 
+         basicstyle=\tiny\ttfamily, % Standardschrift
+         numbers=left,               % Ort der Zeilennummern
+         numberstyle=\tiny,          % Stil der Zeilennummern
+         stepnumber=2,               % Abstand zwischen den Zeilennummern
+         numbersep=5pt,              % Abstand der Nummern zum Text
+         tabsize=2,                  % Groesse von Tabs
+         extendedchars=true,         %
+         breaklines=false,            % Zeilen werden Umgebrochen
+         keywordstyle=\color{red},
+                frame=b,         
+         keywordstyle=[1]\textbf,    % Stil der Keywords
+         keywordstyle=[2]\textbf,    %
+         keywordstyle=[3]\textbf,    %
+         keywordstyle=[4]\textbf,   %\sqrt{\sqrt{}} %
+         stringstyle=\color{black}\ttfamily, % Farbe der String
+         showspaces=false,           % Leerzeichen anzeigen ?
+         showtabs=false,             % Tabs anzeigen ?
+         xleftmargin=17pt,
+         framexleftmargin=17pt,
+         framexrightmargin=5pt,
+         framexbottommargin=4pt,
+         %backgroundcolor=\color{lightgray},
+         showstringspaces=false      % Leerzeichen in Strings anzeigen ?        
+ }
+
+ \lstloadlanguages{% Check Dokumentation for further languages ...
+         [Visual]Basic,
+         Pascal,
+         C,
+         C++,
+         XML,
+         HTML,
+         PYTHON,
+ }
+\lstset{language=Python}
+\lstset{emph={@process, @choise,choice, Alternation, Skip,Timeout,Parallel,Sequence, Spawn,@io,ChannelPoisonException, ChannelRetireException},emphstyle=\underbar}
+
 \newcommand\mc[1]{\multicolumn{1}{c}{\textbf {#1}}} % sparer plads
 
 
@@ -154,7 +193,7 @@ måske
 
 \section{DES}
 \begin{frame}
-  \frametitle{Krav}
+  \frametitle{Eksempel}
 slagtersimulering, banksimulering, trafik, vejr, Mig
 \end{frame}
 
@@ -170,23 +209,64 @@ slagtersimulering, banksimulering, trafik, vejr, Mig
 \begin{frame}
 \frametitle{Implementering}
   \begin{itemize}   
-	\item Now
-	\item Wait
+	\item Now()
+	\item Wait()
 	\item Plotter
 	\item Udvide scheduler
 	\item Køer
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{Udvidelsen af scheduler}
+  Inkscape eller figur diagram over scheduler med timers -- New -- Next --timers/back eller slut
+\end{frame}
 
+% \begin{algorithm}[H]  
 
-%\begin{frame}
-%\frametitle{Udvidelsen af scheduler}
-%%  Inkscape eller figur med timers -- New -- Next --timers/back eller slut
-%  \end{itemize}
-%\end{frame}
- 
+\subsection{Resultater}
+\begin{frame}[fragile]
+  \frametitle{Greenlets-version}
+\begin{lstlisting}
+@process
+def Generator(i,number,meanTBA, meanWT,
+              customerWRITER,barrierWRITER,barrierREADER):
+  t_event = 0
+  time = 0
+  numberInserted = 0
+  while numberInserted<number:
+    if t_event<=time:
+      customerWRITER(Customer(name = "Customer%d:%02d"%
+                     (i,numberInserted),meanWT=meanWT))
+      t_event = time + round(expovariate(1/meanTBA))
+      numberInserted+=1
+    barrierWRITER(0)
+    barrierREADER()
+    time+=1
+  retire(customerWRITER)
+  try:
+    while True:
+      barrierWRITER(0)
+      barrierREADER()
+      time +=1
+  except ChannelPoisonException: 
+    return
+\end{lstlisting}
+\end{frame}
 
+\subsection{Resultater}
+\begin{frame}[fragile]
+  \frametitle{DES-version}
+\begin{lstlisting}
+@process
+def Generator(i,number,meanTBA, meanWT, customerWRITER):
+  for numberInserted in range(number):
+    customerWRITER(Customer(name = "Customer%d:%02d"%(i,numberInserted),
+                            meanWT = meanWT))
+    Wait(expovariate(1/meanTBA))
+  retire(customerWRITER)
+\end{lstlisting}
+\end{frame}
 
 \section{RTP}
 \begin{frame}
@@ -206,91 +286,94 @@ slagtersimulering, banksimulering, trafik, vejr, Mig
   \end{itemize}
 \end{frame}
 
-\section{RTP}
 \begin{frame}
-  \frametitle{Teknologi}
+  \frametitle{Implementering}
   \begin{itemize}   
-    \item Sched	
-    \item process
-	\item kanaler -> ANYTOANY
-	\item Alternation
-	\item prioritetsnedarvning
-  \end{itemize}
-\end{frame}
-
-
-\section{Resultater}
-\subsection{DES - bank2 eksempel}
-\begin{frame}
-  \frametitle{Kode sammenligning}
-% \begin{algorithm}[H] 
-%	\def Generator(i,number,meanTBA, meanWT, customerWRITER):\;
-%	for numberInserted in range(number):\;
-%    	customerWRITER(Customer(name = "Customer%d:%02d"%(i,numberInserted),\;
-%                             meanWT = meanWT))\;
-%    Wait(expovariate(1/meanTBA))\;
-%	retire(customerWRITER)\;
-%   \caption{Generatorprocessen for simulerings-versionen}
-%   \end{algorithm} 
-\end{frame}
-
-\begin{frame}
-  \frametitle{Tabeller}
-  \begin{itemize}
-    \item .
+    \item Deadline på processer (Set\_deadline())
+	\item Deadline exception
+    \item Scheduler 
+	\begin{itemize}
+		\item has$\_$deadline 
+		\item no$\_$deadline
+		\item timers
+	\end{itemize}
+	\item Prioritetsinvertering
+	\item Prioritetsnedarvning
   \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Figurer?}
-  \begin{itemize} 
-    \item .
+  \frametitle{Scheduler}
+\begin{itemize}
+	\item Design og gennemgang Scheduler via inkscape
   \end{itemize}
 \end{frame}
 
-\subsection{RTP}
 \begin{frame}
-  \frametitle{Tabeller fra gris}
-\tiny 
-\begin{table}[htbp]
-	\centering
-	\begin{tabular}{lccc}
-       	\toprule
-        \mc{Version}  &\mc{Samtidige grise} & \mc{Succesrate (\%)} & \mc{Standard Afvigelse (SA)} \\
-        \midrule
-        Processes        & 1 & 16 & 2 \\
-        Processes        & 2 &  0 & 0 \\
-        Processes        & 3 &  0 & 0 \\
-        Processes        & 5 &  0 & 0\\
-        \midrule
-        Threads          & 1 & 34 & 6 \\
-        Threads          & 2 &  1 & 1 \\
-        Threads          & 3 &  1 & 0 \\
-        Threads          & 5 &  1 & 1 \\
-        \midrule
-        Greenlets        & 1 & 44 & 7 \\
-        Greenlets        & 2 & 49 & 1 \\
-        Greenlets        & 3 & 32 & 0\\
-        Greenlets        & 5 & 20 & 0 \\
-        \midrule
-        RTP u. prioritet & 1 & 42 & 6 \\
-        RTP u. prioritet & 2 & 44 & 2 \\
-        RTP u. prioritet & 3 & 31 & 2 \\
-        RTP u. prioritet & 5 & 19 & 0 \\
-        \midrule
-        RTP m. prioritet & 1 & 44 & 10\\
-        RTP m. prioritet & 2 & 21 & 5\\
-        RTP m. prioritet & 3 & 21 & 7\\
-        RTP m. prioritet & 5 &  7 & 3\\
- 
-        \bottomrule
-    \end{tabular}
-	\caption[]{\tiny 10 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }
-\end{table}
+  \frametitle{Prioritetsnedarvning}
+\begin{itemize}
+	\item Proces kalder Write() 
+	\item Kanalen gennemløber liste af Readers
+	\item Såfremt ingen readers er klar foretages prioritetsnedarvning
+	\item Hver reader arver writerprocessens prioritet 
+	\item Såfremt nedarvning medfører en forbedret prioritet genscheduleres processen
+	\item Når en reader er klar gennemføres kommunikation
+	\item Readers sættes tilbage til deres forrige prioritet
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-  	\frametitle{Tabeller fra gris}
+\frametitle{Kommunikation}
+\begin{itemize}
+	\item Udfordring ved Any-to-Any Kanaler 
+ 	\item Alternation
+\end{itemize} 
+\end{frame} 
+
+\subsection{Resultater}
+
+%\begin{frame}
+%\frametitle{RTP resultater}
+%\tiny 
+%\begin{table}[htbp]
+%	\centering
+%	\begin{tabular}{lccc}
+%       	\toprule
+%        \mc{Version}  &\mc{Samtidige grise} & \mc{Succesrate (\%)} & \mc{Standard Afvigelse (SA)} \\
+%        \midrule
+%        Processes        & 1 & 16 & 2 \\
+%        Processes        & 2 &  0 & 0 \\
+%        Processes        & 3 &  0 & 0 \\
+%        Processes        & 5 &  0 & 0\\
+%        \midrule
+%        Threads          & 1 & 34 & 6 \\
+%        Threads          & 2 &  1 & 1 \\
+%        Threads          & 3 &  1 & 0 \\
+%        Threads          & 5 &  1 & 1 \\
+%        \midrule
+%        Greenlets        & 1 & 44 & 7 \\
+%        Greenlets        & 2 & 49 & 1 \\
+%        Greenlets        & 3 & 32 & 0\\
+%        Greenlets        & 5 & 20 & 0 \\
+%        \midrule
+%        RTP u. prioritet & 1 & 42 & 6 \\
+%        RTP u. prioritet & 2 & 44 & 2 \\
+%        RTP u. prioritet & 3 & 31 & 2 \\
+%        RTP u. prioritet & 5 & 19 & 0 \\
+%        \midrule
+%        RTP m. prioritet & 1 & 44 & 10\\
+%        RTP m. prioritet & 2 & 21 & 5\\
+%        RTP m. prioritet & 3 & 21 & 7\\
+%        RTP m. prioritet & 5 &  7 & 3\\
+% 
+%        \bottomrule
+%    \end{tabular}
+%	\caption[]{\tiny 10 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }
+%\end{table}
+%\end{frame}
+
+\begin{frame}
+  	\frametitle{RTP resultater}
 	\tiny 
 	\begin{table}[htbp]
 		\centering
@@ -299,7 +382,7 @@ slagtersimulering, banksimulering, trafik, vejr, Mig
 		    \mc{Version}&\mc{Tid i dummyproces(s)}&\mc{SA.}& \mc{Succesrate (\%)}&\mc{SA.}\\
 		    \midrule
 		    Greenlets         & 1.29 & 0.61 & 13 & 2  \\
-		    RTP               & 1.05 & 0.28 & 24 & 6  \\
+		    RTP u. prioritet  & 1.05 & 0.28 & 24 & 6  \\
 		    RTP m. prioritet  & 0.74 & 0.34 & 42 & 13 \\
 		    \bottomrule
 		\end{tabular}
@@ -307,7 +390,25 @@ slagtersimulering, banksimulering, trafik, vejr, Mig
 	\end{table}
 \end{frame}
 
-
+\section{Fremtidigt arbejde}
+\begin{frame}
+  	\frametitle{Fremtidigt arbejde}
+\begin{itemize}
+\item DES
+	\begin{itemize}
+	\item Dynamisk køskifte
+	\item Reservering af flere ressurcer
+	\item Stopkriterium
+	\item Parallelisering
+	\end{itemize}
+\item RTP
+	\begin{itemize}
+	\item Estimater for udførselstid
+	\item Samarbejde med operativsystemet
+	\item Forskellige typer deadlines
+	\end{itemize}
+\end{itemize}
+\end{frame}
 %\section*{Vi mangler at snakke om:}
 %\begin{frame}
 %  \frametitle{Blandede noter}
@@ -320,7 +421,6 @@ slagtersimulering, banksimulering, trafik, vejr, Mig
 %\begin{frame}
 %  \frametitle{Blandede noter}
 %  \begin{itemize}
-%    
 %    \item Sætte begrænsning på kommunikation ifh. til tid.
 %    \item MOTIVATION!
 %  \end{itemize}
