@@ -10,7 +10,7 @@
 \documentclass[12pt]{beamer} 
 \usepackage{times}
 \usepackage[]{algorithm2e}
-\SetKw{def}{def}
+%\SetKw{def}{def}
 %\SetKw{To}{to} 
 %\SetKw{Othera}{other}
 %\SetKw{Become}{become}
@@ -68,51 +68,58 @@
 \begin{frame}
   \frametitle{Tid}
   \begin{itemize}
-\item Tid er en fundamental egenskab ved universet.
-\item og derfor vil tid være relevant når der skal laves programmer, der skal interagere med, eller simulere den virkelige verden.
+	\item Fundamental egenskab
+	\item Relevant ved interaktion med, eller simulering af virkeligheden
+	\item - Eksempelvis vejrsystemer, trafik, kontrolsystemer 
   \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{PyCSP}
   \begin{itemize}
-\item Skrevet i Python, der er let at anvende
-\item CSP  gør det let at repræsentere samtidighed og desuden kræver eksplicit udveksling af data frem for at benytte
-delte datastrukturer.
-\item Vi bruger kun greenlets versionen, da denne har en scheduler.
-  \end{itemize}
+	\item  Nem representaion af samtidighed
+	\item Eksplicit udveksling af data
+	\item Ingen delte datastrukturer
+	\item PyCSP er skrevet i Python
+ \end{itemize}
 \end{frame}
 
 \subsection{Mål}
 \begin{frame}
   \frametitle{Praktisk anvendelig implementering af tid i CSP}
   \begin{itemize}
-	\item 
+	\item Tilbyde en ensartet håndtering af tid i PyCSP
 	\item Let at anvende
-	\item Brugbart
-	\item mindre kode og mindre tid på håndteringen af tid
-	\item Løsningen skal skal stå for håndtering af tilstande tilknyttet tid, som ikke direkter er relateret til problemet
+	\item Brugbar
+	\item håndtere tilstande tilknyttet tid, som ikke direkte er relateret til problemet
   \end{itemize}
 \end{frame}
 
-
 \section{PyCSP}
-\subsection{Kort overblik}
+%\subsection{Kort overblik}
 \begin{frame}		
   \frametitle{Kort overblik}
   \begin{itemize}
-	\item Praktisk anvendelig implemetering af tid i CSP.
-	\item Tidsmodeller.
-	\item Greenlet er små bruger-tråde.
+	\item Greenlets-versionen pga. scheduler
+	\item Greenlets er små bruger-tråde
+	\item hurtige processkift, samt oprettelse og nedlæggelse af dem
+	\item Kun Any-to-Any kanaler
   \end{itemize}
 \end{frame}
 
 \subsection{Scheduler}
 \begin{frame}
-  \frametitle{Gennemgang af Scheduler}
+  \frametitle{Gennemgang af scheduler}
   \begin{itemize}
-	\item Timers og dennes ændring til hob.
+	\item er også en brugertråd
+	\item ingen tvungen kontekstskift
+	\item Timeouts og timers listen.
   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Kodeuddrag af scheduler}
+måske
 \end{frame}
 
 
@@ -128,7 +135,7 @@ delte datastrukturer.
 
 \begin{frame}
 	\frametitle{To tidsmodeller}
-	\begin{enumerate}
+	\begin{itemize}
 		\item Diskret tid
 		\begin{itemize}
 			\item Drives af begivenheder
@@ -142,41 +149,43 @@ delte datastrukturer.
 			\item Kan have et starttidspunkt
 			\item Kan have en deadline.
 		\end{itemize}
-	\end{enumerate}
-\end{frame}
-
-
-\subsection{Diskret}
-\begin{frame}
-  \frametitle{Blandede noter}
-  \begin{itemize}
-    
-    \item Sætte begrænsning på kommunikation ifh. til tid.
-    \item MOTIVATION!
-  \end{itemize}
+	\end{itemize}
 \end{frame}
 
 \section{DES}
 \begin{frame}
-  \frametitle{Eksempel}
+  \frametitle{Krav}
+slagtersimulering, banksimulering, trafik, vejr, Mig
+\end{frame}
+
+\begin{frame}
+  \frametitle{Krav}
   \begin{itemize}   
-    \item Eksempel (se nedenfor)
-	
-    \item MOTIVATION!
+	\item Repræsentation af tid
+	\item Liste af begivenheder
+	\item Opsamling af statistisk data
   \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Scheduler}
+\frametitle{Implementering}
   \begin{itemize}   
-\item Design	
-    \item Now
-\item Wait
-\item Scheduler
-\item plotter
-\item køer. ikke muh.
+	\item Now
+	\item Wait
+	\item Plotter
+	\item Udvide scheduler
+	\item Køer
   \end{itemize}
 \end{frame}
+
+
+
+%\begin{frame}
+%\frametitle{Udvidelsen af scheduler}
+%%  Inkscape eller figur med timers -- New -- Next --timers/back eller slut
+%  \end{itemize}
+%\end{frame}
+ 
 
 
 \section{RTP}
@@ -185,6 +194,15 @@ delte datastrukturer.
   \begin{itemize}   
     \item GRIS , GUI	
     \item MOTIVATION!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Krav}
+  \begin{itemize}   
+	\item Processer skal have en  deadline
+	\item Scheduleringsalgoritme, EDF
+	\item DeadlineException
   \end{itemize}
 \end{frame}
 
@@ -299,6 +317,14 @@ delte datastrukturer.
 %  \end{itemize}
 %\end{frame}
 
+%\begin{frame}
+%  \frametitle{Blandede noter}
+%  \begin{itemize}
+%    
+%    \item Sætte begrænsning på kommunikation ifh. til tid.
+%    \item MOTIVATION!
+%  \end{itemize}
+%\end{frame}
 
 
 %\section*{Noter fra tavlen}
