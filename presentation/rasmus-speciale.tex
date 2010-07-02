@@ -88,9 +88,9 @@
 \institute
 {Datalogisk Institut \\ Københavns Universitet}
 \author
-{Rasmus Sørensen}
+{Rasmus Ebdrup Sørensen}
 \date
-{5 juli 2010}
+{5. juli 2010}
 
 
 \begin{document}
@@ -102,8 +102,8 @@
   \tableofcontents
 \end{frame}
 
-\section{Indledning}
-\subsection{Motivation}
+\section{Motivation og mål}
+%\subsection{Motivation}
 \begin{frame}
   \frametitle{Tid}
   \begin{itemize}
@@ -114,20 +114,19 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{PyCSP}
+  \frametitle{CSP}
   \begin{itemize}
-	\item  Nem representaion af samtidighed
+	\item Nem representation af samtidighed
 	\item Eksplicit udveksling af data
 	\item Ingen delte datastrukturer
-	\item PyCSP er skrevet i Python
  \end{itemize}
 \end{frame}
 
-\subsection{Mål}
+%\subsection{Mål}
 \begin{frame}
-  \frametitle{Praktisk anvendelig implementering af tid i CSP}
+  \frametitle{Introduktion af tid i CSP}
   \begin{itemize}
-	\item Tilbyde en ensartet håndtering af tid i PyCSP
+	\item Tilbyde en ensartet håndtering af tid i CSP
 	\item Let at anvende
 	\item Brugbar
 	\item håndtere tilstande tilknyttet tid, som ikke direkte er relateret til problemet
@@ -137,8 +136,9 @@
 \section{PyCSP}
 %\subsection{Kort overblik}
 \begin{frame}		
-  \frametitle{Kort overblik}
+  \frametitle{PyCSP}
   \begin{itemize}
+  \item Skrevet i Python
 	\item Greenlets-versionen pga. scheduler
 	\item Greenlets er små bruger-tråde
 	\item hurtige processkift, samt oprettelse og nedlæggelse af dem
@@ -176,17 +176,22 @@
 \end{frame}
 
 \section{DES}
+
 \begin{frame}
-  \frametitle{Eksempel}
+  \frametitle{DES Eksempel}
 Banksimulering
 \end{frame}
 
 \begin{frame}
-  \frametitle{Krav}
+  \frametitle{Krav til DES}
   \begin{itemize}   
 	\item Repræsentation af tid
 	\item Liste af begivenheder
 	\item Opsamling af statistisk data
+  \end{itemize}
+  \begin {itemize}
+  \item Kan håndteres uden Timed PyCSP \\
+   - Vi gør det bare bedre
   \end{itemize}
 \end{frame}
 
@@ -197,11 +202,10 @@ Banksimulering
 	\item Wait()
 	\item Plotter
 	\item Udvide scheduler
-	\item Køer
   \end{itemize}
 \end{frame}
 
-\subsection{Resultater}
+%\subsection{Resultater}
 \begin{frame}[fragile]
   \frametitle{Greenlets-version}
 \begin{lstlisting}
@@ -245,8 +249,9 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
 \end{frame}
 
 \section{RTP}
+
 \begin{frame}
-  \frametitle{Eksempel}
+  \frametitle{RTP Eksempel}
   \begin{itemize}   
     \item GRIS
   \end{itemize}
@@ -254,7 +259,7 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
 
 %Typer af deadline og Hard real time
 \begin{frame}
-  \frametitle{Krav}
+  \frametitle{Krav til RTP}
   \begin{itemize}   
 	\item Processer skal have en  deadline
 	\item Scheduleringsalgoritme, EDF
@@ -262,17 +267,16 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
   \end{itemize}
 \end{frame}
 
-
 %Wait i RTP
 \begin{frame}
   \frametitle{Implementering}
   \begin{itemize}   
     \item Deadline på processer (Set\_deadline())
-	\item Deadline exception
+	  \item Deadline exception
     \item Scheduler 
 	\begin{itemize}
-		\item has$\_$deadline 
-		\item no$\_$deadline
+		\item has$\_$priority 
+		\item no$\_$priority
 		\item timers
 	\end{itemize}
 	\item Prioritetsinvertering
@@ -281,55 +285,16 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
 \end{frame}
 
 
-\begin{frame}
-\frametitle{Kommunikation}
-\begin{itemize}
-	\item Udfordring ved Any-to-Any Kanaler 
- 	\item Alternation
-\end{itemize} 
-\end{frame} 
-
-\subsection{Resultater}
-
 %\begin{frame}
-%\frametitle{RTP resultater}
-%\tiny 
-%\begin{table}[htbp]
-%	\centering
-%	\begin{tabular}{lccc}
-%       	\toprule
-%        \mc{Version}  &\mc{Samtidige grise} & \mc{Succesrate (\%)} & \mc{Standard Afvigelse (SA)} \\
-%        \midrule
-%        Processes        & 1 & 16 & 2 \\
-%        Processes        & 2 &  0 & 0 \\
-%        Processes        & 3 &  0 & 0 \\
-%        Processes        & 5 &  0 & 0\\
-%        \midrule
-%        Threads          & 1 & 34 & 6 \\
-%        Threads          & 2 &  1 & 1 \\
-%        Threads          & 3 &  1 & 0 \\
-%        Threads          & 5 &  1 & 1 \\
-%        \midrule
-%        Greenlets        & 1 & 44 & 7 \\
-%        Greenlets        & 2 & 49 & 1 \\
-%        Greenlets        & 3 & 32 & 0\\
-%        Greenlets        & 5 & 20 & 0 \\
-%        \midrule
-%        RTP u. prioritet & 1 & 42 & 6 \\
-%        RTP u. prioritet & 2 & 44 & 2 \\
-%        RTP u. prioritet & 3 & 31 & 2 \\
-%        RTP u. prioritet & 5 & 19 & 0 \\
-%        \midrule
-%        RTP m. prioritet & 1 & 44 & 10\\
-%        RTP m. prioritet & 2 & 21 & 5\\
-%        RTP m. prioritet & 3 & 21 & 7\\
-%        RTP m. prioritet & 5 &  7 & 3\\
-% 
-%        \bottomrule
-%    \end{tabular}
-%	\caption[]{\tiny 10 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }
-%\end{table}
-%\end{frame}
+%\frametitle{Kommunikation}
+%\begin{itemize}
+%	\item Udfordring ved Any-to-Any Kanaler 
+% 	\item Alternation
+%\end{itemize} 
+%\end{frame} 
+
+%\subsection{Resultater}
+
 
 \begin{frame}
   	\frametitle{RTP resultater}
@@ -347,6 +312,46 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
 		\end{tabular}
 		\caption[]{\tiny 10 * 100 grise køres igennem procesnetværket. Samtidigt køres en dummyproces.}
 	\end{table}
+\end{frame}
+
+\begin{frame}
+\frametitle{RTP resultater}
+\tiny 
+\begin{table}[htbp]
+	\centering
+	\begin{tabular}{lccc}
+       	\toprule
+        \mc{Version}  &\mc{Samtidige grise} & \mc{Succesrate (\%)} & \mc{Standard Afvigelse (SA)} \\
+%       \midrule
+%      Processes        & 1 & 16 & 2 \\
+%       Processes        & 2 &  0 & 0 \\
+%       Processes        & 3 &  0 & 0 \\
+%       Processes        & 5 &  0 & 0\\
+%       \midrule
+%       Threads          & 1 & 34 & 6 \\
+%       Threads          & 2 &  1 & 1 \\
+%       Threads          & 3 &  1 & 0 \\
+%       Threads          & 5 &  1 & 1 \\
+        \midrule
+        Greenlets        & 1 & 44 & 7 \\
+        Greenlets        & 2 & 49 & 1 \\
+        Greenlets        & 3 & 32 & 0\\
+        Greenlets        & 5 & 20 & 0 \\
+        \midrule
+        RTP u. prioritet & 1 & 42 & 6 \\
+        RTP u. prioritet & 2 & 44 & 2 \\
+        RTP u. prioritet & 3 & 31 & 2 \\
+        RTP u. prioritet & 5 & 19 & 0 \\
+        \midrule
+        RTP m. prioritet & 1 & 44 & 10\\
+        RTP m. prioritet & 2 & 21 & 5\\
+        RTP m. prioritet & 3 & 21 & 7\\
+        RTP m. prioritet & 5 &  7 & 3\\
+ 
+        \bottomrule
+    \end{tabular}
+	\caption[]{\tiny 10 kørsler hvor 100 grise bliver sendt igennem procesnetværket. }
+\end{table}
 \end{frame}
 
 \section{Fremtidigt arbejde}
