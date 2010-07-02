@@ -129,7 +129,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -139,7 +139,7 @@
      id="layer1"
      transform="translate(-85.576989,-46.527442)">
     <rect
-       style="fill:#63b0dd;fill-opacity:0.57647059;stroke:#000000;stroke-width:0.41748258;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:#3e6628;fill-opacity:0.51372552;stroke:#000000;stroke-width:0.41748257999999999;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect2816"
        width="118.91116"
        height="49.966637"
@@ -163,7 +163,7 @@
          style="font-size:14px;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle"
          id="tspan2914">overskredet</tspan></text>
     <rect
-       style="fill:#63b0dd;fill-opacity:0.57647059;stroke:#000000;stroke-width:0.41660261;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:#3e6628;fill-opacity:0.51372552;stroke:#000000;stroke-width:0.41660260999999998;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect2816-5"
        width="118.91116"
        height="49.756222"
@@ -186,7 +186,7 @@
          style="font-size:14px"
          id="tspan3209">no_priority</tspan></text>
     <rect
-       style="fill:#63b0dd;fill-opacity:0.57647059;stroke:#000000;stroke-width:0.41274816;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:#3e6628;fill-opacity:0.51372552;stroke:#000000;stroke-width:0.41274815999999998;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect2816-5-0"
        width="118.91116"
        height="48.839779"
@@ -237,7 +237,7 @@
          y="252.36218"
          style="font-size:14px">Nej</tspan></text>
     <rect
-       style="fill:#63b0dd;fill-opacity:0.57647059;stroke:#000000;stroke-width:0.41274816;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:#3e6628;fill-opacity:0.51372552;stroke:#000000;stroke-width:0.41274815999999998;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect2816-5-0-5"
        width="118.91116"
        height="48.839779"
@@ -276,7 +276,7 @@
        id="path2950"
        sodipodi:nodetypes="ccc" />
     <rect
-       style="fill:#63b0dd;fill-opacity:0.57647059;stroke:#000000;stroke-width:0.41274816;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:#3e6628;fill-opacity:0.51372552;stroke:#000000;stroke-width:0.41274815999999998;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect2816-5-0-9"
        width="118.91116"
        height="48.839779"
@@ -309,7 +309,7 @@
          x="365.56573"
          y="292.24402">Nej</tspan></text>
     <rect
-       style="fill:#63b0dd;fill-opacity:0.57647059;stroke:#000000;stroke-width:0.41274816;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:#3e6628;fill-opacity:0.51372552;stroke:#000000;stroke-width:0.41274815999999998;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect2816-5-0-5-3"
        width="118.91116"
        height="48.839779"
@@ -352,7 +352,7 @@
          x="371.75656"
          y="89.075127">Ja</tspan></text>
     <rect
-       style="fill:#63b0dd;fill-opacity:0.57647059;stroke:#000000;stroke-width:0.41274816;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:#3e6628;fill-opacity:0.51207727;stroke:#000000;stroke-width:0.41274815999999998;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;opacity:1"
        id="rect2816-5-0-5-3-0"
        width="118.91116"
        height="48.839779"
