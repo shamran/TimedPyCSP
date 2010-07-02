@@ -179,7 +179,13 @@
 
 \begin{frame}
   \frametitle{DES Eksempel}
-Banksimulering
+\begin{figure}
+ \begin{center}
+  \includegraphics[scale=0.75]{bank_example}
+	\caption{Kunder i en bank}
+	\label{fig:hard-rtp}
+\end{center}
+\end{figure}
 \end{frame}
 
 \begin{frame}
@@ -252,9 +258,14 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
 
 \begin{frame}
   \frametitle{RTP Eksempel}
-  \begin{itemize}   
-    \item GRIS
-  \end{itemize}
+  \begin{figure}
+ \begin{center}
+  \includegraphics[scale=0.75]{pig-network}
+	\caption{Udskæring af grise på et slagteri}
+	\label{fig:hard-rtp}
+\end{center}
+\end{figure}
+
 \end{frame}
 
 %Typer af deadline og Hard real time
@@ -271,14 +282,17 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
 \begin{frame}
   \frametitle{Implementering}
   \begin{itemize}   
-    \item Deadline på processer (Set\_deadline())
-	  \item Deadline exception
+    \item Set\_deadline() og Remove\_deadline()
+    \item Set\_priority() og Remove\_priority()
+    %\item Deadline exception
+    \item Now()
+    \item Wait()
     \item Scheduler 
-	\begin{itemize}
-		\item has$\_$priority 
-		\item no$\_$priority
-		\item timers
-	\end{itemize}
+	%\begin{itemize}
+	%	\item has$\_$priority 
+	%	\item no$\_$priority
+	%	\item timers
+	%\end{itemize}
 	\item Prioritetsinvertering
 	\item Prioritetsnedarvning
   \end{itemize}
