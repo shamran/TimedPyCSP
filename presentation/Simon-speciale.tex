@@ -101,16 +101,16 @@
 	\item Tilbyde en ensartet håndtering af tid i PyCSP
 	\item Let at anvende
 	%\item Brugbar
-	\item håndtere tilstande tilknyttet tid, som ikke direkte er relateret til problemet
+	\item Håndtere tilstande tilknyttet tid, som ikke direkte er relateret til problemet
   \end{itemize}
 \end{frame}
 
-\begin{frame}
+\begin{frame} 
   \frametitle{Scheduler i PyCSP}
   \begin{itemize}
-	\item er også en brugertråd
-	\item ingen tvungen kontekstskift
-	\item Timeouts og timers listen.
+	\item Er en brugertråd
+	\item Ingen tvungen kontekstskift
+	\item Tid introduceret via Timeouts
   \end{itemize}
 \end{frame}
 
@@ -121,8 +121,16 @@
 
 \section{DES}
 \begin{frame}
-  \frametitle{DES}
-Eksempel : MIG 
+  \frametitle{DES -  Simulation af Minimum Intrusion Grid
+}
+  \includegraphics[scale=0.3]{mig}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Simulation af Minimum Intrusion Grid
+}
+  \includegraphics[scale=0.4]{tidsmodel-1}
+  \includegraphics[scale=0.4]{queue}
 \end{frame}
 
 
@@ -140,66 +148,78 @@ Eksempel : MIG
 \end{frame}
 
 % \subsection{Resultater}
-\begin{frame}[fragile]
-  \frametitle{Greenlets-version}
-\begin{lstlisting}
-@process
-def Generator(i,number,meanTBA, meanWT,
-              customerWRITER,barrierWRITER,barrierREADER):
-  t_event = 0
-  time = 0
-  numberInserted = 0
-  while numberInserted<number:
-    if t_event<=time:
-      customerWRITER(Customer(name = "Customer%d:%02d"%
-                     (i,numberInserted),meanWT=meanWT))
-      t_event = time + round(expovariate(1/meanTBA))
-      numberInserted+=1
-    barrierWRITER(0)
-    barrierREADER()
-    time+=1
-  retire(customerWRITER)
-  try:
-    while True:
-      barrierWRITER(0)
-      barrierREADER()
-      time +=1
-  except ChannelPoisonException: 
-    return
-\end{lstlisting}
-\end{frame}
+%\begin{frame}[fragile]
+%  \frametitle{Greenlets-version}
+%\begin{lstlisting}
+%@process
+%def Generator(i,number,meanTBA, meanWT,
+%              customerWRITER,barrierWRITER,barrierREADER):
+%  t_event = 0
+%  time = 0
+%  numberInserted = 0
+%  while numberInserted<number:
+%    if t_event<=time:
+%      customerWRITER(Customer(name = "Customer%d:%02d"%
+%                     (i,numberInserted),meanWT=meanWT))
+%      t_event = time + round(expovariate(1/meanTBA))
+%      numberInserted+=1
+%    barrierWRITER(0)
+%    barrierREADER()
+%    time+=1
+%  retire(customerWRITER)
+%  try:
+%    while True:
+%      barrierWRITER(0)
+%      barrierREADER()
+%      time +=1
+%  except ChannelPoisonException: 
+%    return
+%\end{lstlisting}
+%\end{frame}
 
-\begin{frame}[fragile]
-  \frametitle{DES-version}
-\begin{lstlisting}
-@process
-def Generator(i,number,meanTBA, meanWT, customerWRITER):
-  for numberInserted in range(number):
-    customerWRITER(Customer(name = "Customer%d:%02d"%(i,numberInserted),
-                            meanWT = meanWT))
-    Wait(expovariate(1/meanTBA))
-  retire(customerWRITER)
-\end{lstlisting}
-\end{frame}
+%\begin{frame}[fragile]
+%  \frametitle{DES-version}
+%\begin{lstlisting}
+%@process
+%def Generator(i,number,meanTBA, meanWT, customerWRITER):
+%  for numberInserted in range(number):
+%    customerWRITER(Customer(name = "Customer%d:%02d"%(i,numberInserted),
+%                            meanWT = meanWT))
+%    Wait(expovariate(1/meanTBA))
+%  retire(customerWRITER)
+%\end{lstlisting}
+%\end{frame}
 
 \section{RTP}
 \begin{frame}
   \frametitle{RTP eksempel}
   \begin{itemize}   
-    \item GRIS
+    \item Slagterieksempel
   \end{itemize}
 \end{frame}
+
+
+\begin{frame}
+  \frametitle{Udviddelser}
+  \begin{itemize}
+	\item Udvidelser af processer   
+	  \begin{itemize}   
+		\item Deadline
+		\item Prioritet	
+	  \end{itemize}
+	\item Udviddelser af kanaler
+	  \begin{itemize}   
+		\item tilknytninger reader og writer processer
+		\item bedste prioritet
+	  \end{itemize}
+\end{itemize}
+\end{frame}
+
 
 \begin{frame}
   \frametitle{RTP scheduler}
 \includegraphics[scale=0.9]{rtp-scheduler} 
 \end{frame}
-
-
-
-%	\item Deadline exception
-%prioriteter
-
 
 
 \begin{frame}
