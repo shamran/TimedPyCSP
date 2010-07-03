@@ -94,24 +94,28 @@
   \tableofcontents
 \end{frame}
 
-\section{Mål}
+\section{Formål}
 \begin{frame}
-  \frametitle{Praktisk anvendelig implementering af tid i PyCSP}
+  \frametitle{Formålet med dette speciale er:}
   \begin{itemize}
-	\item Tilbyde en ensartet håndtering af tid i PyCSP
+	\item Praktisk anvendelig implementering af tid i PyCSP
+	\item Ensartet håndtering af tid i PyCSP
 	\item Let at anvende
-	%\item Brugbar
-	\item Håndtere tilstande tilknyttet tid, som ikke direkte er relateret til problemet
   \end{itemize}
 \end{frame}
 
-\begin{frame} 
-  \frametitle{Scheduler i PyCSP}
+ 
+\section{PyCSP}
+\begin{frame} [fragile]
+  \frametitle{Scheduleren i PyCSP}
   \begin{itemize}
 	\item Er en brugertråd
-	\item Ingen tvungen kontekstskift
-	\item Tid introduceret via Timeouts
+	\item Har ingen tvungen kontekstskift
+	\item Er tid introduceret via Timeouts
   \end{itemize}
+\begin{lstlisting}
+Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
+\end{lstlisting}
 \end{frame}
 
 \begin{frame}
@@ -119,9 +123,10 @@
   \includegraphics[scale=0.9]{pycsp-scheduler} 
 \end{frame}
 
-\section{DES}
+\section{Simulering i diskret tid (DES)}
 \begin{frame}
-  \frametitle{DES -  Simulation af Minimum Intrusion Grid
+  \frametitle{Simulering i diskret tid\\
+-  Simulation af Minimum Intrusion Grid
 }
   \includegraphics[scale=0.3]{mig}  
 \end{frame}
@@ -190,58 +195,63 @@
 %\end{lstlisting}
 %\end{frame}
 
-\section{RTP}
-\begin{frame}
-  \frametitle{RTP eksempel}
-  \begin{itemize}   
-    \item Slagterieksempel
-  \end{itemize}
-\end{frame}
-
+\section{Real-time planlægning (RTP)}
 
 \begin{frame}
-  \frametitle{Udviddelser}
+  \frametitle{Real-time planlægning (RTP)}
   \begin{itemize}
-	\item Udvidelser af processer   
+	\item Udvidelse af processer:
 	  \begin{itemize}   
 		\item Deadline
 		\item Prioritet	
 	  \end{itemize}
-	\item Udviddelser af kanaler
+	\item Udvidelse af kanaler:
 	  \begin{itemize}   
-		\item Tilknytninger reader og writer processer
-		\item Bedste prioritet
+		\item Tilknytninger reader og writer processer til kanaler
+		\item Udvælger processer til kommunikation
 	  \end{itemize}
 \end{itemize}
 \end{frame}
 
 
 \begin{frame}
-  \frametitle{RTP scheduler}
-\includegraphics[scale=0.9]{rtp-scheduler} 
-\end{frame}
+	\frametitle{RTP har indvirkning på kommunikation ved:}
+	\begin{itemize}
+		\item Any-to-Any Kanaler 
+	 	\item Alternation
+	\end{itemize} 
+\begin{center}
+	\includegraphics[scale=0.7]{alt-inheritance.pdf} 
+\end{center}
+\end{frame} 
 
+
+\begin{frame}
+  \frametitle{RTP scheduler}
+\includegraphics[scale=0.9]{rtp-scheduler}
+\end{frame}
 
 \begin{frame}
   \frametitle{Prioritetsnedarvning}
-\begin{itemize}
-	\item Proces kalder Write() 
-	\item Kanalen gennemløber liste af Readers
-	\item Såfremt ingen readers er klar foretages prioritetsnedarvning
-	\item Hver reader arver writerprocessens prioritet 
-	\item Såfremt nedarvning medfører en forbedret prioritet genscheduleres processen
-	\item Når en reader er klar gennemføres kommunikation
-	\item Readers sættes tilbage til deres forrige prioritet
-  \end{itemize}
+\includegraphics[scale=0.7]{nedarvning} 
+\end{frame}
+\begin{frame}
+  \frametitle{Prioritetsnedarvning}
+\includegraphics[scale=0.7]{nedarvning2} 
+\end{frame}
+\begin{frame}
+  \frametitle{Prioritetsnedarvning}
+\includegraphics[scale=0.7]{nedarvning3} 
+\end{frame}
+\begin{frame}
+  \frametitle{Prioritetsnedarvning}
+\includegraphics[scale=0.7]{nedarvning4} 
+\end{frame}
+\begin{frame}
+  \frametitle{Prioritetsnedarvning}
+\includegraphics[scale=0.7]{nedarvning5} 
 \end{frame}
 
-\begin{frame}
-	\frametitle{Kommunikation}
-	\begin{itemize}
-		\item Udfordring ved Any-to-Any Kanaler 
-	 	\item Alternation
-	\end{itemize} 
-\end{frame} 
 
 %\subsection{Resultater}
 \begin{frame}
@@ -268,16 +278,16 @@
 \begin{itemize}
 \item DES
 	\begin{itemize}
-	\item Dynamisk køskifte
-	\item Reservering af flere ressurcer
+	%\item Dynamisk køskifte
+	%\item Reservering af flere ressurcer
 	\item Stopkriterium
 	\item Parallelisering
 	\end{itemize}
 \item RTP
 	\begin{itemize}
-	\item Estimater for udførselstid
+	%\item Estimater for udførselstid
 	\item Samarbejde med operativsystemet
-	\item Forskellige typer deadlines
+	%\item Forskellige typer deadlines
 	\end{itemize}
 \end{itemize}
 \end{frame}
