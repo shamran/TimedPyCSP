@@ -116,9 +116,11 @@
 \begin{frame}
   \frametitle{CSP}
   \begin{itemize}
-	\item Nem representation af samtidighed
+	\item Processer
+  \item Kanaler
 	\item Eksplicit udveksling af data
 	\item Ingen delte datastrukturer
+  \item Nem representation af samtidighed
  \end{itemize}
 \end{frame}
 
@@ -272,9 +274,11 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
 \begin{frame}
   \frametitle{Krav til RTP}
   \begin{itemize}   
-	\item Processer skal have en  deadline
+	\item Information om begivenhederne\\
+  - Deadline \\
+  - Udførselstid\\
+  - Prioritet
 	\item Scheduleringsalgoritme, EDF
-	\item DeadlineException
   \end{itemize}
 \end{frame}
 
@@ -287,6 +291,21 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
     %\item Deadline exception
     \item Now()
     \item Wait()
+	  \item DeadlineException
+  %  \item Scheduler 
+	%\begin{itemize}
+	%	\item has$\_$priority 
+	%	\item no$\_$priority
+	%	\item timers
+	%\end{itemize}
+	%\item Prioritetsinvertering
+	%\item Prioritetsnedarvning
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Implementering}
+  \begin{itemize}   
     \item Scheduler 
 	%\begin{itemize}
 	%	\item has$\_$priority 
@@ -297,7 +316,6 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
 	\item Prioritetsnedarvning
   \end{itemize}
 \end{frame}
-
 
 %\begin{frame}
 %\frametitle{Kommunikation}
@@ -376,13 +394,10 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
 	\begin{itemize}
 	\item Dynamisk køskifte
 	\item Reservering af flere ressurcer
-	\item Stopkriterium
-	\item Parallelisering
 	\end{itemize}
 \item RTP
 	\begin{itemize}
 	\item Estimater for udførselstid
-	\item Samarbejde med operativsystemet
 	\item Forskellige typer deadlines
 	\end{itemize}
 \end{itemize}
