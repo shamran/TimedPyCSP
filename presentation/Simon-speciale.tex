@@ -21,7 +21,7 @@
 \usepackage[]{booktabs}
 \usepackage{listings}
  \lstset{ 
-         basicstyle=\tiny\ttfamily, % Standardschrift
+         basicstyle=\scriptsize\ttfamily, % Standardschrift
          numbers=left,               % Ort der Zeilennummern
          numberstyle=\tiny,          % Stil der Zeilennummern
          stepnumber=2,               % Abstand zwischen den Zeilennummern
@@ -65,18 +65,8 @@
 % You should also probably read the algorithm2e -documentation more than I did.
 
 \usetheme[nat,dk,style=simple]{Frederiksberg}% Beamer theme v 3.0
-%\mode<presentation>
-%{
-%\usetheme{Rochester}% Beamer theme v 3.0
-%\usecolortheme{whale}
-%   \setbeamercovered{transparent}
-%   \definecolor{beamer@tkkblue}{HTML}{0041AD}
-%   \setbeamercolor{structure}{fg=beamer@tkkblue}
-%} 
 \title
 {Timed PyCSP}
-%\subtitle
-%{Specialeforsvar}
 \institute
 {Datalogisk Institut \\ Københavns Universitet}
 \author
@@ -114,7 +104,10 @@
 	\item Har introduceret tid via Timeouts
   \end{itemize}
 \begin{lstlisting}
-Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
+Alternation([
+    {Timeout(seconds=0.5):None}, 
+    {Cin:None}])
+.select()
 \end{lstlisting}
 \end{frame}
 
@@ -156,7 +149,9 @@ Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
 \section{Real-time planlægning (RTP)}
 \begin{frame}
   \frametitle{Real-time planlægning (RTP)}
-\includegraphics[scale=0.35]{Process_Model_GUI} 
+\begin{center}
+\includegraphics[scale=0.35]{gui_screenshot.pdf} 
+\end{center}
 \end{frame}
 
 \begin{frame}
@@ -179,62 +174,48 @@ Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
 
 
 \begin{frame}
-	\frametitle{RTP og PyCSP indvirkning på kommunikation ved}
+	\frametitle{RTP og PyCSP indvirkning på kommunikation}
 	\begin{itemize}
-		\item Any-to-Any Kanaler 
-	 	\item Alternation
+		\item Any-to-Any Kanaler\\
+			\vspace{0,5cm}
+			\includegraphics[scale=0.7]{any-any} 
+	 	\item Alternation\\
+			\vspace{0,5cm}
+			\includegraphics[scale=0.7]{alt-inheritance} 
 	\end{itemize} 
-\begin{center}
-	\includegraphics[scale=0.7]{alt-inheritance.pdf} 
-\end{center}
 \end{frame} 
 
+
+\begin{frame}[t]
+  \frametitle{Prioritetsnedarvning}
+\vspace{1.2cm}
+\includegraphics[scale=0.7]{nedarvning} 
+\end{frame}
+\begin{frame}[t]
+  \frametitle{Prioritetsnedarvning}
+\vspace{1.2cm}
+\includegraphics[scale=0.7]{nedarvning2} 
+\end{frame}
+\begin{frame}[t]
+  \frametitle{Prioritetsnedarvning}
+\vspace{1.2cm}
+\includegraphics[scale=0.7]{nedarvning3} 
+\end{frame}
+\begin{frame}[t]
+  \frametitle{Prioritetsnedarvning}
+\vspace{1.2cm}
+\includegraphics[scale=0.7]{nedarvning4} 
+\end{frame}
+\begin{frame}[t]
+  \frametitle{Prioritetsnedarvning}
+\vspace{1.2cm}
+\includegraphics[scale=0.7]{nedarvning5} 
+\end{frame}
 
 \begin{frame}
   \frametitle{RTP scheduler}
 \includegraphics[scale=0.9]{rtp-scheduler}
 \end{frame}
-
-\begin{frame}
-  \frametitle{Prioritetsnedarvning}
-\includegraphics[scale=0.7]{nedarvning} 
-\end{frame}
-\begin{frame}
-  \frametitle{Prioritetsnedarvning}
-\includegraphics[scale=0.7]{nedarvning2} 
-\end{frame}
-\begin{frame}
-  \frametitle{Prioritetsnedarvning}
-\includegraphics[scale=0.7]{nedarvning3} 
-\end{frame}
-\begin{frame}
-  \frametitle{Prioritetsnedarvning}
-\includegraphics[scale=0.7]{nedarvning4} 
-\end{frame}
-\begin{frame}
-  \frametitle{Prioritetsnedarvning}
-\includegraphics[scale=0.7]{nedarvning5} 
-\end{frame}
-
-
-%\subsection{Resultater}
-%\begin{frame}
-%  	\frametitle{RTP resultater}
-%	\tiny 
-%	\begin{table}[htbp]
-%		\centering
-%		\begin{tabular}{lcccc}
-%		   	\toprule
-%		    \mc{Version}&\mc{Tid i dummyproces(s)}&\mc{SA.}& \mc{Succesrate (\%)}&\mc{SA.}\\
-%		    \midrule
-%		    Greenlets         & 1.29 & 0.61 & 13 & 2  \\
-%		    RTP u. prioritet  & 1.05 & 0.28 & 24 & 6  \\
-%		    RTP m. prioritet  & 0.74 & 0.34 & 42 & 13 \\
-%		    \bottomrule
-%		\end{tabular}
-%		\caption[]{\tiny 10 * 100 grise køres igennem procesnetværket. Samtidigt køres en dummyproces.}
-%	\end{table}
-%\end{frame} 
 
 \section{Fremtidigt arbejde}
 \begin{frame}
@@ -242,16 +223,12 @@ Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
 \begin{itemize}
 \item DES
 	\begin{itemize}
-	%\item Dynamisk køskifte
-	%\item Reservering af flere ressurcer
 	\item Stopkriterium
 	\item Parallelisering
 	\end{itemize}
 \item RTP
 	\begin{itemize}
-	%\item Estimater for udførselstid
 	\item Samarbejde med operativsystemet
-	%\item Forskellige typer deadlines
 	\end{itemize}
 \end{itemize}
 \end{frame}
