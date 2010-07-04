@@ -111,7 +111,7 @@
   \begin{itemize}
 	\item Er en brugertråd
 	\item Har ingen tvungen kontekstskift
-	\item Er tid introduceret via Timeouts
+	\item Har introduceret tid via Timeouts
   \end{itemize}
 \begin{lstlisting}
 Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
@@ -119,14 +119,14 @@ Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
 \end{frame}
 
 \begin{frame}
-  \frametitle{Gennemgang af scheduler}
+  \frametitle{Gennemgang af scheduleren}
   \includegraphics[scale=0.9]{pycsp-scheduler} 
 \end{frame}
 
 \section{Simulering i diskret tid (DES)}
 \begin{frame}
-  \frametitle{Simulering i diskret tid\\
--  Simulation af Minimum Intrusion Grid
+  \frametitle{Simulering i diskret tid (DES)\\
+-  Simulering af Minimum Intrusion Grid
 }
   \includegraphics[scale=0.3]{mig}  
 \end{frame}
@@ -148,66 +148,25 @@ Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
 \end{frame}
  
 \begin{frame}
-\frametitle{Udvidelsen af scheduler}
+\frametitle{Udvidelsen af scheduleren}
 \includegraphics[scale=0.9]{des-scheduler} 
 \end{frame}
 
-% \subsection{Resultater}
-%\begin{frame}[fragile]
-%  \frametitle{Greenlets-version}
-%\begin{lstlisting}
-%@process
-%def Generator(i,number,meanTBA, meanWT,
-%              customerWRITER,barrierWRITER,barrierREADER):
-%  t_event = 0
-%  time = 0
-%  numberInserted = 0
-%  while numberInserted<number:
-%    if t_event<=time:
-%      customerWRITER(Customer(name = "Customer%d:%02d"%
-%                     (i,numberInserted),meanWT=meanWT))
-%      t_event = time + round(expovariate(1/meanTBA))
-%      numberInserted+=1
-%    barrierWRITER(0)
-%    barrierREADER()
-%    time+=1
-%  retire(customerWRITER)
-%  try:
-%    while True:
-%      barrierWRITER(0)
-%      barrierREADER()
-%      time +=1
-%  except ChannelPoisonException: 
-%    return
-%\end{lstlisting}
-%\end{frame}
-
-%\begin{frame}[fragile]
-%  \frametitle{DES-version}
-%\begin{lstlisting}
-%@process
-%def Generator(i,number,meanTBA, meanWT, customerWRITER):
-%  for numberInserted in range(number):
-%    customerWRITER(Customer(name = "Customer%d:%02d"%(i,numberInserted),
-%                            meanWT = meanWT))
-%    Wait(expovariate(1/meanTBA))
-%  retire(customerWRITER)
-%\end{lstlisting}
-%\end{frame}
 
 \section{Real-time planlægning (RTP)}
-
 \begin{frame}
   \frametitle{Real-time planlægning (RTP)}
   \begin{itemize}
 	\item Udvidelse af processer:
 	  \begin{itemize}   
 		\item Deadline
-		\item Prioritet	
+		\item Bruger prioritet
+		\item Beregnet prioritet	
+		\item Nedarvet prioritet
 	  \end{itemize}
 	\item Udvidelse af kanaler:
 	  \begin{itemize}   
-		\item Tilknytninger reader og writer processer til kanaler
+		\item Tilknytte processer med kanalender
 		\item Udvælger processer til kommunikation
 	  \end{itemize}
 \end{itemize}
@@ -215,7 +174,7 @@ Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
 
 
 \begin{frame}
-	\frametitle{RTP har indvirkning på kommunikation ved:}
+	\frametitle{RTP og PyCSP indvirkning på kommunikation ved}
 	\begin{itemize}
 		\item Any-to-Any Kanaler 
 	 	\item Alternation
@@ -293,59 +252,6 @@ Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
 \end{frame}
  
 
-
-
-
-%\section*{Vi mangler at snakke om:}
-%\begin{frame}
-%  \frametitle{Blandede noter}
-%  \begin{itemize}
-%    \item Barrierer
-%	\item shared memory
-%  \end{itemize}  
-%\end{frame}
-
-%\begin{frame}
-%  \frametitle{Blandede noter}
-%  \begin{itemize}
-%    \item Sætte begrænsning på kommunikation ifh. til tid.
-%    \item MOTIVATION!
-%  \end{itemize}
-%\end{frame}
-
-
-%\section*{Noter fra tavlen}
-%\begin{frame}
-%  \frametitle{Blandede noter}
-%  \begin{itemize}
-%    \item Håndtering af tilstande, som ikke direkter er relateret til problemet.
-%    \item Sætte begrænsning på kommunikation ifh. til tid.
-%    \item MOTIVATION!
-%  \end{itemize}
-%\end{frame}
-
-%\begin{frame}
-%  \frametitle{Anvendelse}
-%  \begin{itemize}
-%	\item MIG
-%	\item GRISE
-%	\item Fabrik
-%	\item Trafik
-%	\item vejr, hav forudsigelser mv,
-%  \end{itemize}
-%\end{frame}
-
-
-%\begin{frame}
-%  \frametitle{TID}
-%  \begin{itemize}
-%	\item Forventet mål 3-5 min
-%	\item Tidsmodel
-%	\item DES 10 min.
-%	\item RTP 5 min.
-%	\item Finale 5 min.
-%  \end{itemize}
-%\end{frame}
 
 \end{document}
 
