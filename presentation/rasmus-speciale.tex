@@ -104,6 +104,17 @@
 
 \section{Motivation og mål}
 %\subsection{Motivation}
+
+\begin{frame}
+  \frametitle{Introduktion af tid i CSP}
+  \begin{itemize}
+	\item Tilbyde en ensartet håndtering af tid i CSP
+	\item Let at anvende
+	\item Brugbar
+	\item håndtere tilstande tilknyttet tid, som ikke direkte er relateret til problemet
+  \end{itemize}
+\end{frame}
+
 \begin{frame}
   \frametitle{Tid}
   \begin{itemize}
@@ -126,15 +137,6 @@
 \end{frame}
 
 %\subsection{Mål}
-\begin{frame}
-  \frametitle{Introduktion af tid i CSP}
-  \begin{itemize}
-	\item Tilbyde en ensartet håndtering af tid i CSP
-	\item Let at anvende
-	\item Brugbar
-	\item håndtere tilstande tilknyttet tid, som ikke direkte er relateret til problemet
-  \end{itemize}
-\end{frame}
 
 \section{PyCSP}
 %\subsection{Kort overblik}
@@ -292,6 +294,7 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
     %\item Deadline exception
     \item Now()
     \item Wait()
+    \item Release()
 	  \item DeadlineException
   %  \item Scheduler 
 	%\begin{itemize}
@@ -314,7 +317,21 @@ def Generator(i,number,meanTBA, meanWT, customerWRITER):
 	%	\item timers
 	%\end{itemize}
 	\item Prioritetsinvertering
+  \begin{figure}
+  \begin{center}
+  \includegraphics[scale=0.75]{prioritetsinvertering}
+	%\caption{Uddrag af procesnetværk}
+  \end{center}
+  \end{figure}
+
 	\item Prioritetsnedarvning
+  \begin{figure}
+  \begin{center}
+  \includegraphics[scale=0.75]{prioritetsnedarvning}
+	%\caption{Uddrag af procesnetværk}
+  \end{center}
+  \end{figure}
+
   \end{itemize}
 \end{frame}
 
