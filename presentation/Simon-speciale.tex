@@ -139,13 +139,13 @@ Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
 \end{frame}
 
 
-\begin{frame}
-\frametitle{Implementering}
-  \begin{itemize}   
-	\item Udvide scheduler
-	\item Håndtering af køer
-  \end{itemize}
-\end{frame}
+%\begin{frame}
+%\frametitle{Implementering}
+%  \begin{itemize}   
+%	\item Udvide scheduler
+%	%\item Håndtering af køer
+%  \end{itemize}
+%\end{frame}
  
 \begin{frame}
 \frametitle{Udvidelsen af scheduleren}
@@ -154,6 +154,11 @@ Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
 
 
 \section{Real-time planlægning (RTP)}
+\begin{frame}
+  \frametitle{Real-time planlægning (RTP)}
+\includegraphics[scale=0.35]{Process_Model_GUI} 
+\end{frame}
+
 \begin{frame}
   \frametitle{Real-time planlægning (RTP)}
   \begin{itemize}
@@ -213,23 +218,23 @@ Alternation([{Timeout(seconds=0.5):None}, {Cin:None}]).select()
 
 
 %\subsection{Resultater}
-\begin{frame}
-  	\frametitle{RTP resultater}
-	\tiny 
-	\begin{table}[htbp]
-		\centering
-		\begin{tabular}{lcccc}
-		   	\toprule
-		    \mc{Version}&\mc{Tid i dummyproces(s)}&\mc{SA.}& \mc{Succesrate (\%)}&\mc{SA.}\\
-		    \midrule
-		    Greenlets         & 1.29 & 0.61 & 13 & 2  \\
-		    RTP u. prioritet  & 1.05 & 0.28 & 24 & 6  \\
-		    RTP m. prioritet  & 0.74 & 0.34 & 42 & 13 \\
-		    \bottomrule
-		\end{tabular}
-		\caption[]{\tiny 10 * 100 grise køres igennem procesnetværket. Samtidigt køres en dummyproces.}
-	\end{table}
-\end{frame} 
+%\begin{frame}
+%  	\frametitle{RTP resultater}
+%	\tiny 
+%	\begin{table}[htbp]
+%		\centering
+%		\begin{tabular}{lcccc}
+%		   	\toprule
+%		    \mc{Version}&\mc{Tid i dummyproces(s)}&\mc{SA.}& \mc{Succesrate (\%)}&\mc{SA.}\\
+%		    \midrule
+%		    Greenlets         & 1.29 & 0.61 & 13 & 2  \\
+%		    RTP u. prioritet  & 1.05 & 0.28 & 24 & 6  \\
+%		    RTP m. prioritet  & 0.74 & 0.34 & 42 & 13 \\
+%		    \bottomrule
+%		\end{tabular}
+%		\caption[]{\tiny 10 * 100 grise køres igennem procesnetværket. Samtidigt køres en dummyproces.}
+%	\end{table}
+%\end{frame} 
 
 \section{Fremtidigt arbejde}
 \begin{frame}
